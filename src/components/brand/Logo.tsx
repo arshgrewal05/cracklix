@@ -10,11 +10,11 @@ interface LogoProps {
 }
 
 export default function Logo({ className = "", variant = 'light', showTagline = true }: LogoProps) {
-  const isDarkBackground = variant === 'light'; 
+  const isLightVariant = variant === 'light'; 
   
   return (
-    <Link href="/" className={`flex items-center gap-3.5 group ${className}`}>
-      {/* New Premium Circular C-Tick Icon */}
+    <Link href="/" className={`flex items-center gap-[12px] group ${className}`}>
+      {/* Premium Circular C-Tick Icon */}
       <motion.div 
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -24,13 +24,13 @@ export default function Logo({ className = "", variant = 'light', showTagline = 
           {/* Orange Circle */}
           <circle cx="26" cy="26" r="24" stroke="#F97316" strokeWidth="3"/>
 
-          {/* C Shape - Color adjusts based on background */}
+          {/* C Shape - Color adjusts based on variant */}
           <motion.path
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             d="M34 14 C22 10, 12 18, 12 26 C12 34, 22 42, 34 38"
-            stroke={isDarkBackground ? "#FFFFFF" : "#0F172A"}
+            stroke={isLightVariant ? "#FFFFFF" : "#0F172A"}
             strokeWidth="5"
             strokeLinecap="round"
             fill="none"
@@ -53,15 +53,15 @@ export default function Logo({ className = "", variant = 'light', showTagline = 
 
       <div className="flex flex-col">
         <div className="flex items-baseline leading-none">
-          <span className={`text-[26px] font-black tracking-tighter ${isDarkBackground ? 'text-white' : 'text-[#0F172A]'}`}>
+          <span className={`text-[32px] font-extrabold tracking-tighter ${isLightVariant ? 'text-white' : 'text-[#0F172A]'}`}>
             Crack
           </span>
-          <span className="text-[#F97316] text-[26px] font-black tracking-tighter">
+          <span className="text-[#F97316] text-[32px] font-extrabold tracking-tighter">
             lix
           </span>
         </div>
         {showTagline && (
-          <span className={`text-[10px] font-black uppercase tracking-[0.2em] mt-1.5 ${isDarkBackground ? 'text-white/40' : 'text-[#0F172A]/40'}`}>
+          <span className={`text-[10px] font-black uppercase tracking-[0.2em] mt-1 ${isLightVariant ? 'text-white/40' : 'text-[#0F172A]/40'}`}>
             MOCK TEST DA NETFLIX
           </span>
         )}
