@@ -1,5 +1,5 @@
 export type Difficulty = 'Easy' | 'Medium' | 'Hard';
-export type ExamCategory = 'Police' | 'Clerk' | 'Teaching' | 'Banking' | 'General';
+export type BoardCategory = 'PSSSB' | 'PPSC' | 'Punjab Police' | 'Education' | 'High Court' | 'Power Sector' | 'Health' | 'Cooperative';
 
 export interface Question {
   id: string;
@@ -14,7 +14,8 @@ export interface Question {
 export interface Exam {
   id: string;
   name: string;
-  category: ExamCategory;
+  board: BoardCategory;
+  category: string;
   totalQuestions: number;
   duration: number; // minutes
   description?: string;
