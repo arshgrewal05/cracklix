@@ -29,7 +29,7 @@ export default function Navbar() {
             <Link 
               key={link.label} 
               href={link.href} 
-              className={`transition-colors hover:text-[#FF8800] ${link.active ? 'text-white' : ''}`}
+              className={`transition-colors hover:text-[#F97316] ${link.active ? 'text-white' : ''}`}
             >
               {link.label}
             </Link>
@@ -37,7 +37,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-5">
-          <Button asChild className="bg-[#FF8800] hover:bg-[#E07700] text-white font-bold px-6 py-2.5 rounded-lg h-auto hidden sm:flex border-none transition-all hover:-translate-y-0.5 shadow-lg shadow-[#FF8800]/20">
+          <Button asChild className="bg-[#F97316] hover:bg-[#EA580C] text-white font-bold px-6 py-2.5 rounded-lg h-auto hidden sm:flex border-none transition-all hover:-translate-y-0.5 shadow-lg shadow-orange-500/20">
             <Link href="/login">Login</Link>
           </Button>
           
@@ -63,13 +63,13 @@ export default function Navbar() {
               <Link 
                 key={link.label} 
                 href={link.href} 
-                className="text-[#7A8B9E] hover:text-[#FF8800] font-bold text-sm uppercase tracking-widest"
+                className="text-[#7A8B9E] hover:text-[#F97316] font-bold text-sm uppercase tracking-widest"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <Button asChild className="bg-[#FF8800] hover:bg-[#E07700] text-white font-bold w-full h-12 rounded-lg">
+            <Button asChild className="bg-[#F97316] hover:bg-[#EA580C] text-white font-bold w-full h-12 rounded-lg">
               <Link href="/login" onClick={() => setIsOpen(false)}>Login</Link>
             </Button>
           </motion.div>
