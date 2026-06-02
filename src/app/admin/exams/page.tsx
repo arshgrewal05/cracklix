@@ -126,7 +126,7 @@ export default function ExamManagement() {
           <DialogHeader className="p-10 pb-0">
             <DialogTitle className="text-3xl font-black font-headline uppercase">{editingBoard?.id ? "Update Authority" : "New Recruitment Board"}</DialogTitle>
           </DialogHeader>
-          <div className="p-10 space-y-8">
+          <div className="p-10 space-y-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
             <div className="flex justify-center">
               <div className="h-24 w-24 rounded-3xl bg-white/5 border-2 border-dashed border-white/10 flex items-center justify-center relative overflow-hidden group">
                  {editingBoard?.iconUrl ? (
@@ -155,7 +155,7 @@ export default function ExamManagement() {
               </div>
             </div>
           </div>
-          <DialogFooter className="p-10 pt-0 flex gap-4">
+          <DialogFooter className="p-10 pt-0 flex gap-4 border-t border-white/5 pt-6">
             <Button variant="ghost" onClick={() => setEditingBoard(null)} className="rounded-xl h-12 px-6 font-bold text-slate-400 hover:text-white">Cancel</Button>
             <Button className="bg-primary hover:bg-primary/90 rounded-xl h-12 px-10 font-black uppercase tracking-widest text-xs shadow-2xl" onClick={handleSave}>
               <Save className="h-4 w-4 mr-3" /> {editingBoard?.id ? "Sync Configuration" : "Initialize Board"}

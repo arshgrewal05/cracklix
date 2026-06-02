@@ -145,8 +145,8 @@ export default function AdminNotifications() {
       </Card>
 
       <Dialog open={!!editingNotice} onOpenChange={(open) => !open && setEditingNotice(null)}>
-        <DialogContent className="sm:max-w-xl rounded-[2.5rem] bg-[#0F172A] text-white border-white/10 shadow-3xl">
-          <DialogHeader className="px-2">
+        <DialogContent className="sm:max-w-xl rounded-[2.5rem] bg-[#0F172A] text-white border-white/10 shadow-3xl overflow-hidden p-0">
+          <DialogHeader className="px-10 pt-10">
             <DialogTitle className="text-3xl font-black font-headline uppercase flex items-center gap-4">
                <div className="h-10 w-10 bg-orange-500 rounded-xl flex items-center justify-center">
                   <Send className="h-5 w-5 text-white" />
@@ -154,7 +154,7 @@ export default function AdminNotifications() {
                Alert Composition
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 py-8 px-2">
+          <div className="space-y-6 py-8 px-10 max-h-[70vh] overflow-y-auto custom-scrollbar">
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Notification Headline</Label>
               <Input value={editingNotice?.title || ""} onChange={e => setEditingNotice({...editingNotice, title: e.target.value})} className="bg-white/5 border-white/10 rounded-xl h-14 font-bold text-lg" placeholder="e.g. PSSSB Clerk Result Announced" />
@@ -192,7 +192,7 @@ export default function AdminNotifications() {
                />
             </div>
           </div>
-          <DialogFooter className="border-t border-white/5 pt-6 px-2 flex gap-3">
+          <DialogFooter className="border-t border-white/5 p-10 flex gap-3">
             <Button variant="ghost" onClick={() => setEditingNotice(null)} className="text-slate-400 hover:text-white rounded-xl">Cancel Broadcast</Button>
             <Button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 px-10 font-bold rounded-xl shadow-2xl shadow-orange-900/40 h-12">
               <Send className="h-5 w-5 mr-3" /> Deploy Live
