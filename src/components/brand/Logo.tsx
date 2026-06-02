@@ -9,26 +9,31 @@ export default function Logo({ className = "", variant = 'dark' }: LogoProps) {
   const isLight = variant === 'light';
   
   return (
-    <Link href="/" className={`flex items-center gap-3 group transition-all hover:scale-[1.02] ${className}`}>
-      <div className="relative h-11 w-11 flex items-center justify-center">
-        {/* Special Punjab Map SVG Logo with Integrated Checkmark */}
+    <Link href="/" className={`flex items-center gap-2 group ${className}`}>
+      <div className="relative h-10 w-10 flex items-center justify-center shrink-0">
         <svg
           viewBox="0 0 100 100"
-          className={`h-full w-full ${isLight ? 'text-white' : 'text-[#0F172A]'}`}
+          className={`h-full w-full ${isLight ? 'text-white' : 'text-[#0B1F3A]'}`}
           fill="none"
           stroke="currentColor"
-          strokeWidth="2.5"
+          strokeWidth="3"
         >
-          {/* Detailed Punjab Map Outline */}
+          {/* Refined C Shape */}
           <path 
-            d="M52 5 L68 12 L82 35 L88 55 L78 85 L50 96 L25 88 L12 65 L8 40 L22 15 Z" 
+            d="M80 25 C 60 5, 20 20, 20 50 C 20 80, 60 95, 80 75" 
             strokeLinecap="round" 
-            strokeLinejoin="round" 
           />
-          {/* Integrated Victory Checkmark in Brand Orange */}
+          {/* Inset Punjab Outline Simplified */}
+          <path 
+            d="M45 40 L55 45 L60 60 L50 70 L40 60 Z" 
+            className={isLight ? 'text-white/40' : 'text-[#0B1F3A]/20'}
+            fill="currentColor"
+            stroke="none"
+          />
+          {/* Refined Victory Check */}
           <path
-            d="M35 55 L48 65 L72 35"
-            className="text-[#F97316]"
+            d="M40 50 L50 60 L75 35"
+            className="text-[#F59E0B]"
             fill="none"
             stroke="currentColor"
             strokeWidth="10"
@@ -38,12 +43,12 @@ export default function Logo({ className = "", variant = 'dark' }: LogoProps) {
         </svg>
       </div>
       <div className="flex flex-col leading-none">
-        <span className="font-headline text-3xl font-black tracking-tighter uppercase">
-          <span className={isLight ? 'text-white' : 'text-[#0F172A]'}>CRACK</span>
-          <span className="text-[#F97316]">LIX</span>
+        <span className="font-headline text-2xl font-bold tracking-tight">
+          <span className={isLight ? 'text-white' : 'text-[#0B1F3A]'}>Crack</span>
+          <span className="text-[#1E5EFF]">lix</span>
         </span>
-        <span className={`text-[8px] uppercase tracking-[0.3em] font-black mt-1 ${isLight ? 'text-white/60' : 'text-muted-foreground'}`}>
-          Punjab Exam Preparation
+        <span className={`text-[9px] uppercase tracking-widest font-medium ${isLight ? 'text-white/60' : 'text-muted-foreground'}`}>
+          Institutional Trust
         </span>
       </div>
     </Link>

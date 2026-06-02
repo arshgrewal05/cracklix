@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Search, User, Bell, Menu, ChevronDown } from "lucide-react"
+import { Search, Bell, Menu, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Logo from "@/components/brand/Logo"
 import {
@@ -17,21 +17,21 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-[#0F172A] border-b border-white/5 py-1 backdrop-blur-xl shadow-2xl">
-      <div className="container mx-auto flex h-18 items-center justify-between px-4">
-        <Logo variant="light" />
+    <nav className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 py-3">
+      <div className="container mx-auto flex items-center justify-between px-4">
+        <Logo variant="dark" />
 
-        <div className="hidden lg:flex items-center gap-10 text-xs font-black uppercase tracking-[0.15em] text-white/60">
-          <Link href="/" className="hover:text-primary transition-colors text-primary border-b-2 border-primary py-6">Home</Link>
+        <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-600">
+          <Link href="/exams" className="hover:text-primary transition-colors">Exams</Link>
           
           <DropdownMenu>
-            <DropdownMenuTrigger className="hover:text-primary transition-colors flex items-center gap-1.5 outline-none group py-6">
-              Exams <ChevronDown className="h-3 w-3 group-data-[state=open]:rotate-180 transition-transform" />
+            <DropdownMenuTrigger className="hover:text-primary transition-colors flex items-center gap-1.5 outline-none group">
+              Boards <ChevronDown className="h-4 w-4 group-data-[state=open]:rotate-180 transition-transform" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#0F172A] border-white/10 text-white min-w-[240px] mt-2 p-2 rounded-xl shadow-2xl">
+            <DropdownMenuContent className="bg-white border-gray-200 min-w-[200px] mt-2 p-1 rounded-lg shadow-xl">
               {boards.map(board => (
                 <DropdownMenuItem key={board} asChild>
-                  <Link href={`/exams?board=${encodeURIComponent(board)}`} className="cursor-pointer hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary rounded-lg py-3 px-4 font-bold text-[10px] uppercase tracking-widest border-b border-white/5 last:border-0 transition-colors">
+                  <Link href={`/exams?board=${encodeURIComponent(board)}`} className="cursor-pointer hover:bg-gray-50 rounded-md py-2 px-3 text-xs font-semibold">
                     {board}
                   </Link>
                 </DropdownMenuItem>
@@ -39,24 +39,24 @@ export default function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link href="/mocks" className="hover:text-primary transition-colors py-6">Mocks</Link>
-          <Link href="/pyqs" className="hover:text-primary transition-colors py-6">PYQs</Link>
-          <Link href="/current-affairs" className="hover:text-primary transition-colors py-6">Current Affairs</Link>
+          <Link href="/mocks" className="hover:text-primary transition-colors">Mock Tests</Link>
+          <Link href="/results" className="hover:text-primary transition-colors">Results</Link>
+          <Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link>
+          <Link href="/about" className="hover:text-primary transition-colors">About</Link>
         </div>
 
-        <div className="flex items-center gap-6">
-          <button className="text-white/40 hover:text-white transition-colors">
+        <div className="flex items-center gap-4">
+          <button className="text-gray-400 hover:text-gray-600 transition-colors p-2">
             <Search className="h-5 w-5" />
           </button>
-          <Link href="/notifications" className="text-white/40 hover:text-white transition-colors relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full ring-4 ring-[#0F172A]" />
+          <div className="h-6 w-[1px] bg-gray-200 hidden sm:block" />
+          <Link href="/login" className="text-sm font-semibold text-gray-700 hover:text-primary transition-colors px-2">
+            Login
           </Link>
-          <div className="h-6 w-[1px] bg-white/10 hidden sm:block" />
-          <Button asChild className="bg-primary hover:bg-primary/90 text-white font-black px-8 rounded-lg uppercase text-[10px] tracking-[0.2em] h-11 shadow-lg shadow-primary/20 transition-all active:scale-95">
-            <Link href="/admin">Login</Link>
+          <Button asChild size="sm" className="bg-[#1E5EFF] hover:bg-[#1E5EFF]/90 text-white font-bold px-6 shadow-sm">
+            <Link href="/mocks">Start Free Mock</Link>
           </Button>
-          <Button variant="ghost" size="icon" className="lg:hidden text-white">
+          <Button variant="ghost" size="icon" className="lg:hidden text-gray-600">
             <Menu className="h-6 w-6" />
           </Button>
         </div>
