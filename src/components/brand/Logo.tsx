@@ -1,3 +1,6 @@
+
+'use client';
+
 import Link from "next/link"
 
 interface LogoProps {
@@ -36,7 +39,7 @@ export default function Logo({ className = "", variant = 'dark' }: LogoProps) {
         </svg>
       </div>
       <div className="flex flex-col leading-none">
-        <span className="font-headline font-bold text-xl tracking-tighter uppercase italic">
+        <span className="font-headline font-bold text-xl tracking-tighter italic">
           <span className={isLight ? 'text-white' : 'text-[#0F172A]'}>Crack</span>
           <span className="text-[#F97316]">lix</span>
         </span>

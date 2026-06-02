@@ -1,29 +1,30 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 210 40% 98%; /* #F8FAFC */
+    --foreground: 222 47% 11%; /* #0F172A */
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
     --primary: 222 47% 11%; /* #0F172A */
     --primary-foreground: 210 40% 98%;
-    --secondary: 24.6 95% 53.1%; /* #F97316 */
+    --secondary: 221 83% 55%; /* #1E5EFF - Trust Blue */
     --secondary-foreground: 210 40% 98%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 38 92% 50%; /* #F97316 - Orange */
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 24.6 95% 53.1%;
-    --radius: 0.75rem;
+    --ring: 38 92% 50%;
+    --radius: 1rem;
   }
 
   .dark {
@@ -71,22 +72,14 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.orange-button {
-  @apply bg-[#F97316] hover:bg-[#EA580C] text-white font-bold transition-all;
-}
-
-.outline-button {
-  @apply border-2 border-white/20 hover:bg-white/10 text-white font-bold transition-all;
-}
-
-.section-title {
-  @apply text-3xl font-bold text-[#0F172A] mb-2;
-}
-
-.section-subtitle {
-  @apply text-muted-foreground mb-8;
-}
-
 .custom-shadow {
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+}
+
+.orange-btn {
+  @apply bg-[#F97316] hover:bg-[#EA580C] text-white font-bold transition-all shadow-lg shadow-orange-500/20;
+}
+
+.outline-btn {
+  @apply border-2 border-[#1E5EFF] text-[#1E5EFF] hover:bg-[#1E5EFF]/5 font-bold transition-all;
 }
