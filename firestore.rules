@@ -13,22 +13,23 @@ service cloud.firestore {
     }
 
     // Public content: Anyone can read (get/list), only authenticated users (admins) can write
-    match /boards/{id} { allow read: if true; allow write: if isAuthenticated(); }
-    match /exams/{id} { allow read: if true; allow write: if isAuthenticated(); }
-    match /subjects/{id} { allow read: if true; allow write: if isAuthenticated(); }
-    match /questions/{id} { allow read: if true; allow write: if isAuthenticated(); }
-    match /mocks/{id} { allow read: if true; allow write: if isAuthenticated(); }
-    match /current_affairs/{id} { allow read: if true; allow write: if isAuthenticated(); }
-    match /notifications/{id} { allow read: if true; allow write: if isAuthenticated(); }
-    match /settings/{id} { allow read: if true; allow write: if isAuthenticated(); }
+    // Explicitly splitting read into get and list to ensure collection-level query compatibility
+    match /boards/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
+    match /exams/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
+    match /subjects/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
+    match /questions/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
+    match /mocks/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
+    match /current_affairs/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
+    match /notifications/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
+    match /settings/{id} { allow get, list: if true; allow write: if isAuthenticated(); }
 
     // Results: Users can only read/write their own results
     match /results/{id} {
       allow create: if isAuthenticated();
-      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow get, list: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
     }
     
-    // Deployment trigger: Ensure rules are updated for content list operations
-    // Triggered at: 2024-05-20T10:05:00Z
+    // Deployment trigger: Resolving list permission errors for content collections
+    // Triggered at: 2024-05-20T10:20:00Z
   }
 }
