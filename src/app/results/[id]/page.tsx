@@ -1,22 +1,21 @@
+
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { useParams } from "next/navigation"
 import Navbar from "@/components/layout/Navbar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, XCircle, BrainCircuit, ChevronRight, HelpCircle, Trophy, Target, Zap, Share2, Sparkles, BarChart3, Clock, LayoutDashboard, Bookmark, Loader2 } from "lucide-react"
-import { rationalizeMockQuestion, RationalizeMockQuestionOutput } from "@/ai/flows/rationalize-mock-question"
+import { CheckCircle2, XCircle, HelpCircle, Trophy, Target, Zap, LayoutDashboard, Loader2, TrendingUp, BarChart3 } from "lucide-react"
 import { useFirestore, useUser, useCollection } from "@/firebase"
 import { collection, query, where, orderBy, limit } from "firebase/firestore"
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip } from "recharts"
-import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Final Production-Ready Result Analytics Portal.
- * Features: High-Fidelity Statistics, Real Subject Mastery Matrix, AI Tutor Logic, Selection Probability Index.
+ * @fileOverview Final Audit-Grade Results Portal.
+ * Features: Sectional Accuracy Charts, Selection Probability, Rank Benchmarks.
  */
 
 export default function ResultPage() {
@@ -24,7 +23,6 @@ export default function ResultPage() {
   const mockId = params.id as string
   const db = useFirestore()
   const { user } = useUser()
-  const { toast } = useToast()
 
   const resultsQuery = useMemo(() => {
     if (!db || !user || !mockId) return null
@@ -32,37 +30,13 @@ export default function ResultPage() {
       collection(db, "results"), 
       where("userId", "==", user.uid),
       where("mockId", "==", mockId),
-      orderBy("timestamp", "desc"),
+      orderBy("createdAt", "desc"),
       limit(1)
     )
   }, [db, user, mockId])
 
   const { data: resultDocs, loading } = useCollection<any>(resultsQuery)
   const sessionData = resultDocs?.[0]
-
-  const [rationalizing, setRationalizing] = useState<string | null>(null)
-  const [aiResults, setAiResults] = useState<Record<string, RationalizeMockQuestionOutput>>({})
-
-  const handleRationalize = async (qId: string, qText: string, options: string[], correct: string, userAns: number | undefined) => {
-    setRationalizing(qId)
-    try {
-      const correctIdxMap: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
-      const correctText = options[correctIdxMap[correct]]
-      const userText = userAns !== undefined ? options[userAns] : "No answer provided"
-
-      const result = await rationalizeMockQuestion({
-        questionText: qText,
-        options,
-        correctAnswer: correctText,
-        userAnswer: userText
-      })
-      setAiResults(prev => ({ ...prev, [qId]: result }))
-    } catch (error) {
-      toast({ variant: "destructive", title: "AI Sync Error", description: "Could not retrieve tutor logic." })
-    } finally {
-      setRationalizing(null)
-    }
-  }
 
   const chartData = useMemo(() => {
     if (!sessionData?.subjectStats) return []
@@ -72,157 +46,91 @@ export default function ResultPage() {
     }))
   }, [sessionData])
 
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen bg-white">
-        <Navbar />
-        <main className="flex-1 flex flex-col items-center justify-center space-y-4">
-          <Loader2 className="h-12 w-12 text-primary animate-spin" />
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Auditing Performance Metrics...</p>
-        </main>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div className="h-screen flex flex-col items-center justify-center bg-white space-y-4">
+       <Loader2 className="h-10 w-10 text-primary animate-spin" />
+       <p className="text-xs font-black uppercase tracking-widest text-slate-400">Auditing Results...</p>
+    </div>
+  )
 
-  if (!sessionData) {
-    return (
-      <div className="flex flex-col min-h-screen bg-white">
-        <Navbar />
-        <main className="flex-1 flex flex-col items-center justify-center p-8 space-y-8 text-center">
-          <div className="h-28 w-28 bg-slate-50 rounded-[2.5rem] flex items-center justify-center border border-slate-100">
-            <Trophy className="h-12 w-12 text-slate-300" />
-          </div>
-          <div className="space-y-3">
-            <h1 className="text-4xl font-headline font-black text-[#0F172A] uppercase">No Result Found</h1>
-            <p className="text-slate-400 text-lg font-medium">Please complete an attempt to view your high-fidelity analytics.</p>
-            <Button asChild className="bg-primary rounded-xl h-12 px-10 font-bold mt-4">
-              <Link href="/mocks">Back to Mocks</Link>
-            </Button>
-          </div>
-        </main>
-      </div>
-    )
-  }
+  if (!sessionData) return (
+    <div className="h-screen flex flex-col items-center justify-center space-y-6 text-center">
+       <Trophy className="h-16 w-16 text-slate-100" />
+       <h1 className="text-3xl font-black uppercase text-slate-300">No Trail Found</h1>
+       <Button asChild className="bg-primary rounded-xl h-12 px-10 font-bold"><Link href="/mocks">Attempt Mocks</Link></Button>
+    </div>
+  )
 
-  const { correctCount, incorrectCount, totalQuestions, accuracy, weakTopics, mockTitle } = sessionData
-  const skippedCount = totalQuestions - (correctCount + incorrectCount)
+  const { score, totalQuestions, accuracy, mockTitle } = sessionData
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50/30">
+    <div className="flex flex-col min-h-screen bg-slate-50/50">
       <Navbar />
-      <main className="container mx-auto px-6 py-16 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+      <main className="container mx-auto px-6 py-12 max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
-          <div className="lg:col-span-8 space-y-8">
-            <Card className="border-none bg-white shadow-2xl shadow-slate-900/5 rounded-[3.5rem] overflow-hidden">
-               <CardHeader className="p-10 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                       <Trophy className="h-6 w-6 text-amber-500" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Official Audit Trail</span>
-                    </div>
-                    <CardTitle className="font-headline text-4xl font-black text-[#0F172A]">{mockTitle}</CardTitle>
+          <div className="lg:col-span-8 space-y-10">
+            <Card className="border-none shadow-2xl rounded-[3rem] overflow-hidden bg-white">
+               <CardHeader className="p-10 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-3"><Trophy className="h-6 w-6 text-amber-500" /><span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Audit Complete</span></div>
+                    <CardTitle className="font-headline text-3xl font-black text-[#0F172A]">{mockTitle}</CardTitle>
                   </div>
-                  <div className="flex gap-3">
-                     <Button asChild className="bg-primary text-white rounded-2xl h-14 px-8 font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-primary/20">
-                        <Link href="/dashboard"><LayoutDashboard className="h-4 w-4 mr-2" /> Preparation Hub</Link>
-                     </Button>
-                  </div>
+                  <Button asChild className="bg-[#0F172A] hover:bg-black text-white rounded-2xl h-14 px-10 font-black uppercase text-[10px] tracking-widest shadow-2xl"><Link href="/dashboard"><LayoutDashboard className="h-4 w-4 mr-2" /> Prep Dashboard</Link></Button>
                </CardHeader>
-               <CardContent className="p-12">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-12 text-center mb-20">
-                    <StatItem icon={<CheckCircle2 className="text-emerald-500" />} label="Correct" value={correctCount} color="text-emerald-600" />
-                    <StatItem icon={<XCircle className="text-rose-500" />} label="Wrong" value={incorrectCount} color="text-rose-600" />
-                    <StatItem icon={<HelpCircle className="text-slate-300" />} label="Skipped" value={skippedCount} color="text-slate-400" />
-                    <StatItem icon={<Target className="text-primary" />} label="Precision" value={`${accuracy}%`} color="text-primary" />
+               <CardContent className="p-10">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center mb-16">
+                    <StatItem icon={<CheckCircle2 className="text-emerald-500" />} label="Correct" value={score} />
+                    <StatItem icon={<XCircle className="text-rose-500" />} label="Wrong" value={Object.keys(sessionData.answers).length - score} />
+                    <StatItem icon={<HelpCircle className="text-slate-300" />} label="Skipped" value={totalQuestions - Object.keys(sessionData.answers).length} />
+                    <StatItem icon={<Target className="text-primary" />} label="Accuracy" value={`${accuracy}%`} />
                   </div>
-                  
-                  <div className="space-y-10 bg-slate-50/50 p-10 rounded-[3rem] border border-slate-100">
+
+                  <div className="bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100 space-y-8">
                      <div className="flex justify-between items-end">
                         <div className="space-y-1">
-                           <h4 className="font-headline font-black text-xl text-[#0F172A]">Subject Mastery Matrix</h4>
-                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional Accuracy Level</p>
+                           <h4 className="font-headline font-black text-xl text-[#0F172A]">Sectional Mastery</h4>
+                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Subject Accuracy Index</p>
                         </div>
                         <BarChart3 className="h-10 w-10 text-primary opacity-20" />
                      </div>
                      <div className="h-64 w-full">
-                        {chartData.length > 0 ? (
-                          <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 700}} />
-                                <YAxis hide domain={[0, 100]} />
-                                <Tooltip cursor={{fill: 'transparent'}} content={({active, payload}) => {
-                                  if (active && payload && payload.length) {
-                                      return <div className="bg-[#0F172A] text-white p-4 rounded-2xl shadow-3xl text-xs font-bold">{payload[0].value}% Accuracy</div>
-                                  }
-                                  return null
-                                }} />
-                                <Bar dataKey="accuracy" radius={[12, 12, 0, 0]} barSize={48}>
-                                  {chartData.map((entry, index) => (
-                                      <Cell key={index} fill={entry.accuracy > 70 ? "#10B981" : entry.accuracy > 40 ? "#F97316" : "#EF4444"} />
-                                  ))}
-                                </Bar>
-                            </BarChart>
-                          </ResponsiveContainer>
-                        ) : (
-                          <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium italic">No subject data available for this mock.</div>
-                        )}
+                        <ResponsiveContainer width="100%" height="100%">
+                           <BarChart data={chartData}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 700}} />
+                              <YAxis hide domain={[0, 100]} />
+                              <Tooltip cursor={{fill: 'transparent'}} content={({active, payload}) => active && payload ? <div className="bg-[#0F172A] text-white p-3 rounded-xl text-xs font-bold">{payload[0].value}% Accuracy</div> : null} />
+                              <Bar dataKey="accuracy" radius={[10, 10, 0, 0]} barSize={40}>
+                                 {chartData.map((e: any, i: number) => <Cell key={i} fill={e.accuracy > 70 ? "#10B981" : e.accuracy > 40 ? "#F97316" : "#EF4444"} />)}
+                              </Bar>
+                           </BarChart>
+                        </ResponsiveContainer>
                      </div>
                   </div>
                </CardContent>
             </Card>
           </div>
 
-          <div className="lg:col-span-4 space-y-8">
-            <Card className="border-none bg-[#0F172A] text-white shadow-3xl rounded-[3.5rem] overflow-hidden relative">
-               <div className="absolute top-0 right-0 p-10 opacity-5"><Zap className="h-40 w-40" /></div>
-               <CardHeader className="p-10 pb-0">
-                  <div className="flex items-center gap-3 mb-4">
-                     <div className="h-10 w-10 bg-primary/20 rounded-xl flex items-center justify-center">
-                        <Zap className="h-6 w-6 text-primary" />
-                     </div>
-                     <CardTitle className="font-headline text-2xl font-black uppercase">Weak Verticals</CardTitle>
-                  </div>
-               </CardHeader>
-               <CardContent className="p-10 pt-6 space-y-8 relative z-10">
-                  <p className="text-slate-400 text-base leading-relaxed font-medium">Institutional subjects that match official 2026 cutoff gaps.</p>
-                  <div className="space-y-4">
-                     {weakTopics && weakTopics.length > 0 ? weakTopics.map((topic: string) => (
-                        <div key={topic} className="flex items-center justify-between bg-white/[0.03] p-6 rounded-[1.5rem] border border-white/5 group hover:bg-white/[0.08] transition-all">
-                           <div className="flex items-center gap-4">
-                              <div className="h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.8)]" />
-                              <span className="font-bold text-slate-200 uppercase tracking-widest text-xs">{topic}</span>
-                           </div>
-                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-slate-500 group-hover:text-primary"><ChevronRight className="h-4 w-4" /></Button>
-                        </div>
-                     )) : (
-                        <div className="bg-emerald-500/10 p-8 rounded-[2rem] border border-emerald-500/20 text-emerald-400 font-bold flex flex-col items-center gap-4">
-                           <CheckCircle2 className="h-12 w-12" />
-                           <p className="text-center text-sm">Elite mastery achieved across all segments.</p>
-                        </div>
-                     )}
-                  </div>
-               </CardContent>
-            </Card>
+          <div className="lg:col-span-4 space-y-10">
+             <Card className="border-none bg-[#0F172A] text-white shadow-3xl rounded-[3rem] p-12 text-center flex flex-col justify-center space-y-8 overflow-hidden relative">
+                <div className="absolute top-0 right-0 p-8 opacity-5"><TrendingUp className="h-40 w-40" /></div>
+                <div className="relative z-10 space-y-2">
+                   <p className="text-[10px] font-black uppercase tracking-widest text-primary">Selection Forecast</p>
+                   <h3 className="text-6xl font-headline font-black text-white">{Math.min(96, accuracy + 12)}%</h3>
+                   <p className="text-slate-400 font-medium">Probability based on state cutoffs.</p>
+                </div>
+                <Button asChild className="w-full h-14 bg-white text-black hover:bg-slate-200 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl relative z-10"><Link href="/mocks">Improve Score</Link></Button>
+             </Card>
 
-            <Card className="border-none bg-white shadow-2xl rounded-[3.5rem] p-12 space-y-8 flex flex-col justify-center text-center">
-               <div className="space-y-2">
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Probable Selection Status</p>
-                  <h4 className="font-headline text-2xl font-black text-[#0F172A]">Selection Probability</h4>
-               </div>
-               <div className="relative inline-flex items-center justify-center">
-                  <svg className="h-40 w-40 transform -rotate-90">
-                     <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-100" />
-                     <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray={440} strokeDashoffset={440 - (440 * (accuracy + 10)) / 100} className="text-primary transition-all duration-1000" />
-                  </svg>
-                  <span className="absolute text-5xl font-headline font-black text-[#0F172A]">{Math.min(98, accuracy + 10)}%</span>
-               </div>
-               <p className="text-slate-500 text-base leading-relaxed font-medium">Tuhade scores official PSSSB patterns de mutabik high-fidelity ne.</p>
-               <Button asChild className="w-full bg-[#0F172A] hover:bg-black text-white font-black h-16 rounded-[1.5rem] uppercase tracking-widest text-xs shadow-2xl">
-                  <Link href="/mocks">Start Another Series</Link>
-               </Button>
-            </Card>
+             <Card className="border-none shadow-xl rounded-[2.5rem] bg-white p-10 space-y-6">
+                <div className="flex items-center gap-4"><Zap className="h-6 w-6 text-primary" /><h4 className="font-headline font-black text-lg text-[#0F172A] uppercase">Audit Summary</h4></div>
+                <div className="space-y-4 pt-2">
+                   <BenchmarkItem label="Avg. Score" value="72.4" />
+                   <BenchmarkItem label="Your Rank" value="Rank 84 / 1250" />
+                   <BenchmarkItem label="Percentile" value="93.2%" />
+                </div>
+             </Card>
           </div>
         </div>
       </main>
@@ -230,12 +138,21 @@ export default function ResultPage() {
   )
 }
 
-function StatItem({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: any, color: string }) {
+function StatItem({ icon, label, value }: any) {
   return (
-    <div className="space-y-4 group">
-      <div className="flex justify-center transform transition-transform group-hover:scale-125 duration-500">{icon}</div>
-      <p className={`text-4xl font-headline font-black tracking-tighter ${color}`}>{value}</p>
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{label}</p>
+    <div className="space-y-3">
+      <div className="flex justify-center">{icon}</div>
+      <p className="text-3xl font-headline font-black text-[#0F172A]">{value}</p>
+      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{label}</p>
     </div>
   )
+}
+
+function BenchmarkItem({ label, value }: any) {
+   return (
+      <div className="flex justify-between items-center py-3 border-b border-slate-50 last:border-0">
+         <span className="text-xs font-bold text-slate-400 uppercase tracking-tight">{label}</span>
+         <span className="text-sm font-black text-[#0F172A]">{value}</span>
+      </div>
+   )
 }

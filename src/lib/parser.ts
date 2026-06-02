@@ -26,7 +26,7 @@ export function parseBulkQuestions(
       const aMatch = block.match(/A\.\s*([\s\S]*?)(?=B\.)/i);
       const bMatch = block.match(/B\.\s*([\s\S]*?)(?=C\.)/i);
       const cMatch = block.match(/C\.\s*([\s\S]*?)(?=D\.)/i);
-      const dMatch = block.match(/D\.\s*([\s\S]*?)(?=Answer:|$|Explanation:)/i);
+      const dMatch = block.match(/D\.\s*([\s\S]*?)(?=Answer:|$|Explanation:|Solution:)/i);
 
       // Extract Answer: A/B/C/D
       const answerMatch = block.match(/Answer:\s*([A-D])/i);
@@ -44,8 +44,7 @@ export function parseBulkQuestions(
         optionBEn: bMatch[1].trim(),
         optionCEn: cMatch[1].trim(),
         optionDEn: dMatch[1].trim(),
-        // Punjabi fields left empty for bulk English import, can be filled manually or handled by translator later
-        questionPa: "",
+        questionPa: "", // Left for manual/AI translation later
         optionAPa: "",
         optionBPa: "",
         optionCPa: "",
