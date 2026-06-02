@@ -1,5 +1,4 @@
-
-"use client"
+'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { LayoutDashboard, Database, ClipboardList, TrendingUp, Settings, Users, LogOut, Bell, ShieldCheck, GraduationCap, Zap, Newspaper, AlertCircle, AlertTriangle, FileText } from "lucide-react"
@@ -16,7 +15,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
 
   useEffect(() => {
-    if (!loading && (!user || (profile?.role !== 'ADMIN' && profile?.role !== 'SUPER_ADMIN'))) {
+    // Force Admin access for the founder email
+    const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || user?.email === 'arshdeepgrewal1122@gmail.com';
+
+    if (!loading && (!user || !isAdmin)) {
       router.push('/login')
     }
   }, [user, profile, loading, router])
@@ -28,7 +30,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading) return <div className="h-screen w-full bg-[#0F172A] flex items-center justify-center"><ShieldCheck className="h-10 w-10 text-primary animate-pulse" /></div>
   
-  if (!profile || (profile.role !== 'ADMIN' && profile.role !== 'SUPER_ADMIN')) return null
+  // Force Admin access for the founder email
+  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || user?.email === 'arshdeepgrewal1122@gmail.com';
+
+  if (!user || !isAdmin) return null
 
   return (
     <SidebarProvider>
@@ -75,7 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <SidebarGroup className="mt-auto pb-8">
               <SidebarMenu>
-                {profile.role === 'SUPER_ADMIN' && <AdminNavItem icon={<Settings />} label="Portal Settings" href="/admin/settings" />}
+                {(profile?.role === 'SUPER_ADMIN' || user?.email === 'arshdeepgrewal1122@gmail.com') && <AdminNavItem icon={<Settings />} label="Portal Settings" href="/admin/settings" />}
                 <SidebarMenuItem>
                    <SidebarMenuButton onClick={handleLogout} className="px-6 text-destructive/70 hover:bg-destructive/10 hover:text-destructive transition-colors">
                     <LogOut className="h-4 w-4 mr-2" /> Logout Portal
@@ -99,13 +104,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold leading-none">{profile.name}</p>
+                  <p className="text-sm font-bold leading-none">{profile?.name || 'System Admin'}</p>
                   <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-1">
-                    {profile.role === 'SUPER_ADMIN' ? 'Founder & Lead' : 'Content Admin'}
+                    {profile?.role === 'SUPER_ADMIN' || user?.email === 'arshdeepgrewal1122@gmail.com' ? 'Founder & Lead' : 'Content Admin'}
                   </p>
                 </div>
                 <div className="h-9 w-9 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/20">
-                  <span className="font-black text-primary text-xs">{profile.name.split(' ').map(n => n[0]).join('')}</span>
+                  <span className="font-black text-primary text-xs">{profile?.name?.split(' ').map(n => n[0]).join('') || 'SA'}</span>
                 </div>
               </div>
             </div>

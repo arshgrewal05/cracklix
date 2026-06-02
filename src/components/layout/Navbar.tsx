@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from "next/link";
@@ -49,7 +48,8 @@ export default function Navbar() {
     { label: "Current Affairs", href: "/current-affairs" },
   ];
 
-  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN';
+  // Force Admin access for the founder email
+  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || user?.email === 'arshdeepgrewal1122@gmail.com';
 
   return (
     <div className="sticky top-0 z-[1000] w-full">
