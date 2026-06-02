@@ -16,10 +16,16 @@ export default function QuestionPalette({
   onSelect
 }: QuestionPaletteProps) {
   return (
-    <div className="p-4 bg-card border rounded-xl">
-      <h3 className="font-headline font-bold mb-4 text-sm uppercase tracking-wider text-muted-foreground">
-        Question Palette
-      </h3>
+    <div className="p-6 bg-card border rounded-2xl shadow-sm">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-headline font-black text-xs uppercase tracking-widest text-muted-foreground">
+          Question Palette
+        </h3>
+        <span className="text-[10px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded">
+          {answeredIndices.length} / {totalQuestions} Done
+        </span>
+      </div>
+      
       <div className="question-palette-grid">
         {Array.from({ length: totalQuestions }).map((_, i) => {
           const isCurrent = currentIndex === i
@@ -31,34 +37,43 @@ export default function QuestionPalette({
               key={i}
               onClick={() => onSelect(i)}
               className={cn(
-                "h-9 w-9 rounded-md text-xs font-bold transition-all border flex items-center justify-center",
-                isCurrent && "border-primary ring-2 ring-primary/20 bg-primary/10 text-primary",
+                "h-10 w-10 rounded-xl text-xs font-bold transition-all border-2 flex items-center justify-center",
+                isCurrent && "border-primary bg-primary/10 text-primary shadow-lg shadow-primary/10",
                 !isCurrent && isAnswered && "bg-secondary border-secondary text-secondary-foreground",
-                !isCurrent && isFlagged && "bg-yellow-500/10 border-yellow-500 text-yellow-500",
-                !isCurrent && !isAnswered && !isFlagged && "bg-muted/50 hover:bg-muted"
+                !isCurrent && isFlagged && "bg-orange-500 border-orange-500 text-white",
+                !isCurrent && !isAnswered && !isFlagged && "bg-muted/30 border-transparent hover:border-muted-foreground/20 text-muted-foreground"
               )}
             >
-              {i + 1}
+              {(i + 1).toString().padStart(2, '0')}
             </button>
           )
         })}
       </div>
 
-      <div className="mt-8 space-y-2 border-t pt-4">
-        <LegendItem color="bg-primary/20 border-primary" label="Current" />
-        <LegendItem color="bg-secondary" label="Answered" />
-        <LegendItem color="bg-yellow-500/20 border-yellow-500" label="Review later" />
-        <LegendItem color="bg-muted/50" label="Not Answered" />
+      <div className="mt-8 pt-6 border-t border-foreground/5 grid grid-cols-2 gap-y-3 gap-x-4">
+        <LegendItem variant="current" label="Current" />
+        <LegendItem variant="answered" label="Answered" />
+        <LegendItem variant="flagged" label="Review" />
+        <LegendItem variant="not-answered" label="Remaining" />
       </div>
     </div>
   )
 }
 
-function LegendItem({ color, label }: { color: string, label: string }) {
+function LegendItem({ variant, label }: { variant: 'current' | 'answered' | 'flagged' | 'not-answered', label: string }) {
+  const getStyles = () => {
+    switch (variant) {
+      case 'current': return "bg-primary/20 border-primary"
+      case 'answered': return "bg-secondary"
+      case 'flagged': return "bg-orange-500"
+      case 'not-answered': return "bg-muted/30"
+    }
+  }
+
   return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <div className={cn("h-3 w-3 rounded", color)} />
-      <span>{label}</span>
+    <div className="flex items-center gap-2">
+      <div className={cn("h-3 w-3 rounded-md", getStyles())} />
+      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{label}</span>
     </div>
   )
 }
