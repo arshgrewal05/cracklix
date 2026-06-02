@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
@@ -28,7 +27,7 @@ import { Badge } from "@/components/ui/badge"
 
 /**
  * @fileOverview Final Production-Ready CBT Attempt Engine.
- * Features: Timer, Palette, 10s Auto-Save, Session Recovery, Bilingual Toggles, Weak Topic Analysis.
+ * Features: Timer, Palette, 10s Auto-Save, Session Recovery, Bilingual Toggles, Detailed Subject Analytics.
  */
 
 export default function MockAttemptPage() {
@@ -74,7 +73,7 @@ export default function MockAttemptPage() {
     fetchQuestions()
   }, [db, mockConfig])
 
-  // 2. Cloud Session Recovery (Arsh Grewal Management Logic)
+  // 2. Cloud Session Recovery
   useEffect(() => {
     if (!db || !user || !mockId) return
     const sessionRef = doc(db, "test_sessions", `${user.uid}_${mockId}`)
@@ -123,26 +122,27 @@ export default function MockAttemptPage() {
     if (isSubmitting || questions.length === 0) return
     setIsSubmitting(true)
 
-    const correctCount = questions.reduce((acc, q, idx) => {
-      const userAns = answers[idx]
-      const correctMap: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
-      return userAns === correctMap[q.correctAnswer] ? acc + 1 : acc
-    }, 0)
-    
-    const topicStats: Record<string, { total: number; correct: number }> = {}
+    const correctMap: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
+    const subjectStats: Record<string, { total: number; correct: number; attempted: number }> = {}
+
+    let correctCount = 0
     questions.forEach((q, idx) => {
-      const topic = q.subjectId || "General"
-      if (!topicStats[topic]) topicStats[topic] = { total: 0, correct: 0 }
-      topicStats[topic].total++
+      const subject = q.subjectId || "General"
+      if (!subjectStats[subject]) subjectStats[subject] = { total: 0, correct: 0, attempted: 0 }
+      
+      subjectStats[subject].total++
       if (answers[idx] !== undefined) {
-         const correctMap: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
-         if (answers[idx] === correctMap[q.correctAnswer]) topicStats[topic].correct++
+        subjectStats[subject].attempted++
+        if (answers[idx] === correctMap[q.correctAnswer]) {
+          subjectStats[subject].correct++
+          correctCount++
+        }
       }
     })
 
-    const weakTopics = Object.entries(topicStats)
-      .filter(([topic, stats]) => (stats.correct / stats.total) < 0.6)
-      .map(([topic]) => topic)
+    const weakTopics = Object.entries(subjectStats)
+      .filter(([_, stats]) => (stats.correct / (stats.total || 1)) < 0.6)
+      .map(([subject]) => subject)
 
     const resultData = {
       mockId, 
@@ -155,6 +155,7 @@ export default function MockAttemptPage() {
       skippedCount: questions.length - Object.keys(answers).length,
       totalQuestions: questions.length, 
       weakTopics, 
+      subjectStats,
       timestamp: new Date().toISOString(), 
       answers
     }

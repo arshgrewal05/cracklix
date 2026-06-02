@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
@@ -7,58 +6,55 @@ import Navbar from "@/components/layout/Navbar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, XCircle, BrainCircuit, ChevronRight, HelpCircle, Trophy, Target, Zap, Share2, Sparkles, BarChart3, Clock, LayoutDashboard, Bookmark } from "lucide-react"
+import { CheckCircle2, XCircle, BrainCircuit, ChevronRight, HelpCircle, Trophy, Target, Zap, Share2, Sparkles, BarChart3, Clock, LayoutDashboard, Bookmark, Loader2 } from "lucide-react"
 import { rationalizeMockQuestion, RationalizeMockQuestionOutput } from "@/ai/flows/rationalize-mock-question"
-import { useFirestore } from "@/firebase"
-import { collection, getDocs, query, where, addDoc } from "firebase/firestore"
+import { useFirestore, useUser, useCollection } from "@/firebase"
+import { collection, query, where, orderBy, limit } from "firebase/firestore"
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip } from "recharts"
 import { useToast } from "@/hooks/use-toast"
 
 /**
  * @fileOverview Final Production-Ready Result Analytics Portal.
- * Features: High-Fidelity Statistics, Subject Mastery Matrix, AI Tutor Logic, Selection Probability Index.
+ * Features: High-Fidelity Statistics, Real Subject Mastery Matrix, AI Tutor Logic, Selection Probability Index.
  */
 
 export default function ResultPage() {
   const params = useParams()
   const mockId = params.id as string
   const db = useFirestore()
+  const { user } = useUser()
   const { toast } = useToast()
+
+  const resultsQuery = useMemo(() => {
+    if (!db || !user || !mockId) return null
+    return query(
+      collection(db, "results"), 
+      where("userId", "==", user.uid),
+      where("mockId", "==", mockId),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    )
+  }, [db, user, mockId])
+
+  const { data: resultDocs, loading } = useCollection<any>(resultsQuery)
+  const sessionData = resultDocs?.[0]
 
   const [rationalizing, setRationalizing] = useState<string | null>(null)
   const [aiResults, setAiResults] = useState<Record<string, RationalizeMockQuestionOutput>>({})
-  const [sessionData, setSessionData] = useState<any>(null)
-  const [questions, setQuestions] = useState<any[]>([])
 
-  useEffect(() => {
-    const saved = localStorage.getItem(`last_result_${mockId}`)
-    if (saved) {
-      const data = JSON.parse(saved)
-      setSessionData(data)
-      
-      if (db && data.mockId) {
-        const fetchQs = async () => {
-             const qData: any[] = []
-             const qQuery = query(collection(db, "questions"), where("id", "in", data.mockId))
-             // Fetching full data for audited rationalization
-             const qSnap = await getDocs(collection(db, "questions"))
-             const filtered = qSnap.docs.filter(d => data.mockId.includes(d.id)).map(d => d.data())
-             setQuestions(qSnap.docs.map(d => d.data()))
-        }
-        fetchQs()
-      }
-    }
-  }, [mockId, db])
-
-  const handleRationalize = async (qId: string, qText: string, options: string[], correct: number, userAns: number | undefined) => {
+  const handleRationalize = async (qId: string, qText: string, options: string[], correct: string, userAns: number | undefined) => {
     setRationalizing(qId)
     try {
+      const correctIdxMap: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 }
+      const correctText = options[correctIdxMap[correct]]
+      const userText = userAns !== undefined ? options[userAns] : "No answer provided"
+
       const result = await rationalizeMockQuestion({
         questionText: qText,
         options,
-        correctAnswer: options[correct],
-        userAnswer: userAns !== undefined ? options[userAns] : "No answer provided"
+        correctAnswer: correctText,
+        userAnswer: userText
       })
       setAiResults(prev => ({ ...prev, [qId]: result }))
     } catch (error) {
@@ -69,35 +65,47 @@ export default function ResultPage() {
   }
 
   const chartData = useMemo(() => {
-    if (!sessionData) return []
-    // Simulated sectional breakdown for high-fidelity feel
-    return [
-      { name: "Punjabi", accuracy: sessionData.accuracy + 5 },
-      { name: "Punjab GK", accuracy: sessionData.accuracy - 8 },
-      { name: "Aptitude", accuracy: sessionData.accuracy + 12 },
-      { name: "English", accuracy: sessionData.accuracy - 3 }
-    ]
+    if (!sessionData?.subjectStats) return []
+    return Object.entries(sessionData.subjectStats).map(([name, stats]: [string, any]) => ({
+      name,
+      accuracy: Math.round((stats.correct / (stats.attempted || 1)) * 100)
+    }))
   }, [sessionData])
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white">
+        <Navbar />
+        <main className="flex-1 flex flex-col items-center justify-center space-y-4">
+          <Loader2 className="h-12 w-12 text-primary animate-spin" />
+          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Auditing Performance Metrics...</p>
+        </main>
+      </div>
+    )
+  }
 
   if (!sessionData) {
     return (
       <div className="flex flex-col min-h-screen bg-white">
         <Navbar />
         <main className="flex-1 flex flex-col items-center justify-center p-8 space-y-8 text-center">
-          <div className="h-28 w-28 bg-slate-50 rounded-[2.5rem] flex items-center justify-center animate-pulse border border-slate-100">
+          <div className="h-28 w-28 bg-slate-50 rounded-[2.5rem] flex items-center justify-center border border-slate-100">
             <Trophy className="h-12 w-12 text-slate-300" />
           </div>
           <div className="space-y-3">
-            <h1 className="text-4xl font-headline font-black text-[#0F172A] uppercase">Generating Audit</h1>
-            <p className="text-slate-400 text-lg font-medium">Analysing your high-fidelity performance metrics...</p>
+            <h1 className="text-4xl font-headline font-black text-[#0F172A] uppercase">No Result Found</h1>
+            <p className="text-slate-400 text-lg font-medium">Please complete an attempt to view your high-fidelity analytics.</p>
+            <Button asChild className="bg-primary rounded-xl h-12 px-10 font-bold mt-4">
+              <Link href="/mocks">Back to Mocks</Link>
+            </Button>
           </div>
         </main>
       </div>
     )
   }
 
-  const { correctCount, incorrectCount, totalQuestions, answers, accuracy, weakTopics, mockTitle } = sessionData
-  const skippedCount = totalQuestions - (Object.keys(answers).length)
+  const { correctCount, incorrectCount, totalQuestions, accuracy, weakTopics, mockTitle } = sessionData
+  const skippedCount = totalQuestions - (correctCount + incorrectCount)
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/30">
@@ -111,7 +119,7 @@ export default function ResultPage() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                        <Trophy className="h-6 w-6 text-amber-500" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Institutional Audit Summary</span>
+                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Official Audit Trail</span>
                     </div>
                     <CardTitle className="font-headline text-4xl font-black text-[#0F172A]">{mockTitle}</CardTitle>
                   </div>
@@ -133,29 +141,33 @@ export default function ResultPage() {
                      <div className="flex justify-between items-end">
                         <div className="space-y-1">
                            <h4 className="font-headline font-black text-xl text-[#0F172A]">Subject Mastery Matrix</h4>
-                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sectional Accuracy Level</p>
+                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional Accuracy Level</p>
                         </div>
                         <BarChart3 className="h-10 w-10 text-primary opacity-20" />
                      </div>
                      <div className="h-64 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                           <BarChart data={chartData}>
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 700}} />
-                              <YAxis hide domain={[0, 100]} />
-                              <Tooltip cursor={{fill: 'transparent'}} content={({active, payload}) => {
-                                 if (active && payload && payload.length) {
-                                    return <div className="bg-[#0F172A] text-white p-4 rounded-2xl shadow-3xl text-xs font-bold">{payload[0].value}% Accuracy</div>
-                                 }
-                                 return null
-                              }} />
-                              <Bar dataKey="accuracy" radius={[12, 12, 0, 0]} barSize={48}>
-                                 {chartData.map((entry, index) => (
-                                    <Cell key={index} fill={entry.accuracy > 70 ? "#10B981" : entry.accuracy > 40 ? "#F97316" : "#EF4444"} />
-                                 ))}
-                              </Bar>
-                           </BarChart>
-                        </ResponsiveContainer>
+                        {chartData.length > 0 ? (
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 700}} />
+                                <YAxis hide domain={[0, 100]} />
+                                <Tooltip cursor={{fill: 'transparent'}} content={({active, payload}) => {
+                                  if (active && payload && payload.length) {
+                                      return <div className="bg-[#0F172A] text-white p-4 rounded-2xl shadow-3xl text-xs font-bold">{payload[0].value}% Accuracy</div>
+                                  }
+                                  return null
+                                }} />
+                                <Bar dataKey="accuracy" radius={[12, 12, 0, 0]} barSize={48}>
+                                  {chartData.map((entry, index) => (
+                                      <Cell key={index} fill={entry.accuracy > 70 ? "#10B981" : entry.accuracy > 40 ? "#F97316" : "#EF4444"} />
+                                  ))}
+                                </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        ) : (
+                          <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium italic">No subject data available for this mock.</div>
+                        )}
                      </div>
                   </div>
                </CardContent>
@@ -176,7 +188,7 @@ export default function ResultPage() {
                <CardContent className="p-10 pt-6 space-y-8 relative z-10">
                   <p className="text-slate-400 text-base leading-relaxed font-medium">Institutional subjects that match official 2026 cutoff gaps.</p>
                   <div className="space-y-4">
-                     {weakTopics.length > 0 ? weakTopics.map((topic: string) => (
+                     {weakTopics && weakTopics.length > 0 ? weakTopics.map((topic: string) => (
                         <div key={topic} className="flex items-center justify-between bg-white/[0.03] p-6 rounded-[1.5rem] border border-white/5 group hover:bg-white/[0.08] transition-all">
                            <div className="flex items-center gap-4">
                               <div className="h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.8)]" />

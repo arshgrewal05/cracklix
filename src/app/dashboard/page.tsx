@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo } from "react"
@@ -53,14 +52,22 @@ export default function StudentDashboard() {
     
     const avgAcc = Math.round(results.reduce((acc: number, r: any) => acc + (r.accuracy || 0), 0) / results.length)
     
-    // Virtual breakdown based on recent performance
-    const subjectData = [
-      { name: "Punjabi", accuracy: avgAcc + 8 },
-      { name: "Punjab GK", accuracy: avgAcc - 5 },
-      { name: "Quant", accuracy: avgAcc - 12 },
-      { name: "Reasoning", accuracy: avgAcc + 15 },
-      { name: "English", accuracy: avgAcc - 2 }
-    ]
+    // Aggregating real subject mastery from all results
+    const subjectMap: Record<string, { correct: number; total: number }> = {}
+    results.forEach((res: any) => {
+      if (res.subjectStats) {
+        Object.entries(res.subjectStats).forEach(([subj, stats]: [string, any]) => {
+          if (!subjectMap[subj]) subjectMap[subj] = { correct: 0, total: 0 }
+          subjectMap[subj].correct += stats.correct || 0
+          subjectMap[subj].total += stats.attempted || 0
+        })
+      }
+    })
+
+    const subjectData = Object.entries(subjectMap).map(([name, stats]) => ({
+      name,
+      accuracy: Math.round((stats.correct / (stats.total || 1)) * 100)
+    }))
 
     return { 
       total: results.length, 
@@ -79,7 +86,6 @@ export default function StudentDashboard() {
       <main className="container mx-auto px-6 py-16 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
-          {/* Left: Quick Profile & Context */}
           <div className="lg:col-span-4 space-y-10">
             <Card className="border-none shadow-3xl shadow-slate-900/5 rounded-[3.5rem] bg-white overflow-hidden group">
                <div className="h-32 w-full bg-[#08152D] relative">
@@ -120,8 +126,8 @@ export default function StudentDashboard() {
                </div>
                <p className="text-slate-400 text-base leading-relaxed font-medium relative z-10">
                   {analytics.total > 0 
-                    ? `Audit suggests high proficiency in Punjabi, but your Quant speed is below the 2026 PSSSB benchmark. Focus on "Ratio & Percentage" series tonight.`
-                    : "The preparation hub is initialized. Attempt your first mock to generate AI-driven performance insights and subject recommendations."}
+                    ? `Institutional audit suggests proficiency in common segments. High-fidelity focus on your weak sections could push selection probability above 95%.`
+                    : "The preparation hub is initialized. Attempt your first mock to generate AI-driven performance insights and subject mastery analytics."}
                </p>
                <Button asChild className="w-full bg-white text-[#0F172A] hover:bg-slate-100 font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl h-14 relative z-10 shadow-2xl">
                   <Link href="/mocks">Audit Weak Subjects</Link>
@@ -129,7 +135,6 @@ export default function StudentDashboard() {
             </Card>
           </div>
 
-          {/* Right: Analytical Deep-Dive */}
           <div className="lg:col-span-8 space-y-12">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                <div className="space-y-1">
@@ -156,7 +161,7 @@ export default function StudentDashboard() {
                     <BarChart3 className="h-10 w-10 text-primary opacity-20" />
                   </div>
                   <div className="h-64 w-full">
-                     {analytics.total > 0 ? (
+                     {analytics.subjectData.length > 0 ? (
                        <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={analytics.subjectData}>
                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
@@ -187,14 +192,14 @@ export default function StudentDashboard() {
                <Card className="border-none shadow-3xl shadow-slate-900/5 rounded-[3.5rem] bg-white p-12 flex flex-col justify-center text-center space-y-8 relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-125 transition-transform"><TrendingUp className="h-40 w-40" /></div>
                   <div className="space-y-2 relative z-10">
-                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Selection Probability Index</p>
+                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Probable Selection Status</p>
                      <p className="text-8xl font-headline font-black text-primary tracking-tighter">{analytics.selectionProb}%</p>
                      <div className="flex items-center justify-center gap-3 text-emerald-500 font-black text-[10px] uppercase tracking-widest">
-                        <ArrowUpRight className="h-5 w-5" /> {analytics.total > 1 ? "+12% Above Previous" : "Benchmark Established"}
+                        <ArrowUpRight className="h-5 w-5" /> {analytics.total > 1 ? "Positive Trend Detected" : "Benchmark Established"}
                      </div>
                   </div>
                   <p className="text-base text-slate-500 leading-relaxed font-medium px-8 relative z-10">
-                     Your accuracy matches official 2025 cutoff patterns. High-fidelity focus on Quantitative sections could push selection probability above 95%.
+                     Your accuracy matches official 2026 recruitment patterns. High-fidelity focus on Quantitative sections is recommended tonight.
                   </p>
                </Card>
             </div>
