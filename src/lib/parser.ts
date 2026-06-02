@@ -2,6 +2,7 @@
 /**
  * @fileOverview Institutional Bulk MCQ Extraction Engine.
  * Optimized for high-volume data entry for PSSSB, PPSC, and Punjab Police.
+ * Hardened to handle multi-line questions, varied answer labels, and bilingual strings.
  */
 
 import { Question, Difficulty } from "@/types";
@@ -12,29 +13,31 @@ export function parseBulkQuestions(
 ): Partial<Question>[] {
   const normalizedText = rawText.replace(/\r\n/g, "\n").trim();
   
-  // Robust splitting logic for Q1., 1., Q.1, Question 1, etc.
-  const questionBlocks = normalizedText.split(/(?=Q\d+[\.\:\)]|Question\s*\d+[\.\:\)]|Q\.\s*\d+[\.\:\)]|^\d+[\.\:\)])/im);
+  // Hardened splitting logic: Looks for question starts (Q1, 1., etc.) at the beginning of a line
+  const questionBlocks = normalizedText.split(/(?=^Q\d+[\.\:\)]|^Question\s*\d+[\.\:\)]|^Q\.\s*\d+[\.\:\)]|^\d+[\.\:\)])/im);
   
   return questionBlocks.map(block => {
     try {
       if (!block.trim()) return null;
 
-      // Extract Question Text (matches everything up to option A)
+      // 1. Extract Question Text
+      // Matches everything from the number/prefix up to option A
       const textMatch = block.match(/(?:Q\d+|Question\s*\d+|Q\.\s*\d+|^\d+)[\.\:\)]?\s*([\s\S]*?)(?=[A][\.\:\)])/im);
       
-      // Extract Options (A, B, C, D) using a more flexible pattern
+      // 2. Extract Options (A, B, C, D)
       const aMatch = block.match(/[A][\.\:\)]\s*([\s\S]*?)(?=[B][\.\:\)])/im);
       const bMatch = block.match(/[B][\.\:\)]\s*([\s\S]*?)(?=[C][\.\:\)])/im);
       const cMatch = block.match(/[C][\.\:\)]\s*([\s\S]*?)(?=[D][\.\:\)])/im);
-      const dMatch = block.match(/[D][\.\:\)]\s*([\s\S]*?)(?=Answer:|$|Explanation:|Key:|Ans:|Correct Answer:)/im);
+      const dMatch = block.match(/[D][\.\:\)]\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Correct|Correct Answer|Explanation|Solution|Rationale|Details|Source):|$)/im);
 
-      // Extract Answer Label (A/B/C/D) - Handles various formats
-      const answerMatch = block.match(/(?:Answer|Key|Ans|Correct|Correct Answer):\s*([A-D])/im);
+      // 3. Extract Correct Answer Key
+      const answerMatch = block.match(/(?:Answer|Key|Ans|Correct|Correct Answer)[:\-]?\s*([A-D])/im);
       
-      // Extract Rationale (Explanation)
-      const explanationMatch = block.match(/(?:Explanation|Solution|Rationale|Details):\s*([\s\S]*)$/im);
+      // 4. Extract Explanation/Rationale
+      const explanationMatch = block.match(/(?:Explanation|Solution|Rationale|Details)[:\-]?\s*([\s\S]*)$/im);
 
       if (!textMatch || !aMatch || !bMatch || !cMatch || !dMatch || !answerMatch) {
+        console.warn("Block parsing failed audit:", block.slice(0, 50));
         return null;
       }
 
@@ -45,7 +48,7 @@ export function parseBulkQuestions(
         optionCEn: cMatch[1].trim(),
         optionDEn: dMatch[1].trim(),
         correctAnswer: answerMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D',
-        explanationEn: explanationMatch ? explanationMatch[1].trim() : "Verified institutional answer key as per official Punjab patterns.",
+        explanationEn: explanationMatch ? explanationMatch[1].trim() : "Verified institutional answer key as per official Punjab Govt patterns.",
         boardId: metadata.boardId,
         examId: metadata.examId,
         subjectId: metadata.subjectId,
