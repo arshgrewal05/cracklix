@@ -22,6 +22,16 @@ export interface Exam {
   duration?: number;
 }
 
+export interface Series {
+  id: string;
+  title: string;
+  examId: string;
+  boardId: string;
+  description: string;
+  isPremium: boolean;
+  mockCount?: number;
+}
+
 export interface Subject {
   id: string;
   name: string;
@@ -64,6 +74,7 @@ export interface Question {
 export interface MockTest {
   id: string;
   title: string;
+  seriesId?: string;
   boardId: string;
   examId: string;
   subjectId?: string;
@@ -77,16 +88,6 @@ export interface MockTest {
   author?: string;
 }
 
-export interface PreviousPaper {
-  id: string;
-  title: string;
-  examId: string;
-  boardId: string;
-  year: number;
-  pdfUrl: string;
-  createdAt: any;
-}
-
 export interface UserProfile {
   id: string;
   name: string;
@@ -97,70 +98,17 @@ export interface UserProfile {
   targetExam: string;
   createdAt: any;
   status: 'Pro' | 'Free';
+  planId?: string;
   bestScore?: number;
   rank?: string;
 }
 
-export interface TestSession {
+export interface RevisionItem {
   id: string;
   userId: string;
-  mockId: string;
-  currentIdx: number;
-  answers: Record<number, number>;
-  flagged: number[];
-  remainingTime: number;
-  status: 'IN_PROGRESS' | 'SUBMITTED';
-  updatedAt: any;
-}
-
-export interface ContentReport {
-  id: string;
   questionId: string;
-  userId: string;
-  type: 'WRONG_ANS' | 'TYPO' | 'DUPLICATE' | 'OTHER';
-  comment: string;
-  status: 'PENDING' | 'RESOLVED';
+  questionText: string;
+  type: 'BOOKMARK' | 'WRONG_ATTEMPT' | 'MARKED_FOR_REVIEW';
+  subjectId: string;
   timestamp: any;
-}
-
-export interface CurrentAffair {
-  id: string;
-  title: string;
-  content: string;
-  summary: string;
-  category: string;
-  date: string;
-  featured?: boolean;
-  tags?: string[];
-  imageUrl?: string;
-  createdAt: any;
-}
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  category: 'Recruitment' | 'Admit Card' | 'Answer Key' | 'Result' | 'Notice';
-  board: string;
-  time: string;
-  important: boolean;
-  pdfUrl?: string;
-  createdAt: any;
-  type?: 'alert' | 'result' | 'vacancy';
-}
-
-export interface AttemptResult {
-  id?: string;
-  userId: string;
-  mockId: string;
-  mockTitle?: string;
-  score: number;
-  accuracy: number;
-  correctCount: number;
-  incorrectCount: number;
-  skippedCount: number;
-  totalQuestions: number;
-  weakTopics: string[];
-  timestamp: string;
-  answers: Record<number, number>;
 }

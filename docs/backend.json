@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -13,7 +14,8 @@
         "state": { "type": "string", "enum": ["Punjab"] },
         "targetExam": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" },
-        "status": { "type": "string", "enum": ["Pro", "Free"] }
+        "status": { "type": "string", "enum": ["Pro", "Free"] },
+        "planId": { "type": "string" }
       },
       "required": ["id", "name", "email", "role"]
     },
@@ -59,6 +61,7 @@
       "type": "object",
       "properties": {
         "id": { "type": "string" },
+        "seriesId": { "type": "string" },
         "examId": { "type": "string" },
         "title": { "type": "string" },
         "duration": { "type": "number" },
@@ -68,6 +71,19 @@
         "difficulty": { "type": "string" },
         "type": { "type": "string" },
         "language": { "type": "string" }
+      }
+    },
+    "Series": {
+      "title": "Mock Series",
+      "description": "A group of mock tests (e.g., PSSSB Clerk 2026 Series).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "examId": { "type": "string" },
+        "boardId": { "type": "string" },
+        "description": { "type": "string" },
+        "isPremium": { "type": "boolean" }
       }
     },
     "Question": {
@@ -88,17 +104,16 @@
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },
-    "PreviousPaper": {
-      "title": "Previous Year Paper",
-      "description": "Historical recruitment papers for reference.",
+    "Plan": {
+      "title": "Subscription Plan",
+      "description": "Platform membership tiers.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "title": { "type": "string" },
-        "examId": { "type": "string" },
-        "boardId": { "type": "string" },
-        "year": { "type": "number" },
-        "pdfUrl": { "type": "string" }
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "durationDays": { "type": "number" },
+        "features": { "type": "array", "items": { "type": "string" } }
       }
     }
   },
@@ -118,45 +133,25 @@
       "schema": { "$ref": "#/backend/entities/Exam" },
       "description": "Exam categories."
     },
-    "/subjects/{subjectId}": {
-      "schema": { "$ref": "#/backend/entities/Subject" },
-      "description": "Exam subjects."
+    "/series/{seriesId}": {
+      "schema": { "$ref": "#/backend/entities/Series" },
+      "description": "Mock test collections."
+    },
+    "/mocks/{mockId}": {
+      "schema": { "$ref": "#/backend/entities/MockTest" },
+      "description": "Individual mock tests."
     },
     "/questions/{questionId}": {
       "schema": { "$ref": "#/backend/entities/Question" },
       "description": "Global question bank."
     },
-    "/mocks/{mockId}": {
-      "schema": { "$ref": "#/backend/entities/MockTest" },
-      "description": "Mock tests series."
-    },
-    "/pyqs/{pyqId}": {
-      "schema": { "$ref": "#/backend/entities/PreviousPaper" },
-      "description": "Archived previous year papers."
-    },
-    "/current_affairs/{caId}": {
-      "schema": "object",
-      "description": "Daily news updates."
-    },
-    "/notifications/{notificationId}": {
-      "schema": "object",
-      "description": "Global exam alerts."
-    },
-    "/results/{resultId}": {
-      "schema": "object",
-      "description": "User test results."
-    },
-    "/audit_logs/{logId}": {
-      "schema": "object",
-      "description": "Institutional action trail."
+    "/plans/{planId}": {
+      "schema": { "$ref": "#/backend/entities/Plan" },
+      "description": "Subscription definitions."
     },
     "/bookmarks/{bookmarkId}": {
       "schema": "object",
       "description": "Saved aspirant resources."
-    },
-    "/test_sessions/{sessionId}": {
-      "schema": "object",
-      "description": "Active CBT checkpoints."
     }
   }
 }
