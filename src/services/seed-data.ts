@@ -3,7 +3,7 @@ import { Firestore, doc, setDoc, serverTimestamp, collection, addDoc } from 'fir
 
 /**
  * @fileOverview Institutional Seeding Engine for Cracklix.
- * Populates all 13 core collections with verified sample data.
+ * Populates all 13 core collections with verified sample data to make them visible in Firestore.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('Initializing Global Repository Sync...');
@@ -85,6 +85,44 @@ export async function seedInitialData(db: Firestore) {
     { id: 'pyq-seed-1', title: 'Patwari 2023 Official', examId: 'psssb-patwari', boardId: 'psssb', year: 2023, pdfUrl: '#', createdAt: serverTimestamp() }
   ];
   for (const p of pyqs) await setDoc(doc(db, 'pyqs', p.id), p);
+
+  // 9. Results (Transactional)
+  const results = [
+    { id: 'result-seed-1', userId: 'seed-user', mockId: 'mock-seed-1', mockTitle: 'Patwari Mini Mock 01', score: 1, totalQuestions: 1, accuracy: 100, timestamp: new Date().toISOString(), createdAt: serverTimestamp() }
+  ];
+  for (const r of results) await setDoc(doc(db, 'results', r.id), r);
+
+  // 10. Audit Logs
+  const logs = [
+    { id: 'log-seed-1', action: 'SYSTEM_INITIALIZATION', timestamp: serverTimestamp(), details: 'Institutional repository sync completed.' }
+  ];
+  for (const l of logs) await setDoc(doc(db, 'audit_logs', l.id), l);
+
+  // 11. Bookmarks
+  const bookmarks = [
+    { id: 'bookmark-seed-1', userId: 'seed-user', questionId: 'q-seed-1', questionText: 'Capital of Punjab?', timestamp: new Date().toISOString(), createdAt: serverTimestamp() }
+  ];
+  for (const b of bookmarks) await setDoc(doc(db, 'bookmarks', b.id), b);
+
+  // 12. Test Sessions
+  const sessions = [
+    { id: 'session-seed-1', userId: 'seed-user', mockId: 'mock-seed-1', status: 'SUBMITTED', updatedAt: serverTimestamp() }
+  ];
+  for (const s of sessions) await setDoc(doc(db, 'test_sessions', s.id), s);
+
+  // 13. Users
+  const seedUser = {
+    id: 'seed-user', name: 'Aspirant Seed', email: 'seed@cracklix.com', role: 'STUDENT', state: 'Punjab' as const, targetExam: 'PSSSB', status: 'Free' as const, createdAt: new Date().toISOString()
+  };
+  await setDoc(doc(db, 'users', seedUser.id), seedUser);
+
+  // 14. Settings (CMS)
+  await setDoc(doc(db, 'settings', 'global'), {
+    platformName: "Cracklix",
+    announcement: "🔥 Punjab Recruitment Portal 2026 Live",
+    showAnnouncement: true,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
 
   console.log('Institutional Seed Complete. All 13 collections initialized.');
 }
