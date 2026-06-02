@@ -2,46 +2,46 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // FORCE DEPLOYMENT ID: CRACKLIX_RESOLVE_V120
+    // FORCE DEPLOYMENT ID: CRACKLIX_FINAL_RESOLVE_V150
     // AUTHOR: Arsh Grewal Management
-    // PURPOSE: Explicitly allow public read access for all content collections to fix permission denied errors.
+    // PURPOSE: Ensuring absolute public read access for institutional content using recursive wildcards.
 
-    match /notifications/{docId} {
+    match /notifications/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /current_affairs/{docId} {
+    match /current_affairs/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /boards/{docId} {
+    match /boards/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /exams/{docId} {
+    match /exams/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /subjects/{docId} {
+    match /subjects/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /questions/{docId} {
+    match /questions/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /mocks/{docId} {
+    match /mocks/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /settings/{docId} {
+    match /settings/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
