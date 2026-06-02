@@ -3,7 +3,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, BookOpen, ClipboardList, Shield, BarChart3 } from "lucide-react";
+import { ArrowRight, BookOpen, ClipboardList, Shield, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -19,7 +19,7 @@ export default function Hero() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-punjab')?.imageUrl || "https://picsum.photos/seed/punjab-hero/1200/800";
 
   return (
-    <header className="relative min-h-[700px] flex items-center pt-20 pb-32 overflow-hidden bg-[#0c1527]">
+    <header className="relative min-h-[750px] flex items-center pt-20 pb-48 overflow-hidden bg-[#0c1527]">
       {/* Golden Temple Background Image (Right Aligned) */}
       <div className="absolute right-0 top-0 w-full lg:w-[60%] h-full z-0">
         <Image 
@@ -45,18 +45,8 @@ export default function Hero() {
             transition={{ duration: 0.6 }}
             className="w-full lg:w-[50%] text-left"
           >
-            {/* Punjab Map Watermark (Subtle Background) */}
-            <div className="absolute -left-20 top-0 opacity-10 pointer-events-none select-none z-[-1]">
-              <svg viewBox="0 0 100 100" className="w-[500px] h-[500px] fill-white">
-                <path d="M40 20 L60 25 L75 45 L70 70 L50 85 L25 75 L20 45 Z" />
-              </svg>
-            </div>
-
             {/* Tagline */}
             <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-1.5 rounded-full mb-8 text-sm font-medium border border-white/10 backdrop-blur-md">
-              <div className="bg-[#ff7a00] p-1 rounded-full">
-                <Star className="h-3 w-3 text-white fill-current" />
-              </div>
               <span className="text-white/90">#1 Punjab Exam Preparation Platform</span>
             </div>
             
@@ -80,8 +70,8 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Floating Stats Bar */}
-        <div className="absolute bottom-[-60px] left-0 w-full hidden md:block">
+        {/* Floating Stats Bar - Adjusted position to prevent overlap */}
+        <div className="absolute bottom-[-100px] left-0 w-full hidden md:block">
           <div className="grid grid-cols-4 gap-4">
             {stats.map((stat, idx) => (
               <motion.div
