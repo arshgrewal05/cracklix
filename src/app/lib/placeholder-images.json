@@ -1,0 +1,28 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Abstract technological background",
+      "imageUrl": "https://picsum.photos/seed/prep1/1200/600",
+      "imageHint": "technology abstract"
+    },
+    {
+      "id": "exam-medical",
+      "description": "Medical exam preparation",
+      "imageUrl": "https://picsum.photos/seed/med1/400/250",
+      "imageHint": "medical science"
+    },
+    {
+      "id": "exam-engineering",
+      "description": "Engineering entrance exam",
+      "imageUrl": "https://picsum.photos/seed/eng1/400/250",
+      "imageHint": "engineering blueprint"
+    },
+    {
+      "id": "exam-civil",
+      "description": "Civil services exam",
+      "imageUrl": "https://picsum.photos/seed/civil1/400/250",
+      "imageHint": "government building"
+    }
+  ]
+}
