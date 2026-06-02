@@ -18,9 +18,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">
-              Quick Links
-            </h3>
+            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">Quick Links</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li><Link href="/" className="text-white/70 hover:text-[#F97316] transition-colors">Home</Link></li>
               <li><Link href="/exams" className="text-white/70 hover:text-[#F97316] transition-colors">Exams</Link></li>
@@ -31,9 +29,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">
-              Company
-            </h3>
+            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">Company</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li><Link href="#" className="text-white/70 hover:text-[#F97316] transition-colors">About Us</Link></li>
               <li><Link href="#" className="text-white/70 hover:text-[#F97316] transition-colors">Success Stories</Link></li>
@@ -43,9 +39,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">
-              Legal
-            </h3>
+            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">Legal</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li><Link href="#" className="text-white/70 hover:text-[#F97316] transition-colors">Privacy Policy</Link></li>
               <li><Link href="#" className="text-white/70 hover:text-[#F97316] transition-colors">Terms of Service</Link></li>
@@ -54,16 +48,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">
-              Contact Support
-            </h3>
+            <h3 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white/40">Contact Support</h3>
             <div className="space-y-4 text-sm font-medium">
-              <p className="text-white/70 flex items-center gap-3">
-                <Mail className="h-4 w-4 text-[#F97316]" /> support@cracklix.com
-              </p>
-              <p className="text-white/70 flex items-center gap-3">
-                <Phone className="h-4 w-4 text-[#F97316]" /> +91 98765 43210
-              </p>
+              <p className="text-white/70 flex items-center gap-3"><Mail className="h-4 w-4 text-[#F97316]" /> support@cracklix.com</p>
+              <p className="text-white/70 flex items-center gap-3"><Phone className="h-4 w-4 text-[#F97316]" /> +91 98765 43210</p>
               <div className="pt-4 flex gap-4">
                  <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#F97316] transition-colors cursor-pointer group">
                     <Twitter className="h-4 w-4 text-white/70 group-hover:text-white" />
@@ -81,9 +69,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 mt-20 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
           <div>© 2026 Cracklix Authority. All rights reserved.</div>
-          <div className="flex items-center gap-2">
-            Made with <span className="text-[#F97316]">❤️</span> for Punjab Aspirants
-          </div>
+          <div className="flex items-center gap-2">Made with <span className="text-[#F97316]">❤️</span> for Punjab Aspirants</div>
         </div>
       </div>
     </footer>

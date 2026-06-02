@@ -6,11 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Hero() {
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-punjab')?.imageUrl || "https://picsum.photos/seed/punjab-hero/1200/800";
-
   return (
     <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-48 overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#1E3A8A] to-[#0F172A]">
       {/* Punjab Map Watermark */}
@@ -58,15 +55,13 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="relative lg:ml-auto w-full max-w-[600px] aspect-[4/3] group"
           >
-            {/* Soft Glow Effect */}
             <div className="absolute inset-0 bg-[#F97316]/20 blur-3xl rounded-full opacity-50 group-hover:opacity-80 transition-opacity" />
             <div className="relative h-full w-full rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white/10">
               <Image 
-                src={heroImage}
+                src="https://picsum.photos/seed/punjab-hero/1200/800"
                 alt="Golden Temple at Night"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
-                data-ai-hint="golden temple"
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-80" />

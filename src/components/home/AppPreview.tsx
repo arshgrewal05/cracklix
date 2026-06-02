@@ -67,13 +67,11 @@ function PhoneMockup({ delay, isCenter = false, imageUrl }: { delay: number, isC
       viewport={{ once: true }}
       className={`relative ${isCenter ? 'h-[500px] w-[240px] rounded-[3.5rem] border-[8px]' : 'h-[450px] w-[220px] rounded-[3rem] border-[10px]'} border-black bg-white shadow-2xl overflow-hidden`}
     >
-      {/* Notch / Dynamic Island */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 h-8 bg-black rounded-b-3xl w-32 z-20 flex items-center justify-center">
         <div className="h-1.5 w-1.5 rounded-full bg-white/10" />
       </div>
-
       <div className="relative h-full w-full bg-slate-50">
-        <Image src={imageUrl} alt="App screen" fill className="object-cover" data-ai-hint="smartphone app" />
+        <Image src={imageUrl} alt="App screen" fill className="object-cover" />
       </div>
     </motion.div>
   );
