@@ -11,9 +11,9 @@ import { useFirestore, useCollection } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { parseBulkQuestions } from "@/lib/parser"
-import { FileText, Zap, CheckCircle2, Database, ChevronLeft, AlertCircle, Trash2, Languages, Info, BookOpen, Layers } from "lucide-react"
+import { FileText, Zap, CheckCircle2, Database, ChevronLeft, AlertCircle, Trash2, Languages, Info, BookOpen, Layers, Clock, Trophy } from "lucide-react"
 import { errorEmitter } from "@/firebase/error-emitter"
-import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors"
+import { FirestorePermissionError } from "@/firebase/errors"
 
 export default function BulkImportPage() {
   const router = useRouter()
@@ -31,7 +31,9 @@ export default function BulkImportPage() {
     subjectId: "",
     difficulty: "medium" as any
   })
+  
   const [parsedQuestions, setParsedQuestions] = useState<any[]>([])
+  const [detectedMock, setDetectedMock] = useState<any>(null)
   const [isImporting, setIsImporting] = useState(false)
 
   const handleParse = () => {
@@ -42,10 +44,11 @@ export default function BulkImportPage() {
     }
     
     const results = parseBulkQuestions(rawText, { ...metadata, targetLang })
-    setParsedQuestions(results)
+    setParsedQuestions(results.questions)
+    setDetectedMock(results.mockMetadata)
     
-    if (results.length > 0) {
-      toast({ title: "Extraction Complete", description: `Structured ${results.length} ${targetLang} nodes with multi-subject logic.` })
+    if (results.questions.length > 0) {
+      toast({ title: "Extraction Complete", description: `Structured ${results.questions.length} ${targetLang} nodes with section detection.` })
     } else {
       toast({ variant: "destructive", title: "Extraction Failed", description: "Invalid format detected." })
     }
@@ -102,20 +105,20 @@ export default function BulkImportPage() {
             <div className="h-2 w-full bg-primary" />
             <CardHeader className="p-10 pb-4">
               <CardTitle className="font-headline font-black text-2xl uppercase">Full Mock Paste Node</CardTitle>
-              <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Tag subjects inside the text to build multi-subject mocks.</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Pasting an entire paper? The engine will auto-detect subjects and metadata.</CardDescription>
             </CardHeader>
             <CardContent className="p-10 pt-4 space-y-10">
               <div className="bg-blue-50 p-8 rounded-3xl border border-blue-100 space-y-4">
-                 <h4 className="font-black text-[10px] uppercase text-blue-600 flex items-center gap-2 tracking-widest"><Info className="h-4 w-4" /> Full Mock Protocol</h4>
+                 <h4 className="font-black text-[10px] uppercase text-blue-600 flex items-center gap-2 tracking-widest"><Info className="h-4 w-4" /> Extraction Protocol</h4>
                  <div className="space-y-3">
                    <p className="text-xs text-blue-800 leading-relaxed font-bold">
-                     To paste a Full Mock with multiple subjects, use the following pattern:
+                     Use headers like 'PART-A:', 'Section:' or 'Subject:' to split subjects in one go.
                    </p>
                    <code className="block p-4 bg-white/50 rounded-xl text-[11px] text-blue-900 leading-relaxed border border-blue-100 font-mono">
+                     PSSSB EXCISE MOCK TEST<br/>
+                     Time Allowed: 150 Minutes<br/>
                      Subject: Punjab GK<br/>
-                     Q1. Text... A. Opt... B. Opt... Ans: A Explanation: Reasoning...<br/><br/>
-                     Subject: Numerical Ability<br/>
-                     Q2. Text... A. Opt... B. Opt... Ans: B Explanation: Solved...
+                     Q1. Text... Ans: A Explanation: Solved...
                    </code>
                  </div>
               </div>
@@ -126,9 +129,9 @@ export default function BulkImportPage() {
                   <Select value={targetLang} onValueChange={(v: any) => setTargetLang(v)}>
                     <SelectTrigger className="rounded-xl bg-slate-50 border-slate-100 shadow-inner h-12 font-bold text-[#0F172A]"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="En">English</SelectItem>
-                      <SelectItem value="Pa">Punjabi</SelectItem>
-                      <SelectItem value="Hi">Hindi</SelectItem>
+                      <SelectItem value="En">English Node</SelectItem>
+                      <SelectItem value="Pa">Punjabi Node</SelectItem>
+                      <SelectItem value="Hi">Hindi Node</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -141,30 +144,10 @@ export default function BulkImportPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase text-slate-500 ml-1">Default Subject (Fallback)</p>
-                  <Select onValueChange={val => setMetadata({...metadata, subjectId: val})}>
-                    <SelectTrigger className="rounded-xl bg-slate-50 border-slate-100 shadow-inner h-12 font-bold text-[#0F172A]"><SelectValue placeholder="Select Subject" /></SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {subjects?.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase text-slate-500 ml-1">Difficulty</p>
-                  <Select onValueChange={val => setMetadata({...metadata, difficulty: val})} defaultValue="medium">
-                    <SelectTrigger className="rounded-xl bg-slate-50 border-slate-100 shadow-inner h-12 font-bold text-[#0F172A]"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="easy">Easy Level</SelectItem>
-                      <SelectItem value="medium">Medium Level</SelectItem>
-                      <SelectItem value="hard">Hard Level</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
               <Textarea 
-                placeholder="Paste Full Mock Text here with 'Subject:' tags..."
+                placeholder="Paste the Full Mock Test here..."
                 className="min-h-[400px] rounded-[2rem] bg-slate-50 border-slate-100 p-8 text-sm font-mono leading-relaxed shadow-inner text-[#0F172A]"
                 value={rawText}
                 onChange={e => setRawText(e.target.value)}
@@ -181,11 +164,25 @@ export default function BulkImportPage() {
           <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] h-full flex flex-col overflow-hidden">
             <CardHeader className="p-10 bg-slate-50/50 border-b border-slate-50">
               <CardTitle className="font-headline font-black text-2xl uppercase flex items-center gap-3 text-[#0F172A]">
-                <Database className="h-6 w-6 text-primary" /> Multi-Subject Buffer
+                <Database className="h-6 w-6 text-primary" /> Extraction Buffer
               </CardTitle>
-              <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">{parsedQuestions.length} Questions Ready.</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">{parsedQuestions.length} Items Validated.</CardDescription>
             </CardHeader>
             <CardContent className="p-10 flex-1 overflow-y-auto custom-scrollbar space-y-6">
+              {detectedMock && (
+                <div className="p-8 bg-primary/5 border border-primary/10 rounded-3xl space-y-4 mb-6">
+                   <div className="flex items-center gap-3">
+                      <Trophy className="h-5 w-5 text-primary" />
+                      <span className="text-[10px] font-black uppercase text-primary tracking-widest">Mock Metadata Detected</span>
+                   </div>
+                   <p className="text-xl font-black text-[#0F172A] leading-tight">{detectedMock.title || "Unknown Series"}</p>
+                   <div className="flex items-center gap-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                      <span className="flex items-center gap-2"><Clock className="h-4 w-4" /> {detectedMock.duration} Min</span>
+                      <span className="flex items-center gap-2"><Layers className="h-4 w-4" /> {detectedMock.totalQuestions} Qs</span>
+                   </div>
+                </div>
+              )}
+
               {parsedQuestions.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-slate-300 opacity-20 py-40">
                   <AlertCircle className="h-20 w-20 mb-6" />
@@ -201,8 +198,8 @@ export default function BulkImportPage() {
                     <p className="text-sm font-bold leading-relaxed text-slate-600 line-clamp-3">{(q as any)[`question${targetLang}`]}</p>
                     
                     <div className="pt-4 border-t border-slate-200">
-                       <p className="text-[9px] font-black uppercase text-slate-400 mb-2 flex items-center gap-2"><BookOpen className="h-3 w-3" /> Audit Rationale</p>
-                       <p className="text-[11px] text-slate-500 italic line-clamp-2">{(q as any)[`explanation${targetLang}`] || "No explanation parsed."}</p>
+                       <p className="text-[9px] font-black uppercase text-slate-400 mb-2 flex items-center gap-2"><BookOpen className="h-3 w-3" /> Rationale Node</p>
+                       <p className="text-[11px] text-slate-500 italic line-clamp-2">{(q as any)[`explanation${targetLang}`] || "No explanation detected."}</p>
                     </div>
                   </div>
                 ))
