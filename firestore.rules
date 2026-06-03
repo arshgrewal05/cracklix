@@ -6,9 +6,19 @@ service cloud.firestore {
       allow read, list, write: if true;
     }
 
-    match /plans/{id} { allow read: if true; }
-    match /users/{id} { allow read, write: if true; }
-    match /payments/{id} { allow read: if request.auth != null && request.auth.uid == resource.data.userId; }
+    match /users/{id} { 
+      allow read, write: if true; 
+    }
+    
+    match /subscriptions/{id} {
+      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'SUPER_ADMIN']);
+      allow write: if request.auth != null;
+    }
+    
+    match /orders/{id} {
+      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'SUPER_ADMIN']);
+      allow write: if request.auth != null;
+    }
     
     // Core Institutional Nodes
     match /mocks/{id} { allow read, list, write: if true; }

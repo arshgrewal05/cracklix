@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { ShieldCheck, Lock, CreditCard, ChevronRight, Zap, ArrowLeft, Loader2, Sparkles } from "lucide-react"
 import { useUser, useFirestore } from "@/firebase"
 import { useEffect, useState, Suspense } from "react"
-import { doc, setDoc, serverTimestamp } from "firebase/firestore"
+import { doc, setDoc, addDoc, collection, serverTimestamp } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 
@@ -36,29 +36,49 @@ function CheckoutContent() {
   }, [user, loading, router])
 
   const planData = {
-    silver: { name: "Silver Pass", price: 99 },
-    gold: { name: "Gold Pass", price: 199 },
-    premium: { name: "Elite Pass", price: 499 }
-  }[planId] || { name: "Gold Pass", price: 199 }
+    silver: { id: 'silver', name: "Silver Pass", price: 99, tier: 'Silver' },
+    gold: { id: 'gold', name: "Gold Pass", price: 199, tier: 'Gold' },
+    premium: { id: 'premium', name: "Elite Pass", price: 499, tier: 'Premium' }
+  }[planId] || { id: 'gold', name: "Gold Pass", price: 199, tier: 'Gold' }
 
   const handleSimulatePayment = async () => {
     if (!user || !db) return
     setProcessing(true)
     
     // In Phase 2, integrate Razorpay here
-    // Currently simulating successful payment
+    // Currently simulating high-fidelity payment & activation cycle
     setTimeout(async () => {
       try {
+        // 1. Log the Order
+        const orderRef = await addDoc(collection(db, "orders"), {
+          userId: user.uid,
+          planId: planData.id,
+          amount: planData.price,
+          currency: "INR",
+          status: "success",
+          createdAt: serverTimestamp()
+        })
+
+        // 2. Activate Subscription
+        await addDoc(collection(db, "subscriptions"), {
+          userId: user.uid,
+          planId: planData.id,
+          status: "active",
+          startDate: serverTimestamp(),
+          expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 Days
+        })
+
+        // 3. Update User Profile Status
         const userRef = doc(db, "users", user.uid)
         await setDoc(userRef, { 
-          status: planId.charAt(0).toUpperCase() + planId.slice(1), 
+          status: planData.tier, 
           updatedAt: serverTimestamp() 
         }, { merge: true })
         
         toast({ title: "Pass Activated", description: `You have successfully upgraded to ${planData.name}.` })
         router.push("/dashboard")
       } catch (e) {
-        toast({ variant: "destructive", title: "Sync Failed", description: "Could not finalize subscription." })
+        toast({ variant: "destructive", title: "Sync Failed", description: "Could not finalize institutional activation." })
       } finally {
         setProcessing(false)
       }
@@ -73,9 +93,9 @@ function CheckoutContent() {
            <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl h-14 w-14 border border-slate-200 bg-white shadow-sm">
              <ArrowLeft className="h-6 w-6 text-[#0F172A]" />
            </Button>
-           <div>
+           <div className="text-left">
               <h1 className="text-4xl font-headline font-black text-[#0F172A] uppercase">Audit Checkout</h1>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">Finalizing Institutional Node Access</p>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1 text-left">Finalizing Institutional Node Access</p>
            </div>
         </div>
 
@@ -88,14 +108,14 @@ function CheckoutContent() {
                     </CardTitle>
                  </CardHeader>
                  <CardContent className="p-12 space-y-8">
-                    <div className="p-8 rounded-[2rem] border-2 border-primary bg-primary/5 flex items-center justify-between group cursor-pointer shadow-xl">
+                    <div className="p-8 rounded-[2rem] border-2 border-primary bg-primary/5 flex items-center justify-between group cursor-pointer shadow-xl" onClick={handleSimulatePayment}>
                        <div className="flex items-center gap-6">
                           <div className="h-14 w-14 rounded-2xl bg-white flex items-center justify-center shadow-sm">
                              <Zap className="h-7 w-7 text-primary fill-current" />
                           </div>
-                          <div>
-                             <p className="font-black text-[#0F172A] uppercase tracking-tight">UPI / QR Scan</p>
-                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Razorpay</p>
+                          <div className="text-left">
+                             <p className="font-black text-[#0F172A] uppercase tracking-tight text-left">UPI / QR Scan</p>
+                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-left">Powered by Razorpay Simulation</p>
                           </div>
                        </div>
                        <div className="h-6 w-6 rounded-full border-4 border-primary bg-white" />
@@ -106,9 +126,9 @@ function CheckoutContent() {
                           <div className="h-14 w-14 rounded-2xl bg-white flex items-center justify-center shadow-sm">
                              <CreditCard className="h-7 w-7 text-slate-400" />
                           </div>
-                          <div>
-                             <p className="font-black text-slate-400 uppercase tracking-tight">Card / NetBanking</p>
-                             <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Maintenance Window</p>
+                          <div className="text-left">
+                             <p className="font-black text-slate-400 uppercase tracking-tight text-left">Card / NetBanking</p>
+                             <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest text-left">Maintenance Window</p>
                           </div>
                        </div>
                     </div>
@@ -117,7 +137,7 @@ function CheckoutContent() {
 
               <div className="bg-emerald-50 border border-emerald-100 p-8 rounded-[2.5rem] flex items-center gap-6 shadow-sm">
                  <ShieldCheck className="h-10 w-10 text-emerald-600 shrink-0" />
-                 <p className="text-sm font-bold text-emerald-800 leading-relaxed italic antialiased">
+                 <p className="text-sm font-bold text-emerald-800 leading-relaxed italic antialiased text-left">
                    "Your transaction is encrypted using institutional-grade SSL standards. Arsh Grewal Management guarantees 100% security for all aspirant nodes."
                  </p>
               </div>

@@ -93,6 +93,25 @@ export interface UserProfile {
   subscriptions?: string[]; 
 }
 
+export interface Subscription {
+  id?: string;
+  userId: string;
+  planId: string;
+  status: 'active' | 'expired' | 'cancelled';
+  startDate: any;
+  expiryDate: any;
+}
+
+export interface Order {
+  id?: string;
+  userId: string;
+  planId: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'success' | 'failed';
+  createdAt: any;
+}
+
 export interface Plan {
   id: string;
   name: string;

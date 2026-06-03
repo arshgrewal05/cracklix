@@ -14,8 +14,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 
 /**
- * @fileOverview Final Command Center (Monetization Patch).
- * Replaced invisible text with high-contrast navy and added Revenue Monitoring.
+ * @fileOverview Final Command Center (Phase 156).
+ * Features: High-fidelity revenue monitoring and plan distribution nodes.
  */
 
 export default function AdminDashboard() {
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-12 pb-20 pt-4 text-[#0F172A]">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
-        <div>
+        <div className="text-left">
            <div className="flex items-center gap-3 mb-2">
               <ShieldCheck className="h-5 w-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Governance Hub</span>
@@ -93,12 +93,12 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
          <div className="lg:col-span-8 space-y-10">
             <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden">
-               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50">
+               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50 text-left">
                   <div className="flex items-center gap-4">
                      <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                         <DollarSign className="h-6 w-6" />
                      </div>
-                     <div>
+                     <div className="text-left">
                         <CardTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Revenue Engine</CardTitle>
                         <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Institutional monetization and subscriber metrics.</CardDescription>
                      </div>
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
             </Card>
 
             <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden">
-               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50">
+               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50 text-left">
                   <div className="flex items-center gap-4">
                      <Target className="h-6 w-6 text-primary" />
                      <CardTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Beta Launch Readiness</CardTitle>
@@ -155,21 +155,21 @@ export default function AdminDashboard() {
             </Card>
          </div>
 
-         <div className="lg:col-span-4 space-y-10">
+         <div className="lg:col-span-4 space-y-10 text-left">
             <Card className="border-slate-100 bg-white rounded-[3.5rem] p-12 space-y-10 shadow-3xl text-left">
                <div className="space-y-2 text-left">
-                  <h3 className="text-2xl font-headline font-black text-[#0F172A] uppercase flex items-center gap-4">
+                  <h3 className="text-2xl font-headline font-black text-[#0F172A] uppercase flex items-center gap-4 text-left">
                      <TrendingUp className="h-6 w-6 text-emerald-600" /> Conversion
                   </h3>
                </div>
                <div className="space-y-6">
-                  <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100 space-y-4 shadow-inner">
+                  <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100 space-y-4 shadow-inner text-left">
                      <div className="flex justify-between items-center">
                         <span className="text-[10px] font-black uppercase text-slate-500">Status</span>
                         <Badge className="bg-emerald-600 text-white border-none text-[9px] font-black">STABLE</Badge>
                      </div>
-                     <p className="text-4xl font-headline font-black text-[#0F172A]">{Math.round((proUsers.length / (users?.length || 1)) * 100)}%</p>
-                     <p className="text-xs text-slate-500 font-medium">Free-to-Pro institutional conversion rate.</p>
+                     <p className="text-4xl font-headline font-black text-[#0F172A] text-left">{Math.round((proUsers.length / (users?.length || 1)) * 100)}%</p>
+                     <p className="text-xs text-slate-500 font-medium text-left leading-relaxed">Free-to-Pro institutional conversion rate.</p>
                   </div>
                </div>
             </Card>
@@ -178,8 +178,8 @@ export default function AdminDashboard() {
                <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                   <Layers className="h-8 w-8" />
                </div>
-               <h4 className="text-2xl font-headline font-black text-[#0F172A] uppercase leading-tight">Monetization Active</h4>
-               <p className="text-slate-600 text-sm font-medium leading-relaxed">
+               <h4 className="text-2xl font-headline font-black text-[#0F172A] uppercase leading-tight text-left">Monetization Active</h4>
+               <p className="text-slate-600 text-sm font-medium leading-relaxed text-left">
                   The Pass System is now live in the architectural node. Users can select plans at /pricing.
                </p>
                <Button asChild className="w-full bg-primary hover:bg-primary/90 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl">
@@ -197,12 +197,12 @@ function StatCard({ label, value, icon, color }: any) {
    
    return (
       <Card className="border-slate-100 shadow-xl bg-white p-8 rounded-[3rem] group hover:translate-y-[-4px] transition-all overflow-hidden text-left">
-         <div className="flex items-center gap-4">
+         <div className="flex items-center gap-4 text-left">
             <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shrink-0 shadow-inner">
                {icon}
             </div>
             <div className="min-w-0 text-left">
-               <p className={`font-headline font-black tracking-tighter truncate ${isLongValue ? 'text-2xl' : 'text-4xl'} ${color || 'text-[#0F172A]'}`}>
+               <p className={`font-headline font-black tracking-tighter truncate text-left ${isLongValue ? 'text-2xl' : 'text-4xl'} ${color || 'text-[#0F172A]'}`}>
                  {value}
                </p>
                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1 truncate text-left">{label}</p>
@@ -215,7 +215,7 @@ function StatCard({ label, value, icon, color }: any) {
 function LaunchMetric({ label, current, target }: { label: string, current: number, target: number }) {
    const perc = Math.min(100, Math.round((current / target) * 100));
    return (
-      <div className="space-y-4">
+      <div className="space-y-4 text-left">
          <div className="flex justify-between items-end">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
             <span className="text-[10px] font-black text-primary">{current} / {target} ({perc}%)</span>
