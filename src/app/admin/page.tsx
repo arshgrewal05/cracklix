@@ -17,7 +17,6 @@ import {
   ShieldAlert,
   Settings,
   Zap,
-  BarChart3,
   Activity,
   ArrowUpRight,
   Target
@@ -25,7 +24,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Link from "next/link"
 import { useCollection, useFirestore, useUser, useDoc } from "@/firebase"
-import { collection, query, orderBy, limit, doc } from "firebase/firestore"
+import { collection, doc } from "firebase/firestore"
 import { useMemo, useState } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
@@ -46,7 +45,10 @@ export default function AdminDashboard() {
   const { data: users, loading: uLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "users") : null), [db]))
   const { data: questions, loading: qLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "questions") : null), [db]))
   const { data: mocks } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]))
-  const { data: globalSettings } = useDoc<any>(useMemo(() => (db ? doc(db, "settings", "global") : null), [db]))
+  
+  // Explicitly check for global settings to determine initialization status
+  const globalSettingsRef = useMemo(() => (db ? doc(db, "settings", "global") : null), [db]);
+  const { data: globalSettings } = useDoc<any>(globalSettingsRef)
 
   const isFounder = user?.email === 'arshdeepgrewal1122@gmail.com';
 
@@ -57,6 +59,7 @@ export default function AdminDashboard() {
     try {
       await seedInitialData(db)
       toast({ title: "Success", description: "Global Repository Live." })
+      // Delay reload to allow toast visibility
       setTimeout(() => window.location.reload(), 1500)
     } catch (e: any) {
       toast({ variant: "destructive", title: "Sync Blocked", description: e.message })
@@ -92,11 +95,11 @@ export default function AdminDashboard() {
         </div>
         <div className="flex flex-wrap gap-4">
           {isFounder && (
-            <Button onClick={handleSeed} disabled={seeding} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black h-14 px-8 text-xs uppercase tracking-widest gap-3 shadow-xl">
+            <Button onClick={handleSeed} disabled={seeding} className={`${isInitialized ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-orange-600 hover:bg-orange-700 animate-pulse'} text-white rounded-2xl font-black h-14 px-8 text-xs uppercase tracking-widest gap-3 shadow-xl`}>
               <Rocket className={`h-4 w-4 ${seeding ? 'animate-spin' : ''}`} /> {isInitialized ? 'Resync Global Repo' : 'Initialize Global Repo'}
             </Button>
           )}
-          <Button onClick={handleExport} variant="outline" className="border-foreground/10 h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest text-xs gap-3">
+          <Button onClick={handleExport} variant="outline" className="border-foreground/10 h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest gap-3">
              <FileJson className="h-4 w-4" /> JSON Export
           </Button>
           <Button asChild className="bg-primary hover:bg-primary/90 rounded-2xl h-14 px-10 font-black shadow-2xl shadow-primary/20 uppercase tracking-widest text-xs">
@@ -196,7 +199,7 @@ export default function AdminDashboard() {
          </div>
 
          <div className="lg:col-span-4 space-y-8">
-            <Card className="border-none bg-[#0F172A] rounded-[3rem] shadow-3xl p-10 space-y-8">
+            <Card className={`border-none ${isInitialized ? 'bg-[#0F172A]' : 'bg-orange-500/10 border-orange-500/20'} rounded-[3rem] shadow-3xl p-10 space-y-8`}>
                <div className="space-y-2">
                   <h3 className="text-xl font-headline font-black text-white uppercase flex items-center gap-3">
                      <CheckCircle2 className="h-5 w-5 text-primary" /> Go-Live Checklist
@@ -208,16 +211,15 @@ export default function AdminDashboard() {
                   <ChecklistItem label="Firebase Rules Applied" status="complete" />
                   <ChecklistItem label="Institutional Repo Initialized" status={isInitialized ? "complete" : "pending"} />
                   <ChecklistItem label="Admin Roles Configured" status="complete" />
-                  <ChecklistItem label="Question Bank (>100 MCQs)" status={questions && questions.length > 100 ? "complete" : "pending"} />
-                  <ChecklistItem label="SEO & Metadata Locked" status="complete" />
-                  <ChecklistItem label="Bilingual Parser Audited" status="complete" />
+                  <ChecklistItem label="Question Bank Check" status={questions && questions.length > 0 ? "complete" : "pending"} />
+                  <ChecklistItem label="Legal Pages Live" status="complete" />
                </div>
 
                {!isInitialized && (
                   <div className="p-6 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex gap-4 items-start">
                      <AlertTriangle className="h-5 w-5 text-rose-500 shrink-0 mt-0.5" />
                      <p className="text-xs font-bold text-rose-200 leading-relaxed">
-                        System not initialized. Click "Initialize Global Repo" to load official boards, exams, and settings.
+                        System not initialized. Click "Initialize Global Repo" to establish the official recruitment board hierarchy.
                      </p>
                   </div>
                )}

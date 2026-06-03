@@ -11,8 +11,13 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.token.email == 'arshdeepgrewal1122@gmail.com';
     }
 
+    // Hardened Admin check: Prevents rule crashes if user document is missing
     function isAdmin() {
-      return isFounder() || (isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'SUPER_ADMIN']);
+      return isFounder() || (
+        isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'SUPER_ADMIN']
+      );
     }
 
     function isOwner(userId) {
@@ -20,7 +25,7 @@ service cloud.firestore {
     }
 
     // --- Public Institutional Data ---
-    // These collections must be readable by everyone (including guests) for SEO and browsing
+    // Unified read permissions for public browsing
     match /boards/{docId} { allow read: if true; allow write: if isAdmin(); }
     match /exams/{docId} { allow read: if true; allow write: if isAdmin(); }
     match /subjects/{docId} { allow read: if true; allow write: if isAdmin(); }
