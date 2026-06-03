@@ -29,14 +29,21 @@ export async function seedInitialData(db: Firestore) {
   ];
   for (const s of subjects) await setDoc(doc(db, 'subjects', s.id), s);
 
-  // 3. Exams Hierarchy
+  // 3. Exams Hierarchy (Expanded PSSSB Catalog)
   const exams = [
     { id: 'psssb-clerk', boardId: 'psssb', name: 'PSSSB Clerk (General/IT/Accounts)', category: 'Clerical', totalMocks: 60, activeQuestions: 2500, description: "Multi-departmental recruitment with Paper A focus." },
     { id: 'psssb-patwari', boardId: 'psssb', name: 'Revenue Patwari', category: 'Revenue', totalMocks: 45, activeQuestions: 1800, description: "Official Canal & Revenue Patwari recruitment portal." },
     { id: 'psssb-excise', boardId: 'psssb', name: 'Excise & Taxation Inspector', category: 'Inspector', totalMocks: 25, activeQuestions: 1200, description: "High-grade technical & non-technical inspection posts." },
     { id: 'psssb-vdo', boardId: 'psssb', name: 'VDO / Gram Sevak', category: 'Development', totalMocks: 30, activeQuestions: 1500, description: "Village Development Officer recruitment cycle." },
+    { id: 'psssb-jail-warder', boardId: 'psssb', name: 'Jail Warder & Matron', category: 'Security', totalMocks: 20, activeQuestions: 1000, description: "Jail department recruitment nodes." },
+    { id: 'psssb-senior-assistant', boardId: 'psssb', name: 'Senior Assistant cum Inspector', category: 'Executive', totalMocks: 15, activeQuestions: 800, description: "Senior level clerical and field inspector posts." },
+    { id: 'psssb-technical', boardId: 'psssb', name: 'Technical / Field Posts (Librarian/Storekeeper)', category: 'Technical', totalMocks: 10, activeQuestions: 500, description: "Specialized technical departmental posts." },
+    { id: 'psssb-group-d', boardId: 'psssb', name: 'PSSSB Group D (Sewadar/Chowkidar)', category: 'Field', totalMocks: 15, activeQuestions: 600, description: "General field staff recruitment." },
+    { id: 'psssb-je', boardId: 'psssb', name: 'PSSSB Junior Engineer (JE)', category: 'Engineering', totalMocks: 12, activeQuestions: 1200, description: "Civil, Mechanical, and Electrical JE posts." },
+    { id: 'psssb-steno', boardId: 'psssb', name: 'Steno-Typist / Junior Scale Stenographer', category: 'Stenography', totalMocks: 10, activeQuestions: 400, description: "Stenography and typing based recruitments." },
     { id: 'police-constable', boardId: 'police', name: 'Police Constable', category: 'Police', totalMocks: 50, activeQuestions: 3000, description: "District and Armed cadre law enforcement." },
     { id: 'ppsc-pcs', boardId: 'ppsc', name: 'PPSC Civil Services (PCS)', category: 'Executive', totalMocks: 15, activeQuestions: 5000, description: "Class A Gazetted administrative posts." },
+    { id: 'ppsc-naib', boardId: 'ppsc', name: 'Naib Tehsildar', category: 'Revenue', totalMocks: 10, activeQuestions: 1500, description: "Revenue department Class B executive post." },
   ];
   for (const e of exams) await setDoc(doc(db, 'exams', e.id), e);
 
@@ -58,19 +65,18 @@ export async function seedInitialData(db: Firestore) {
       ]
     },
     {
-      id: 'pattern-psssb-excise',
-      examId: 'psssb-excise',
-      examName: 'PSSSB Excise Inspector',
+      id: 'pattern-psssb-patwari',
+      examId: 'psssb-patwari',
+      examName: 'PSSSB Patwari',
       totalQuestions: 150,
       duration: 120,
       negativeMarking: true,
       sections: [
         { name: 'Paper A: Punjabi Qualifying', count: 50, subjectId: 'punjabi-qualifying' },
-        { name: 'Punjab GK', count: 20, subjectId: 'punjab-history' },
-        { name: 'Polity & CA', count: 20, subjectId: 'gk-ca' },
-        { name: 'Quantitative Aptitude & Mental Ability', count: 40, subjectId: 'math-reasoning' },
-        { name: 'English', count: 10, subjectId: 'english' },
-        { name: 'Computer', count: 10, subjectId: 'ict' }
+        { name: 'Punjab History & Culture', count: 25, subjectId: 'punjab-history' },
+        { name: 'GK & CA', count: 25, subjectId: 'gk-ca' },
+        { name: 'Math & Reasoning', count: 25, subjectId: 'math-reasoning' },
+        { name: 'English & Computers', count: 25, subjectId: 'ict' }
       ]
     },
   ];
