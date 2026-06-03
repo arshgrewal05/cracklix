@@ -20,7 +20,7 @@ const healthData = [
 
 /**
  * @fileOverview Final Operational Node Monitor.
- * Standardised to high-contrast Navy/White theme for readability.
+ * Standardized to high-contrast Institutional Navy/White theme.
  */
 
 export default function PlatformHealth() {

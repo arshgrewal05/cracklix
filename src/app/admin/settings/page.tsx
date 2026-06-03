@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 
 /**
  * @fileOverview Final Enterprise CMS (Visibility Patch).
- * Standardised to high-contrast Navy/White theme for readability.
+ * Standardized to high-contrast Institutional Navy/White theme.
  */
 
 export default function AdminSettings() {
