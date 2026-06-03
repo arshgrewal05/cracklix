@@ -12,13 +12,13 @@ import { useFirestore, useCollection } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { parseBulkQuestions } from "@/lib/parser"
-import { FileText, Zap, CheckCircle2, Database, ChevronLeft, AlertCircle, Trash2, Languages } from "lucide-react"
+import { FileText, Zap, CheckCircle2, Database, ChevronLeft, AlertCircle, Trash2, Languages, Info } from "lucide-react"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors"
 
 /**
  * @fileOverview Trilingual Bulk Import Engine.
- * Supports targeted imports for English, Punjabi, and Hindi nodes.
+ * Supports multi-subject pastes using the "Subject:" tag.
  */
 
 export default function BulkImportPage() {
@@ -47,7 +47,6 @@ export default function BulkImportPage() {
       return
     }
     
-    // Pass target language to the parser to populate the correct fields
     const results = parseBulkQuestions(rawText, { ...metadata, targetLang })
     setParsedQuestions(results)
     
@@ -109,18 +108,25 @@ export default function BulkImportPage() {
             <div className="h-2 w-full bg-primary" />
             <CardHeader className="p-10 pb-4">
               <CardTitle className="font-headline font-black text-2xl uppercase">Operational MCQ Paste</CardTitle>
-              <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Target Language Mode: {targetLang === 'En' ? 'English' : targetLang === 'Pa' ? 'Punjabi' : 'Hindi'}</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Target Language: {targetLang}</CardDescription>
             </CardHeader>
             <CardContent className="p-10 pt-4 space-y-10">
+              <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 space-y-3">
+                 <h4 className="font-black text-[10px] uppercase text-blue-600 flex items-center gap-2"><Info className="h-3 w-3" /> Multi-Subject Logic</h4>
+                 <p className="text-xs text-blue-800 leading-relaxed font-medium">
+                   Paste multiple subjects in one go by adding <code>Subject: [Name]</code> above each question block. If no tag is found, the global selection below is used.
+                 </p>
+              </div>
+
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <p className="text-[10px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Languages className="h-3 w-3" /> Import Language</p>
                   <Select value={targetLang} onValueChange={(v: any) => setTargetLang(v)}>
                     <SelectTrigger className="rounded-xl bg-slate-50 border-slate-100 shadow-inner h-12 font-bold"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="En">English (Universal)</SelectItem>
-                      <SelectItem value="Pa">Punjabi (Gurmukhi)</SelectItem>
-                      <SelectItem value="Hi">Hindi (Devanagari)</SelectItem>
+                      <SelectItem value="En">English</SelectItem>
+                      <SelectItem value="Pa">Punjabi</SelectItem>
+                      <SelectItem value="Hi">Hindi</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -134,7 +140,7 @@ export default function BulkImportPage() {
                   </Select>
                 </div>
                 <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase text-slate-500 ml-1">Thematic Subject</p>
+                  <p className="text-[10px] font-black uppercase text-slate-500 ml-1">Default Subject</p>
                   <Select onValueChange={val => setMetadata({...metadata, subjectId: val})}>
                     <SelectTrigger className="rounded-xl bg-slate-50 border-slate-100 shadow-inner h-12"><SelectValue placeholder="Select Subject" /></SelectTrigger>
                     <SelectContent className="max-h-[300px]">
@@ -156,7 +162,7 @@ export default function BulkImportPage() {
               </div>
 
               <Textarea 
-                placeholder="Paste MCQ data strings here... (Q1. Text... A. Option... Answer: A)"
+                placeholder="Q1. Text... A. Opt... B. Opt... Ans: A Subject: Punjab GK"
                 className="min-h-[400px] rounded-[2rem] bg-slate-50 border-slate-100 p-8 text-sm font-mono leading-relaxed shadow-inner"
                 value={rawText}
                 onChange={e => setRawText(e.target.value)}
@@ -187,7 +193,7 @@ export default function BulkImportPage() {
                 parsedQuestions.map((q, idx) => (
                   <div key={idx} className="p-8 rounded-3xl bg-slate-50 border border-slate-100 space-y-4 group hover:border-primary transition-all">
                     <div className="flex justify-between items-center">
-                       <Badge className="bg-emerald-50 text-emerald-600 border-none text-[9px] font-black uppercase px-4 py-1.5 rounded-xl">Node {idx+1} Validated</Badge>
+                       <Badge className="bg-emerald-50 text-emerald-600 border-none text-[9px] font-black uppercase px-4 py-1.5 rounded-xl">{q.subjectId}</Badge>
                        <span className="text-[11px] font-black text-[#0F172A] font-mono">KEY: {q.correctAnswer}</span>
                     </div>
                     <p className="text-sm font-bold leading-relaxed text-slate-600 line-clamp-3">{(q as any)[`question${targetLang}`]}</p>

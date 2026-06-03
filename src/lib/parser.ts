@@ -1,7 +1,7 @@
 
 /**
  * @fileOverview Hardened Trilingual Bulk MCQ Extraction Engine.
- * Optimized for targeting specific language nodes (EN/PA/HI).
+ * Optimized for targeting specific language nodes (EN/PA/HI) and multi-subject pastes.
  */
 
 import { Question, Difficulty } from "@/types";
@@ -27,13 +27,17 @@ export function parseBulkQuestions(
       const aMatch = block.match(/[A][\.\:\)]\s*([\s\S]*?)(?=[B][\.\:\)])/im);
       const bMatch = block.match(/[B][\.\:\)]\s*([\s\S]*?)(?=[C][\.\:\)])/im);
       const cMatch = block.match(/[C][\.\:\)]\s*([\s\S]*?)(?=[D][\.\:\)])/im);
-      const dMatch = block.match(/[D][\.\:\)]\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Correct|Correct Answer|Explanation|Solution|Rationale|Details|Source):|$)/im);
+      const dMatch = block.match(/[D][\.\:\)]\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Correct|Correct Answer|Explanation|Solution|Rationale|Details|Source|Subject|S:):|$)/im);
 
       // 3. Extract Correct Answer Key
       const answerMatch = block.match(/(?:Answer|Key|Ans|Correct|Correct Answer)[:\-]?\s*([A-D])/im);
       
       // 4. Extract Explanation/Rationale
-      const explanationMatch = block.match(/(?:Explanation|Solution|Rationale|Details)[:\-]?\s*([\s\S]*)$/im);
+      const explanationMatch = block.match(/(?:Explanation|Solution|Rationale|Details)[:\-]?\s*([\s\S]*?)(?=(?:Subject|S:)|$)/im);
+
+      // 5. NEW: Extract inline Subject override (e.g. "Subject: Reasoning" or "S: Punjab GK")
+      const subjectMatch = block.match(/(?:Subject|S:)[:\-]?\s*([^\n]*)/im);
+      const inlineSubject = subjectMatch ? subjectMatch[1].trim() : null;
 
       if (!textMatch || !aMatch || !bMatch || !cMatch || !dMatch || !answerMatch) {
         return null;
@@ -43,7 +47,7 @@ export function parseBulkQuestions(
       const q: any = {
         boardId: metadata.boardId,
         examId: metadata.examId,
-        subjectId: metadata.subjectId,
+        subjectId: inlineSubject || metadata.subjectId, // Use inline tag if present
         difficulty: metadata.difficulty,
         correctAnswer: answerMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D',
         createdAt: new Date().toISOString()
