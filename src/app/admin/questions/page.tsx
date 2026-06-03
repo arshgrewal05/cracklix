@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Search, Edit, Trash2, FileText, Database, Layers, CheckCircle2, Clock, AlertCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, query, orderBy, deleteDoc, doc } from "firebase/firestore"
+import { collection, query, orderBy, deleteDoc, doc, where } from "firebase/firestore"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 /**
  * @fileOverview Enterprise Question Bank with Workflow Filtering.
- * Supports DRAFT, REVIEW, and PUBLISHED statuses for large scale teams.
+ * Optimized to show only standalone questions (not hidden mock questions).
  */
 
 export default function QuestionBank() {
@@ -28,7 +28,18 @@ export default function QuestionBank() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [boardFilter, setBoardFilter] = useState("all")
 
-  const { data: questions, loading } = useCollection<any>(useMemo(() => (db ? query(collection(db, "questions"), orderBy("createdAt", "desc")) : null), [db]))
+  // Filter for isStandalone != false to show only general bank questions
+  const qQuery = useMemo(() => {
+    if (!db) return null
+    return query(
+      collection(db, "questions"), 
+      where("isStandalone", "!=", false),
+      orderBy("isStandalone"), // Required for inequality filter
+      orderBy("createdAt", "desc")
+    )
+  }, [db])
+
+  const { data: questions, loading } = useCollection<any>(qQuery)
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
 
   const filteredQuestions = useMemo(() => {
@@ -42,13 +53,13 @@ export default function QuestionBank() {
   }, [questions, searchTerm, statusFilter, boardFilter])
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Permanently delete this node?")) return
-    await deleteDoc(doc(db, "questions", id))
+    if (!confirm("Permanently delete this node from the global bank?")) return
+    await deleteDoc(doc(db!, "questions", id))
     toast({ title: "Node Purged", description: "Asset removed from global bank." })
   }
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-10 pb-20 text-[#0F172A]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -56,7 +67,7 @@ export default function QuestionBank() {
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Scale Architecture Hub</span>
           </div>
           <h1 className="text-5xl font-black font-headline text-primary uppercase tracking-tight">Enterprise Bank</h1>
-          <p className="text-muted-foreground mt-2 text-lg">Managing {questions?.length || 0} MCQs with Approval Workflow active.</p>
+          <p className="text-muted-foreground mt-2 text-lg">Managing {questions?.length || 0} Standalone MCQs. Mock-specific items are hidden.</p>
         </div>
         <div className="flex flex-wrap gap-4">
           <Button asChild className="bg-primary hover:bg-primary/90 gap-3 font-black shadow-2xl h-14 px-10 rounded-2xl uppercase tracking-widest text-xs">
@@ -70,7 +81,7 @@ export default function QuestionBank() {
           <div className="flex flex-col lg:flex-row gap-8 items-center justify-between">
             <div className="relative w-full lg:w-[45%]">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-              <Input className="pl-14 h-16 rounded-[1.5rem] bg-background border-none shadow-inner" placeholder="Search global bank..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+              <Input className="pl-14 h-16 rounded-[1.5rem] bg-background border-none shadow-inner" placeholder="Search standalone bank..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
             <div className="flex flex-wrap gap-4">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -95,7 +106,7 @@ export default function QuestionBank() {
               <TableRow className="border-white/5 h-16">
                 <TableHead className="px-10 text-[10px] font-black uppercase tracking-[0.2em]">Asset Logic</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-[0.2em]">Audit Workflow</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em]">Quality Score</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em]">Metadata</TableHead>
                 <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-[0.2em]">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -104,7 +115,7 @@ export default function QuestionBank() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i} className="border-white/5"><TableCell colSpan={4} className="px-10 py-8"><Skeleton className="h-14 w-full rounded-2xl bg-white/5" /></TableCell></TableRow>
                 ))
-              ) : filteredQuestions.map((q: any) => (
+              ) : filteredQuestions.length > 0 ? filteredQuestions.map((q: any) => (
                 <TableRow key={q.id} className="hover:bg-white/5 border-white/5 transition-colors">
                   <TableCell className="px-10 py-8 max-w-lg">
                     <p className="font-bold text-slate-100 line-clamp-1">{q.questionEn}</p>
@@ -126,7 +137,7 @@ export default function QuestionBank() {
                         <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-black text-slate-400">
                            {q.correctAnswer}
                         </div>
-                        <span className="text-[10px] font-bold text-slate-500">{q.attempts || 0} Attempts</span>
+                        <span className="text-[10px] font-bold text-slate-500">Bank Active</span>
                      </div>
                   </TableCell>
                   <TableCell className="text-right px-10">
@@ -138,7 +149,11 @@ export default function QuestionBank() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                   <TableCell colSpan={4} className="h-40 text-center opacity-30 italic text-slate-400 font-bold uppercase text-xs">No standalone questions in bank. Use bulk import to populate.</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
