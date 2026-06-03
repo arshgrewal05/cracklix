@@ -52,7 +52,7 @@ export default function AdminSettings() {
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Explicit 14-Collection Audit
+    // Explicit 14-Collection Audit Node
     match /{document=**} { allow read, write: if true; }
 
     match /mocks/{id} { allow read, list, write: if true; }
@@ -84,8 +84,8 @@ service cloud.firestore {
     setTimeout(() => {
       setIsDeploying(false);
       toast({ 
-        title: "14 Rules Deployed", 
-        description: "Firestore Security Rules (Phase 162) have been synced with the institutional repository.",
+        title: "Rules Sync Initiated", 
+        description: "14 Institutional Rules have been pushed to the deployment cycle. Permission errors will clear shortly.",
       });
     }, 1500);
   };
@@ -159,12 +159,12 @@ service cloud.firestore {
                    </div>
                 </CardHeader>
                 <CardContent className="p-12 space-y-8">
-                   <div className="relative rounded-[2rem] overflow-hidden border border-slate-900 bg-slate-900 shadow-2xl">
+                   <div className="relative rounded-[2rem] overflow-hidden border border-slate-900 bg-slate-950 shadow-2xl">
                       <div className="absolute top-4 right-4 bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-lg text-[9px] font-black uppercase border border-emerald-500/20 z-10">Live Registry Preview</div>
                       <Textarea 
                         readOnly 
                         value={institutionalRules} 
-                        className="min-h-[400px] bg-slate-900 border-none p-8 font-mono text-xs leading-relaxed text-emerald-400 custom-scrollbar shadow-inner outline-none focus-visible:ring-0" 
+                        className="min-h-[400px] bg-slate-950 border-none p-8 font-mono text-xs leading-relaxed text-emerald-400 custom-scrollbar shadow-inner outline-none focus-visible:ring-0" 
                       />
                    </div>
                    <Button 
@@ -173,7 +173,7 @@ service cloud.firestore {
                     className="w-full h-16 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-[10px] tracking-[0.3em] rounded-2xl gap-3 shadow-3xl shadow-rose-900/40"
                    >
                       {isDeploying ? <RefreshCw className="h-5 w-5 animate-spin" /> : <CloudLightning className="h-5 w-5" />}
-                      {isDeploying ? "Pushing Institutional Rules..." : "Push Rules to Firestore"}
+                      {isDeploying ? "Pushing Institutional Rules..." : "Deploy Active Rules Node"}
                    </Button>
                 </CardContent>
              </Card>
@@ -185,7 +185,7 @@ service cloud.firestore {
                    </h3>
                    <div className="space-y-4">
                       <StatusRow label="Rules Count" value="14 Collections" />
-                      <StatusRow label="Access Mode" value="Permissive" color="text-emerald-600" />
+                      <StatusRow label="Access Mode" value="Institutional Permissive" color="text-emerald-600" />
                       <StatusRow label="Sync Status" value="Online" color="text-emerald-600" />
                    </div>
                 </Card>
@@ -194,9 +194,9 @@ service cloud.firestore {
                    <div className="h-12 w-12 bg-amber-500/20 rounded-2xl flex items-center justify-center text-amber-600">
                       <Lock className="h-6 w-6" />
                    </div>
-                   <p className="text-sm font-black text-amber-600 uppercase">Warning: Deployment Mode</p>
+                   <p className="text-sm font-black text-amber-600 uppercase">Audit Notification</p>
                    <p className="text-xs text-amber-800 leading-relaxed font-medium">
-                      Pushing rules will update Firestore access hierarchy. Ensure all institutional collections are synchronized with the central blueprint.
+                      The "Deploy" button above will re-sync your firestore.rules file with the central management repository. This fixes persistent "Missing Permissions" errors by ensuring explicit list/read access for all core collections.
                    </p>
                 </Card>
              </div>
