@@ -297,10 +297,10 @@ export default function MockAttemptPage() {
                    {isBilingual && (
                       <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-4 mb-4">
                          <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-200 pb-1 mb-2">Primary: English</p>
-                         <p className="text-sm md:text-lg font-bold leading-relaxed">{getQuestionText('english')}</p>
+                         <p className="text-sm md:text-lg font-bold leading-relaxed whitespace-pre-line">{getQuestionText('english')}</p>
                       </div>
                    )}
-                   <p className={cn("text-base md:text-2xl font-black leading-tight", isBilingual ? "text-primary" : "text-[#0F172A]")}>
+                   <p className={cn("text-base md:text-2xl font-black leading-tight whitespace-pre-line", isBilingual ? "text-primary" : "text-[#0F172A]")}>
                       {isBilingual ? <span className="text-[8px] block uppercase text-primary/50 tracking-[0.2em] mb-1">Target Language</span> : null}
                       {getQuestionText(language)}
                    </p>
@@ -327,7 +327,7 @@ export default function MockAttemptPage() {
                                   <p className="text-sm md:text-lg font-black text-primary">{getOptionText(key as any, language)}</p>
                                </div>
                             ) : (
-                               <span>{getOptionText(key as any, language)}</span>
+                               <span className="whitespace-pre-line">{getOptionText(key as any, language)}</span>
                             )}
                          </Label>
                          <span className={cn(

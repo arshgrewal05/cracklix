@@ -97,11 +97,12 @@ export function parseBulkQuestions(
         currentQuestion[`explanation${lang}`] = trimmed.replace(/^(Explanation|Solution|Rationale|Details|Explanation\/Solution)[\:\-\s]*/i, '');
       } else {
         // Append to question or last option/explanation if it spans multiple lines
+        // Preserving line breaks with \n to support columns/tables format
         if (currentQuestion[`explanation${lang}`]) {
-           currentQuestion[`explanation${lang}`] += ' ' + trimmed;
+           currentQuestion[`explanation${lang}`] += '\n' + trimmed;
         } else {
            if (!currentQuestion[`question${lang}`]) currentQuestion[`question${lang}`] = "";
-           currentQuestion[`question${lang}`] += ' ' + trimmed;
+           currentQuestion[`question${lang}`] += '\n' + trimmed;
         }
       }
     }
