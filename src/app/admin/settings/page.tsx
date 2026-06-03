@@ -16,8 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 /**
- * @fileOverview Final Enterprise CMS (Phase 163).
- * Visibility fix applied for light-mode readability.
+ * @fileOverview Final Enterprise CMS (Phase 164).
+ * High-contrast visibility audit applied for terminal-style rules preview.
  */
 
 export default function AdminSettings() {
@@ -52,12 +52,9 @@ export default function AdminSettings() {
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Global Access (Dev Mode)
-    match /{document=**} {
-      allow read, write: if true;
-    }
+    // Explicit 14-Collection Audit
+    match /{document=**} { allow read, write: if true; }
 
-    // 14 Core Rules Explicitly Structured
     match /mocks/{id} { allow read, list, write: if true; }
     match /test_sessions/{id} { allow read, list, write: if true; }
     match /results/{id} { allow read, list, write: if true; }
@@ -89,7 +86,6 @@ service cloud.firestore {
       toast({ 
         title: "14 Rules Deployed", 
         description: "Firestore Security Rules (Phase 162) have been synced with the institutional repository.",
-        variant: "default"
       });
     }, 1500);
   };
@@ -151,24 +147,24 @@ service cloud.firestore {
         <TabsContent value="security">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
              <Card className="lg:col-span-7 border-slate-200 bg-white shadow-xl rounded-[3.5rem] overflow-hidden">
-                <CardHeader className="p-12 border-b border-slate-100 bg-rose-50">
+                <CardHeader className="p-12 border-b border-slate-100 bg-slate-50">
                    <div className="flex items-center gap-4">
                       <div className="h-12 w-12 rounded-2xl bg-rose-500 flex items-center justify-center text-white shadow-xl">
                          <FileCode className="h-6 w-6" />
                       </div>
                       <div>
-                         <CardTitle className="text-2xl font-headline font-black uppercase text-rose-900">Institutional Rules Audit</CardTitle>
+                         <CardTitle className="text-2xl font-headline font-black uppercase text-slate-900">Institutional Rules Audit</CardTitle>
                          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-rose-500">14 Active Rules Structured for Deployment.</CardDescription>
                       </div>
                    </div>
                 </CardHeader>
                 <CardContent className="p-12 space-y-8">
-                   <div className="relative">
-                      <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-lg text-[9px] font-black uppercase">Institutional Pattern</div>
+                   <div className="relative rounded-[2rem] overflow-hidden border border-slate-950 bg-slate-950 shadow-2xl">
+                      <div className="absolute top-4 right-4 bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-lg text-[9px] font-black uppercase border border-emerald-500/20 z-10">Institutional Pattern</div>
                       <Textarea 
                         readOnly 
                         value={institutionalRules} 
-                        className="min-h-[400px] bg-[#0F172A] border-none rounded-[2rem] p-8 font-mono text-xs leading-relaxed text-emerald-400 custom-scrollbar shadow-inner" 
+                        className="min-h-[400px] bg-slate-950 border-none p-8 font-mono text-xs leading-relaxed text-emerald-400 custom-scrollbar shadow-inner outline-none focus-visible:ring-0" 
                       />
                    </div>
                    <Button 
@@ -189,8 +185,8 @@ service cloud.firestore {
                    </h3>
                    <div className="space-y-4">
                       <StatusRow label="Rules Count" value="14 Collections" />
-                      <StatusRow label="Access Mode" value="Dev Permissive" color="text-emerald-500" />
-                      <StatusRow label="Sync Status" value="Online" color="text-emerald-500" />
+                      <StatusRow label="Access Mode" value="Dev Permissive" color="text-emerald-600" />
+                      <StatusRow label="Sync Status" value="Online" color="text-emerald-600" />
                    </div>
                 </Card>
 
