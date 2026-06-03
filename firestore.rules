@@ -7,75 +7,59 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isFounder() {
-      return isAuthenticated() && request.auth.token.email == 'arshdeepgrewal1122@gmail.com';
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
     function isAdmin() {
-      return isFounder() || (
-        isAuthenticated() && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'SUPER_ADMIN']
+      return isAuthenticated() && (
+        request.auth.token.email == 'arshdeepgrewal1122@gmail.com' ||
+        getUserData().role in ['ADMIN', 'SUPER_ADMIN']
       );
     }
 
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    function isContentTeam() {
+      return isAdmin() || (isAuthenticated() && getUserData().role in ['CONTENT_MANAGER', 'QUESTION_REVIEWER']);
     }
 
-    // --- Public Institutional Data ---
-    match /boards/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /exams/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /subjects/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /mocks/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /settings/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /current_affairs/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /notifications/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /pyqs/{docId} { allow read: if true; allow write: if isAdmin(); }
-    match /notes/{docId} { allow read: if true; allow write: if isAdmin(); }
+    function isSupport() {
+      return isAdmin() || (isAuthenticated() && getUserData().role == 'SUPPORT_AGENT');
+    }
 
-    // --- Protected Aspirant Data ---
-    match /users/{userId} {
-      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+    // --- Enterprise Data Rules ---
+    match /boards/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /exams/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /subjects/{id} { allow read: if true; allow write: if isContentTeam(); }
+    
+    match /questions/{id} { 
+      allow read: if isAuthenticated(); 
+      allow create: if isContentTeam();
+      allow update: if isContentTeam();
       allow delete: if isAdmin();
     }
 
-    match /questions/{docId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+    match /mocks/{id} { 
+      allow read: if true; 
+      allow create, update: if isContentTeam();
+      allow delete: if isAdmin();
     }
 
-    match /results/{resultId} {
-      allow read: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
-      allow update, delete: if isAdmin();
-    }
-
-    match /test_sessions/{sessionId} {
-      allow read: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow write: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
-    }
-
-    match /bookmarks/{docId} {
-      allow read: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
-      allow delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
-    }
-
-    match /reports/{docId} {
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin() || isSupport());
       allow create: if isAuthenticated();
-      allow read, update, delete: if isAdmin();
+      allow update: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
     }
 
-    match /audit_logs/{logId} {
-      allow read: if isAdmin();
-      allow write: if isAdmin();
-    }
+    match /settings/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /current_affairs/{id} { allow read: if true; allow write: if isContentTeam(); }
+    match /notifications/{id} { allow read: if true; allow write: if isContentTeam(); }
+    match /pyqs/{id} { allow read: if true; allow write: if isContentTeam(); }
+    match /reports/{id} { allow create: if isAuthenticated(); allow read, update: if isSupport(); }
+    match /audit_logs/{id} { allow read: if isAdmin(); allow create: if isContentTeam(); }
 
     match /{document=**} {
-      allow read, write: if isFounder();
+      allow read, write: if request.auth.token.email == 'arshdeepgrewal1122@gmail.com';
     }
   }
 }

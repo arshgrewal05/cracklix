@@ -1,7 +1,8 @@
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'STUDENT';
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'CONTENT_MANAGER' | 'QUESTION_REVIEWER' | 'SUPPORT_AGENT' | 'STUDENT';
 export type MockType = 'FULL' | 'SUBJECT' | 'SECTIONAL' | 'PYQ';
+export type ContentStatus = 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'ARCHIVED';
 
 export interface Board {
   id: string;
@@ -22,16 +23,6 @@ export interface Exam {
   duration?: number;
 }
 
-export interface Series {
-  id: string;
-  title: string;
-  examId: string;
-  boardId: string;
-  description: string;
-  isPremium: boolean;
-  mockCount?: number;
-}
-
 export interface Subject {
   id: string;
   name: string;
@@ -45,6 +36,7 @@ export interface Question {
   subjectId: string;
   difficulty: Difficulty;
   topic?: string;
+  status: ContentStatus;
 
   // Bilingual Content
   questionEn: string;
@@ -63,28 +55,34 @@ export interface Question {
   optionDPa: string;
 
   correctAnswer: 'A' | 'B' | 'C' | 'D';
-
   explanationEn: string;
   explanationPa: string;
 
+  // Quality Analytics
+  attempts?: number;
+  correctAttempts?: number;
+  avgTimeSeconds?: number;
+
   createdAt: any;
+  updatedAt?: any;
   author?: string;
+  reviewedBy?: string;
 }
 
 export interface MockTest {
   id: string;
   title: string;
-  seriesId?: string;
   boardId: string;
   examId: string;
-  subjectId?: string;
   mockType: MockType;
   duration: number;
   totalQuestions: number;
   questionIds: string[];
   difficulty: string;
   published: boolean;
+  status: ContentStatus;
   createdAt: any;
+  updatedAt?: any;
   author?: string;
 }
 
@@ -99,16 +97,4 @@ export interface UserProfile {
   createdAt: any;
   status: 'Pro' | 'Free';
   planId?: string;
-  bestScore?: number;
-  rank?: string;
-}
-
-export interface RevisionItem {
-  id: string;
-  userId: string;
-  questionId: string;
-  questionText: string;
-  type: 'BOOKMARK' | 'WRONG_ATTEMPT' | 'MARKED_FOR_REVIEW';
-  subjectId: string;
-  timestamp: any;
 }
