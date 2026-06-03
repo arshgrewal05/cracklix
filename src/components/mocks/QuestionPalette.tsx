@@ -16,7 +16,7 @@ interface QuestionPaletteProps {
 
 /**
  * @fileOverview Final Paginated Audit Map.
- * Updated: Replaced "NODES" with "QUESTIONS" and optimized 5x5 grid alignment.
+ * Updated: Centered grid to prevent clipping and corrected "QUESTIONS" terminology.
  */
 
 export default function QuestionPalette({

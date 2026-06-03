@@ -34,8 +34,8 @@ import { cn } from "@/lib/utils"
 type LangMode = 'en' | 'reg' | 'bilingual'
 
 /**
- * @fileOverview Final Testbook-Style CBT Engine.
- * Fixed: Bilingual duplication check with trim() and paper-specific subheaders.
+ * @fileOverview Final Testbook-Style CBT Engine (Phase 160).
+ * Fixed: Bilingual color consistency, Paper A header logic, and Sidebar alignment.
  */
 
 export default function MockAttemptPage() {
@@ -159,6 +159,10 @@ export default function MockAttemptPage() {
   const regLabel = mock?.examType === 'central' ? 'हिन्दी' : 'ਪੰਜਾਬੀ'
   const regKey = mock?.examType === 'central' ? 'Hi' : 'Pa'
 
+  // Header Logic: Paper A (0-49) is strictly Punjabi Qualifying
+  const isPaperA = currentIdx < 50;
+  const activePaper = q?.paper || (isPaperA ? "PAPER A: PUNJABI QUALIFYING" : "PAPER B: MAIN EXAM")
+  
   const subjectNames: Record<string, string> = {
     'punjabi-qualifying': 'Punjabi Language & Grammar',
     'punjab-history': 'Punjab History & Culture',
@@ -169,12 +173,9 @@ export default function MockAttemptPage() {
     'english': 'General English'
   }
 
-  // Paper A logic for subheader fixes
-  const isPaperA = currentIdx < 50;
-  const activePaper = q?.paper || (isPaperA ? "PAPER A: PUNJABI QUALIFYING" : "PAPER B: MAIN EXAM")
   const activeSection = isPaperA ? "Punjabi Language & Grammar" : (subjectNames[q?.subjectId] || q?.section || "General Assessment")
 
-  // Duplication Check: Strictly hide EN if identical to REG (trimmed)
+  // Duplicate Check
   const qEnTrim = (q?.questionEn || "").trim()
   const qRegTrim = (q?.[`question${regKey}`] || "").trim()
   const hasDistinctTranslation = qEnTrim && qRegTrim && qEnTrim !== qRegTrim
@@ -227,7 +228,7 @@ export default function MockAttemptPage() {
                    {showReg && (
                       <p className={cn(
                         "text-lg md:text-xl font-bold leading-snug text-[#0B1528] antialiased whitespace-pre-line",
-                        language === 'bilingual' && showEn ? 'text-slate-500 border-t border-slate-100 pt-3' : ''
+                        language === 'bilingual' && showEn ? 'border-t border-slate-100 pt-3' : ''
                       )}>
                          {q?.[`question${regKey}`] || q?.questionEn}
                       </p>
@@ -241,9 +242,9 @@ export default function MockAttemptPage() {
                 >
                   {['A', 'B', 'C', 'D'].map((k, i) => {
                     const isSelected = answers[currentIdx] === i
-                    const optEn = q?.[`option${k}En`]
-                    const optReg = q?.[`option${k}${regKey}`]
-                    const hasValidTranslation = optReg && optReg.trim() !== (optEn || "").trim()
+                    const optEn = (q?.[`option${k}En`] || "").trim()
+                    const optReg = (q?.[`option${k}${regKey}`] || "").trim()
+                    const hasValidTranslation = optReg && optReg !== optEn
 
                     return (
                       <div key={i} onClick={() => setAnswers(prev => ({ ...prev, [currentIdx]: i }))} className={cn(
