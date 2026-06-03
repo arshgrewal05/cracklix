@@ -34,8 +34,8 @@ import { cn } from "@/lib/utils"
 type LangMode = 'en' | 'reg' | 'bilingual'
 
 /**
- * @fileOverview Final Testbook-Style CBT Engine (Phase 160).
- * Fixed: Bilingual color consistency, Paper A header logic, and Sidebar alignment.
+ * @fileOverview Final Testbook-Style CBT Engine (Phase 162).
+ * Fixed: Consolidated Paper A headers, unified bilingual colors, and stabilized Timer/Palette.
  */
 
 export default function MockAttemptPage() {
@@ -159,9 +159,9 @@ export default function MockAttemptPage() {
   const regLabel = mock?.examType === 'central' ? 'हिन्दी' : 'ਪੰਜਾਬੀ'
   const regKey = mock?.examType === 'central' ? 'Hi' : 'Pa'
 
-  // Header Logic: Paper A (0-49) is strictly Punjabi Qualifying
+  // Correct Paper A Logic: Ensure questions 1-50 are strictly labeled as Punjabi Language
   const isPaperA = currentIdx < 50;
-  const activePaper = q?.paper || (isPaperA ? "PAPER A: PUNJABI QUALIFYING" : "PAPER B: MAIN EXAM")
+  const activePaper = isPaperA ? "PAPER A: PUNJABI QUALIFYING" : (q?.paper || "PAPER B: MAIN EXAM")
   
   const subjectNames: Record<string, string> = {
     'punjabi-qualifying': 'Punjabi Language & Grammar',
@@ -175,7 +175,7 @@ export default function MockAttemptPage() {
 
   const activeSection = isPaperA ? "Punjabi Language & Grammar" : (subjectNames[q?.subjectId] || q?.section || "General Assessment")
 
-  // Duplicate Check
+  // Duplicate Check: Prevents redundant blocks if translations match
   const qEnTrim = (q?.questionEn || "").trim()
   const qRegTrim = (q?.[`question${regKey}`] || "").trim()
   const hasDistinctTranslation = qEnTrim && qRegTrim && qEnTrim !== qRegTrim
@@ -255,7 +255,7 @@ export default function MockAttemptPage() {
                          <Label htmlFor={`opt-${i}`} className="flex-1 cursor-pointer select-none text-sm md:text-base font-bold text-[#0B1528] flex flex-col gap-0.5">
                             {language === 'bilingual' ? (
                                <>
-                                  <span className="text-[11px] text-slate-500 font-medium">{optEn}</span>
+                                  <span className="text-[11px] text-[#0B1528] font-bold opacity-70">{optEn}</span>
                                   {hasValidTranslation && <span className="leading-tight">{optReg}</span>}
                                </>
                             ) : (

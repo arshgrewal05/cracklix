@@ -14,7 +14,7 @@ interface TimerProps {
 
 /**
  * @fileOverview Institutional Timer Node.
- * Features: High-contrast blinking during last 10 minutes and reliable auto-submit trigger.
+ * Fixed: Moved onTick out of state updater to prevent React render warnings.
  */
 
 export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: TimerProps) {
@@ -25,6 +25,13 @@ export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: Ti
   useEffect(() => {
     setTimeLeft(initialSeconds)
   }, [initialSeconds])
+
+  // Synchronize parent state via onTick callback safely
+  useEffect(() => {
+    if (onTick && !isPaused) {
+      onTick(timeLeft)
+    }
+  }, [timeLeft, onTick, isPaused])
 
   useEffect(() => {
     if (isPaused) {
@@ -39,17 +46,13 @@ export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: Ti
     }
 
     timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        const next = prev - 1
-        if (onTick) onTick(next)
-        return next
-      })
+      setTimeLeft(prev => Math.max(0, prev - 1))
     }, 1000)
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [timeLeft, onTimeUp, onTick, isPaused])
+  }, [timeLeft, onTimeUp, isPaused])
 
   const formatTime = (seconds: number) => {
     const safeSecs = Math.max(0, seconds)

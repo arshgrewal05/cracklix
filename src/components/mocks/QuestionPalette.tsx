@@ -16,7 +16,7 @@ interface QuestionPaletteProps {
 
 /**
  * @fileOverview Final Paginated Audit Map.
- * Updated: Centered grid to prevent clipping and corrected "QUESTIONS" terminology.
+ * Fixed: Pagination auto-jump beyond 25 and manual arrow stability.
  */
 
 export default function QuestionPalette({
@@ -31,10 +31,16 @@ export default function QuestionPalette({
   const totalPages = Math.ceil(totalQuestions / PAGE_SIZE)
   const [currentPage, setCurrentPage] = useState(0)
 
+  // Auto-jump to the correct page when current index changes, but only if it's outside current view
   useEffect(() => {
     const targetPage = Math.floor(currentIndex / PAGE_SIZE)
-    if (targetPage !== currentPage) setCurrentPage(targetPage)
-  }, [currentIndex, totalQuestions, currentPage])
+    const startIdx = currentPage * PAGE_SIZE
+    const endIdx = startIdx + PAGE_SIZE
+    
+    if (currentIndex < startIdx || currentIndex >= endIdx) {
+      setCurrentPage(targetPage)
+    }
+  }, [currentIndex, totalQuestions])
 
   const startIdx = currentPage * PAGE_SIZE
   const endIdx = Math.min(startIdx + PAGE_SIZE, totalQuestions)
@@ -49,7 +55,7 @@ export default function QuestionPalette({
     return {
       answered: answered - answeredAndReview,
       review: review - answeredAndReview,
-      notVisited: totalQuestions - visited,
+      notVisited: Math.max(0, totalQuestions - visited),
       notAnswered: Math.max(0, visited - answered),
       answeredAndReview
     }
@@ -69,8 +75,20 @@ export default function QuestionPalette({
          <div className="flex items-center justify-between px-1">
             <h4 className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Audit Grid</h4>
             <div className="flex gap-1.5">
-               <button onClick={() => setCurrentPage(p => Math.max(0, p - 1))} disabled={currentPage === 0} className="p-1 hover:bg-slate-100 rounded-lg disabled:opacity-20 transition-colors"><ChevronLeft className="h-4 w-4" /></button>
-               <button onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))} disabled={currentPage === totalPages - 1} className="p-1 hover:bg-slate-100 rounded-lg disabled:opacity-20 transition-colors"><ChevronRight className="h-4 w-4" /></button>
+               <button 
+                  onClick={() => setCurrentPage(p => Math.max(0, p - 1))} 
+                  disabled={currentPage === 0} 
+                  className="p-1 hover:bg-slate-100 rounded-lg disabled:opacity-20 transition-colors"
+               >
+                  <ChevronLeft className="h-4 w-4" />
+               </button>
+               <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))} 
+                  disabled={currentPage === totalPages - 1} 
+                  className="p-1 hover:bg-slate-100 rounded-lg disabled:opacity-20 transition-colors"
+               >
+                  <ChevronRight className="h-4 w-4" />
+               </button>
             </div>
          </div>
 
@@ -89,7 +107,7 @@ export default function QuestionPalette({
                      onClick={() => onSelect(idx)}
                      className={cn(
                         "h-8 w-8 rounded-lg text-[10px] font-black transition-all border flex items-center justify-center shadow-sm shrink-0",
-                        isCurrent ? "ring-2 ring-primary ring-offset-2 scale-110 z-10 bg-white text-primary border-primary" : "",
+                        isCurrent ? "ring-2 ring-primary ring-offset-2 scale-110 z-10 bg-white text-primary border-primary font-bold" : "",
                         !isCurrent && isBoth && "bg-purple-600 text-white border-purple-600",
                         !isCurrent && isAnswered && !isFlagged && "bg-emerald-600 text-white border-emerald-600",
                         !isCurrent && isFlagged && !isAnswered && "bg-amber-500 text-white border-amber-500",
@@ -102,7 +120,7 @@ export default function QuestionPalette({
                )
             })}
          </div>
-         <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest text-center">QUESTIONS {startIdx + 1} — {endIdx}</p>
+         <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest text-center mt-2">QUESTIONS {startIdx + 1} — {endIdx}</p>
       </div>
     </div>
   )
