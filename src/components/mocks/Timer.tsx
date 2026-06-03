@@ -55,11 +55,11 @@ export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: Ti
 
   return (
     <div className={cn(
-      "flex items-center gap-4 px-6 py-2.5 rounded-2xl font-headline font-black text-lg border-2 transition-all duration-300 shadow-2xl tabular-nums",
+      "flex items-center gap-2 px-3 py-1 rounded-lg font-black text-sm border transition-all duration-300 tabular-nums",
       isLowTime ? "bg-rose-50 border-rose-200 text-rose-600 animate-pulse" : "bg-white/5 border-white/10 text-white"
     )}>
-      <Clock className={cn("h-5 w-5", isLowTime ? "text-rose-500" : "text-primary")} />
-      <span className="tracking-widest">⏱ {formatTime(timeLeft)}</span>
+      <Clock className={cn("h-3.5 w-3.5", isLowTime ? "text-rose-500" : "text-primary")} />
+      <span className="tracking-widest">{formatTime(timeLeft)}</span>
     </div>
   )
 }
