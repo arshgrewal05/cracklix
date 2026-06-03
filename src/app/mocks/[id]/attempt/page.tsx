@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
@@ -13,18 +12,11 @@ import { Label } from "@/components/ui/label"
 import { 
   PauseCircle, 
   PlayCircle,
-  LayoutGrid,
   Languages,
   Loader2,
   Trash2,
-  Monitor,
   Target
 } from "lucide-react"
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
@@ -79,6 +71,9 @@ export default function MockAttemptPage() {
   }, [db, mock, toast])
 
   const currentSection = useMemo(() => {
+    // Paper A Override: 1-50 questions are strictly Punjabi Qualifying
+    if (currentIdx < 50) return { name: "PUNJABI LANGUAGE & GRAMMAR", paper: "PAPER A" }
+    
     if (!activePattern || !questions.length) return { name: "General Assessment", paper: "PAPER B" }
     
     let cumulative = 0
@@ -86,13 +81,13 @@ export default function MockAttemptPage() {
       cumulative += section.count
       if (currentIdx < cumulative) {
         return { 
-          name: section.name, 
+          name: section.name.toUpperCase(), 
           paper: section.name.includes("Qualifying") || section.name.includes("Paper A") || section.name.toLowerCase().includes("punjabi") ? "PAPER A" : "PAPER B" 
         }
       }
     }
     return { name: "General Assessment", paper: "PAPER B" }
-  }, [activePattern, currentIdx, questions])
+  }, [activePattern, currentIdx, questions.length])
 
   const submitMock = useCallback(async () => {
     if (isSubmitting || questions.length === 0 || !user || !db) return
@@ -147,7 +142,6 @@ export default function MockAttemptPage() {
   const regLabel = mock?.examType === 'central' ? 'हिन्दी' : 'ਪੰਜਾਬੀ'
   const regKey = mock?.examType === 'central' ? 'Hi' : 'Pa'
 
-  // Institutional Rule: Force Punjabi only for Paper A or Punjabi subjects
   const isPunjabiOnlyNode = currentSection.paper === "PAPER A" || q?.subjectId === "punjabi-qualifying" || currentSection.name.toLowerCase().includes("punjabi");
 
   return (
@@ -160,7 +154,7 @@ export default function MockAttemptPage() {
         </div>
         
         <div className="flex items-center gap-3">
-          <Timer onTimeUp={submitMock} initialSeconds={remainingTime} onTick={setRemainingTime} isPaused={isPaused} />
+          <Timer onTimeUp={submitMock} initialSeconds={(mock?.duration || 120) * 60} onTick={setRemainingTime} isPaused={isPaused} />
           <Button variant="ghost" size="icon" onClick={() => setIsPaused(!isPaused)} className="h-9 w-9 text-slate-400 hover:text-white">
             {isPaused ? <PlayCircle className="h-5 w-5" /> : <PauseCircle className="h-5 w-5" />}
           </Button>
@@ -217,7 +211,7 @@ export default function MockAttemptPage() {
                     const optPa = q?.[`option${k}${regKey}`] || ""
 
                     return (
-                      <div key={i} onClick={() => setAnswers(prev => ({ ...prev, [currentIdx]: i }))} className={cn(
+                      <div key={i} className={cn(
                         "flex items-center space-x-4 p-4 md:p-6 border rounded-2xl transition-all cursor-pointer bg-white shadow-sm hover:border-primary/40",
                         isSelected ? 'border-primary ring-2 ring-primary/10 bg-primary/[0.01]' : 'border-slate-200'
                       )}>

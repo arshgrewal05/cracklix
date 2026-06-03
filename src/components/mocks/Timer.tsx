@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useEffect, useState, useRef } from "react"
@@ -14,25 +13,26 @@ interface TimerProps {
 
 /**
  * @fileOverview Institutional Timer Node.
- * Fixed: Moved onTick call to a standalone useEffect to avoid "update during render" warning.
+ * Fixed: Stabilized initialSeconds to prevent feedback loops and fixed setState re-render warning.
  */
 
 export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(initialSeconds)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const onTickRef = useRef(onTick)
   const hasSubmitted = useRef(false)
 
-  // Reset timer if initialSeconds changes
+  // Keep onTick reference stable for the effect
   useEffect(() => {
-    setTimeLeft(initialSeconds)
-  }, [initialSeconds])
+    onTickRef.current = onTick
+  }, [onTick])
 
-  // Synchronize parent state via onTick callback safely (avoiding warning)
+  // Sync parent only when timeLeft changes, handled via stable ref to avoid render conflict
   useEffect(() => {
-    if (onTick && !isPaused) {
-      onTick(timeLeft)
+    if (onTickRef.current && !isPaused) {
+      onTickRef.current(timeLeft)
     }
-  }, [timeLeft, onTick, isPaused])
+  }, [timeLeft, isPaused])
 
   useEffect(() => {
     if (isPaused) {

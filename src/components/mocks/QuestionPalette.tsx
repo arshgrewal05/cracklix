@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
@@ -16,7 +15,7 @@ interface QuestionPaletteProps {
 
 /**
  * @fileOverview Final Paginated Audit Map.
- * Fixed: Range-based pagination auto-shift and terminological realignment to "QUESTIONS".
+ * Fixed: Robust range-based pagination and centered grid alignment.
  */
 
 export default function QuestionPalette({
@@ -88,7 +87,7 @@ export default function QuestionPalette({
             </div>
          </div>
 
-         <div className="grid grid-cols-5 gap-2 px-2 justify-items-center">
+         <div className="grid grid-cols-5 gap-3 px-1 justify-items-center">
             {currentRange.map((idx) => {
                const isCurrent = currentIndex === idx
                const isAnswered = answeredIndices.includes(idx)
@@ -101,7 +100,7 @@ export default function QuestionPalette({
                      key={idx}
                      onClick={() => onSelect(idx)}
                      className={cn(
-                        "h-8 w-8 rounded-lg text-[10px] font-black transition-all border flex items-center justify-center shadow-sm shrink-0",
+                        "h-9 w-9 rounded-lg text-[10px] font-black transition-all border flex items-center justify-center shadow-sm shrink-0",
                         isCurrent ? "ring-2 ring-primary ring-offset-2 scale-110 z-10 bg-white text-primary border-primary" : "",
                         !isCurrent && isBoth && "bg-purple-600 text-white border-purple-600",
                         !isCurrent && isAnswered && !isFlagged && "bg-emerald-600 text-white border-emerald-600",
