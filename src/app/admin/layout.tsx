@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
@@ -38,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-slate-50">
+      <div className="flex min-h-screen w-full bg-white">
         <Sidebar className="border-r border-white/5 bg-[#0F172A]">
           <SidebarHeader className="p-6">
             <Logo variant="light" className="scale-90 origin-left" />
@@ -98,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </SidebarContent>
         </Sidebar>
         
-        <SidebarInset className="flex flex-col bg-slate-50">
+        <SidebarInset className="flex flex-col bg-white">
           <header className="h-16 border-b border-slate-200 flex items-center px-6 justify-between bg-white sticky top-0 z-40 shadow-sm">
             <div className="flex items-center gap-4 min-w-0">
               <SidebarTrigger className="text-[#0F172A]" />
@@ -122,7 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
           </header>
-          <main className="flex-1 p-8 overflow-y-auto">
+          <main className="flex-1 p-8 overflow-y-auto bg-white">
             {children}
           </main>
         </SidebarInset>
