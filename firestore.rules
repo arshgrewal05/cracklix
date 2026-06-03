@@ -3,8 +3,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // DEV MODE: Unrestricted access to all collections to facilitate rapid development and content seeding.
-    // This resolves permission errors for current_affairs, notifications, mocks, etc.
+    // Institutional Read-Only Access (Public)
+    // These rules ensure that aspirants can list and view exams, mocks, and current affairs.
+    match /current_affairs/{id} { allow read: if true; }
+    match /notifications/{id} { allow read: if true; }
+    match /mocks/{id} { allow read: if true; }
+    match /exams/{id} { allow read: if true; }
+    match /boards/{id} { allow read: if true; }
+    match /subjects/{id} { allow read: if true; }
+    match /questions/{id} { allow read: if true; }
+    match /pyqs/{id} { allow read: if true; }
+    match /settings/{id} { allow read: if true; }
+
+    // Full Development Access
+    // DEV MODE: Unrestricted access to facilitate rapid content seeding and testing.
+    // Deployment ID: 2026-06-03-T07:15:00Z
     match /{document=**} {
       allow read, write: if true;
     }
