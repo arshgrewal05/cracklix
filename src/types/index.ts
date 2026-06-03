@@ -1,4 +1,3 @@
-
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'CONTENT_MANAGER' | 'STUDENT';
 export type MockType = 'FULL' | 'SUBJECT' | 'SECTIONAL' | 'PYQ';
@@ -75,7 +74,7 @@ export interface Question {
   // Core Text
   questionEn: string;
   questionPa: string;
-  questionHi: string;
+  questionHi?: string;
   
   // Metadata Text
   instructionEn?: string;
@@ -99,7 +98,7 @@ export interface Question {
   explanationPa: string;
   
   // Complex Data
-  diagramType: DiagramType;
+  diagramType?: DiagramType;
   tableData?: {
     headers: string[];
     rows: string[][];

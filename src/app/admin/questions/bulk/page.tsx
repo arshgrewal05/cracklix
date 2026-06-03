@@ -12,13 +12,13 @@ import { useFirestore, useCollection } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { parseBulkQuestions } from "@/lib/parser"
-import { Zap, Database, ChevronLeft, Rocket, ShieldCheck, ClipboardList, Layers, Settings2, Globe, Languages } from "lucide-react"
+import { Zap, Database, ChevronLeft, Rocket, ShieldCheck, ClipboardList, Layers, Settings2, Globe, Languages, AlertTriangle, FileWarning, CheckCircle2 } from "lucide-react"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
 /**
- * @fileOverview Final Mock Extraction Node.
- * Optimized for fused bilingual text formats and repeated option markers.
+ * @fileOverview Final Strict Template Extraction Node.
+ * Replaced AI guessing with strict position-based validation.
  */
 
 export default function BulkImportPage() {
@@ -42,21 +42,8 @@ export default function BulkImportPage() {
   })
   
   const [parsedQuestions, setParsedQuestions] = useState<any[]>([])
+  const [parseErrors, setParseErrors] = useState<string[]>([])
   const [isImporting, setIsImporting] = useState(false)
-
-  // Auto-set duration and subject based on pattern
-  useEffect(() => {
-    if (patterns && metadata.examId) {
-      const pattern = patterns.find((p: any) => p.examId === metadata.examId)
-      if (pattern) {
-        setMetadata(prev => ({ 
-          ...prev, 
-          duration: pattern.duration || 120,
-          subjectId: pattern.sections?.[0]?.subjectId || prev.subjectId 
-        }))
-      }
-    }
-  }, [metadata.examId, patterns])
 
   const activePattern = useMemo(() => {
     if (!patterns || !metadata.examId) return null
@@ -84,12 +71,15 @@ export default function BulkImportPage() {
     }
     
     const results = parseBulkQuestions(rawText, { ...metadata })
-    setParsedQuestions(results.questions)
     
-    if (results.questions.length > 0) {
-      toast({ title: "Extraction Complete", description: `Structured ${results.questions.length} nodes with script transition detection.` })
+    if (results.errors.length > 0) {
+      setParseErrors(results.errors)
+      setParsedQuestions([])
+      toast({ variant: "destructive", title: "Template Mismatch", description: "Validation failed. Correct the errors below." })
     } else {
-      toast({ variant: "destructive", title: "Extraction Failed", description: "No questions detected. Please check format." })
+      setParseErrors([])
+      setParsedQuestions(results.questions)
+      toast({ title: "Extraction Success", description: `${results.questions.length} nodes structured using strict template.` })
     }
   }
 
@@ -112,7 +102,6 @@ export default function BulkImportPage() {
         id: newRef.id,
         isStandalone: false,
         createdAt: serverTimestamp(),
-        status: "PUBLISHED",
         author: "Institutional Bulk Engine"
       })
     })
@@ -151,51 +140,29 @@ export default function BulkImportPage() {
 
   return (
     <div className="space-y-10 pb-20 max-w-7xl mx-auto text-[#0F172A]">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl border border-slate-200 bg-white h-12 w-12 shadow-sm">
             <ChevronLeft className="h-6 w-6 text-[#0F172A]" />
           </Button>
           <div className="text-left">
-            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Bulk Extraction Hub</h1>
-            <p className="text-slate-500 font-medium italic">High-fidelity parsing for fused scripts and repeated option markers.</p>
+            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Institutional Importer</h1>
+            <p className="text-slate-500 font-medium italic">Strict Template System v2.0 - Position-Based Script Splitting</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* Left: Input & Config */}
         <div className="lg:col-span-5 space-y-8 text-left">
           <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] overflow-hidden">
             <div className="h-2 w-full bg-primary" />
             <CardHeader className="p-10 pb-4">
               <CardTitle className="font-headline font-black text-2xl uppercase flex items-center gap-3">
-                <Settings2 className="h-6 w-6 text-primary" /> Configuration
+                <Settings2 className="h-6 w-6 text-primary" /> Import Protocol
               </CardTitle>
             </CardHeader>
             <CardContent className="p-10 pt-4 space-y-8">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase text-slate-500 ml-1">Series Type</p>
-                  <Select value={metadata.mockType} onValueChange={(v) => setMetadata({...metadata, mockType: v})}>
-                    <SelectTrigger className="rounded-xl bg-slate-50 border-slate-100 h-12 font-bold"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="FULL">Full Length Mock</SelectItem>
-                      <SelectItem value="SECTIONAL">Sectional Test</SelectItem>
-                      <SelectItem value="SUBJECT">Subject-wise Mock</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase text-slate-500 ml-1">Duration (Min)</p>
-                  <Input 
-                    type="number" 
-                    value={metadata.duration || ""} 
-                    onChange={e => setMetadata({...metadata, duration: parseInt(e.target.value) || 0})} 
-                    className="rounded-xl bg-slate-50 border-slate-100 h-12 font-black"
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <p className="text-[10px] font-black uppercase text-slate-500 ml-1">Board Authority</p>
@@ -224,76 +191,100 @@ export default function BulkImportPage() {
               </div>
 
               <Textarea 
-                placeholder="Paste fused text here. Parser will auto-split fused EN/PA and repeated markers (A... A...)."
-                className="min-h-[400px] rounded-[2rem] bg-slate-50 border-slate-100 p-8 text-sm font-mono leading-relaxed shadow-inner"
+                placeholder="Paste content following the Q1. [EN] \n [PA] template..."
+                className="min-h-[500px] rounded-[2rem] bg-slate-50 border-slate-100 p-8 text-sm font-mono leading-relaxed shadow-inner"
                 value={rawText}
                 onChange={e => setRawText(e.target.value)}
               />
               
               <Button onClick={handleParse} className="w-full h-20 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.2em] gap-3 rounded-2xl shadow-xl transition-all">
-                <Zap className="h-5 w-5 text-primary" /> Parse Content Batch
+                <Zap className="h-5 w-5 text-primary" /> Run Strict Audit
               </Button>
             </CardContent>
           </Card>
         </div>
 
+        {/* Right: Validation & High-Fidelity Preview */}
         <div className="lg:col-span-7 text-left">
-          <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] h-full flex flex-col overflow-hidden">
-            <CardHeader className="p-10 bg-slate-50/50 border-b border-slate-50">
-              <CardTitle className="font-headline font-black text-2xl uppercase flex items-center gap-3">
-                <Globe className="h-6 w-6 text-primary" /> Extraction Buffer
-              </CardTitle>
-              <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">{parsedQuestions.length} Bilingual Nodes Ready.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-10 flex-1 overflow-y-auto custom-scrollbar space-y-8">
-              {parsedQuestions.length > 0 ? (
-                parsedQuestions.map((q, idx) => (
-                  <div key={idx} className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 space-y-8 relative overflow-hidden group">
-                    <div className="flex justify-between items-center relative z-10">
-                       <div className="flex gap-2">
-                          <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase px-3 py-1 rounded-lg">EN</Badge>
-                          <Badge className="bg-blue-500/10 text-blue-600 border-none text-[9px] font-black uppercase px-3 py-1 rounded-lg">PA</Badge>
-                       </div>
-                       <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">KEY: {q.correctAnswer}</span>
-                    </div>
-                    
-                    <div className="space-y-6 relative z-10">
-                       <p className="text-lg font-bold text-[#0F172A] leading-tight">{q.questionEn}</p>
-                       {q.questionPa && q.questionPa !== q.questionEn && (
-                         <p className="text-lg font-medium text-slate-500 leading-tight italic border-t border-slate-200 pt-6">{q.questionPa}</p>
-                       )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-8 pt-8 border-t border-slate-200 relative z-10">
-                       {['A', 'B', 'C', 'D'].map(l => (
-                          <div key={l} className="space-y-2">
-                             <span className="text-[9px] font-black text-slate-400 uppercase">Option {l} (EN/PA)</span>
-                             <p className="text-sm font-bold text-[#0F172A] truncate">{q[`option${l}En`]}</p>
-                             <p className="text-sm font-medium text-slate-500 truncate">{q[`option${l}Pa`]}</p>
-                          </div>
-                       ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="h-full flex flex-col items-center justify-center text-slate-300 opacity-20 py-40">
-                  <ClipboardList className="h-20 w-20 mb-6" />
-                  <p className="font-black uppercase tracking-[0.3em] text-sm">Awaiting Input</p>
+          {parseErrors.length > 0 ? (
+            <Card className="border-rose-100 bg-rose-50/50 shadow-2xl rounded-[3rem] p-10 space-y-6">
+              <div className="flex items-center gap-4 text-rose-600">
+                <FileWarning className="h-10 w-10" />
+                <div>
+                   <h3 className="text-xl font-headline font-black uppercase">Validation Failed</h3>
+                   <p className="text-sm font-bold uppercase tracking-widest opacity-70">{parseErrors.length} Schema Violations Detected</p>
                 </div>
-              )}
-            </CardContent>
-            {parsedQuestions.length > 0 && (
-               <div className="p-10 border-t border-slate-50 bg-slate-50/30">
-                  <Button 
-                    className="w-full h-16 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.2em] gap-3 rounded-2xl shadow-3xl"
-                    onClick={handleDirectDeployMock}
-                    disabled={isImporting}
-                  >
-                    <Rocket className="h-5 w-5 text-primary" /> Deploy Institutional Series
-                  </Button>
-               </div>
-            )}
-          </Card>
+              </div>
+              <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                {parseErrors.map((err, i) => (
+                  <div key={i} className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-rose-100 shadow-sm">
+                    <AlertTriangle className="h-4 w-4 text-rose-500 shrink-0 mt-0.5" />
+                    <p className="text-sm font-bold text-rose-800">{err}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          ) : parsedQuestions.length > 0 ? (
+            <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] h-full flex flex-col overflow-hidden">
+               <CardHeader className="p-10 bg-slate-50/50 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center">
+                 <div>
+                    <CardTitle className="font-headline font-black text-2xl uppercase flex items-center gap-3">
+                      <CheckCircle2 className="h-6 w-6 text-emerald-600" /> Extraction Ready
+                    </CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest text-slate-400">{parsedQuestions.length} Questions Verified for Deployment.</CardDescription>
+                 </div>
+                 <Button onClick={handleDirectDeployMock} disabled={isImporting} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest rounded-xl h-12 px-8 gap-3 shadow-xl shadow-emerald-500/20">
+                    <Rocket className="h-4 w-4" /> Deploy Live Series
+                 </Button>
+               </CardHeader>
+               <CardContent className="p-10 flex-1 overflow-y-auto custom-scrollbar space-y-12">
+                  {parsedQuestions.map((q, idx) => (
+                    <div key={idx} className="space-y-8 pb-12 border-b border-slate-50 last:border-0 last:pb-0">
+                       <div className="flex justify-between items-start">
+                          <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3">Question {idx + 1}</Badge>
+                          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Key: {q.correctAnswer}</span>
+                       </div>
+
+                       <div className="space-y-4">
+                          <p className="text-xl font-bold text-[#0F172A] leading-tight">{q.questionEn}</p>
+                          <p className="text-xl font-medium text-slate-500 leading-tight italic">{q.questionPa}</p>
+                       </div>
+
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {['A','B','C','D'].map(l => (
+                             <div key={l} className={`p-6 rounded-2xl border transition-all ${q.correctAnswer === l ? 'bg-emerald-50 border-emerald-100 ring-2 ring-emerald-500/10' : 'bg-slate-50 border-slate-100 opacity-60'}`}>
+                                <div className="flex items-center gap-4 mb-3">
+                                   <div className={`h-6 w-6 rounded-lg flex items-center justify-center text-[10px] font-black ${q.correctAnswer === l ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 shadow-sm'}`}>{l}</div>
+                                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Option Node</span>
+                                </div>
+                                <p className="text-sm font-bold text-[#0F172A] mb-1">{q[`option${l}En`]}</p>
+                                <p className="text-sm font-medium text-slate-500">{q[`option${l}Pa`]}</p>
+                             </div>
+                          ))}
+                       </div>
+
+                       <div className="bg-[#0F172A] p-8 rounded-[2rem] space-y-6">
+                          <div className="flex items-center gap-4">
+                             <div className="h-8 w-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                                <Languages className="h-4 w-4 text-primary" />
+                             </div>
+                             <p className="text-[10px] font-black uppercase text-primary tracking-widest">Institutional Rationale</p>
+                          </div>
+                          <div className="space-y-4">
+                             <p className="text-sm font-medium text-slate-300 leading-relaxed"><span className="text-white font-black">EN:</span> {q.explanationEn}</p>
+                             <p className="text-sm font-medium text-slate-400 leading-relaxed italic border-t border-white/5 pt-4"><span className="text-white font-black">PA:</span> {q.explanationPa}</p>
+                          </div>
+                       </div>
+                    </div>
+                  ))}
+               </CardContent>
+            </Card>
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-slate-300 opacity-20 py-40">
+              <ClipboardList className="h-20 w-20 mb-6" />
+              <p className="font-black uppercase tracking-[0.3em] text-sm">Awaiting Input Protocol</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
