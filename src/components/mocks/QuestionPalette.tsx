@@ -1,4 +1,3 @@
-
 "use client"
 
 import { cn } from "@/lib/utils"
@@ -19,17 +18,18 @@ export default function QuestionPalette({
   onSelect
 }: QuestionPaletteProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="font-headline font-black text-xs uppercase tracking-[0.2em] text-slate-400">
-          Question Palette
+        <h3 className="font-headline font-black text-[10px] uppercase tracking-[0.2em] text-slate-400">
+          Audit Palette
         </h3>
-        <span className="text-[10px] font-black text-primary px-3 py-1 bg-primary/5 rounded-lg border border-primary/10">
+        <span className="text-[9px] font-black text-primary px-3 py-1 bg-primary/5 rounded-lg border border-primary/10">
           {answeredIndices.length} / {totalQuestions}
         </span>
       </div>
       
-      <div className="grid grid-cols-5 gap-3">
+      {/* Dense 5-column grid for high node visibility */}
+      <div className="grid grid-cols-5 gap-2.5">
         {Array.from({ length: totalQuestions }).map((_, i) => {
           const isCurrent = currentIndex === i
           const isAnswered = answeredIndices.includes(i)
@@ -40,7 +40,7 @@ export default function QuestionPalette({
               key={i}
               onClick={() => onSelect(i)}
               className={cn(
-                "h-10 w-10 rounded-xl text-xs font-black transition-all duration-200 border-2 flex items-center justify-center shadow-sm",
+                "h-9 w-9 rounded-lg text-[10px] font-black transition-all duration-200 border-2 flex items-center justify-center shadow-sm",
                 isCurrent && "border-primary bg-primary/10 text-primary scale-110 z-10",
                 !isCurrent && isAnswered && "bg-emerald-600 border-emerald-600 text-white",
                 !isCurrent && isFlagged && "bg-amber-500 border-amber-500 text-white",
@@ -53,7 +53,7 @@ export default function QuestionPalette({
         })}
       </div>
 
-      <div className="pt-8 border-t border-slate-100 grid grid-cols-2 gap-y-4 gap-x-6">
+      <div className="pt-6 border-t border-slate-100 grid grid-cols-2 gap-y-3 gap-x-4">
         <LegendItem variant="current" label="Current" />
         <LegendItem variant="answered" label="Answered" />
         <LegendItem variant="flagged" label="Review" />
@@ -74,9 +74,9 @@ function LegendItem({ variant, label }: { variant: 'current' | 'answered' | 'fla
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className={cn("h-3 w-3 rounded-md border", getStyles())} />
-      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
+    <div className="flex items-center gap-2.5">
+      <div className={cn("h-2.5 w-2.5 rounded-sm border", getStyles())} />
+      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
     </div>
   )
 }
