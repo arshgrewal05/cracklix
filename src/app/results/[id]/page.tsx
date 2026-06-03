@@ -13,6 +13,7 @@ import { collection, query, where, orderBy, limit, doc, updateDoc } from "fireba
 import Link from "next/link"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip } from "recharts"
 import { useToast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils"
 
 export default function ResultPage() {
   const params = useParams()
@@ -73,7 +74,7 @@ export default function ResultPage() {
   const { score, totalQuestions, accuracy, mockTitle } = sessionData
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50/50">
+    <div className="flex flex-col min-h-screen bg-slate-50/30">
       <Navbar />
       <main className="container mx-auto px-6 py-12 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
