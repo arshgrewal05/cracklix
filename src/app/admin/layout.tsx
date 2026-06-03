@@ -1,3 +1,4 @@
+
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
@@ -37,7 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-[#0F172A]">
+      <div className="flex min-h-screen w-full bg-slate-50">
         <Sidebar className="border-r border-white/5 bg-[#0F172A]">
           <SidebarHeader className="p-6">
             <Logo variant="light" className="scale-90 origin-left" />
@@ -97,26 +98,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </SidebarContent>
         </Sidebar>
         
-        <SidebarInset className="flex flex-col bg-background/95">
-          <header className="h-16 border-b border-foreground/5 flex items-center px-6 justify-between bg-card/30 backdrop-blur-sm sticky top-0 z-40">
+        <SidebarInset className="flex flex-col bg-slate-50">
+          <header className="h-16 border-b border-slate-200 flex items-center px-6 justify-between bg-white sticky top-0 z-40 shadow-sm">
             <div className="flex items-center gap-4 min-w-0">
-              <SidebarTrigger />
-              <div className="h-4 w-[1px] bg-foreground/10 mx-2 hidden sm:block" />
+              <SidebarTrigger className="text-[#0F172A]" />
+              <div className="h-4 w-[1px] bg-slate-200 mx-2 hidden sm:block" />
               <div className="flex items-center gap-2 truncate">
                  <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground truncate">Management System</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0F172A] truncate">Management System</span>
               </div>
             </div>
             <div className="flex items-center gap-6 shrink-0">
               <div className="flex items-center gap-4">
                 <div className="text-right hidden md:block">
-                  <p className="text-xs font-bold leading-none truncate max-w-[150px]">{displayName}</p>
-                  <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mt-1">
-                    {profile?.role === 'SUPER_ADMIN' || isFounder ? 'Founder & Lead' : 'Content Admin'}
+                  <p className="text-xs font-black leading-none truncate max-w-[150px] text-[#0F172A] uppercase">{displayName}</p>
+                  <p className="text-[9px] text-slate-500 uppercase font-black tracking-widest mt-1">
+                    {profile?.role === 'SUPER_ADMIN' || isFounder ? 'Lead Authority' : 'Content Admin'}
                   </p>
                 </div>
-                <div className="h-9 w-9 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/20">
-                  <span className="font-black text-primary text-xs">{displayName.split(' ').map(n => n[0]).join('')}</span>
+                <div className="h-9 w-9 rounded-xl bg-[#0F172A] flex items-center justify-center border border-[#0F172A]">
+                  <span className="font-black text-white text-xs">{displayName.split(' ').map(n => n[0]).join('')}</span>
                 </div>
               </div>
             </div>

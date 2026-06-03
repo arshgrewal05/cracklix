@@ -14,8 +14,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 
 /**
- * @fileOverview Phase 132: Founder's Command Center.
- * Visibility fixes: Changed invisible dark text to high-contrast white/primary.
+ * @fileOverview Final Command Center (Visibility Patch).
+ * Replaced invisible text with high-contrast navy and hardened card layouts.
  */
 
 export default function AdminDashboard() {
@@ -63,15 +63,15 @@ export default function AdminDashboard() {
   }, [users, questions, mocks]);
 
   return (
-    <div className="space-y-12 pb-20 pt-4 text-white">
+    <div className="space-y-12 pb-20 pt-4 text-[#0F172A]">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
         <div>
            <div className="flex items-center gap-3 mb-2">
               <ShieldCheck className="h-5 w-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Institutional Governance Hub</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Governance Hub</span>
            </div>
-          <h1 className="text-5xl font-headline font-black text-white uppercase tracking-tight">Command Center</h1>
-          <p className="text-slate-400 mt-2 text-lg">System Audit: {questions?.length || 0} Questions Live. Database in Dev Mode.</p>
+          <h1 className="text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Command Center</h1>
+          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. Database in Dev Mode.</p>
         </div>
         <div className="flex gap-4">
            {isAdmin && (
@@ -91,50 +91,50 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-         <StatCard label="Aspirant Nodes" value={users?.length || 0} icon={<Users className="text-blue-400" />} />
-         <StatCard label="Database Status" value="Connected" icon={<Database className="text-emerald-500" />} color="text-emerald-500" />
+         <StatCard label="Aspirant Nodes" value={users?.length || 0} icon={<Users className="text-blue-500" />} />
+         <StatCard label="Database Status" value="Connected" icon={<Database className="text-emerald-600" />} color="text-emerald-600" />
          <StatCard label="Attempts Logged" value={results?.length || 0} icon={<Activity className="text-primary" />} />
          <StatCard label="Audit Flags" value={reports?.filter((r:any) => r.status === 'PENDING').length || 0} icon={<ShieldAlert className="text-rose-500" />} color="text-rose-500" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
          <div className="lg:col-span-8 space-y-10">
-            <Card className="border-white/5 shadow-xl bg-card rounded-[3.5rem] overflow-hidden">
-               <CardHeader className="p-12 border-b border-white/5 bg-white/5">
+            <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden">
+               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50">
                   <div className="flex items-center gap-4">
                      <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                         <Database className="h-6 w-6" />
                      </div>
                      <div>
-                        <CardTitle className="text-2xl font-headline font-black uppercase text-white">Database Engine</CardTitle>
+                        <CardTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Database Engine</CardTitle>
                         <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Manage collection hierarchy and initial data seeding.</CardDescription>
                      </div>
                   </div>
                </CardHeader>
                <CardContent className="p-12 space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                     <div className="p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
+                     <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6 shadow-inner">
                         <div className="space-y-1">
-                           <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Seeding Protocol</p>
-                           <h4 className="text-xl font-headline font-black text-white uppercase">Push Collections</h4>
+                           <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Seeding Protocol</p>
+                           <h4 className="text-xl font-headline font-black text-[#0F172A] uppercase">Push Collections</h4>
                         </div>
-                        <p className="text-xs text-slate-400 font-medium leading-relaxed">
+                        <p className="text-xs text-slate-500 font-medium leading-relaxed">
                            Sync Boards, Exams, and Subjects to Firestore. Use this to reset or initialize the system architecture.
                         </p>
                         <Button 
                            onClick={handleSyncDatabase} 
                            disabled={isSyncing}
                            variant="outline" 
-                           className="w-full h-12 rounded-xl border-white/10 font-black uppercase text-[10px] tracking-widest hover:bg-emerald-600 hover:text-white transition-all text-white"
+                           className="w-full h-12 rounded-xl border-slate-200 bg-white font-black uppercase text-[10px] tracking-widest hover:bg-emerald-600 hover:text-white transition-all text-[#0F172A]"
                         >
                            {isSyncing ? "Processing..." : "Trigger Full Sync"}
                         </Button>
                      </div>
 
-                     <div className="p-8 bg-white/5 rounded-[2.5rem] border border-white/5 space-y-6">
+                     <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6 shadow-inner">
                         <div className="space-y-1">
-                           <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Metadata Audit</p>
-                           <h4 className="text-xl font-headline font-black text-white uppercase">Hierarchy Status</h4>
+                           <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Metadata Audit</p>
+                           <h4 className="text-xl font-headline font-black text-[#0F172A] uppercase">Hierarchy Status</h4>
                         </div>
                         <div className="space-y-3">
                            <ProgressRow label="Recruitment Boards" perc={100} status="Verified" />
@@ -146,11 +146,11 @@ export default function AdminDashboard() {
                </CardContent>
             </Card>
 
-            <Card className="border-none shadow-3xl bg-[#0F172A] text-white rounded-[3.5rem] overflow-hidden">
-               <CardHeader className="p-12 border-b border-white/5">
+            <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden">
+               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50">
                   <div className="flex items-center gap-4">
                      <Target className="h-6 w-6 text-primary" />
-                     <CardTitle className="text-2xl font-headline font-black uppercase">Launch Readiness ({avgProgress}%)</CardTitle>
+                     <CardTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Launch Readiness ({avgProgress}%)</CardTitle>
                   </div>
                </CardHeader>
                <CardContent className="p-12 space-y-10">
@@ -165,30 +165,30 @@ export default function AdminDashboard() {
          </div>
 
          <div className="lg:col-span-4 space-y-10">
-            <Card className="border-none bg-[#0F172A] rounded-[3.5rem] p-12 space-y-10 shadow-4xl border border-white/5">
+            <Card className="border-slate-100 bg-white rounded-[3.5rem] p-12 space-y-10 shadow-3xl">
                <div className="space-y-2">
-                  <h3 className="text-2xl font-headline font-black text-white uppercase flex items-center gap-4">
-                     <DollarSign className="h-6 w-6 text-emerald-500" /> Revenue Node
+                  <h3 className="text-2xl font-headline font-black text-[#0F172A] uppercase flex items-center gap-4">
+                     <DollarSign className="h-6 w-6 text-emerald-600" /> Revenue Node
                   </h3>
                </div>
                <div className="space-y-6">
-                  <div className="p-8 bg-white/5 rounded-3xl border border-white/5 space-y-4">
+                  <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100 space-y-4 shadow-inner">
                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase text-slate-400">Scale Mode</span>
-                        <Badge className="bg-emerald-500/10 text-emerald-500 border-none text-[9px] font-black">ACTIVE</Badge>
+                        <span className="text-[10px] font-black uppercase text-slate-500">Scale Mode</span>
+                        <Badge className="bg-emerald-600 text-white border-none text-[9px] font-black">ACTIVE</Badge>
                      </div>
-                     <p className="text-4xl font-headline font-black text-white">Free Beta</p>
+                     <p className="text-4xl font-headline font-black text-[#0F172A]">Free Beta</p>
                      <p className="text-xs text-slate-500 font-medium">Platform-wide subscription gateways are currently bypassed for testing.</p>
                   </div>
                </div>
             </Card>
 
-            <Card className="border-white/5 bg-primary/5 rounded-[3.5rem] p-12 space-y-6 border shadow-xl">
+            <Card className="border-primary/20 bg-primary/5 rounded-[3.5rem] p-12 space-y-6 border shadow-xl">
                <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                   <Layers className="h-8 w-8" />
                </div>
-               <h4 className="text-2xl font-headline font-black text-white uppercase leading-tight">Fast-Track Assembly</h4>
-               <p className="text-slate-400 text-sm font-medium leading-relaxed">
+               <h4 className="text-2xl font-headline font-black text-[#0F172A] uppercase leading-tight">Fast-Track Assembly</h4>
+               <p className="text-slate-600 text-sm font-medium leading-relaxed">
                   Use the Smart Assembler to generate mocks instantly from the existing question bank metadata.
                </p>
                <Button asChild className="w-full bg-primary hover:bg-primary/90 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl">
@@ -205,13 +205,13 @@ function StatCard({ label, value, icon, color }: any) {
    const isLongValue = typeof value === 'string' && value.length > 8;
    
    return (
-      <Card className="border-white/5 shadow-xl bg-card p-8 rounded-[3rem] group hover:translate-y-[-4px] transition-all overflow-hidden">
+      <Card className="border-slate-100 shadow-xl bg-white p-8 rounded-[3rem] group hover:translate-y-[-4px] transition-all overflow-hidden">
          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shrink-0 shadow-inner">
+            <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shrink-0 shadow-inner">
                {icon}
             </div>
             <div className="min-w-0">
-               <p className={`font-headline font-black tracking-tighter truncate ${isLongValue ? 'text-2xl' : 'text-4xl'} ${color || 'text-white'}`}>
+               <p className={`font-headline font-black tracking-tighter truncate ${isLongValue ? 'text-2xl' : 'text-4xl'} ${color || 'text-[#0F172A]'}`}>
                  {value}
                </p>
                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1 truncate">{label}</p>
@@ -225,10 +225,10 @@ function ProgressRow({ label, perc, status }: { label: string, perc: number, sta
    return (
       <div className="space-y-2">
          <div className="flex justify-between items-end">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</span>
-            <span className="text-[9px] font-black text-emerald-400">{status || `${perc}%`}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
+            <span className="text-[9px] font-black text-emerald-600">{status || `${perc}%`}</span>
          </div>
-         <Progress value={perc} className="h-1 bg-white/5" />
+         <Progress value={perc} className="h-1 bg-slate-200" />
       </div>
    )
 }
@@ -238,10 +238,10 @@ function LaunchMetric({ label, current, target }: { label: string, current: numb
    return (
       <div className="space-y-4">
          <div className="flex justify-between items-end">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
             <span className="text-[10px] font-black text-primary">{current} / {target} ({perc}%)</span>
          </div>
-         <Progress value={perc} className="h-1.5 bg-white/5" />
+         <Progress value={perc} className="h-1.5 bg-slate-100" />
       </div>
    )
 }
