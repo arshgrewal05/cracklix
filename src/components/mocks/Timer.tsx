@@ -17,6 +17,10 @@ export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: Ti
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
+    setTimeLeft(initialSeconds)
+  }, [initialSeconds])
+
+  useEffect(() => {
     if (isPaused) {
        if (timerRef.current) clearInterval(timerRef.current)
        return

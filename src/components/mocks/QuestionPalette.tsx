@@ -4,6 +4,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { ChevronLeft, ChevronRight, CheckCircle2, Flag, HelpCircle, Layers } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 interface QuestionPaletteProps {
   totalQuestions: number
@@ -71,7 +72,7 @@ export default function QuestionPalette({
                Audit Map
             </h3>
             <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[9px] font-black">
-               {answeredIndices.length} COMPLETE
+               {answeredIndices.length} ANSWERED
             </Badge>
          </div>
 
@@ -98,7 +99,7 @@ export default function QuestionPalette({
             </button>
          </div>
 
-         {/* Question Grid */}
+         {/* Question Grid (5x5) */}
          <div className="grid grid-cols-5 gap-3">
             {currentRange.map((idx) => {
                const isCurrent = currentIndex === idx

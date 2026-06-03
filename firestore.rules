@@ -3,10 +3,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     /**
-     * @fileOverview TOTAL AUTHORITY NODE (SYNC 105).
-     * Resolution for hasHindi metadata and paginated palette nodes.
+     * @fileOverview TOTAL AUTHORITY NODE (SYNC 115).
+     * Final Testbook-style CBT Session & Result Metadata Authorization.
      * 
-     * DEPLOYMENT_ID: 2026-06-03T23:45:00Z
+     * DEPLOYMENT_ID: 2026-06-04T01:00:00Z
      */
     
     match /{document=**} {

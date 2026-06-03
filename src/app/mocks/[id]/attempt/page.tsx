@@ -38,15 +38,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -55,14 +46,7 @@ import {
 } from "@/components/ui/sheet"
 import { useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-
-/**
- * @fileOverview Final Testbook-Level CBT Engine.
- * Features: Bilingual Stacking, 5-State Palette, Keyboard Shortcuts, Pause/Resume.
- */
 
 type LangMode = 'english' | 'punjabi' | 'bilingual'
 
@@ -80,7 +64,7 @@ export default function MockAttemptPage() {
   const [loadingQuestions, setLoadingQuestions] = useState(true)
   const [currentIdx, setCurrentIdx] = useState(0)
   const [answers, setAnswers] = useState<Record<number, number>>({})
-  const [flagged, setFlagged] = useState<number[]>([]) // Review state
+  const [flagged, setFlagged] = useState<number[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [language, setLanguage] = useState<LangMode>('bilingual') 
   const [remainingTime, setRemainingTime] = useState(0)
@@ -135,7 +119,7 @@ export default function MockAttemptPage() {
         userId: user.uid, mockId, currentIdx, answers, flagged, remainingTime,
         status: 'IN_PROGRESS', updatedAt: serverTimestamp()
       }, { merge: true })
-    }, 10000)
+    }, 15000)
     return () => clearInterval(interval)
   }, [db, user, mockId, currentIdx, answers, flagged, remainingTime, questions, isSubmitting, isPaused])
 
@@ -199,7 +183,7 @@ export default function MockAttemptPage() {
   if (mockLoading || loadingQuestions) return (
     <div className="h-screen flex flex-col items-center justify-center bg-white space-y-6">
        <Loader2 className="h-10 w-10 text-primary animate-spin" />
-       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Initializing Exam Environment...</p>
+       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Initializing High-Fidelity Engine...</p>
     </div>
   )
 
@@ -209,17 +193,16 @@ export default function MockAttemptPage() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white text-[#0F172A] font-body">
       {/* Testbook Style Header */}
-      <header className="h-16 border-b flex items-center justify-between px-4 md:px-8 bg-[#0B1528] text-white shrink-0 z-50 shadow-xl">
+      <header className="h-16 border-b flex items-center justify-between px-4 md:px-8 bg-[#0B1528] text-white shrink-0 z-[60] shadow-xl">
         <div className="flex items-center gap-6">
           <ShieldCheck className="h-6 w-6 text-primary" />
           <div className="hidden sm:block">
              <h1 className="font-black text-xs uppercase tracking-widest truncate max-w-xs">{mockConfig?.title}</h1>
-             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Official 2026 Pattern</p>
+             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Testbook Style Layout • 2026</p>
           </div>
         </div>
         
         <div className="flex items-center gap-4">
-          {/* Language Switch: ENGLISH | ਪੰਜਾਬੀ | BILINGUAL */}
           <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
              <LangTab label="ENGLISH" active={language === 'english'} onClick={() => setLanguage('english')} />
              <LangTab label="ਪੰਜਾਬੀ" active={language === 'punjabi'} onClick={() => setLanguage('punjabi')} />
@@ -294,20 +277,21 @@ export default function MockAttemptPage() {
                 <span className="text-sm font-black text-[#0F172A] uppercase tracking-tight">Question {currentIdx + 1} <span className="text-slate-300 mx-2">of</span> {questions.length}</span>
              </div>
              <div className="flex items-center gap-4">
-                <button onClick={() => {}} className="text-slate-300 hover:text-primary transition-colors flex items-center gap-2 font-black text-[10px] uppercase tracking-widest">
-                   <Bookmark className="h-4 w-4" /> Save
-                </button>
+                <div className="hidden md:flex gap-4">
+                   <SummaryBadge label="Answered" val={Object.keys(answers).length} color="text-emerald-600" />
+                   <SummaryBadge label="Review" val={flagged.length} color="text-amber-500" />
+                </div>
              </div>
           </div>
 
           {/* Question Display Node */}
           <div className="flex-1 overflow-y-auto p-4 md:p-12 custom-scrollbar">
-             <div className="max-w-4xl mx-auto space-y-12">
+             <div className="max-w-4xl mx-auto space-y-12 pb-20">
                 <div className="space-y-10 text-left">
                    {(language === 'english' || language === 'bilingual') && (
                       <div className="space-y-4">
-                         {language === 'bilingual' && <p className="text-[9px] font-black uppercase text-slate-300 tracking-[0.3em]">English Segment</p>}
-                         <p className="text-2xl md:text-3xl font-bold leading-relaxed text-[#0F172A] antialiased whitespace-pre-line">
+                         {language === 'bilingual' && <p className="text-[10px] font-black uppercase text-slate-300 tracking-[0.3em]">English</p>}
+                         <p className="text-2xl md:text-[32px] font-bold leading-[1.5] text-[#0F172A] antialiased whitespace-pre-line">
                             {q.questionEn}
                          </p>
                       </div>
@@ -317,8 +301,8 @@ export default function MockAttemptPage() {
 
                    {(language === 'punjabi' || language === 'bilingual') && (
                       <div className="space-y-4">
-                         {language === 'bilingual' && <p className="text-[9px] font-black uppercase text-primary tracking-[0.3em]">ਪੰਜਾਬੀ (Punjabi) Segment</p>}
-                         <p className="text-2xl md:text-3xl font-bold leading-relaxed text-[#0F172A] antialiased whitespace-pre-line">
+                         {language === 'bilingual' && <p className="text-[10px] font-black uppercase text-primary tracking-[0.3em]">ਪੰਜਾਬੀ (Punjabi)</p>}
+                         <p className="text-2xl md:text-[32px] font-bold leading-[1.5] text-[#0F172A] antialiased whitespace-pre-line">
                             {q.questionPa || q.questionEn}
                          </p>
                       </div>
@@ -342,10 +326,10 @@ export default function MockAttemptPage() {
                             {language === 'bilingual' ? (
                                <>
                                   <p className="text-sm font-medium text-slate-400">{q[`option${key}En`]}</p>
-                                  <p className="text-xl font-bold">{q[`option${key}Pa`] || q[`option${key}En`]}</p>
+                                  <p className="text-lg md:text-[22px] font-bold">{q[`option${key}Pa`] || q[`option${key}En`]}</p>
                                </>
                             ) : (
-                               <span className="text-xl font-bold">{language === 'english' ? q[`option${key}En`] : (q[`option${key}Pa`] || q[`option${key}En`])}</span>
+                               <span className="text-lg md:text-[22px] font-bold">{language === 'english' ? q[`option${key}En`] : (q[`option${key}Pa`] || q[`option${key}En`])}</span>
                             )}
                          </Label>
                          <div className={cn(
@@ -442,6 +426,15 @@ function SummaryNode({ label, val, color }: any) {
       <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 text-center space-y-1">
          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{label}</p>
          <p className={cn("text-3xl font-headline font-black", color)}>{val}</p>
+      </div>
+   )
+}
+
+function SummaryBadge({ label, val, color }: any) {
+   return (
+      <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
+         <span className="text-[8px] font-black uppercase text-slate-400">{label}</span>
+         <span className={cn("text-xs font-black", color)}>{val}</span>
       </div>
    )
 }
