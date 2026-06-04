@@ -1,144 +1,145 @@
+"use client"
 
-'use client';
-
-import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Clock, BookOpen, ShieldCheck, ArrowRight, Zap, Award, ChevronRight, FileText } from "lucide-react";
-import Link from "next/link";
-import { useCollection, useFirestore } from "@/firebase";
-import { collection, query, where } from "firebase/firestore";
-import { useMemo } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useMemo } from "react"
+import Navbar from "@/components/layout/Navbar"
+import Footer from "@/components/layout/Footer"
+import { useCollection, useFirestore } from "@/firebase"
+import { collection, query, where } from "firebase/firestore"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ShieldCheck, ChevronRight, GraduationCap, Target, Sparkles, Layout } from "lucide-react"
+import Link from "next/link"
+import { Skeleton } from "@/components/ui/skeleton"
+import Image from "next/image"
 
 /**
- * @fileOverview Institutional Latest Series Registry (Exam-Centric).
- * Redesigned for Testbook Aesthetic: Compact badges, metadata strip, and absolute black typography.
+ * @fileOverview Final Exam Gateway Node.
+ * Replaces the global mock list with an Exam Selection Portal to ensure content isolation.
+ * Fixed: Added missing Badge import and aligned with Testbook aesthetic.
  */
 
-export default function LatestMocks() {
-  const db = useFirestore();
+export default function MocksGatewayPage() {
+  const db = useFirestore()
   
-  const mocksQuery = useMemo(() => {
-    if (!db) return null;
-    return query(
-      collection(db, "mocks"), 
-      where("published", "==", true)
-    );
-  }, [db]);
+  const examsQuery = useMemo(() => {
+    if (!db) return null
+    return query(collection(db, "exams"))
+  }, [db])
 
-  const { data: rawMocks, loading } = useCollection<any>(mocksQuery);
+  const boardsQuery = useMemo(() => {
+    if (!db) return null
+    return query(collection(db, "boards"))
+  }, [db])
 
-  const sortedMocks = useMemo(() => {
-    if (!rawMocks) return [];
-    return [...rawMocks]
-      .sort((a, b) => {
-        const timeA = a.createdAt?.seconds || 0;
-        const timeB = b.createdAt?.seconds || 0;
-        return timeB - timeA;
-      })
-      .slice(0, 5);
-  }, [rawMocks]);
+  const { data: exams, loading: examsLoading } = useCollection<any>(examsQuery)
+  const { data: boards } = useCollection<any>(boardsQuery)
 
   return (
-    <section className="py-16 md:py-24 bg-white overflow-hidden">
-      <div className="container mx-auto px-6 max-w-7xl">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-16 gap-6 text-left">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-2"
-          >
-            <div className="flex items-center gap-2">
-               <div className="h-1 w-6 bg-primary rounded-full" />
-               <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">Institutional Feed</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-headline font-black text-[#000000] uppercase tracking-tight leading-none">
-              Recent <span className="text-primary">Mastery</span>
-            </h2>
-            <p className="text-slate-400 text-sm md:text-lg font-medium">Newest high-fidelity series deployed for 2026 aspirants.</p>
-          </motion.div>
-          
-          <Link 
-            href="/mocks" 
-            className="group flex items-center gap-3 bg-slate-50 hover:bg-[#0F172A] hover:text-white px-8 py-4 rounded-2xl transition-all duration-500 shadow-sm font-black uppercase text-[9px] tracking-widest"
-          >
-            Explore Exam Hubs <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+    <div className="flex flex-col min-h-screen bg-slate-50/50 font-body">
+      <Navbar />
+      <main className="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
+        <div className="text-center mb-12 space-y-4">
+          <div className="flex items-center justify-center gap-2 mb-4">
+             <ShieldCheck className="h-6 w-6 text-primary" />
+             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Institutional Registry</span>
+          </div>
+          <h1 className="text-4xl md:text-7xl font-headline font-black text-[#000000] uppercase tracking-tighter leading-[0.9]">
+            Select Your <br/> <span className="text-primary">Exam Hub</span>
+          </h1>
+          <p className="text-slate-500 font-medium text-base md:text-lg max-w-2xl mx-auto mt-4">
+            Choose your target recruitment board to access structured Full Mocks, Subject mastery, and PYQ archives.
+          </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
-          {loading ? (
-             Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-96 w-full rounded-[2.5rem]" />)
-          ) : sortedMocks && sortedMocks.length > 0 ? (
-            sortedMocks.map((mock, i) => (
-              <motion.div
-                key={mock.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="h-full"
-              >
-                <Card className="border-none rounded-[2.5rem] bg-white shadow-xl hover:shadow-3xl hover:-translate-y-1.5 transition-all duration-500 overflow-hidden flex flex-col h-full group border border-slate-50">
-                  <CardContent className="p-0 flex-1 flex flex-col h-full">
-                    <div className="p-6 md:p-8 pb-4 space-y-6 flex-1">
-                       <div className="flex justify-between items-start">
-                          <div className="h-14 w-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center relative overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-500 shrink-0">
-                             {mock.boardId === 'psssb' ? (
-                               <img src="https://sssb.punjab.gov.in/images/logo.png" className="w-full h-full object-contain p-2" alt="PSSSB" />
-                             ) : (
-                               <ShieldCheck className="h-7 w-7 text-primary fill-current opacity-20" />
-                             )}
-                          </div>
-                          <div className="text-right">
-                             <Badge className="bg-orange-50 text-primary border-none text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-md mb-1">
-                                {mock.boardId || 'OFFICIAL'}
-                             </Badge>
-                             <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest">Pattern Match</p>
-                          </div>
-                       </div>
 
-                       <div className="space-y-4">
-                          <h3 className="font-bold text-base md:text-lg text-[#000000] leading-tight uppercase line-clamp-2 min-h-[44px] group-hover:text-primary transition-colors">
-                           {mock.title}
-                          </h3>
-                          
-                          <div className="space-y-2.5 pt-2 border-t border-slate-50">
-                             <div className="flex items-center gap-2 text-slate-400 font-bold uppercase text-[9px] tracking-tight">
-                                <BookOpen className="h-3.5 w-3.5 text-primary shrink-0" /> {mock.totalQuestions} Questions
-                             </div>
-                             <div className="flex items-center gap-2 text-slate-400 font-bold uppercase text-[9px] tracking-tight">
-                                <Clock className="h-3.5 w-3.5 text-primary shrink-0" /> {mock.duration} Minutes
-                             </div>
-                             <div className="flex items-center gap-2 text-slate-400 font-bold uppercase text-[9px] tracking-tight">
-                                <FileText className="h-3.5 w-3.5 text-primary shrink-0" /> {mock.totalQuestions} Marks
-                             </div>
-                          </div>
-                       </div>
-                    </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+           {examsLoading ? (
+             Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-[2.5rem]" />)
+           ) : exams?.map((exam: any) => {
+             const board = boards?.find(b => b.id === exam.boardId)
+             return (
+                <Link key={exam.id} href={`/exams/${exam.id}`}>
+                   <Card className="border-none shadow-xl hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden text-left h-full flex flex-col border border-slate-50">
+                      <CardContent className="p-8 md:p-10 flex flex-col h-full">
+                         <div className="flex justify-between items-start mb-8">
+                            <div className="h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:shadow-lg transition-all shadow-inner relative overflow-hidden">
+                               {board?.iconUrl ? (
+                                 <img src={board.iconUrl} alt={board.abbreviation} className="w-full h-full object-contain p-2" />
+                               ) : (
+                                 <GraduationCap className="h-7 w-7 text-primary" />
+                               )}
+                            </div>
+                            <Badge className="bg-primary/5 text-primary border-none text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-lg">
+                               {board?.abbreviation || 'PSSSB'} BOARD
+                            </Badge>
+                         </div>
+                         
+                         <div className="space-y-2 flex-1">
+                            <h3 className="font-headline text-2xl md:text-3xl font-black text-[#000000] uppercase leading-tight group-hover:text-primary transition-colors">
+                               {exam.name}
+                            </h3>
+                            <p className="text-xs md:text-sm font-medium text-slate-400 leading-relaxed line-clamp-2">
+                               {exam.description || "Comprehensive preparation hub for all specialized cadre posts."}
+                            </p>
+                         </div>
 
-                    <div className="p-6 pt-0">
-                       <Button asChild className="w-full bg-[#0B1528] hover:bg-primary text-white font-black h-12 rounded-xl text-[9px] uppercase tracking-[0.2em] shadow-lg transition-all group">
-                         <Link href={`/exams/${mock.examId}`} className="flex items-center justify-center gap-2">
-                            Start Practice <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
-                         </Link>
-                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))
-          ) : (
-            <div className="col-span-full py-20 text-center opacity-10">
-               <ShieldCheck className="h-16 w-16 mx-auto mb-4" />
-               <p className="font-headline font-black uppercase tracking-[0.4em] text-xs">Registry Node Empty</p>
-            </div>
-          )}
+                         <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                               <div className="space-y-0.5 text-left">
+                                  <p className="text-[10px] font-black text-[#000000] leading-none">{exam.totalMocks || 0}+ Series</p>
+                                  <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Active Registry</p>
+                               </div>
+                            </div>
+                            <Button variant="ghost" className="h-11 w-11 rounded-2xl bg-slate-50 text-[#0F172A] group-hover:bg-primary group-hover:text-white transition-all shadow-sm p-0">
+                               <ChevronRight className="h-5 w-5" />
+                            </Button>
+                         </div>
+                      </CardContent>
+                   </Card>
+                </Link>
+             )
+           })}
         </div>
+
+        <div className="mt-20 p-10 md:p-16 rounded-[3.5rem] bg-[#0F172A] text-white relative overflow-hidden shadow-3xl group">
+           <div className="absolute top-0 right-0 p-8 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Sparkles className="h-48 w-48" /></div>
+           <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10 text-left">
+              <div className="space-y-6">
+                 <div className="flex items-center gap-3 text-left">
+                    <Target className="h-8 w-8 text-primary" />
+                    <h2 className="text-3xl md:text-4xl font-headline font-black uppercase leading-tight">Master Any <br/> Recruitment Hub</h2>
+                 </div>
+                 <p className="text-slate-400 text-base font-medium leading-relaxed">
+                    Cracklix provides isolated, high-fidelity preparation hubs for every major Punjab recruitment cycle. No noise, just precision.
+                 </p>
+                 <Button asChild className="bg-white text-[#0F172A] hover:bg-slate-100 h-14 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl">
+                    <Link href="/exams">View All Boards Hub</Link>
+                 </Button>
+              </div>
+              <div className="hidden lg:flex justify-end gap-10">
+                 <div className="space-y-6">
+                    <PortalStat val="500+" label="Full Mocks" />
+                    <PortalStat val="10k+" label="Atomic MCQs" />
+                 </div>
+                 <div className="h-32 w-px bg-white/5 self-center" />
+                 <div className="space-y-6">
+                    <PortalStat val="24/7" label="Audit Online" />
+                    <PortalStat val="State" label="Rankers" />
+                 </div>
+              </div>
+           </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  )
+}
+
+function PortalStat({ val, label }: any) {
+   return (
+      <div className="text-left">
+         <p className="text-2xl font-headline font-black text-primary leading-none">{val}</p>
+         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mt-2">{label}</p>
       </div>
-    </section>
-  );
+   )
 }
