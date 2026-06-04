@@ -1,8 +1,8 @@
+
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { cn } from "@/lib/utils"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface QuestionPaletteProps {
   totalQuestions: number
@@ -14,8 +14,8 @@ interface QuestionPaletteProps {
 }
 
 /**
- * @fileOverview Final Paginated Audit Map.
- * Fixed: Robust range-based pagination and centered grid alignment.
+ * @fileOverview Final High-Density Audit Matrix.
+ * Removed pagination to allow direct access to all 150+ questions in a scrollable grid.
  */
 
 export default function QuestionPalette({
@@ -26,21 +26,8 @@ export default function QuestionPalette({
   visitedIndices,
   onSelect
 }: QuestionPaletteProps) {
-  const PAGE_SIZE = 25
-  const totalPages = Math.ceil(totalQuestions / PAGE_SIZE)
-  const [currentPage, setCurrentPage] = useState(0)
-
-  // Auto-jump range when currentIndex moves out of current page view
-  useEffect(() => {
-    const targetPage = Math.floor(currentIndex / PAGE_SIZE)
-    if (targetPage !== currentPage) {
-      setCurrentPage(targetPage)
-    }
-  }, [currentIndex, currentPage])
-
-  const startIdx = currentPage * PAGE_SIZE
-  const endIdx = Math.min(startIdx + PAGE_SIZE, totalQuestions)
-  const currentRange = Array.from({ length: endIdx - startIdx }, (_, i) => startIdx + i)
+  
+  const allIndices = Array.from({ length: totalQuestions }, (_, i) => i)
 
   const summary = useMemo(() => {
     const answered = answeredIndices.length
@@ -59,36 +46,20 @@ export default function QuestionPalette({
 
   return (
     <div className="space-y-6 flex flex-col h-full text-left">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
          <PaletteStat count={summary.answered} label="Answered" color="bg-emerald-600" />
          <PaletteStat count={summary.notAnswered} label="Not Answered" color="bg-rose-500" />
          <PaletteStat count={summary.notVisited} label="Not Visited" color="bg-slate-100" textColor="text-slate-400" />
          <PaletteStat count={summary.review} label="Review" color="bg-amber-500" />
       </div>
 
-      <div className="space-y-4 pt-4 border-t border-slate-100">
-         <div className="flex items-center justify-between px-2">
-            <h4 className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Audit Grid</h4>
-            <div className="flex gap-2">
-               <button 
-                  onClick={() => setCurrentPage(p => Math.max(0, p - 1))} 
-                  disabled={currentPage === 0} 
-                  className="p-1.5 hover:bg-slate-50 rounded-lg disabled:opacity-20 transition-all border border-transparent hover:border-slate-100"
-               >
-                  <ChevronLeft className="h-4 w-4" />
-               </button>
-               <button 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))} 
-                  disabled={currentPage === totalPages - 1} 
-                  className="p-1.5 hover:bg-slate-50 rounded-lg disabled:opacity-20 transition-all border border-transparent hover:border-slate-100"
-               >
-                  <ChevronRight className="h-4 w-4" />
-               </button>
-            </div>
+      <div className="space-y-4 pt-4 border-t border-slate-100 flex-1">
+         <div className="flex items-center justify-between px-1 mb-4">
+            <h4 className="text-[10px] font-black uppercase text-black tracking-widest">Audit Grid (Total {totalQuestions})</h4>
          </div>
 
-         <div className="grid grid-cols-5 gap-4 px-1 justify-items-center">
-            {currentRange.map((idx) => {
+         <div className="grid grid-cols-5 gap-3 px-1 justify-items-center">
+            {allIndices.map((idx) => {
                const isCurrent = currentIndex === idx
                const isAnswered = answeredIndices.includes(idx)
                const isFlagged = flaggedIndices.includes(idx)
@@ -114,7 +85,6 @@ export default function QuestionPalette({
                )
             })}
          </div>
-         <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em] text-center mt-2">QUESTIONS {startIdx + 1} — {endIdx}</p>
       </div>
     </div>
   )
@@ -122,11 +92,11 @@ export default function QuestionPalette({
 
 function PaletteStat({ count, label, color, textColor = "text-white" }: any) {
   return (
-    <div className="flex items-center gap-3 px-3 py-2 rounded-xl border border-slate-50 bg-white shadow-sm">
-       <div className={cn("h-6 w-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 shadow-sm", color, textColor)}>
+    <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-slate-50 bg-white shadow-sm">
+       <div className={cn("h-5 w-5 rounded flex items-center justify-center text-[9px] font-black shrink-0", color, textColor)}>
           {count}
        </div>
-       <span className="text-[9px] font-black uppercase text-slate-400 tracking-tight truncate">{label}</span>
+       <span className="text-[8px] font-black uppercase text-slate-500 tracking-tight truncate">{label}</span>
     </div>
   )
 }
