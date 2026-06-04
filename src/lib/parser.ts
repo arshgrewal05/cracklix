@@ -3,7 +3,6 @@
  * Supports: 
  * 1. Simple Format (Q1. Text, A., B., C., D., Answer: B, Explanation: ...)
  * 2. Tagged Format (QUESTION_TYPE: MCQ, QUESTION_EN: ..., etc.)
- * 3. Bilingual Tagged Format
  * 
  * Logic: All optional fields return null instead of undefined to satisfy Firestore.
  */
@@ -59,7 +58,6 @@ export function parseBulkQuestions(
 
       questions.push({
         ...parsed,
-        id: `q-${Date.now()}-${index}`,
         isStandalone: true,
         status: metadata.status
       });
@@ -81,7 +79,7 @@ function parseTaggedBlock(block: string, metadata: any): Partial<Question> {
   };
 
   const qType = (getTag("QUESTION_TYPE") || "MCQ").toUpperCase() as QuestionType;
-  const ansRaw = getTag("ANSWER");
+  const ansRaw = getTag("ANSWER") || getTag("CORRECT_ANSWER");
   const correctAnswer = (ansRaw.match(/[A-D]/i)?.[0].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
 
   const qEn = getTag("QUESTION_EN") || getTag("TITLE");
@@ -100,14 +98,16 @@ function parseTaggedBlock(block: string, metadata: any): Partial<Question> {
     optionCEn: getTag("OPTION_C_EN") || "Option C",
     optionCPa: getTag("OPTION_C_PA") || getTag("OPTION_C_EN") || "ਵਿਕਲਪ C",
     optionDEn: getTag("OPTION_D_EN") || "Option D",
-    optionDPa: getTag("OPTION_DPa") || getTag("OPTION_D_EN") || "ਵਿਕਲਪ D",
+    optionDPa: getTag("OPTION_D_PA") || getTag("OPTION_D_EN") || "ਵਿਕਲਪ D",
     correctAnswer,
     explanationEn: getTag("EXPLANATION_EN") || "Rationale provided.",
     explanationPa: getTag("EXPLANATION_PA") || getTag("EXPLANATION_EN") || "ਵਿਆਖਿਆ.",
     imageUrl: getTag("IMAGE_URL") || null,
     passageEn: getTag("PASSAGE_EN") || null,
     passagePa: getTag("PASSAGE_PA") || null,
-    tableData: null, // Initialized to null for Firestore
+    instructionEn: getTag("INSTRUCTION_EN") || null,
+    instructionPa: getTag("INSTRUCTION_PA") || null,
+    tableData: null,
     chartConfig: null
   };
 }
@@ -152,6 +152,8 @@ function parseSimpleBlock(block: string, metadata: any): Partial<Question> {
     imageUrl: null,
     passageEn: null,
     passagePa: null,
+    instructionEn: null,
+    instructionPa: null,
     tableData: null,
     chartConfig: null
   };

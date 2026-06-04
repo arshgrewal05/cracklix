@@ -8,19 +8,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChevronLeft, Save, Languages, ShieldCheck, Clock, Layers, Layout, Database, Eye, Image as ImageIcon, FileText, BarChart3 } from "lucide-react"
+import { ChevronLeft, Save, Languages, Layers, Database, Eye, BarChart3 } from "lucide-react"
 import { useFirestore, useDoc, useCollection, useUser } from "@/firebase"
 import { doc, setDoc, serverTimestamp, collection } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 import QuestionRenderer from "@/components/questions/QuestionRenderer"
-import { QuestionType, DiagramType } from "@/types"
 
 /**
- * @fileOverview Enterprise Question Entry Point.
+ * @fileOverview Enterprise Question Editor Node.
  * Optimized for payload sanitization to prevent 'undefined' field errors.
  */
 
@@ -52,7 +50,7 @@ function QuestionEntryContent() {
     status: "DRAFT",
     questionType: "MCQ",
     diagramType: "none",
-    questionEn: "", questionPa: "", questionHi: "",
+    questionEn: "", questionPa: "",
     optionAEn: "", optionAPa: "",
     optionBEn: "", optionBPa: "",
     optionCEn: "", optionCPa: "",
@@ -79,7 +77,6 @@ function QuestionEntryContent() {
   const handleSave = () => {
     if (!db || isSaving) return
     
-    // Parse JSON fields
     let tableData = null;
     let chartConfig = null;
     
@@ -95,23 +92,21 @@ function QuestionEntryContent() {
     const finalId = questionId || `q-${Date.now()}`
     const questionRef = doc(db, "questions", finalId)
     
-    // Sanitization: Prepare payload without serverTimestamp first to avoid JSON issues
     const basePayload: any = { 
       ...formData, 
       id: finalId,
       tableData,
       chartConfig,
+      isStandalone: true,
       author: existingData?.author || profile?.name || "Team Node"
     };
     
-    // Cleanup temporary UI fields
     delete basePayload.tableDataJson;
     delete basePayload.chartConfigJson;
 
     // Strict cleanup of undefined values
     Object.keys(basePayload).forEach(key => basePayload[key] === undefined && delete basePayload[key]);
 
-    // Add Firestore FieldValues after cleanup
     const finalPayload = {
       ...basePayload,
       updatedAt: serverTimestamp(),
@@ -120,12 +115,12 @@ function QuestionEntryContent() {
 
     setDoc(questionRef, finalPayload, { merge: true })
       .then(() => {
-        toast({ title: "Node Synced", description: `MCQ status set to: ${formData.status}` })
+        toast({ title: "Node Synced", description: `Asset updated in Global Bank.` })
         router.push("/admin/questions")
       })
       .catch(async (err) => {
         console.error("Firestore Save Error:", err)
-        errorEmitter.emit("permission-error", new FirestorePermissionError({ path: questionRef.path, operation: 'write', requestResourceData: finalPayload }))
+        errorEmitter.emit("permission-error", new FirestorePermissionError({ path: questionRef.path, operation: 'write' }))
       })
       .finally(() => setIsSaving(false))
   }
@@ -133,11 +128,11 @@ function QuestionEntryContent() {
   return (
     <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 text-left">
           <Button variant="ghost" size="icon" className="rounded-2xl h-12 w-12 border border-slate-200 bg-white" onClick={() => router.back()}><ChevronLeft className="h-6 w-6" /></Button>
           <div className="text-left">
-            <h1 className="text-3xl font-black font-headline text-[#0F172A] uppercase tracking-tight">{isEditing ? "Audit Entry" : "Creation Node"}</h1>
-            <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mt-1">Enterprise Question Ingestion Framework</p>
+            <h1 className="text-3xl font-black font-headline text-[#0F172A] uppercase tracking-tight">{isEditing ? "Audit Entry" : "Manual Entry Node"}</h1>
+            <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mt-1">High-Fidelity Question Engineering</p>
           </div>
         </div>
         <div className="flex gap-4">
@@ -150,13 +145,12 @@ function QuestionEntryContent() {
              </SelectContent>
            </Select>
            <Button className="bg-primary hover:bg-primary/90 gap-3 font-black px-10 h-14 shadow-xl rounded-2xl uppercase tracking-widest text-xs" onClick={handleSave} disabled={isSaving}>
-             <Save className="h-4 w-4" /> {isSaving ? "Syncing..." : "Sync Global Bank"}
+             <Save className="h-4 w-4" /> {isSaving ? "Syncing..." : "Commit Changes"}
            </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-[#0F172A]">
-        {/* Left: Editor */}
         <div className="lg:col-span-7 space-y-8 text-left">
           <Tabs defaultValue="content" className="w-full">
             <TabsList className="bg-slate-100 rounded-2xl p-1.5 h-16 mb-6 overflow-x-auto overflow-y-hidden custom-scrollbar max-w-full">
@@ -175,12 +169,10 @@ function QuestionEntryContent() {
                            <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-100"><SelectValue /></SelectTrigger>
                            <SelectContent>
                               <SelectItem value="MCQ">Standard MCQ</SelectItem>
-                              <SelectItem value="BILINGUAL_MCQ">Bilingual MCQ</SelectItem>
-                              <SelectItem value="PASSAGE">Passage/RC</SelectItem>
-                              <SelectItem value="DI_TABLE">Table DI</SelectItem>
-                              <SelectItem value="DI_CHART">Chart DI</SelectItem>
                               <SelectItem value="MATCHING">Match Following</SelectItem>
                               <SelectItem value="ASSERTION_REASON">Assertion Reason</SelectItem>
+                              <SelectItem value="DI_QUESTION">DI Question</SelectItem>
+                              <SelectItem value="PASSAGE_QUESTION">Passage Question</SelectItem>
                            </SelectContent>
                         </Select>
                      </div>
@@ -196,11 +188,6 @@ function QuestionEntryContent() {
                            </SelectContent>
                         </Select>
                      </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Instruction (English)</Label>
-                    <Input value={formData.instructionEn} onChange={e => setFormData({...formData, instructionEn: e.target.value})} className="h-12 rounded-xl bg-slate-50 border-slate-100 font-medium" placeholder="e.g. Read the following table and answer..." />
                   </div>
 
                   <div className="space-y-3">
@@ -228,7 +215,7 @@ function QuestionEntryContent() {
                       value={formData.explanationEn} 
                       onChange={e => setFormData({...formData, explanationEn: e.target.value})} 
                       className="min-h-[100px] rounded-2xl bg-emerald-50/30 border-emerald-100 p-6 font-medium" 
-                      placeholder="Detailed explanation for solution hub..."
+                      placeholder="Detailed explanation..."
                     />
                   </div>
                </Card>
@@ -247,7 +234,6 @@ function QuestionEntryContent() {
                               <SelectItem value="table">Interactive Table</SelectItem>
                               <SelectItem value="barGraph">Bar Graph</SelectItem>
                               <SelectItem value="pieChart">Pie Chart</SelectItem>
-                              <SelectItem value="lineGraph">Line Graph</SelectItem>
                            </SelectContent>
                         </Select>
                      </div>
@@ -263,29 +249,7 @@ function QuestionEntryContent() {
                       value={formData.passageEn} 
                       onChange={e => setFormData({...formData, passageEn: e.target.value})} 
                       className="min-h-[250px] rounded-2xl bg-slate-900 border-none p-8 font-mono text-emerald-400 text-sm leading-relaxed" 
-                      placeholder="Enter passage text here..."
                     />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                     <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Table Data (JSON)</Label>
-                        <Textarea 
-                          value={formData.tableDataJson} 
-                          onChange={e => setFormData({...formData, tableDataJson: e.target.value})} 
-                          className="h-[200px] rounded-2xl bg-slate-900 border-none p-6 font-mono text-blue-400 text-xs" 
-                          placeholder='{ "headers": ["City", "Pop"], "rows": [["Bathinda", "30k"]] }'
-                        />
-                     </div>
-                     <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Chart Configuration (JSON)</Label>
-                        <Textarea 
-                          value={formData.chartConfigJson} 
-                          onChange={e => setFormData({...formData, chartConfigJson: e.target.value})} 
-                          className="h-[200px] rounded-2xl bg-slate-900 border-none p-6 font-mono text-orange-400 text-xs" 
-                          placeholder='{ "data": [{ "name": "2024", "value": 100 }] }'
-                        />
-                     </div>
                   </div>
                </Card>
             </TabsContent>
@@ -304,10 +268,6 @@ function QuestionEntryContent() {
                       </div>
                     ))}
                   </div>
-                  <div className="space-y-3 pt-6 border-t border-slate-100">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">ਵਿਆਖਿਆ (Explanation)</Label>
-                    <Textarea value={formData.explanationPa} onChange={e => setFormData({...formData, explanationPa: e.target.value})} className="min-h-[100px] rounded-2xl bg-slate-50 border-slate-100 p-6 font-medium" />
-                  </div>
                </Card>
             </TabsContent>
 
@@ -315,7 +275,7 @@ function QuestionEntryContent() {
                <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] p-12 space-y-8">
                   <div className="grid grid-cols-2 gap-8">
                      <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Recruitment Board</Label>
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Board</Label>
                         <Select value={formData.boardId} onValueChange={v => setFormData({...formData, boardId: v})}>
                            <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-100"><SelectValue placeholder="Select" /></SelectTrigger>
                            <SelectContent>{boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
@@ -331,6 +291,10 @@ function QuestionEntryContent() {
                   </div>
                   <div className="grid grid-cols-2 gap-8">
                      <div className="space-y-3">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Topic / Chapter</Label>
+                        <Input value={formData.chapterId} onChange={e => setFormData({...formData, chapterId: e.target.value})} className="h-12 rounded-xl bg-slate-50 border-slate-100" placeholder="e.g. Percentage" />
+                     </div>
+                     <div className="space-y-3">
                         <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Difficulty</Label>
                         <Select value={formData.difficulty} onValueChange={v => setFormData({...formData, difficulty: v})}>
                            <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-100"><SelectValue /></SelectTrigger>
@@ -341,33 +305,27 @@ function QuestionEntryContent() {
                            </SelectContent>
                         </Select>
                      </div>
-                     <div className="space-y-3">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Topic / Chapter</Label>
-                        <Input value={formData.chapterId} onChange={e => setFormData({...formData, chapterId: e.target.value})} className="h-12 rounded-xl bg-slate-50 border-slate-100" placeholder="e.g. Percentage" />
-                     </div>
                   </div>
                </Card>
             </TabsContent>
           </Tabs>
         </div>
 
-        {/* Right: Real-time Preview */}
         <div className="lg:col-span-5 space-y-8">
           <Card className="border-none bg-white shadow-2xl rounded-[3.5rem] overflow-hidden sticky top-32">
-             <div className="bg-[#0B1528] px-10 py-6 flex items-center justify-between border-b border-white/5">
+             <div className="bg-[#0B1528] px-10 py-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                    <Eye className="h-4 w-4 text-primary" />
-                   <span className="text-[10px] font-black uppercase tracking-widest text-white">Student View Node</span>
+                   <span className="text-[10px] font-black uppercase tracking-widest text-white">Student Preview Node</span>
                 </div>
-                <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase tracking-widest px-3 py-1">Instant Audit</Badge>
              </div>
              <CardContent className="p-10 space-y-10 h-[70vh] overflow-y-auto custom-scrollbar">
                 <QuestionRenderer 
                    language="bilingual" 
                    question={{
                      ...formData,
-                     tableData: formData.tableDataJson ? JSON.parse(formData.tableDataJson || '{}') : undefined,
-                     chartConfig: formData.chartConfigJson ? JSON.parse(formData.chartConfigJson || '{}') : undefined
+                     tableData: formData.tableDataJson ? JSON.parse(formData.tableDataJson || '{}') : null,
+                     chartConfig: formData.chartConfigJson ? JSON.parse(formData.chartConfigJson || '{}') : null
                    }} 
                    showSolution={true}
                 />

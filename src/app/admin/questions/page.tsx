@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Database, Layers, CheckCircle2, Clock, Filter, Archive } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Database, Filter } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, deleteDoc, doc, where } from "firebase/firestore"
@@ -15,8 +15,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 /**
- * @fileOverview Institutional Question Bank Asset Registry.
- * Fixed: Filterable reusable bank logic.
+ * @fileOverview Institutional Asset Ledger (Global Bank).
+ * Standardized to production schema for 100% data visibility.
  */
 
 export default function QuestionBank() {
@@ -51,7 +51,7 @@ export default function QuestionBank() {
   const handleDelete = async (id: string) => {
     if (!confirm("Permanently purge this asset from the global bank?")) return
     await deleteDoc(doc(db!, "questions", id))
-    toast({ title: "Asset Purged", description: "Node removed from reusable bank." })
+    toast({ title: "Asset Purged", description: "Node removed from registry." })
   }
 
   return (
@@ -63,19 +63,19 @@ export default function QuestionBank() {
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Atomic Asset Registry</span>
           </div>
           <h1 className="text-5xl font-black font-headline text-primary uppercase tracking-tight">Question Bank</h1>
-          <p className="text-muted-foreground mt-2 text-lg">Central hub for {allQuestions?.length || 0} reusable exam nodes.</p>
+          <p className="text-muted-foreground mt-2 text-lg">Managing {allQuestions?.length || 0} reusable institutional nodes.</p>
         </div>
         <div className="flex gap-4">
            <Button asChild variant="outline" className="h-14 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 shadow-sm bg-white">
               <Link href="/admin/bulk-import"><Plus className="h-5 w-5" /> Bulk Ingestion</Link>
            </Button>
           <Button asChild className="bg-[#0F172A] hover:bg-black text-white gap-3 font-black shadow-2xl h-14 px-10 rounded-2xl uppercase tracking-widest text-xs">
-            <Link href="/admin/questions/add"><Plus className="h-5 w-5" /> Manual Node</Link>
+            <Link href="/admin/questions/add"><Plus className="h-5 w-5" /> Add Manual</Link>
           </Button>
         </div>
       </div>
 
-      <Card className="border-foreground/5 bg-card/50 shadow-3xl rounded-[3rem] overflow-hidden">
+      <Card className="border-none shadow-3xl rounded-[3rem] overflow-hidden bg-white">
         <CardHeader className="p-10 border-b border-slate-50 bg-muted/20">
           <div className="flex flex-col lg:flex-row gap-8 items-center justify-between">
             <div className="relative w-full lg:w-[45%]">
@@ -98,10 +98,10 @@ export default function QuestionBank() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-white/5 h-16">
-                <TableHead className="px-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Atomic Statement</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Context</TableHead>
-                <TableHead className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Solution</TableHead>
-                <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Audit</TableHead>
+                <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Node Logic</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500">Context</TableHead>
+                <TableHead className="text-center text-[10px] font-black uppercase text-slate-500">Correct</TableHead>
+                <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Audit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -114,8 +114,8 @@ export default function QuestionBank() {
                   <TableCell className="px-10 py-8 max-w-lg text-left">
                     <p className="font-bold text-[#0F172A] line-clamp-1">{q.questionEn}</p>
                     <div className="flex items-center gap-4 mt-2">
-                       <code className="text-[9px] font-mono text-slate-500 uppercase">UID: {q.id.slice(-8)}</code>
-                       {q.imageUrl && <Badge className="bg-blue-50 text-blue-600 border-none text-[8px] font-black uppercase">VISUAL NODE</Badge>}
+                       <code className="text-[9px] font-mono text-slate-500 uppercase">ID: {q.id.slice(-8)}</code>
+                       <Badge className="bg-slate-100 text-slate-500 border-none text-[8px] font-black uppercase">{q.questionType}</Badge>
                     </div>
                   </TableCell>
                   <TableCell className="text-left">
@@ -138,7 +138,7 @@ export default function QuestionBank() {
                 </TableRow>
               )) : (
                 <TableRow>
-                   <TableCell colSpan={4} className="h-40 text-center opacity-30 italic text-slate-400 font-bold uppercase text-xs">Awaiting atomic ingestion. Use Bulk Ingestion to populate the bank.</TableCell>
+                   <TableCell colSpan={4} className="h-40 text-center opacity-30 italic text-slate-400 font-bold uppercase text-xs">No questions found in registry.</TableCell>
                 </TableRow>
               )}
             </TableBody>

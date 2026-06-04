@@ -11,22 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { 
-  Upload, 
   Database, 
   ChevronLeft, 
-  CheckCircle2, 
   AlertCircle, 
   Settings2, 
   Loader2, 
   Trash2, 
-  Rocket,
   Zap,
   Copy,
-  Layers,
   Save,
   FileCode,
-  DatabaseBackup,
-  FileText
+  DatabaseBackup
 } from "lucide-react"
 import { useFirestore, useCollection } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
@@ -78,7 +73,7 @@ export default function BulkImportPage() {
     if (errors.length > 0) {
       toast({ variant: "destructive", title: "Partial Format Mismatch", description: `Parsed ${questions.length} blocks, but found ${errors.length} errors.` })
     } else {
-      toast({ title: "Hybrid Audit Complete", description: `${questions.length} nodes structured with ${conf}% confidence.` })
+      toast({ title: "Audit Complete", description: `${questions.length} nodes structured with ${conf}% confidence.` })
     }
   }
 
@@ -127,8 +122,8 @@ export default function BulkImportPage() {
             <ChevronLeft className="h-6 w-6" />
           </Button>
           <div>
-            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Hybrid Bank Ingestion</h1>
-            <p className="text-slate-500 font-medium text-left">Supports both Tagged and Simple (Q1, A, B, C, D) content formats.</p>
+            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Atomic Ingestion Hub</h1>
+            <p className="text-slate-500 font-medium text-left">Inject metadata and structure your reusable question bank.</p>
           </div>
         </div>
         <div className="flex gap-4">
@@ -192,7 +187,7 @@ export default function BulkImportPage() {
                     <li>• <span className="text-primary">SIMPLE MODE:</span> Q1. Question text &gt; A. Option A &gt; Answer: B</li>
                     <li>• <span className="text-primary">TAGGED MODE:</span> QUESTION_EN: &gt; OPTION_A_EN: &gt; ANSWER:</li>
                     <li>• <span className="text-primary">IMAGE MODE:</span> IMAGE_URL: [Link] &gt; QUESTION_EN: ...</li>
-                    <li>• Use <span className="font-black text-[#0F172A]">===</span> between questions for best results.</li>
+                    <li>• Use <span className="font-black text-[#0F172A]">===</span> between questions.</li>
                  </ul>
               </div>
             </CardContent>
@@ -208,8 +203,8 @@ export default function BulkImportPage() {
                 placeholder="Paste Q1. A. B. C. D. Answer: format or Tagged format here..."
                 className="min-h-[500px] rounded-[3.5rem] bg-white border-none p-12 text-sm font-mono shadow-4xl custom-scrollbar text-[#0F172A]"
               />
-              <Button onClick={handleAnalyze} className="w-full h-20 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.3em] rounded-[2.5rem] shadow-4xl mt-6 gap-4">
-                 <Zap className="h-6 w-6 fill-current" /> Structure & Audit Batch
+              <Button onClick={handleAnalyze} className="w-full h-20 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.3em] rounded-[2.5rem] shadow-4xl mt-6 gap-4">
+                 <Zap className="h-6 w-6 text-primary fill-current" /> Structure & Audit Batch
               </Button>
            </div>
 
