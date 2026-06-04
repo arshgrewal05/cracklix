@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo } from "react"
@@ -9,7 +10,6 @@ import Link from "next/link"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, where } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
-import Image from "next/image"
 
 /**
  * @fileOverview High-Fidelity Latest Mocks Node.
@@ -24,7 +24,10 @@ export default function LatestMocks() {
     return query(collection(db, "mocks"), where("published", "==", true))
   }, [db])
 
-  const { data: rawMocks, loading } = useCollection<any>(mocksQuery)
+  const boardsQuery = useMemo(() => (db ? collection(db, "boards") : null), [db])
+
+  const { data: rawMocks, loading: mocksLoading } = useCollection<any>(mocksQuery)
+  const { data: boards, loading: boardsLoading } = useCollection<any>(boardsQuery)
 
   const mocks = useMemo(() => {
     if (!rawMocks) return []
@@ -35,7 +38,7 @@ export default function LatestMocks() {
     }).slice(0, 5)
   }, [rawMocks])
 
-  const psssbLogo = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png";
+  const psssbEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png";
 
   return (
     <section className="py-24 bg-white">
@@ -61,57 +64,60 @@ export default function LatestMocks() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {loading ? (
+          {mocksLoading || boardsLoading ? (
              Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-72 w-full rounded-[2.5rem]" />)
           ) : mocks.length > 0 ? (
-            mocks.map((mock, i) => (
-              <motion.div
-                key={mock.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="h-full"
-              >
-                <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-500 group h-full flex flex-col p-6">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center relative overflow-hidden group-hover:shadow-lg transition-all shadow-inner">
-                       {mock.boardId?.toLowerCase().includes('psssb') ? (
-                          <img 
-                            src={psssbLogo} 
+            mocks.map((mock, i) => {
+              const board = boards?.find((b: any) => b.id === mock.boardId);
+              return (
+                <motion.div
+                  key={mock.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  viewport={{ once: true }}
+                  className="h-full"
+                >
+                  <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-500 group h-full flex flex-col p-6">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center relative overflow-hidden group-hover:shadow-lg transition-all shadow-inner">
+                         <img 
+                            src={board?.iconUrl || psssbEmblem} 
                             referrerPolicy="no-referrer"
                             crossOrigin="anonymous"
                             className="w-full h-full object-contain p-2" 
-                            alt="PSSSB" 
-                          />
-                       ) : (
-                          <ShieldCheck className="h-7 w-7 text-primary opacity-20" />
-                       )}
+                            alt={mock.boardId || 'Board'} 
+                            onError={(e) => {
+                               const target = e.target as HTMLImageElement;
+                               target.src = psssbEmblem;
+                            }}
+                         />
+                      </div>
+                      <Badge className="bg-orange-50 text-primary border-none text-[8px] font-black uppercase px-2 py-0.5 rounded-lg">
+                        {board?.abbreviation || mock.boardId?.toUpperCase() || 'OFFICIAL'}
+                      </Badge>
                     </div>
-                    <Badge className="bg-orange-50 text-primary border-none text-[8px] font-black uppercase px-2 py-0.5 rounded-lg">
-                      {mock.boardId?.toUpperCase() || 'OFFICIAL'}
-                    </Badge>
-                  </div>
-                  
-                  <h3 className="font-headline font-black text-left text-lg text-[#000000] leading-tight min-h-[48px] group-hover:text-primary transition-colors mb-4 line-clamp-2 uppercase">
-                    {mock.title}
-                  </h3>
-                  
-                  <div className="space-y-3 mb-6 pt-4 border-t border-slate-50">
-                    <div className="flex items-center gap-2 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-                       <BookOpen className="h-3.5 w-3.5 text-primary" /> {mock.totalQuestions} Questions
+                    
+                    <h3 className="font-headline font-black text-left text-lg text-[#000000] leading-tight min-h-[48px] group-hover:text-primary transition-colors mb-4 line-clamp-2 uppercase">
+                      {mock.title}
+                    </h3>
+                    
+                    <div className="space-y-3 mb-6 pt-4 border-t border-slate-50">
+                      <div className="flex items-center gap-2 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                         <BookOpen className="h-3.5 w-3.5 text-primary" /> {mock.totalQuestions} Questions
+                      </div>
+                      <div className="flex items-center gap-2 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                         <Clock className="h-3.5 w-3.5 text-primary" /> {mock.duration} Mins
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-                       <Clock className="h-3.5 w-3.5 text-primary" /> {mock.duration} Mins
-                    </div>
-                  </div>
 
-                  <Button asChild className="w-full bg-[#0B1528] hover:bg-primary text-white font-black h-12 rounded-xl text-[10px] uppercase tracking-[0.2em] mt-auto shadow-lg transition-all active:scale-95">
-                    <Link href={`/mocks/${mock.id}`}>Attempt Now</Link>
-                  </Button>
-                </div>
-              </motion.div>
-            ))
+                    <Button asChild className="w-full bg-[#0B1528] hover:bg-primary text-white font-black h-12 rounded-xl text-[10px] uppercase tracking-[0.2em] mt-auto shadow-lg transition-all active:scale-95">
+                      <Link href={`/mocks/${mock.id}`}>Attempt Now</Link>
+                    </Button>
+                  </div>
+                </motion.div>
+              )
+            })
           ) : (
             <div className="col-span-full py-12 text-center text-slate-300 opacity-30 italic">
                <GraduationCap className="h-12 w-12 mx-auto mb-4" />

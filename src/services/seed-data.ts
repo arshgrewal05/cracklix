@@ -50,7 +50,7 @@ export async function seedInitialData(db: Firestore) {
     await setDoc(doc(db, 'passes', p.id), { ...p, updatedAt: serverTimestamp() });
   }
 
-  // 2. Official Board Registry with High-Fidelity Logos
+  // 2. Official Board Registry with High-Fidelity URLs
   const boards = [
     {
       id: 'psssb',
@@ -63,15 +63,36 @@ export async function seedInitialData(db: Firestore) {
       id: 'ppsc',
       abbreviation: 'PPSC',
       name: 'Punjab Public Service Commission',
-      iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png',
+      iconUrl: 'https://ppsc.gov.in/assets/images/logo.png',
       description: 'Official authority for Class A and B civil services.'
     },
     {
       id: 'punjab-police',
       abbreviation: 'Police',
       name: 'Punjab Police Recruitment Board',
-      iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png',
+      iconUrl: 'https://1000logos.net/wp-content/uploads/2022/12/Punjab-Police-Logo.png',
       description: 'District and Armed cadre recruitments.'
+    },
+    {
+      id: 'pseb',
+      abbreviation: 'PSEB',
+      name: 'Punjab School Education Board (Teaching)',
+      iconUrl: 'https://www.pseb.ac.in/images/logo-punjabi.png',
+      description: 'ETT, Master Cadre and Teaching recruitments.'
+    },
+    {
+      id: 'high-court',
+      abbreviation: 'High Court',
+      name: 'Punjab & Haryana High Court',
+      iconUrl: 'https://highcourtchd.gov.in/sub_pages/left_menu/images/logo1.png',
+      description: 'Judicial and clerical recruitments for subordinate courts.'
+    },
+    {
+      id: 'pspcl',
+      abbreviation: 'Technical',
+      name: 'PSPCL / PSTCL',
+      iconUrl: 'https://pspcl.in/images/logo.png',
+      description: 'Technical and clerical recruitment for power corporations.'
     }
   ];
 
@@ -107,6 +128,15 @@ export async function seedInitialData(db: Firestore) {
       totalMocks: 15,
       activeQuestions: 1800,
       description: 'Complete series for District, Armed and Intelligence SI.'
+    },
+    {
+      id: 'pseb-master-cadre',
+      boardId: 'pseb',
+      name: 'Master Cadre',
+      category: 'Teaching',
+      totalMocks: 30,
+      activeQuestions: 4500,
+      description: 'Subject-wise preparation for PSEB Master Cadre.'
     }
   ];
 
