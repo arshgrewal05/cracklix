@@ -8,14 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Clock, BookOpen, ShieldCheck, ArrowRight, Zap, Award, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCollection, useFirestore } from "@/firebase";
-import { collection, query, limit, where, orderBy } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
 
 /**
  * @fileOverview Institutional Latest Series Registry (Exam-Centric).
- * Updated: Links point to the specific Exam Hub for structured preparation.
+ * Updated: Client-side sorting implemented to resolve Firebase Index requirements.
  */
 
 export default function LatestMocks() {
@@ -25,13 +24,22 @@ export default function LatestMocks() {
     if (!db) return null;
     return query(
       collection(db, "mocks"), 
-      where("published", "==", true),
-      orderBy("createdAt", "desc"),
-      limit(5)
+      where("published", "==", true)
     );
   }, [db]);
 
-  const { data: mocks, loading } = useCollection<any>(mocksQuery);
+  const { data: rawMocks, loading } = useCollection<any>(mocksQuery);
+
+  const sortedMocks = useMemo(() => {
+    if (!rawMocks) return [];
+    return [...rawMocks]
+      .sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeB - timeA;
+      })
+      .slice(0, 5);
+  }, [rawMocks]);
 
   return (
     <section className="py-24 bg-white overflow-hidden">
@@ -64,8 +72,8 @@ export default function LatestMocks() {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
           {loading ? (
              Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-96 w-full rounded-[3rem]" />)
-          ) : mocks && mocks.length > 0 ? (
-            mocks.map((mock, i) => (
+          ) : sortedMocks && sortedMocks.length > 0 ? (
+            sortedMocks.map((mock, i) => (
               <motion.div
                 key={mock.id}
                 initial={{ opacity: 0, y: 20 }}

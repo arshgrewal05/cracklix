@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo } from "react"
@@ -8,12 +9,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Eye, MoreVertical, Search, Filter, Trash2, Edit, ClipboardList } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, query, orderBy, deleteDoc, doc } from "firebase/firestore"
+import { collection, query, deleteDoc, doc } from "firebase/firestore"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors"
+
+/**
+ * @fileOverview Admin Mock Registry.
+ * Updated: Client-side sorting implemented to resolve Firebase Index requirements.
+ */
 
 export default function MockManagement() {
   const db = useFirestore()
@@ -21,10 +27,19 @@ export default function MockManagement() {
   
   const mocksQuery = useMemo(() => {
     if (!db) return null
-    return query(collection(db, "mocks"), orderBy("createdAt", "desc"))
+    return query(collection(db, "mocks"))
   }, [db])
 
-  const { data: mocks, loading } = useCollection<any>(mocksQuery)
+  const { data: rawMocks, loading } = useCollection<any>(mocksQuery)
+
+  const mocks = useMemo(() => {
+    if (!rawMocks) return []
+    return [...rawMocks].sort((a, b) => {
+      const timeA = a.createdAt?.seconds || 0
+      const timeB = b.createdAt?.seconds || 0
+      return timeB - timeA
+    })
+  }, [rawMocks])
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this mock series permanently?")) return

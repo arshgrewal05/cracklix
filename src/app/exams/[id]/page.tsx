@@ -4,7 +4,7 @@
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useDoc, useCollection, useFirestore } from "@/firebase"
-import { doc, collection, query, where, orderBy } from "firebase/firestore"
+import { doc, collection, query, where } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -31,8 +31,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Image from "next/image"
 
 /**
- * @fileOverview Final Exam-Specific Mastery Hub (Phase 200).
- * This page gates all content by examId, ensuring zero-mix of different exam materials.
+ * @fileOverview Final Exam-Specific Mastery Hub.
+ * Updated: Client-side sorting implemented to resolve Firebase Index requirements.
  */
 
 export default function ExamHubPage() {
@@ -43,30 +43,37 @@ export default function ExamHubPage() {
 
   const { data: exam, loading: examLoading } = useDoc<any>(useMemo(() => (db ? doc(db, "exams", examId) : null), [db, examId]))
   
-  // High-Fidelity Mock Query: Filtered strictly by examId
+  // High-Fidelity Mock Query: Simplified to avoid composite index errors
   const mocksQuery = useMemo(() => {
     if (!db || !examId) return null;
     return query(
       collection(db, "mocks"), 
       where("examId", "==", examId), 
-      where("published", "==", true),
-      orderBy("createdAt", "desc")
+      where("published", "==", true)
     );
   }, [db, examId]);
 
-  const { data: allMocks, loading: mocksLoading } = useCollection<any>(mocksQuery)
+  const { data: rawMocks, loading: mocksLoading } = useCollection<any>(mocksQuery)
 
   const groupedMocks = useMemo(() => {
-    if (!allMocks) return { FULL: [], SUBJECT: [], SECTIONAL: [], PYQ: [], CA_QUIZ: [], CHAPTER: [] };
+    if (!rawMocks) return { FULL: [], SUBJECT: [], SECTIONAL: [], PYQ: [], CA_QUIZ: [], CHAPTER: [] };
+    
+    // Perform sorting client-side to avoid index requirements
+    const sortedMocks = [...rawMocks].sort((a, b) => {
+      const timeA = a.createdAt?.seconds || 0;
+      const timeB = b.createdAt?.seconds || 0;
+      return timeB - timeA;
+    });
+
     return {
-      FULL: allMocks.filter(m => m.mockType === 'FULL'),
-      SUBJECT: allMocks.filter(m => m.mockType === 'SUBJECT'),
-      SECTIONAL: allMocks.filter(m => m.mockType === 'SECTIONAL'),
-      CHAPTER: allMocks.filter(m => m.mockType === 'CHAPTER'),
-      PYQ: allMocks.filter(m => m.mockType === 'PYQ'),
-      CA_QUIZ: allMocks.filter(m => m.mockType === 'CA_QUIZ'),
+      FULL: sortedMocks.filter(m => m.mockType === 'FULL'),
+      SUBJECT: sortedMocks.filter(m => m.mockType === 'SUBJECT'),
+      SECTIONAL: sortedMocks.filter(m => m.mockType === 'SECTIONAL'),
+      CHAPTER: sortedMocks.filter(m => m.mockType === 'CHAPTER'),
+      PYQ: sortedMocks.filter(m => m.mockType === 'PYQ'),
+      CA_QUIZ: sortedMocks.filter(m => m.mockType === 'CA_QUIZ'),
     }
-  }, [allMocks])
+  }, [rawMocks])
 
   if (examLoading) return <div className="h-screen flex items-center justify-center bg-white"><Skeleton className="h-24 w-24 rounded-3xl" /></div>
   if (!exam) return <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4"><Layout className="h-16 w-16 opacity-10" /><p className="font-black uppercase tracking-widest">Exam Hub Not Found</p></div>
@@ -96,7 +103,7 @@ export default function ExamHubPage() {
                   {exam.description || "High-fidelity preparation matrix including full mocks, previous papers, and specialized subject tests."}
                </p>
                <div className="flex flex-wrap gap-8 pt-4">
-                  <HubMetric label="Active Mocks" value={allMocks?.length || 0} icon={<Zap className="text-primary" />} />
+                  <HubMetric label="Active Mocks" value={rawMocks?.length || 0} icon={<Zap className="text-primary" />} />
                   <HubMetric label="MCQ Bank" value={exam.activeQuestions || "1,000+"} icon={<BookOpen className="text-blue-400" />} />
                   <HubMetric label="Aspirants" value="12k+" icon={<Trophy className="text-amber-400" />} />
                </div>
