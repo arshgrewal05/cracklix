@@ -143,7 +143,7 @@ export interface MockTest {
   updatedAt?: any;
   author?: string;
   
-  // New CMS Fields
+  // CMS Fields
   subjectId?: string;
   topicId?: string;
   year?: number;
