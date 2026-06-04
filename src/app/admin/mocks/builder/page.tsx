@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo, useEffect, Suspense } from "react"
@@ -10,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Switch } from "@/components/ui/switch"
 import { 
   ChevronLeft, 
   Database, 
@@ -24,10 +24,11 @@ import {
   ShieldCheck,
   SearchCode,
   Filter,
-  ArrowRight
+  ArrowRight,
+  History
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
-import { collection, doc, setDoc, serverTimestamp, query, where } from "firebase/firestore"
+import { collection, doc, setDoc, serverTimestamp, query, where, writeBatch, increment, arrayUnion } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
@@ -35,7 +36,7 @@ import { MockType, MockSection } from "@/types"
 
 /**
  * @fileOverview Modular Mock Architect.
- * Optimized for React controlled component stability and payload sanitization.
+ * Optimized for React controlled component stability and Usage Tracking (Phase 165).
  */
 
 export default function MockBuilderPage() {
@@ -78,11 +79,10 @@ function MockBuilderContent() {
   })
 
   const [selectedQuestions, setSelectedQuestions] = useState<any[]>([])
-  const [bankFilter, setBankFilter] = useState({ subjectId: "all", chapterId: "", search: "" })
+  const [bankFilter, setBankFilter] = useState({ subjectId: "all", chapterId: "", search: "", unusedOnly: false })
 
   useEffect(() => {
     if (existingMock) {
-      // Coalesce null values to empty strings to prevent React controlled component warnings
       const sanitized = { ...existingMock };
       Object.keys(sanitized).forEach(key => {
         if (sanitized[key] === null) sanitized[key] = "";
@@ -104,8 +104,9 @@ function MockBuilderContent() {
       const matchesSub = bankFilter.subjectId === "all" || q.subjectId === bankFilter.subjectId
       const matchesChap = !bankFilter.chapterId || q.chapterId?.toLowerCase().includes(bankFilter.chapterId.toLowerCase())
       const matchesSearch = !bankFilter.search || q.questionEn?.toLowerCase().includes(bankFilter.search.toLowerCase())
+      const matchesUnused = !bankFilter.unusedOnly || (q.usageCount || 0) === 0
       const notSelected = !selectedQuestions.find(sq => sq.id === q.id)
-      return matchesSub && matchesChap && matchesSearch && notSelected
+      return matchesSub && matchesChap && matchesSearch && notSelected && matchesUnused
     })
   }, [questionBank, bankFilter, selectedQuestions])
 
@@ -125,16 +126,20 @@ function MockBuilderContent() {
   }
 
   const totalQuestions = useMemo(() => {
-    if (mockData.mockType !== 'FULL') return selectedQuestions.length
-    return (mockData.sections || []).reduce((acc: number, s: any) => acc + (parseInt(s.questionCount) || 0), 0)
+    if (mockData.mockType === 'FULL') {
+       return (mockData.sections || []).reduce((acc: number, s: any) => acc + (parseInt(s.questionCount) || 0), 0)
+    }
+    return selectedQuestions.length
   }, [mockData.mockType, mockData.sections, selectedQuestions])
 
   const totalDuration = useMemo(() => {
-    if (mockData.mockType !== 'FULL') return mockData.duration
-    return (mockData.sections || []).reduce((acc: number, s: any) => acc + (parseInt(s.duration) || 0), 0)
+    if (mockData.mockType === 'FULL') {
+       return (mockData.sections || []).reduce((acc: number, s: any) => acc + (parseInt(s.duration) || 0), 0)
+    }
+    return mockData.duration
   }, [mockData.mockType, mockData.sections, mockData.duration])
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!mockData.title || !mockData.boardId) {
       toast({ variant: "destructive", title: "Assembly Failed", description: "Title and Board are mandatory." })
       return
@@ -142,9 +147,8 @@ function MockBuilderContent() {
 
     setIsPublishing(true)
     const finalId = mockId || `mock-${Date.now()}`
-    const mockRef = doc(db, "mocks", finalId)
+    const mockRef = doc(db!, "mocks", finalId)
     
-    // Sanitization: Prepare base payload first
     const basePayload: any = {
       ...mockData,
       id: finalId,
@@ -154,26 +158,38 @@ function MockBuilderContent() {
       published: true,
     };
 
-    // Strict cleanup of undefined values
     Object.keys(basePayload).forEach(key => basePayload[key] === undefined && delete basePayload[key]);
 
-    // Add Firestore FieldValues after cleanup
     const finalPayload = {
       ...basePayload,
       updatedAt: serverTimestamp(),
       createdAt: isEditing ? (existingMock?.createdAt || serverTimestamp()) : serverTimestamp(),
     };
 
-    setDoc(mockRef, finalPayload, { merge: true })
-      .then(() => {
-        toast({ title: isEditing ? "Blueprint Updated" : "Mock Test Deployed", description: "Series is now live in the student hub." })
-        router.push("/admin/mocks")
+    try {
+      // 1. Save Mock
+      await setDoc(mockRef, finalPayload, { merge: true })
+
+      // 2. Update Question Usage Stats (Phase 165)
+      const batch = writeBatch(db!)
+      selectedQuestions.forEach(q => {
+        const qRef = doc(db!, "questions", q.id)
+        batch.update(qRef, {
+          usageCount: increment(1),
+          usedInMocks: arrayUnion(finalId),
+          updatedAt: serverTimestamp()
+        })
       })
-      .catch(async (err) => {
-        console.error("Firestore Mock Save Error:", err)
-        errorEmitter.emit("permission-error", new FirestorePermissionError({ path: mockRef.path, operation: 'write' }))
-      })
-      .finally(() => setIsPublishing(false))
+      await batch.commit()
+
+      toast({ title: isEditing ? "Blueprint Updated" : "Mock Test Deployed", description: "Series is now live in the student hub." })
+      router.push("/admin/mocks")
+    } catch (err: any) {
+      console.error("Firestore Mock Save Error:", err)
+      errorEmitter.emit("permission-error", new FirestorePermissionError({ path: mockRef.path, operation: 'write' }))
+    } finally {
+      setIsPublishing(false)
+    }
   }
 
   return (
@@ -183,11 +199,10 @@ function MockBuilderContent() {
           <button onClick={() => router.back()} className="rounded-2xl h-14 w-14 border border-slate-200 bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition-all"><ChevronLeft className="h-7 w-7 text-[#0F172A]" /></button>
           <div className="text-left">
             <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Mock Architect</h1>
-            <p className="text-slate-500 mt-1 font-medium">Assemble Full or Subject mocks by pulling questions from the bank.</p>
+            <p className="text-slate-500 mt-1 font-medium">Assemble modular tests with high-fidelity reuse logic.</p>
           </div>
         </div>
         <div className="flex gap-4">
-           <Button variant="outline" className="h-16 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest bg-white shadow-sm">Save Blueprint</Button>
            <Button className="bg-[#0F172A] hover:bg-black text-white gap-3 font-black px-12 h-16 shadow-2xl rounded-2xl uppercase tracking-widest text-[10px]" onClick={handlePublish} disabled={isPublishing}>
             {isPublishing ? <Loader2 className="h-5 w-5 animate-spin" /> : <ClipboardCheck className="h-5 w-5" />} {isPublishing ? "Syncing..." : "Assemble & Deploy"}
           </Button>
@@ -208,14 +223,15 @@ function MockBuilderContent() {
               </div>
 
               <div className="space-y-3">
-                 <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Mock Type</Label>
+                 <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Mock Type (Phase 165 Category)</Label>
                  <Select value={mockData.mockType} onValueChange={(v: MockType) => setMockData({...mockData, mockType: v})}>
                     <SelectTrigger className="rounded-xl h-12 bg-slate-50 border-none font-bold text-[#0F172A]"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                       <SelectItem value="FULL">Full Exam Pattern</SelectItem>
-                       <SelectItem value="SUBJECT">Subject Mastery</SelectItem>
-                       <SelectItem value="SECTIONAL">Sectional / Topic</SelectItem>
-                       <SelectItem value="PYQ">Previous Year Paper</SelectItem>
+                       <SelectItem value="FULL">Full Mock Test</SelectItem>
+                       <SelectItem value="SUBJECT">Subject Mock Test</SelectItem>
+                       <SelectItem value="SECTIONAL">Sectional Mock Test</SelectItem>
+                       <SelectItem value="CHAPTER">Chapter Wise Test</SelectItem>
+                       <SelectItem value="PYQ">Previous Year Paper (PYQ)</SelectItem>
                        <SelectItem value="CA_QUIZ">Current Affairs Quiz</SelectItem>
                     </SelectContent>
                  </Select>
@@ -245,10 +261,9 @@ function MockBuilderContent() {
                                    <SelectTrigger className="h-9 rounded-xl bg-slate-50 border-none text-xs font-bold"><SelectValue placeholder="Focus Subject" /></SelectTrigger>
                                    <SelectContent>{subjects?.map((s:any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                                 </Select>
-                                <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-50">
-                                   <div className="text-center"><Label className="text-[8px] font-black uppercase text-slate-400">QS</Label><Input type="number" value={sec.questionCount} onChange={e => updateSection(idx, 'questionCount', e.target.value)} className="h-8 text-center text-[10px] font-black" /></div>
-                                   <div className="text-center"><Label className="text-[8px] font-black uppercase text-slate-400">MINS</Label><Input type="number" value={sec.duration} onChange={e => updateSection(idx, 'duration', e.target.value)} className="h-8 text-center text-[10px] font-black" /></div>
-                                   <div className="text-center"><Label className="text-[8px] font-black uppercase text-slate-400">MARKS</Label><Input type="number" value={sec.marksPerQuestion} onChange={e => updateSection(idx, 'marksPerQuestion', e.target.value)} className="h-8 text-center text-[10px] font-black" /></div>
+                                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-50">
+                                   <div className="text-center"><Label className="text-[8px] font-black uppercase text-slate-400">QS Target</Label><Input type="number" value={sec.questionCount} onChange={e => updateSection(idx, 'questionCount', e.target.value)} className="h-8 text-center text-[10px] font-black" /></div>
+                                   <div className="text-center"><Label className="text-[8px] font-black uppercase text-slate-400">Duration</Label><Input type="number" value={sec.duration} onChange={e => updateSection(idx, 'duration', e.target.value)} className="h-8 text-center text-[10px] font-black" /></div>
                                 </div>
                              </div>
                           ))}
@@ -257,14 +272,14 @@ function MockBuilderContent() {
                  ) : (
                     <div className="grid grid-cols-2 gap-6">
                        <div className="space-y-3">
-                          <Label className="text-[10px] font-black uppercase text-slate-500">Subject</Label>
+                          <Label className="text-[10px] font-black uppercase text-slate-500">Subject Hub</Label>
                           <Select value={mockData.subjectId} onValueChange={v => setMockData({...mockData, subjectId: v})}>
                              <SelectTrigger className="rounded-xl h-12 bg-slate-50 border-none font-bold text-[#0F172A]"><SelectValue /></SelectTrigger>
                              <SelectContent>{subjects?.map((s:any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                           </Select>
                        </div>
                        <div className="space-y-3">
-                          <Label className="text-[10px] font-black uppercase text-slate-500">Manual Time</Label>
+                          <Label className="text-[10px] font-black uppercase text-slate-500">Fixed Mins</Label>
                           <Input type="number" value={mockData.duration} onChange={e => setMockData({...mockData, duration: parseInt(e.target.value) || 0})} className="rounded-xl h-12 bg-slate-50 border-none font-black text-lg" />
                        </div>
                     </div>
@@ -279,15 +294,15 @@ function MockBuilderContent() {
               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/20 flex flex-col md:flex-row justify-between items-center gap-10">
                  <div className="space-y-2 text-left">
                     <CardTitle className="font-headline font-black text-2xl uppercase">Bank Assembly Matrix</CardTitle>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-left">Assembling {selectedQuestions.length} reusable nodes.</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-left">Selected: {selectedQuestions.length} nodes.</p>
                  </div>
                  <div className="flex gap-4">
                     <div className="bg-emerald-50 px-6 py-3 rounded-2xl border border-emerald-100 flex items-center gap-4">
-                       <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Total MCQs</p>
+                       <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Total Qs</p>
                        <span className="text-2xl font-black text-emerald-600">{totalQuestions}</span>
                     </div>
                     <div className="bg-primary/5 px-6 py-3 rounded-2xl border border-primary/10 flex items-center gap-4">
-                       <p className="text-[10px] font-black text-primary uppercase tracking-widest">Time Limit</p>
+                       <p className="text-[10px] font-black text-primary uppercase tracking-widest">Total Time</p>
                        <span className="text-2xl font-black text-primary">{totalDuration}m</span>
                     </div>
                  </div>
@@ -295,15 +310,15 @@ function MockBuilderContent() {
               <CardContent className="p-0">
                  <Tabs defaultValue="selected" className="w-full">
                     <TabsList className="bg-white border-b border-slate-50 h-16 w-full justify-start px-12 gap-10">
-                       <TabsTrigger value="selected" className="h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-black uppercase text-[10px] tracking-[0.2em] rounded-none">Active Blueprint ({selectedQuestions.length})</TabsTrigger>
-                       <TabsTrigger value="bank" className="h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-black uppercase text-[10px] tracking-[0.2em] rounded-none">Browse Global Bank</TabsTrigger>
+                       <TabsTrigger value="selected" className="h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-black uppercase text-[10px] tracking-[0.2em] rounded-none">Active Selection ({selectedQuestions.length})</TabsTrigger>
+                       <TabsTrigger value="bank" className="h-full border-b-4 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-black uppercase text-[10px] tracking-[0.2em] rounded-none">Query Bank Ledger</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="selected" className="p-12 space-y-6 min-h-[500px]">
                        {selectedQuestions.length === 0 ? (
                           <div className="py-40 text-center opacity-20 italic font-bold uppercase text-slate-400">
                              <SearchCode className="h-16 w-16 mx-auto mb-4" />
-                             Blueprint Empty. Add questions from the bank to start.
+                             Matrix Empty. Select fresh nodes from the global bank.
                           </div>
                        ) : (
                           <div className="grid grid-cols-1 gap-4">
@@ -324,31 +339,40 @@ function MockBuilderContent() {
                     </TabsContent>
 
                     <TabsContent value="bank" className="p-12 space-y-8 min-h-[500px]">
-                       <div className="grid grid-cols-3 gap-6 mb-8">
-                          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" /><Input placeholder="Search bank..." value={bankFilter.search || ""} onChange={e => setBankFilter({...bankFilter, search: e.target.value})} className="pl-10 h-12 rounded-xl bg-slate-50 border-none shadow-inner" /></div>
+                       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                          <div className="relative md:col-span-2">
+                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                             <Input placeholder="Search bank nodes..." value={bankFilter.search || ""} onChange={e => setBankFilter({...bankFilter, search: e.target.value})} className="pl-10 h-12 rounded-xl bg-slate-50 border-none shadow-inner" />
+                          </div>
                           <Select value={bankFilter.subjectId} onValueChange={v => setBankFilter({...bankFilter, subjectId: v})}>
                              <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold"><SelectValue /></SelectTrigger>
                              <SelectContent><SelectItem value="all">All Subjects</SelectItem>{subjects?.map((s:any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                           </Select>
-                          <Input placeholder="Chapter filter..." value={bankFilter.chapterId || ""} onChange={e => setBankFilter({...bankFilter, chapterId: e.target.value})} className="h-12 rounded-xl bg-slate-50 border-none shadow-inner" />
+                          <div className="flex items-center gap-3 px-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+                             <Label className="text-[8px] font-black uppercase text-slate-400">Exclude Used</Label>
+                             <Switch checked={bankFilter.unusedOnly} onCheckedChange={(val) => setBankFilter({...bankFilter, unusedOnly: val})} />
+                          </div>
                        </div>
 
                        <div className="grid grid-cols-1 gap-4">
                           {filteredBank.slice(0, 15).map(q => (
                              <div key={q.id} className="p-6 bg-white rounded-[2rem] border border-slate-100 flex items-center justify-between group hover:shadow-xl transition-all">
                                 <div className="flex items-center gap-6">
-                                   <div className="h-10 w-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center font-black text-xs">MCQ</div>
+                                   <div className="h-10 w-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center font-black text-xs">{(q.usageCount || 0) > 0 ? <History className="h-4 w-4" /> : <Plus className="h-4 w-4" />}</div>
                                    <div className="space-y-1 text-left">
                                       <p className="font-bold text-[#0F172A] line-clamp-1">{q.questionEn}</p>
-                                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">{q.subjectId} • {q.chapterId}</p>
+                                      <div className="flex items-center gap-4">
+                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest text-left">{q.subjectId} • {q.chapterId}</p>
+                                         <Badge className="bg-slate-50 text-slate-400 border-none text-[8px] font-black uppercase">Usage: {q.usageCount || 0}</Badge>
+                                      </div>
                                    </div>
                                 </div>
                                 <Button size="sm" className="bg-[#0F172A] text-white rounded-xl h-10 px-6 gap-2 font-black uppercase text-[10px]" onClick={() => setSelectedQuestions([...selectedQuestions, q])}>
-                                   <Plus className="h-4 w-4" /> Add to Mock
+                                   <Plus className="h-4 w-4" /> Add Node
                                 </Button>
                              </div>
                           ))}
-                          {filteredBank.length === 0 && <div className="py-20 text-center text-slate-300 italic">No matching reusable nodes found in bank.</div>}
+                          {filteredBank.length === 0 && <div className="py-20 text-center text-slate-300 italic">No available nodes matching filters.</div>}
                        </div>
                     </TabsContent>
                  </Tabs>

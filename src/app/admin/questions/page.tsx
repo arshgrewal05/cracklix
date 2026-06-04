@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Database, Filter, Eye, Image as ImageIcon } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Database, Filter, Eye, Image as ImageIcon, History } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, deleteDoc, doc, where } from "firebase/firestore"
@@ -13,10 +13,12 @@ import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 /**
  * @fileOverview Institutional Asset Ledger (Global Bank).
- * Features structured previews and type filtering.
+ * Updated: Usage tracking and reuse filtering (Phase 165).
  */
 
 export default function QuestionBank() {
@@ -26,6 +28,7 @@ export default function QuestionBank() {
   const [searchTerm, setSearchTerm] = useState("")
   const [subjectFilter, setSubjectFilter] = useState("all")
   const [boardFilter, setBoardFilter] = useState("all")
+  const [showUnusedOnly, setShowUnusedOnly] = useState(false)
 
   const qQuery = useMemo(() => {
     if (!db) return null
@@ -43,10 +46,11 @@ export default function QuestionBank() {
         const matchesSearch = (q.questionEn || q.titleEn || "").toLowerCase().includes(searchTerm.toLowerCase())
         const matchesSub = subjectFilter === "all" || q.subjectId === subjectFilter
         const matchesBoard = boardFilter === "all" || q.boardId === boardFilter
-        return matchesSearch && matchesSub && matchesBoard
+        const matchesUnused = !showUnusedOnly || (q.usageCount || 0) === 0
+        return matchesSearch && matchesSub && matchesBoard && matchesUnused
       })
       .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-  }, [allQuestions, searchTerm, subjectFilter, boardFilter])
+  }, [allQuestions, searchTerm, subjectFilter, boardFilter, showUnusedOnly])
 
   const handleDelete = async (id: string) => {
     if (!confirm("Permanently purge this asset from the global bank?")) return
@@ -78,11 +82,15 @@ export default function QuestionBank() {
       <Card className="border-none shadow-3xl rounded-[3rem] overflow-hidden bg-white">
         <CardHeader className="p-10 border-b border-slate-50 bg-muted/20">
           <div className="flex flex-col lg:flex-row gap-8 items-center justify-between">
-            <div className="relative w-full lg:w-[45%]">
+            <div className="relative w-full lg:w-[40%]">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
               <Input className="pl-14 h-16 rounded-[1.5rem] bg-white border-none shadow-inner" placeholder="Search structured bank..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-50">
+                 <Label className="text-[10px] font-black uppercase text-slate-400">Unused Only</Label>
+                 <Switch checked={showUnusedOnly} onCheckedChange={setShowUnusedOnly} />
+              </div>
               <Select value={subjectFilter} onValueChange={setSubjectFilter}>
                 <SelectTrigger className="rounded-xl h-12 bg-white border-none w-44 shadow-sm"><SelectValue placeholder="Subject" /></SelectTrigger>
                 <SelectContent><SelectItem value="all">All Subjects</SelectItem>{subjects?.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
@@ -100,7 +108,7 @@ export default function QuestionBank() {
               <TableRow className="border-white/5 h-16">
                 <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Node Strategy</TableHead>
                 <TableHead className="text-[10px] font-black uppercase text-slate-500">Context</TableHead>
-                <TableHead className="text-center text-[10px] font-black uppercase text-slate-500">Visuals</TableHead>
+                <TableHead className="text-center text-[10px] font-black uppercase text-slate-500">Usage</TableHead>
                 <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Audit</TableHead>
               </TableRow>
             </TableHeader>
@@ -125,17 +133,10 @@ export default function QuestionBank() {
                      </div>
                   </TableCell>
                   <TableCell className="text-center">
-                     {q.imageUrl ? (
-                       <div className="h-12 w-12 rounded-xl border border-slate-200 overflow-hidden mx-auto bg-white shadow-sm flex items-center justify-center">
-                          <img src={q.imageUrl} className="max-h-full max-w-full object-contain" />
-                       </div>
-                     ) : q.tableData ? (
-                        <div className="h-10 w-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mx-auto border border-blue-100">
-                           <Database className="h-4 w-4" />
-                        </div>
-                     ) : (
-                        <span className="text-slate-200">—</span>
-                     )}
+                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
+                        <History className="h-3 w-3 text-slate-400" />
+                        <span className="text-xs font-black text-[#0F172A]">{q.usageCount || 0}</span>
+                     </div>
                   </TableCell>
                   <TableCell className="text-right px-10">
                     <div className="flex justify-end gap-3 opacity-20 group-hover:opacity-100 transition-opacity">

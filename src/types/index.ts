@@ -87,6 +87,10 @@ export interface Question {
   category?: string;
   year?: number;
 
+  // Usage Tracking (Phase 165)
+  usageCount: number;
+  usedInMocks: string[];
+
   isStandalone?: boolean;
   createdAt: any;
   updatedAt: any;

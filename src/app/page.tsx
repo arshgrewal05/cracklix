@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useMemo, ReactNode } from "react";
@@ -26,21 +25,22 @@ import {
   Timer,
   BrainCircuit,
   ChevronRight,
-  Bell
+  Bell,
+  Layers,
+  FileText,
+  Newspaper
 } from "lucide-react";
 import Link from "next/link";
 
 /**
  * @fileOverview Final Dynamic Homepage Module.
- * Optimized for mobile fold visibility: Hero -> Continue Mock -> Latest Mocks.
- * Fixed: Removed orderBy to prevent index errors, handling sorting client-side.
+ * Updated: Modular Latest Section with Categories (Phase 165).
  */
 
 export default function HomePage() {
   const db = useFirestore();
   const { user } = useUser();
   
-  // Simple query to avoid index requirement
   const noticeQuery = useMemo(() => (db ? query(collection(db, "notifications"), limit(10)) : null), [db]);
   const { data: allNotices } = useCollection<any>(noticeQuery);
 
@@ -97,7 +97,7 @@ export default function HomePage() {
          </div>
       )}
 
-      {/* Trust & Authority Bar */}
+      {/* Trust Bar */}
       <section className="bg-[#08152D] py-8 lg:py-12 relative overflow-hidden">
          <div className="container mx-auto px-6 max-w-7xl relative z-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 text-center items-center">
@@ -109,36 +109,30 @@ export default function HomePage() {
          </div>
       </section>
 
-      {/* Immediate Content Node */}
+      {/* Modular Content Nodes (Phase 165) */}
       <LatestMocks />
       
-      <section className="py-12 bg-[#F8FAFC]">
+      <section className="py-24 bg-[#F8FAFC]">
          <div className="container mx-auto px-6 max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-               
+            <div className="text-center mb-16 space-y-3">
+               <Badge className="bg-primary/10 text-primary border-none uppercase text-[10px] font-black px-6 py-2 rounded-full">Subject Mastery Hub</Badge>
+               <h2 className="text-4xl lg:text-6xl font-headline font-black text-[#0F172A] uppercase">Modular <span className="text-primary">Practice</span></h2>
+               <p className="text-slate-500 text-lg font-medium">Deep analysis across specific subject nodes.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+               <QuickCategory href="/mocks" icon={<Layers className="text-blue-500" />} label="Subject Tests" desc="Reasoning, Quant, GK" />
+               <QuickCategory href="/mocks" icon={<Zap className="text-amber-500" />} label="Sectionals" desc="Topic-wise audits" />
+               <QuickCategory href="/pyqs" icon={<FileText className="text-emerald-500" />} label="PYQ Archive" desc="Authentic Papers" />
+               <QuickCategory href="/current-affairs" icon={<Newspaper className="text-rose-500" />} label="CA Quizzes" desc="Daily Analysis" />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-32">
                <div className="lg:col-span-8">
                   <PopularExams />
-
-                  {/* Daily Quiz Widget */}
-                  <div className="mt-12 bg-white rounded-[3.5rem] p-12 shadow-3xl shadow-slate-900/5 border border-slate-100 overflow-hidden relative group">
-                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><Timer className="h-32 w-32" /></div>
-                     <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-                        <div className="space-y-4 text-center md:text-left">
-                           <div className="flex items-center justify-center md:justify-start gap-3">
-                              <Zap className="h-5 w-5 text-emerald-500" />
-                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Knowledge Audit</span>
-                           </div>
-                           <h3 className="text-3xl font-headline font-black text-[#0F172A] uppercase leading-tight">Daily Punjab <br/> Mastery Node</h3>
-                           <p className="text-slate-500 font-medium">10 Questions • 5 Minutes • Instant Ranking</p>
-                        </div>
-                        <Button className="h-16 px-12 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-xs rounded-2xl gap-3 shadow-2xl shadow-emerald-900/20 group">
-                           Start Daily Quiz <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
-                        </Button>
-                     </div>
-                  </div>
                </div>
 
-               <div className="lg:col-span-4 space-y-8 pt-16">
+               <div className="lg:col-span-4 space-y-8">
                   <Card className="rounded-[3rem] border-none bg-[#0F172A] text-white p-12 overflow-hidden relative shadow-4xl group">
                      <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"><Sparkles className="h-40 w-40" /></div>
                      <div className="relative z-10 space-y-8">
@@ -150,7 +144,7 @@ export default function HomePage() {
                            </div>
                         </div>
                         <div className="p-8 bg-white/5 rounded-[2rem] border border-white/5 shadow-inner">
-                           <p className="text-slate-300 text-lg leading-relaxed font-medium italic text-left">"Punjab became a part of the British Empire in March 1849 following the Second Anglo-Sikh War."</p>
+                           <p className="text-slate-300 text-lg leading-relaxed font-medium italic text-left">"The name Punjab means 'Land of Five Rivers'. These are Sutlej, Beas, Ravi, Chenab, and Jhelum."</p>
                         </div>
                         <Button asChild className="w-full bg-white text-[#0F172A] hover:bg-slate-100 h-16 rounded-2xl font-black uppercase tracking-widest text-xs shadow-3xl">
                            <Link href="/dashboard">Attempt & Earn XP</Link>
@@ -162,7 +156,7 @@ export default function HomePage() {
                      <div className="absolute top-0 right-0 p-8 opacity-5"><Bell className="h-24 w-24" /></div>
                      <div className="flex items-center justify-between mb-10 relative z-10">
                         <h3 className="font-headline font-black text-2xl flex items-center gap-4 text-[#0F172A]">
-                           <Bell className="h-6 w-6 text-primary" /> Official Gazette
+                           <Bell className="h-6 w-6 text-primary" /> Gazette
                         </h3>
                      </div>
                      <div className="space-y-8 relative z-10">
@@ -189,7 +183,7 @@ export default function HomePage() {
                           </div>
                         )}
                         <Button asChild variant="ghost" className="w-full pt-8 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/5 rounded-2xl border-2 border-dashed border-primary/10 h-20">
-                           <Link href="/notifications">Full Gazette <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                           <Link href="/notifications">Full Feed <ChevronRight className="ml-2 h-4 w-4" /></Link>
                         </Button>
                      </div>
                   </Card>
@@ -212,5 +206,21 @@ function TrustMetric({ icon, label, value }: { icon: ReactNode, label: string, v
          <p className="text-2xl lg:text-4xl font-headline font-black text-white tracking-tight leading-none">{value}</p>
          <p className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest text-slate-500 leading-none">{label}</p>
       </div>
+   )
+}
+
+function QuickCategory({ icon, label, desc, href }: any) {
+   return (
+      <Link href={href}>
+         <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-50 flex flex-col items-center gap-6 group hover:translate-y-[-8px] transition-all duration-500 text-center h-full">
+            <div className="h-16 w-16 rounded-[2rem] bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors shadow-inner">
+               <div className="h-8 w-8">{icon}</div>
+            </div>
+            <div className="space-y-2">
+               <h4 className="font-headline font-black text-xl text-[#0F172A] uppercase">{label}</h4>
+               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{desc}</p>
+            </div>
+         </div>
+      </Link>
    )
 }
