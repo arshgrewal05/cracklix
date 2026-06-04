@@ -5,7 +5,7 @@ import { useMemo } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useUser, useCollection, useFirestore } from "@/firebase"
-import { collection, query, where, orderBy, limit } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -38,6 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Final Advanced Selection Dashboard (Phase 156).
@@ -55,17 +56,35 @@ export default function StudentDashboard() {
 
   const resultsQuery = useMemo(() => {
     if (!db || !user) return null
-    return query(collection(db, "results"), where("userId", "==", user.uid), orderBy("createdAt", "desc"), limit(20))
+    return query(collection(db, "results"), where("userId", "==", user.uid))
   }, [db, user])
 
   const sessionQuery = useMemo(() => {
     if (!db || !user) return null
-    return query(collection(db, "test_sessions"), where("userId", "==", user.uid), where("status", "==", "IN_PROGRESS"), orderBy("updatedAt", "desc"), limit(1))
+    // Removed orderBy to avoid index errors, handling sorting client-side
+    return query(collection(db, "test_sessions"), where("userId", "==", user.uid), where("status", "==", "IN_PROGRESS"))
   }, [db, user])
 
-  const { data: results, loading: resultsLoading } = useCollection<any>(resultsQuery)
+  const { data: allResults, loading: resultsLoading } = useCollection<any>(resultsQuery)
   const { data: activeSessions } = useCollection<any>(sessionQuery)
-  const lastSession = activeSessions?.[0]
+  
+  const results = useMemo(() => {
+    if (!allResults) return []
+    return [...allResults].sort((a, b) => {
+      const timeA = a.createdAt?.seconds || 0
+      const timeB = b.createdAt?.seconds || 0
+      return timeB - timeA
+    }).slice(0, 20)
+  }, [allResults])
+
+  const lastSession = useMemo(() => {
+    if (!activeSessions || activeSessions.length === 0) return null
+    return [...activeSessions].sort((a, b) => {
+      const timeA = a.updatedAt?.seconds || 0
+      const timeB = b.updatedAt?.seconds || 0
+      return timeB - timeA
+    })[0]
+  }, [activeSessions])
 
   const analytics = useMemo(() => {
     if (!results || results.length === 0) return { 

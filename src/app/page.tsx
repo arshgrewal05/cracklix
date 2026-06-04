@@ -46,10 +46,19 @@ export default function HomePage() {
 
   const sessionQuery = useMemo(() => {
     if (!db || !user) return null
-    return query(collection(db, "test_sessions"), where("userId", "==", user.uid), where("status", "==", "IN_PROGRESS"), orderBy("updatedAt", "desc"), limit(1))
+    return query(collection(db, "test_sessions"), where("userId", "==", user.uid), where("status", "==", "IN_PROGRESS"))
   }, [db, user])
+  
   const { data: activeSessions } = useCollection<any>(sessionQuery)
-  const lastSession = activeSessions?.[0]
+  
+  const lastSession = useMemo(() => {
+    if (!activeSessions || activeSessions.length === 0) return null
+    return [...activeSessions].sort((a, b) => {
+      const timeA = a.updatedAt?.seconds || 0
+      const timeB = b.updatedAt?.seconds || 0
+      return timeB - timeA
+    })[0]
+  }, [activeSessions])
 
   return (
     <main className="min-h-screen bg-white">
@@ -67,7 +76,7 @@ export default function HomePage() {
                   </div>
                   <div className="text-left">
                      <p className="text-[9px] font-black uppercase text-orange-600 tracking-widest">Incomplete Audit</p>
-                     <h2 className="text-xl font-headline font-black text-[#0F172A]">Resume {lastSession.mockId.split('-')[1]} Series</h2>
+                     <h2 className="text-xl font-headline font-black text-[#0F172A]">Resume {lastSession.mockId.split('-')[1] || 'Practice'} Series</h2>
                   </div>
                </div>
                <Button asChild className="rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black uppercase text-[10px] tracking-widest h-12 px-8 shadow-xl shadow-orange-900/20">

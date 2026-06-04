@@ -103,6 +103,7 @@
     "/bookmarks/{id}": { "schema": "object", "description": "User saved questions." },
     "/pyqs/{id}": { "schema": "object", "description": "Previous year papers." },
     "/support_tickets/{id}": { "schema": "object", "description": "Support inquiries." },
-    "/audit_logs/{id}": { "schema": "object", "description": "Admin activity ledger." }
+    "/audit_logs/{id}": { "schema": "object", "description": "Admin activity ledger." },
+    "/test_sessions/{sessionId}": { "schema": "object", "description": "Active in-progress mock attempts." }
   }
 }
