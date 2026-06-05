@@ -17,8 +17,8 @@ import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
 /**
- * @fileOverview Authority Hub v12.8 - Fixed Build Error & Referrer Bypass.
- * Features: Absolute Referrer Bypassing and Triple-Layer text fallback.
+ * @fileOverview Authority Hub v13.5 - Hardened Government Asset Loader.
+ * Features: Multi-Layer Referrer Suppression and Text-Rescue fallback.
  */
 
 export default function ExamManagement() {
@@ -36,7 +36,6 @@ export default function ExamManagement() {
   const [assetError, setAssetError] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Standard Failover Emblem
   const stateEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png";
 
   useEffect(() => {
@@ -229,7 +228,7 @@ export default function ExamManagement() {
                  </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Logo URL Override (Official SVG)</Label>
+                <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Logo URL Override (Official SVG/PNG)</Label>
                 <div className="flex gap-2">
                   <Input value={editingBoard?.iconUrl || ""} onChange={e => setEditingBoard({...editingBoard, iconUrl: e.target.value.trim()})} className="bg-slate-50 border-none rounded-xl h-12 text-[10px] font-mono flex-1" placeholder="https://..." />
                   {editingBoard?.iconUrl && <Button variant="ghost" size="icon" onClick={() => setEditingBoard({...editingBoard, iconUrl: ""})} className="h-12 w-12 rounded-xl"><X className="h-4 w-4" /></Button>}

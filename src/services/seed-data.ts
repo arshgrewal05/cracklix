@@ -3,7 +3,7 @@ import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/fi
 /**
  * @fileOverview Final Institutional Seeding Engine for Cracklix.
  * Synchronizes binary access passes, official board registry, and platform settings.
- * Hardcoded to official Government URLs for PSSSB and PSPCL.
+ * Hardcoded to official Government URLs for PSSSB, PSPCL, and Punjab Police.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('[REGISTRY] Initializing Global Punjab Access Registry Sync...');
@@ -54,58 +54,51 @@ export async function seedInitialData(db: Firestore) {
   const stateEmblem = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png';
   const psssbOfficialLogo = 'https://sssb.punjab.gov.in/wp-content/themes/ssbtheme/images/punjab-gov.svg';
   const pspclOfficialLogo = 'https://pspcl.in/assets/images/logo.png';
-  const policeEmblem = 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Punjab_Police_India_Logo.png';
+  const policeOfficialLogo = 'https://punjabpolice.gov.in/media/images/Logo_of_Punjab_Police_India.original.png';
   const hcEmblem = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Scale_of_justice_2.svg/512px-Scale_of_justice_2.svg.png';
 
   const boards = [
     {
       id: 'psssb',
       abbreviation: 'PSSSB',
-      name: 'Punjab Subordinate Services Selection Board',
+      name: 'Subordinate Services Selection Board',
       iconUrl: psssbOfficialLogo,
-      description: 'Official board for Group B and C posts.'
+      description: 'Official board for Group B and C recruitment nodes.'
     },
     {
       id: 'ppsc',
       abbreviation: 'PPSC',
-      name: 'Punjab Public Service Commission',
-      iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png',
+      name: 'Public Service Commission',
+      iconUrl: stateEmblem,
       description: 'Authority for Class A and B civil services.'
     },
     {
       id: 'punjab-police',
       abbreviation: 'Police',
-      name: 'Punjab Police Recruitment Board',
-      iconUrl: policeEmblem,
-      description: 'District and Armed cadre recruitments.'
+      name: 'Punjab Police Recruitment',
+      iconUrl: policeOfficialLogo,
+      description: 'District and Armed cadre recruitment registry.'
     },
     {
       id: 'pseb',
       abbreviation: 'Education',
-      name: 'Punjab School Education Board',
+      name: 'School Education Board',
       iconUrl: stateEmblem,
-      description: 'ETT, Master Cadre, and PSTET recruitments.'
+      description: 'ETT, Master Cadre, and PSTET recruitment nodes.'
     },
     {
       id: 'pspcl',
       abbreviation: 'PSPCL',
-      name: 'Punjab State Power Corporation Limited',
+      name: 'State Power Corporation',
       iconUrl: pspclOfficialLogo,
-      description: 'Technical and clerical power sector nodes.'
-    },
-    {
-      id: 'pstcl',
-      abbreviation: 'PSTCL',
-      name: 'Punjab State Transmission Corporation',
-      iconUrl: stateEmblem,
-      description: 'Transmission sector recruitment hub.'
+      description: 'Technical and clerical power sector recruitment.'
     },
     {
       id: 'high-court',
       abbreviation: 'High Court',
       name: 'Punjab & Haryana High Court',
       iconUrl: hcEmblem,
-      description: 'Judicial and clerical court recruitments.'
+      description: 'Judicial and clerical court recruitment registry.'
     }
   ];
 

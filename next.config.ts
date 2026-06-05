@@ -36,27 +36,17 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'punjabpolice.gov.in',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'upload.wikimedia.org',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'ppsc.gov.in',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '1000logos.net',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.pseb.ac.in',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'highcourtchd.gov.in',
         pathname: '/**',
       },
       {
