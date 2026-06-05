@@ -4,6 +4,7 @@ import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/fi
 /**
  * @fileOverview Final Institutional Seeding Engine for Cracklix.
  * Synchronizes binary access passes, official board registry, and platform settings.
+ * Updated: Included EVS subject and official PSTET/CTET/PSPCL nodes.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('Initializing Global Punjab Access Registry Sync...');
@@ -75,10 +76,10 @@ export async function seedInitialData(db: Firestore) {
     },
     {
       id: 'pseb',
-      abbreviation: 'PSEB',
+      abbreviation: 'Education',
       name: 'Punjab School Education Board (Teaching)',
       iconUrl: 'https://www.pseb.ac.in/images/logo-punjabi.png',
-      description: 'ETT, Master Cadre and Teaching recruitments.'
+      description: 'ETT, Master Cadre, PSTET and Teaching recruitments.'
     },
     {
       id: 'high-court',
@@ -89,7 +90,7 @@ export async function seedInitialData(db: Firestore) {
     },
     {
       id: 'pspcl',
-      abbreviation: 'Technical',
+      abbreviation: 'PSPCL/PSTCL',
       name: 'PSPCL / PSTCL',
       iconUrl: 'https://pspcl.in/images/logo.png',
       description: 'Technical and clerical recruitment for power corporations.'
@@ -100,7 +101,25 @@ export async function seedInitialData(db: Firestore) {
     await setDoc(doc(db, 'boards', b.id), { ...b, updatedAt: serverTimestamp() });
   }
 
-  // 3. Exam Hub Hierarchy
+  // 3. Subject Registry Expansion
+  const subjects = [
+    { id: 'punjab-gk', name: 'Punjab GK & Culture' },
+    { id: 'mental-ability', name: 'Mental Ability / Reasoning' },
+    { id: 'quant-aptitude', name: 'Quantitative Aptitude' },
+    { id: 'english', name: 'English Language' },
+    { id: 'punjabi', name: 'Punjabi Language' },
+    { id: 'punjabi-qualifying', name: 'Punjabi Qualifying (Paper A)' },
+    { id: 'ict-computers', name: 'ICT / Computers' },
+    { id: 'general-knowledge', name: 'Static GK & India' },
+    { id: 'evs-education', name: 'Environmental Studies (EVS)' },
+    { id: 'child-pedagogy', name: 'Child Development & Pedagogy' }
+  ];
+
+  for (const s of subjects) {
+    await setDoc(doc(db, 'subjects', s.id), { ...s, updatedAt: serverTimestamp() });
+  }
+
+  // 4. Exam Hub Hierarchy
   const exams = [
     {
       id: 'psssb-excise',
@@ -130,13 +149,31 @@ export async function seedInitialData(db: Firestore) {
       description: 'Complete series for District, Armed and Intelligence SI.'
     },
     {
-      id: 'pseb-master-cadre',
+      id: 'pstet-paper-1',
       boardId: 'pseb',
-      name: 'Master Cadre',
-      category: 'Teaching',
-      totalMocks: 30,
-      activeQuestions: 4500,
-      description: 'Subject-wise preparation for PSEB Master Cadre.'
+      name: 'PSTET (Paper 1)',
+      category: 'Education',
+      totalMocks: 10,
+      activeQuestions: 1200,
+      description: 'Level 1 Teacher Eligibility including EVS and Pedagogy.'
+    },
+    {
+      id: 'pstet-paper-2',
+      boardId: 'pseb',
+      name: 'PSTET (Paper 2)',
+      category: 'Education',
+      totalMocks: 10,
+      activeQuestions: 1200,
+      description: 'Level 2 Teacher Eligibility for Social Studies/Maths.'
+    },
+    {
+      id: 'pspcl-clerk',
+      boardId: 'pspcl',
+      name: 'PSPCL LDC / Clerk',
+      category: 'Technical',
+      totalMocks: 8,
+      activeQuestions: 1000,
+      description: 'Clerical recruitment preparation for Power Corporation.'
     }
   ];
 
@@ -144,7 +181,7 @@ export async function seedInitialData(db: Firestore) {
     await setDoc(doc(db, 'exams', e.id), { ...e, updatedAt: serverTimestamp() });
   }
 
-  // 4. Initial System Config
+  // 5. Initial System Config
   await setDoc(doc(db, 'settings', 'global'), {
     platformName: "Cracklix",
     announcement: "🔥 Official Punjab 2026 Recruitment Calendar Live.",
