@@ -36,7 +36,7 @@ import { useState } from "react";
 /**
  * @fileOverview Compact Mobile Navigation Module.
  * Follows Adda247 style minimalist high-density layout.
- * Features: Fixed Sidebar Width (250px), Tightened Spacing, and Collapsible Sections.
+ * Features: Fixed Sidebar Width (260px), Tightened Spacing, and Collapsible Sections.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -78,7 +78,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-white text-[#0F172A] overflow-hidden font-body w-full">
+    <div className="flex flex-col h-full bg-white text-[#0F172A] overflow-hidden font-body w-full max-w-[260px]">
       {/* 1. COMPACT PROFILE HUB */}
       <div className="px-4 pb-6 pt-[calc(env(safe-area-inset-top,24px)+16px)] bg-[#0B1528] shrink-0">
         <div className="flex items-center gap-3">

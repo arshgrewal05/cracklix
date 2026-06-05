@@ -3,7 +3,7 @@
 import React from 'react';
 import { UserProfile } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, UserRound } from 'lucide-react';
+import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface StudentAvatarProps {
@@ -13,9 +13,9 @@ interface StudentAvatarProps {
 }
 
 /**
- * @fileOverview Gender-Specific Avatar Hub.
- * Renders simple Man silhouette for male students and Simple Woman silhouette for female students.
- * Optimized: Removed initials fallback to use a professional icon by default.
+ * @fileOverview Professional Identity Hub.
+ * Uses sleek User silhouette as the fallback for a production-grade appearance.
+ * Optimized: Removed initials based circles for a cleaner "man icon" style.
  */
 export default function StudentAvatar({ profile, className, iconClassName }: StudentAvatarProps) {
   if (!profile) return (
@@ -26,24 +26,17 @@ export default function StudentAvatar({ profile, className, iconClassName }: Stu
     </Avatar>
   );
 
-  const gender = profile.gender;
-
   return (
     <Avatar className={cn("border border-white/10 shadow-inner overflow-hidden", className)}>
-      {/* If the student has a custom photo, use it first */}
       {profile.photoURL && <AvatarImage src={profile.photoURL} />}
 
       <AvatarFallback className={cn(
         "flex items-center justify-center h-full w-full",
-        gender === 'Male' ? "bg-blue-100 text-blue-500" : 
-        gender === 'Female' ? "bg-rose-100 text-rose-500" : 
+        profile.gender === 'Male' ? "bg-blue-100 text-blue-500" : 
+        profile.gender === 'Female' ? "bg-rose-100 text-rose-500" : 
         "bg-slate-100 text-slate-400"
       )}>
-        {gender === 'Female' ? (
-           <UserRound className={cn("h-3/5 w-3/4", iconClassName)} />
-        ) : (
-           <User className={cn("h-3/5 w-3/4", iconClassName)} />
-        )}
+        <User className={cn("h-3/5 w-3/4", iconClassName)} />
       </AvatarFallback>
     </Avatar>
   );
