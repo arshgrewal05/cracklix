@@ -2,19 +2,17 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { Apple, Play, Smartphone, CheckCircle2 } from "lucide-react";
+import { Apple, Play, Smartphone, CheckCircle2, Map as MapIcon, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 /**
- * @fileOverview Final App Preview Hub.
- * Fixed image clipping issues by using object-contain and proper framing.
+ * @fileOverview Final App Preview Hub v2.0.
+ * Replaced phone boxes with high-fidelity Punjab and India maps for geographic clarity.
  */
 
 export default function AppPreview() {
-  const mockPolice = PlaceHolderImages.find(img => img.id === 'mock-police')?.imageUrl;
-  const armyHero = PlaceHolderImages.find(img => img.id === 'hero-army')?.imageUrl;
-  const armyStrategic = PlaceHolderImages.find(img => img.id === 'army-strategic')?.imageUrl;
+  const punjabMap = "https://www.mapsofindia.com/maps/punjab/punjab-map.jpg";
+  const indiaMap = "https://www.mapsofindia.com/images2/india-map.jpg";
 
   return (
     <section className="py-32 bg-white overflow-hidden border-t border-slate-50">
@@ -62,33 +60,55 @@ export default function AppPreview() {
             </div>
           </motion.div>
 
-          <div className="flex justify-center items-end gap-6 lg:gap-8">
-             {/* Phone Mockups with FIXED object-fit to prevent clipping */}
-             <div className="relative w-44 md:w-52 aspect-[9/19] bg-[#0F172A] rounded-[2.5rem] border-[8px] border-[#0F172A] shadow-5xl overflow-hidden group hover:-translate-y-4 transition-all duration-500">
-                <img 
-                  src={mockPolice!} 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
-                  referrerPolicy="no-referrer" 
-                />
-                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
-             </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+             <div className="absolute -inset-10 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
              
-             <div className="relative w-52 md:w-60 aspect-[9/19] bg-[#0B1528] rounded-[3rem] border-[10px] border-[#0B1528] shadow-5xl overflow-hidden z-10 hover:-translate-y-6 transition-all duration-500">
+             {/* Punjab Coverage Node */}
+             <motion.div 
+               initial={{ opacity: 0, y: 30 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               className="group relative rounded-[3rem] bg-[#0F172A] border-[10px] border-[#0F172A] shadow-5xl overflow-hidden aspect-[4/5] hover:-translate-y-2 transition-all duration-500"
+             >
                 <img 
-                  src={armyHero!} 
-                  className="w-full h-full object-cover" 
-                  referrerPolicy="no-referrer" 
+                   src={punjabMap} 
+                   className="w-full h-full object-cover grayscale brightness-125 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[2s]" 
+                   referrerPolicy="no-referrer"
+                   alt="Punjab Hub"
                 />
-             </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-60" />
+                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                      <MapIcon className="h-5 w-5 text-primary" />
+                      <span className="text-[10px] font-black uppercase text-white tracking-widest">Punjab Hub</span>
+                   </div>
+                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+             </motion.div>
 
-             <div className="relative w-44 md:w-52 aspect-[9/19] bg-[#0F172A] rounded-[2.5rem] border-[8px] border-[#0F172A] shadow-5xl overflow-hidden group hover:-translate-y-4 transition-all duration-500">
+             {/* National Coverage Node */}
+             <motion.div 
+               initial={{ opacity: 0, y: 50 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ delay: 0.2 }}
+               className="group relative rounded-[3rem] bg-[#0F172A] border-[10px] border-[#0F172A] shadow-5xl overflow-hidden aspect-[4/5] md:mt-12 hover:-translate-y-2 transition-all duration-500"
+             >
                 <img 
-                  src={armyStrategic!} 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
-                  referrerPolicy="no-referrer" 
+                   src={indiaMap} 
+                   className="w-full h-full object-cover grayscale brightness-125 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[2s]" 
+                   referrerPolicy="no-referrer"
+                   alt="National Hub"
                 />
-                <div className="absolute inset-0 bg-blue-500/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
-             </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-60" />
+                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                      <Globe className="h-5 w-5 text-blue-400" />
+                      <span className="text-[10px] font-black uppercase text-white tracking-widest">National Hub</span>
+                   </div>
+                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+             </motion.div>
           </div>
         </div>
       </div>
