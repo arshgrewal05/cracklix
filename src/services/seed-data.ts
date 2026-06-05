@@ -4,7 +4,7 @@ import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/fi
 /**
  * @fileOverview Final Institutional Seeding Engine for Cracklix.
  * Synchronizes binary access passes, official board registry, and platform settings.
- * Updated: Official High-Fidelity Logos for all Punjab Boards.
+ * Updated: Official High-Fidelity Logos for all Punjab Boards including PSPCL.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('Initializing Global Punjab Access Registry Sync...');
@@ -90,8 +90,8 @@ export async function seedInitialData(db: Firestore) {
     },
     {
       id: 'pspcl',
-      abbreviation: 'PSPCL/PSTCL',
-      name: 'PSPCL / PSTCL',
+      abbreviation: 'PSPCL',
+      name: 'Punjab State Power Corporation Limited',
       iconUrl: 'https://pspcl.in/images/logo.png',
       description: 'Technical and clerical recruitment for power corporations.'
     }
@@ -147,6 +147,15 @@ export async function seedInitialData(db: Firestore) {
       totalMocks: 15,
       activeQuestions: 1800,
       description: 'Complete series for District, Armed and Intelligence SI.'
+    },
+    {
+      id: 'pstet-p1',
+      boardId: 'pseb',
+      name: 'PSTET Paper 1 (EVS Focus)',
+      category: 'Teaching',
+      totalMocks: 10,
+      activeQuestions: 1200,
+      description: 'Specialized nodes for Punjab State Teacher Eligibility.'
     }
   ];
 

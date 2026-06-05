@@ -3,10 +3,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Database, Users, ShieldCheck, Rocket, Zap, Activity, ShieldAlert, Scale, Megaphone, ClipboardList, TrendingUp, DollarSign, BarChart3, HeartPulse, Target, CheckCircle2, RefreshCw, Layers, CreditCard } from "lucide-react"
+import { Plus, Database, Users, ShieldCheck, Rocket, Zap, Activity, ShieldAlert, Megaphone, ClipboardList, TrendingUp, DollarSign, RefreshCw, Layers, CreditCard, Globe, Newspaper, FileText, Gem, SearchCode, Settings } from "lucide-react"
 import Link from "next/link"
 import { useCollection, useFirestore, useUser } from "@/firebase"
-import { collection, query, orderBy, limit } from "firebase/firestore"
+import { collection } from "firebase/firestore"
 import { useMemo, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { seedInitialData } from "@/services/seed-data"
@@ -14,8 +14,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 
 /**
- * @fileOverview Final Command Center (Phase 156).
- * Features: High-fidelity revenue monitoring and plan distribution nodes.
+ * @fileOverview Final Command Center.
+ * Features: High-fidelity revenue monitoring and Quick Access Hub Grid.
  */
 
 export default function AdminDashboard() {
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-12 pb-20 pt-4 text-[#0F172A]">
+    <div className="space-y-12 pb-20 pt-4 text-[#0F172A] text-left">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
         <div className="text-left">
            <div className="flex items-center gap-3 mb-2">
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Governance Hub</span>
            </div>
           <h1 className="text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Command Center</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. Database in Monetization Mode.</p>
+          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. PSPCL & EVS Nodes Active.</p>
         </div>
         <div className="flex gap-4">
            {isAdmin && (
@@ -83,6 +83,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
          <StatCard label="Aspirant Nodes" value={users?.length || 0} icon={<Users className="text-blue-500" />} />
          <StatCard label="Pro Subscribers" value={proUsers.length} icon={<CreditCard className="text-emerald-600" />} color="text-emerald-600" />
@@ -90,10 +91,23 @@ export default function AdminDashboard() {
          <StatCard label="Audit Flags" value={reports?.filter((r:any) => r.status === 'PENDING').length || 0} icon={<ShieldAlert className="text-rose-500" />} color="text-rose-500" />
       </div>
 
+      {/* Quick Access Matrix */}
+      <section className="space-y-6">
+         <h3 className="font-headline font-black text-xs uppercase tracking-[0.3em] text-slate-400">Quick Access Matrix</h3>
+         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <HubLink href="/admin/exams" icon={<Globe className="text-blue-400" />} label="Authority Hub" />
+            <HubLink href="/admin/questions" icon={<Database className="text-primary" />} label="Atomic Bank" />
+            <HubLink href="/admin/passes" icon={<Gem className="text-amber-400" />} label="Pass Registry" />
+            <HubLink href="/admin/current-affairs" icon={<Newspaper className="text-emerald-400" />} label="Analysis Feed" />
+            <HubLink href="/admin/notifications" icon={<Megaphone className="text-orange-400" />} label="Exam Gazette" />
+            <HubLink href="/admin/settings" icon={<Settings className="text-slate-400" />} label="System Portal" />
+         </div>
+      </section>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
          <div className="lg:col-span-8 space-y-10">
-            <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden">
-               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50 text-left">
+            <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden text-left">
+               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50">
                   <div className="flex items-center gap-4">
                      <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                         <DollarSign className="h-6 w-6" />
@@ -107,7 +121,7 @@ export default function AdminDashboard() {
                <CardContent className="p-12 space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6 shadow-inner text-left">
-                        <div className="space-y-1 text-left">
+                        <div className="space-y-1">
                            <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Projected Growth</p>
                            <h4 className="text-xl font-headline font-black text-[#0F172A] uppercase">Active Pass Volume</h4>
                         </div>
@@ -128,34 +142,19 @@ export default function AdminDashboard() {
                      </div>
 
                      <div className="p-8 bg-[#0F172A] rounded-[2.5rem] shadow-2xl space-y-6 flex flex-col justify-center text-left">
-                        <div className="space-y-1 text-left">
+                        <div className="space-y-1">
                            <p className="text-[10px] font-black uppercase text-primary tracking-widest">Platform Lifetime</p>
                            <h4 className="text-3xl font-headline font-black text-white uppercase">Gross Nodes</h4>
                         </div>
                         <p className="text-5xl font-black text-primary leading-none tracking-tighter">₹{proUsers.length * 199}</p>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Aggregated simulation via Gold Baseline</p>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-left">Aggregated simulation via Gold Baseline</p>
                      </div>
-                  </div>
-               </CardContent>
-            </Card>
-
-            <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden">
-               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50 text-left">
-                  <div className="flex items-center gap-4">
-                     <Target className="h-6 w-6 text-primary" />
-                     <CardTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Beta Launch Readiness</CardTitle>
-                  </div>
-               </CardHeader>
-               <CardContent className="p-12 space-y-10">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                     <LaunchMetric label="Pro Nodes (Conversion)" current={proUsers.length} target={100} />
-                     <LaunchMetric label="Institutional MCQs" current={questions?.length || 0} target={10000} />
                   </div>
                </CardContent>
             </Card>
          </div>
 
-         <div className="lg:col-span-4 space-y-10 text-left">
+         <div className="lg:col-span-4 space-y-10">
             <Card className="border-slate-100 bg-white rounded-[3.5rem] p-12 space-y-10 shadow-3xl text-left">
                <div className="space-y-2 text-left">
                   <h3 className="text-2xl font-headline font-black text-[#0F172A] uppercase flex items-center gap-4 text-left">
@@ -180,10 +179,10 @@ export default function AdminDashboard() {
                </div>
                <h4 className="text-2xl font-headline font-black text-[#0F172A] uppercase leading-tight text-left">Monetization Active</h4>
                <p className="text-slate-600 text-sm font-medium leading-relaxed text-left">
-                  The Pass System is now live in the architectural node. Users can select plans at /pass.
+                  The Pass System is now live. Ensure the board registry is synced for latest official logos.
                </p>
-               <Button asChild className="w-full bg-primary hover:bg-primary/90 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl">
-                  <Link href="/pass">Audit Pricing Hub</Link>
+               <Button asChild className="w-full bg-[#0F172A] hover:bg-black text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl">
+                  <Link href="/admin/passes">Audit Pricing Hub</Link>
                </Button>
             </Card>
          </div>
@@ -193,16 +192,14 @@ export default function AdminDashboard() {
 }
 
 function StatCard({ label, value, icon, color }: any) {
-   const isLongValue = typeof value === 'string' && value.length > 8;
-   
    return (
       <Card className="border-slate-100 shadow-xl bg-white p-8 rounded-[3rem] group hover:translate-y-[-4px] transition-all overflow-hidden text-left">
-         <div className="flex items-center gap-4 text-left">
+         <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shrink-0 shadow-inner">
                {icon}
             </div>
-            <div className="min-w-0 text-left">
-               <p className={`font-headline font-black tracking-tighter truncate text-left ${isLongValue ? 'text-2xl' : 'text-4xl'} ${color || 'text-[#0F172A]'}`}>
+            <div className="min-w-0">
+               <p className={`font-headline font-black tracking-tighter truncate text-left text-4xl ${color || 'text-[#0F172A]'}`}>
                  {value}
                </p>
                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1 truncate text-left">{label}</p>
@@ -212,15 +209,15 @@ function StatCard({ label, value, icon, color }: any) {
    )
 }
 
-function LaunchMetric({ label, current, target }: { label: string, current: number, target: number }) {
-   const perc = Math.min(100, Math.round((current / target) * 100));
+function HubLink({ href, icon, label }: any) {
    return (
-      <div className="space-y-4 text-left">
-         <div className="flex justify-between items-end">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
-            <span className="text-[10px] font-black text-primary">{current} / {target} ({perc}%)</span>
+      <Link href={href}>
+         <div className="bg-white border border-slate-100 p-6 rounded-[2rem] flex flex-col items-center gap-4 shadow-sm hover:shadow-2xl hover:border-primary/20 transition-all duration-300 h-full group">
+            <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors shadow-inner">
+               {icon}
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 text-center">{label}</span>
          </div>
-         <Progress value={perc} className="h-1.5 bg-slate-100" />
-      </div>
+      </Link>
    )
 }
