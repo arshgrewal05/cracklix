@@ -6,8 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash2, Edit, Save, Gem, Zap, ShieldCheck, Trophy, Filter, Lock, X } from "lucide-react"
+import { Plus, Trash2, Edit, Save, Gem, Zap, Lock, X, ChevronRight } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, doc, setDoc, deleteDoc, serverTimestamp, query, orderBy } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -19,8 +18,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Dynamic Pass Hub.
- * Optimized for compact visibility and precise registry control.
+ * @fileOverview Institutional Dynamic Pass Hub v3.1.
+ * Optimized for high-density visibility and zero-clipping on all screens.
  */
 
 export default function PassManagement() {
@@ -49,156 +48,172 @@ export default function PassManagement() {
 
     try {
       await setDoc(passRef, payload, { merge: true })
-      toast({ title: "Registry Synced", description: "Premium pass configuration updated." })
+      toast({ title: "Registry Synced", description: "Pass configuration updated successfully." })
       setEditingPass(null)
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Audit Failed", description: e.message })
+      toast({ variant: "destructive", title: "Sync Failed", description: e.message })
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Permanently purge this access tier from the institutional registry?")) return
+    if (!confirm("Permanently purge this pass from the registry?")) return
     await deleteDoc(doc(db!, "passes", id))
-    toast({ title: "Pass Purged", description: "Access node removed from cloud." })
+    toast({ title: "Pass Purged", description: "Node removed from cloud." })
     if (editingPass?.id === id) setEditingPass(null)
   }
 
   return (
-    <div className="space-y-12 pb-20 text-left text-[#0F172A]">
-      <div className="flex justify-between items-center px-4">
+    <div className="space-y-10 pb-20 text-left text-[#0F172A] px-2 md:px-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <div className="flex items-center gap-3 mb-2">
               <Gem className="h-5 w-5 text-amber-500" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Access Tier Architect</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Monetization Registry</span>
            </div>
-          <h1 className="text-4xl font-black font-headline uppercase tracking-tight">Pass Hub</h1>
-          <p className="text-slate-500 mt-1">Design unlimited Premium passes for content monetization.</p>
+          <h1 className="text-4xl font-black font-headline uppercase tracking-tight">Pass Management</h1>
+          <p className="text-slate-500 mt-1 font-medium">Configure institutional access tiers and pricing logic.</p>
         </div>
-        <button 
+        <Button 
            onClick={() => setEditingPass({ name: "", price: 299, durationDays: 30, features: [], active: true, displayOrder: (passes?.length || 0) + 1, type: "PREMIUM", description: "" })} 
-           className="bg-amber-500 hover:bg-amber-600 text-white gap-2 h-14 px-10 rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-amber-900/20 flex items-center transition-all active:scale-95"
+           className="bg-[#0F172A] hover:bg-black text-white gap-3 h-14 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl transition-all active:scale-95"
         >
-          <Plus className="h-5 w-5 mr-2" /> Construct Pass
-        </button>
+          <Plus className="h-5 w-5" /> Construct New Pass
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 px-4">
+      <div className="grid grid-cols-1 gap-4">
         {loading ? (
-          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-[2.5rem]" />)
+          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)
         ) : passes?.map((p: any) => (
-          <Card key={p.id} className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden group hover:translate-y-[-4px] transition-all">
-             <CardContent className="p-0 flex items-stretch h-auto min-h-[11rem]">
-                <div className={cn("w-3 transition-colors shrink-0", p.active ? 'bg-amber-500' : 'bg-slate-200')} />
-                <div className="flex-1 p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                   <div className="flex items-center gap-6 md:gap-8 w-full md:w-auto">
-                      <div className="h-16 w-16 rounded-[2rem] bg-slate-50 flex items-center justify-center text-amber-500 shadow-inner group-hover:scale-110 transition-transform shrink-0">
-                         {p.type === 'FREE' ? <Zap className="h-8 w-8 text-slate-300" /> : <Lock className="h-8 w-8 text-amber-500" />}
-                      </div>
-                      <div className="space-y-1.5 min-w-0">
-                         <div className="flex items-center gap-4 flex-wrap">
-                            <h3 className="text-xl md:text-2xl font-black text-[#0F172A] uppercase truncate">{p.name}</h3>
-                            <Badge className={cn("border-none uppercase text-[8px] font-black tracking-widest px-3", p.active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400')}>{p.active ? 'ACTIVE NODE' : 'DISABLED'}</Badge>
-                         </div>
-                         <div className="flex items-center gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-slate-400 flex-wrap">
-                            <span className="flex items-center gap-1.5">₹{p.price}</span>
-                            <div className="h-1 w-1 rounded-full bg-slate-200 hidden md:block" />
-                            <span className="flex items-center gap-1.5">{p.durationDays} Days</span>
-                            <div className="h-1 w-1 rounded-full bg-slate-200 hidden md:block" />
-                            <span className="flex items-center gap-1.5 text-primary">Sort Index: {p.displayOrder}</span>
-                         </div>
-                      </div>
-                   </div>
-                   <div className="flex items-center gap-4 ml-auto md:ml-0">
-                      <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-slate-50" onClick={() => setEditingPass(p)}>
-                         <Edit className="h-6 w-6 text-slate-400" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-rose-50 hover:text-rose-600" onClick={() => handleDelete(p.id)}>
-                         <Trash2 className="h-6 w-6" />
-                      </Button>
-                   </div>
-                </div>
-             </CardContent>
-          </Card>
+          <div 
+            key={p.id} 
+            className={cn(
+              "group bg-white border border-slate-100 rounded-3xl p-4 md:p-6 flex items-center justify-between shadow-sm hover:shadow-2xl hover:border-primary/20 transition-all duration-300",
+              !p.active && "opacity-60 grayscale-[0.5]"
+            )}
+          >
+            <div className="flex items-center gap-4 md:gap-8 flex-1 min-w-0">
+               <div className={cn(
+                  "h-12 w-12 md:h-14 md:w-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner transition-transform group-hover:scale-105",
+                  p.type === 'FREE' ? "bg-slate-50 text-slate-400" : "bg-amber-50 text-amber-500"
+               )}>
+                  {p.type === 'FREE' ? <Zap className="h-6 w-6" /> : <Lock className="h-6 w-6" />}
+               </div>
+
+               <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-3 mb-1">
+                     <h3 className="text-lg md:text-xl font-black text-[#0F172A] uppercase truncate">{p.name}</h3>
+                     <Badge className={cn("border-none text-[7px] font-black tracking-widest px-2 py-0.5", p.active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400')}>
+                        {p.active ? 'LIVE' : 'DISABLED'}
+                     </Badge>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[9px] font-black uppercase text-slate-400 tracking-wider">
+                     <span className="text-primary">₹{p.price}</span>
+                     <span className="flex items-center gap-1.5"><ChevronRight className="h-2.5 w-2.5" /> {p.durationDays} Days</span>
+                     <span className="flex items-center gap-1.5"><ChevronRight className="h-2.5 w-2.5" /> Index: {p.displayOrder}</span>
+                  </div>
+               </div>
+            </div>
+
+            <div className="flex items-center gap-2 ml-4 shrink-0">
+               <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 hover:bg-primary hover:text-white transition-all shadow-sm" 
+                onClick={() => setEditingPass(p)}
+               >
+                  <Edit className="h-5 w-5" />
+               </Button>
+               <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 hover:bg-rose-50 hover:text-rose-600 transition-all shadow-sm" 
+                onClick={() => handleDelete(p.id)}
+               >
+                  <Trash2 className="h-5 w-5" />
+               </Button>
+            </div>
+          </div>
         ))}
       </div>
 
       <Dialog open={!!editingPass} onOpenChange={(open) => !open && setEditingPass(null)}>
-        <DialogContent className="sm:max-w-xl w-[95vw] max-h-[90vh] rounded-[3rem] bg-white border-none shadow-4xl p-0 overflow-hidden text-left flex flex-col">
-          <div className="h-1.5 w-full bg-amber-500 shrink-0" />
-          <DialogHeader className="p-8 pb-0 text-left shrink-0">
-            <div className="flex justify-between items-start">
-               <DialogTitle className="text-2xl font-black font-headline uppercase flex items-center gap-3">
-                  <Gem className="h-6 w-6 text-amber-500" /> {editingPass?.id ? "Update Registry" : "Initialize Pass"}
+        <DialogContent className="sm:max-w-xl w-[95vw] max-h-[95vh] rounded-[2.5rem] bg-white border-none shadow-4xl p-0 overflow-hidden text-left flex flex-col">
+          <div className="h-1.5 w-full bg-[#0F172A] shrink-0" />
+          <DialogHeader className="p-6 pb-0 text-left shrink-0">
+            <div className="flex justify-between items-center">
+               <DialogTitle className="text-xl font-black font-headline uppercase flex items-center gap-3">
+                  <Gem className="h-5 w-5 text-primary" /> {editingPass?.id ? "Edit Pass Configuration" : "New Pass Entry"}
                </DialogTitle>
                <button onClick={() => setEditingPass(null)} className="p-2 rounded-xl hover:bg-slate-50 transition-colors"><X className="h-5 w-5 text-slate-400" /></button>
             </div>
           </DialogHeader>
           
-          <div className="p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Pass Label</Label>
-                   <Input value={editingPass?.name || ""} onChange={e => setEditingPass({...editingPass, name: e.target.value})} placeholder="e.g. Premium Monthly" className="h-11 rounded-xl bg-slate-50 border-none font-bold" />
+          <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                   <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Pass Identity</Label>
+                   <Input value={editingPass?.name || ""} onChange={e => setEditingPass({...editingPass, name: e.target.value})} placeholder="e.g. Gold Pass" className="h-11 rounded-xl bg-slate-50 border-none font-bold text-sm" />
                 </div>
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Price (₹)</Label>
-                   <Input type="number" value={editingPass?.price || 0} onChange={e => setEditingPass({...editingPass, price: e.target.value})} className="h-11 rounded-xl bg-slate-50 border-none font-black" />
+                <div className="space-y-1.5">
+                   <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Fee Amount (₹)</Label>
+                   <Input type="number" value={editingPass?.price || 0} onChange={e => setEditingPass({...editingPass, price: e.target.value})} className="h-11 rounded-xl bg-slate-50 border-none font-black text-sm" />
                 </div>
              </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Duration (Days)</Label>
-                   <Input type="number" value={editingPass?.durationDays || 30} onChange={e => setEditingPass({...editingPass, durationDays: e.target.value})} className="h-11 rounded-xl bg-slate-50 border-none font-bold" />
+             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                   <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Validity (Days)</Label>
+                   <Input type="number" value={editingPass?.durationDays || 30} onChange={e => setEditingPass({...editingPass, durationDays: e.target.value})} className="h-11 rounded-xl bg-slate-50 border-none font-bold text-sm" />
                 </div>
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Display Sort</Label>
-                   <Input type="number" value={editingPass?.displayOrder || 1} onChange={e => setEditingPass({...editingPass, displayOrder: e.target.value})} className="h-11 rounded-xl bg-slate-50 border-none font-bold" />
+                <div className="space-y-1.5">
+                   <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Sort Priority</Label>
+                   <Input type="number" value={editingPass?.displayOrder || 1} onChange={e => setEditingPass({...editingPass, displayOrder: e.target.value})} className="h-11 rounded-xl bg-slate-50 border-none font-bold text-sm" />
                 </div>
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Access Tier</Label>
-                   <select value={editingPass?.type || "PREMIUM"} onChange={e => setEditingPass({...editingPass, type: e.target.value})} className="w-full h-11 rounded-xl bg-slate-50 border-none px-4 font-bold text-xs uppercase outline-none">
-                      <option value="FREE">Free Tier</option>
-                      <option value="PREMIUM">Premium Access</option>
+                <div className="space-y-1.5 col-span-2 md:col-span-1">
+                   <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Access Tier</Label>
+                   <select value={editingPass?.type || "PREMIUM"} onChange={e => setEditingPass({...editingPass, type: e.target.value})} className="w-full h-11 rounded-xl bg-slate-50 border-none px-4 font-black text-[10px] uppercase outline-none">
+                      <option value="FREE">Free Node</option>
+                      <option value="PREMIUM">Premium Hub</option>
                    </select>
                 </div>
              </div>
 
-             <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Pass Abstract</Label>
-                <Textarea value={editingPass?.description || ""} onChange={e => setEditingPass({...editingPass, description: e.target.value})} placeholder="Strategic description for pricing card..." className="rounded-xl bg-slate-50 border-none h-20 p-4 resize-none text-sm" />
+             <div className="space-y-1.5">
+                <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Marketing Abstract</Label>
+                <Textarea value={editingPass?.description || ""} onChange={e => setEditingPass({...editingPass, description: e.target.value})} placeholder="Strategic pass description..." className="rounded-xl bg-slate-50 border-none h-16 p-3 resize-none text-xs font-medium" />
              </div>
 
-             <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Feature List (Comma separated)</Label>
-                <Textarea value={Array.isArray(editingPass?.features) ? editingPass.features.join(', ') : editingPass?.features || ""} onChange={e => setEditingPass({...editingPass, features: e.target.value})} placeholder="Unlock All Mocks, AI Rationale..." className="rounded-xl bg-slate-50 border-none h-20 p-4 font-medium resize-none text-sm" />
+             <div className="space-y-1.5">
+                <Label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Features (CSV)</Label>
+                <Textarea value={Array.isArray(editingPass?.features) ? editingPass.features.join(', ') : editingPass?.features || ""} onChange={e => setEditingPass({...editingPass, features: e.target.value})} placeholder="Full Mocks, AI Solutions, All PYQs..." className="rounded-xl bg-slate-50 border-none h-16 p-3 font-bold resize-none text-xs" />
              </div>
 
-             <div className="flex items-center justify-between p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100">
+             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="space-y-0.5">
-                   <p className="font-black text-xs uppercase text-[#0F172A]">Active Node</p>
-                   <p className="text-[9px] text-slate-400 font-bold uppercase">Visibility Control</p>
+                   <p className="font-black text-[11px] uppercase text-[#0F172A]">Visibility Active</p>
+                   <p className="text-[8px] text-slate-400 font-bold uppercase">Toggle to hide/show in pricing hub</p>
                 </div>
                 <Switch checked={editingPass?.active} onCheckedChange={val => setEditingPass({...editingPass, active: val})} />
              </div>
           </div>
 
-          <DialogFooter className="p-8 border-t border-slate-50 shrink-0 bg-white flex flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+          <DialogFooter className="p-6 border-t border-slate-50 shrink-0 bg-white flex flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
                {editingPass?.id && (
                   <Button 
                      variant="ghost" 
                      size="icon" 
-                     className="h-12 w-12 rounded-xl text-rose-500 hover:bg-rose-50 border border-slate-100 shadow-sm" 
+                     className="h-11 w-11 rounded-xl text-rose-500 hover:bg-rose-50 border border-slate-100 shadow-sm" 
                      onClick={() => handleDelete(editingPass.id)}
                   >
                      <Trash2 className="h-5 w-5" />
                   </Button>
                )}
-               <Button variant="ghost" onClick={() => setEditingPass(null)} className="h-12 px-5 font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-slate-900 transition-colors">Cancel</Button>
+               <Button variant="ghost" onClick={() => setEditingPass(null)} className="h-11 px-4 font-black uppercase text-[9px] tracking-widest text-slate-400 hover:text-slate-900 transition-colors">Cancel</Button>
             </div>
             
-            <Button className="bg-[#0F172A] hover:bg-black text-white rounded-xl h-12 px-10 font-black uppercase text-[10px] tracking-[0.2em] shadow-2xl gap-2 flex-1 md:flex-none transition-all active:scale-95" onClick={handleSave}>
+            <Button className="bg-[#0F172A] hover:bg-black text-white rounded-xl h-11 px-8 font-black uppercase text-[10px] tracking-[0.2em] shadow-xl gap-2 flex-1 md:flex-none transition-all active:scale-95" onClick={handleSave}>
               <Save className="h-4 w-4" /> Sync Registry
             </Button>
           </DialogFooter>
