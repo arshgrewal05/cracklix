@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Edit, Image as ImageIcon, Trash2, Save, Globe, Upload, Loader2, AlertCircle } from "lucide-react"
+import { Plus, Edit, Image as ImageIcon, Trash2, Save, Globe, Upload, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useCollection, useFirestore, useStorage } from "@/firebase"
 import { collection, doc, setDoc, deleteDoc } from "firebase/firestore"
@@ -17,8 +17,8 @@ import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors"
 
 /**
- * @fileOverview Authority Hub - Recruitment Board Management v4.0.
- * Features: Direct Firebase Storage Upload, URL Validation, and Anti-Hang Sync Logic.
+ * @fileOverview Authority Hub - Recruitment Board Management v5.0.
+ * Features: Robust Storage Upload, 30s Timeouts, and Deep Error Logging.
  */
 
 export default function ExamManagement() {
@@ -37,7 +37,6 @@ export default function ExamManagement() {
   const handleSave = async () => {
     if (!db || !editingBoard) return
     
-    // Safety check for basic metadata
     if (!editingBoard.abbreviation || !editingBoard.name) {
       toast({ variant: "destructive", title: "Audit Blocked", description: "Identity and Authority Name are mandatory." })
       return
@@ -85,25 +84,50 @@ export default function ExamManagement() {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !storage) return
+    if (!file || !storage) {
+       toast({ variant: "destructive", title: "Storage Offline", description: "Firebase Storage is not initialized." })
+       return
+    }
 
-    // File type validation
     if (!file.type.startsWith('image/')) {
        toast({ variant: "destructive", title: "Invalid Type", description: "Only image files (PNG, JPG, SVG) are supported." })
        return
     }
 
+    console.log("[STORAGE] Upload Cycle Initiated:", file.name);
     setIsUploading(true)
+    
+    // 30 Second Institutional Timeout
+    const timeoutId = setTimeout(() => {
+       if (isUploading) {
+          setIsUploading(false);
+          toast({ variant: "destructive", title: "Upload Timeout", description: "Storage sync timed out. Check connection." });
+          console.error("[STORAGE] Upload Timed Out after 30s");
+       }
+    }, 30000);
+
     const storageRef = ref(storage, `authority_logos/${Date.now()}_${file.name.replace(/\s+/g, '_')}`)
 
     try {
       const snapshot = await uploadBytes(storageRef, file)
+      console.log("[STORAGE] Block Written Successfully:", snapshot.metadata.fullPath);
+      
       const downloadURL = await getDownloadURL(snapshot.ref)
+      console.log("[STORAGE] High-Fidelity URL Generated:", downloadURL);
+      
       setEditingBoard({ ...editingBoard, iconUrl: downloadURL })
       toast({ title: "Upload Complete", description: "Logo successfully synchronized with institutional storage." })
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not reach storage node." })
+      console.error("[STORAGE] Upload Failed Error Code:", error.code);
+      console.error("[STORAGE] Upload Error Message:", error.message);
+      
+      const errorMsg = error.code === 'storage/unauthorized' 
+        ? "Permission Denied: Update Storage Security Rules." 
+        : error.message || "Could not reach storage node.";
+        
+      toast({ variant: "destructive", title: "Upload Failed", description: errorMsg })
     } finally {
+      clearTimeout(timeoutId);
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
     }
@@ -165,7 +189,7 @@ export default function ExamManagement() {
                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-slate-100" onClick={() => setEditingBoard(board)}>
                         <Edit className="h-5 w-5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-rose-50 hover:text-rose-500" onClick={() => handleDelete(board.id)}>
+                      <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-rose hover:text-rose-500" onClick={() => handleDelete(board.id)}>
                         <Trash2 className="h-5 w-5" />
                       </Button>
                     </div>

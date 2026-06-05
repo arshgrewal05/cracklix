@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -14,8 +13,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 
 /**
- * @fileOverview Final Command Center.
- * Features: High-fidelity revenue monitoring and Quick Access Hub Grid.
+ * @fileOverview Final Command Center v4.1.
+ * Features: High-visibility Repo Sync and Quick Access Hub Grid.
  */
 
 export default function AdminDashboard() {
@@ -42,7 +41,7 @@ export default function AdminDashboard() {
       await seedInitialData(db)
       toast({
         title: "Repository Synced",
-        description: "Official Punjab Exam hierarchy (Boards, Exams, Subjects) pushed to Firestore.",
+        description: "Official Punjab Exam hierarchy (Boards, Exams, Subjects) including PSPCL and EVS nodes pushed to Firestore.",
       })
     } catch (e: any) {
       toast({
@@ -64,18 +63,21 @@ export default function AdminDashboard() {
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Governance Hub</span>
            </div>
           <h1 className="text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Command Center</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. PSPCL & EVS Nodes Active.</p>
+          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. PSPCL & EVS Nodes Ready.</p>
         </div>
         <div className="flex gap-4">
            {isAdmin && (
-             <Button 
-              onClick={handleSyncDatabase} 
-              disabled={isSyncing}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black h-14 px-8 text-xs uppercase tracking-widest gap-3 shadow-xl transition-all active:scale-95"
-             >
-               {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
-               {isSyncing ? "Syncing Repo..." : "Global Repo Sync"}
-             </Button>
+             <div className="relative group">
+                <div className="absolute -inset-1 bg-emerald-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <Button 
+                  onClick={handleSyncDatabase} 
+                  disabled={isSyncing}
+                  className="relative bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black h-14 px-8 text-xs uppercase tracking-widest gap-3 shadow-xl transition-all active:scale-95"
+                >
+                  {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
+                  {isSyncing ? "Syncing Registry..." : "Global Repo Sync"}
+                </Button>
+             </div>
            )}
            <Button asChild className="bg-primary hover:bg-primary/90 rounded-2xl h-14 px-10 font-black shadow-2xl uppercase tracking-widest text-xs">
             <Link href="/admin/mocks/builder"><Plus className="mr-3 h-5 w-5" /> Assemble Mock</Link>
@@ -83,7 +85,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
          <StatCard label="Aspirant Nodes" value={users?.length || 0} icon={<Users className="text-blue-500" />} />
          <StatCard label="Pro Subscribers" value={proUsers.length} icon={<CreditCard className="text-emerald-600" />} color="text-emerald-600" />
@@ -91,7 +92,6 @@ export default function AdminDashboard() {
          <StatCard label="Audit Flags" value={reports?.filter((r:any) => r.status === 'PENDING').length || 0} icon={<ShieldAlert className="text-rose-500" />} color="text-rose-500" />
       </div>
 
-      {/* Quick Access Matrix */}
       <section className="space-y-6">
          <h3 className="font-headline font-black text-xs uppercase tracking-[0.3em] text-slate-400">Quick Access Matrix</h3>
          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
