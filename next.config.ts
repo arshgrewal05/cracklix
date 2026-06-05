@@ -42,6 +42,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'pstcl.org',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'highcourtchd.gov.in',
         pathname: '/**',
       },
