@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from "next/link";
@@ -64,7 +63,7 @@ export default function Navbar() {
                      <Menu className="h-5 w-5" />
                    </button>
                  </SheetTrigger>
-                 <SheetContent side="left" className="p-0 border-none w-[280px]">
+                 <SheetContent side="left" className="p-0 border-none w-[260px]">
                    <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle></SheetHeader>
                    <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
                  </SheetContent>
