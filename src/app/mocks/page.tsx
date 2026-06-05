@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo } from "react"
@@ -74,7 +73,7 @@ export default function MocksGatewayPage() {
 
              return (
                 <Link key={exam.id} href={`/exams/${exam.id}`}>
-                   <Card className="border-none shadow-xl hover:shadow-4xl hover:-translate-y-2 transition-all duration-500 rounded-[3.5rem] bg-white group overflow-hidden text-left h-full flex flex-col border border-slate-50">
+                   <Card className="border-none shadow-xl hover:shadow-4xl hover:-translate-y-2 transition-all duration-500 rounded-[3.5rem] bg-white group overflow-hidden text-left h-full flex flex-col border border-slate-100">
                       <CardContent className="p-10 flex flex-col h-full">
                          <div className="flex justify-between items-start mb-10">
                             <div className="h-20 w-20 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-all group-hover:shadow-xl shadow-inner relative overflow-hidden shrink-0">
@@ -83,6 +82,7 @@ export default function MocksGatewayPage() {
                                   referrerPolicy="no-referrer"
                                   alt={board?.abbreviation || 'Board'} 
                                   className="w-full h-full object-contain p-3 transition-transform duration-500 group-hover:scale-110" 
+                                  onError={(e) => { (e.target as HTMLImageElement).src = psssbLogo }}
                                />
                             </div>
                             <Badge className="bg-primary/5 text-primary border-none text-[10px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-xl shadow-sm">

@@ -23,27 +23,27 @@ export async function seedInitialData(db: Firestore) {
       features: ['Limited Mocks', 'Daily Analysis', 'Exam Calendar']
     },
     { 
-      id: 'premium_monthly', 
-      name: 'Premium Monthly', 
-      price: 299, 
+      id: 'silver_pass', 
+      name: 'Silver Pass', 
+      price: 99, 
       durationDays: 30, 
       active: true, 
       displayOrder: 2, 
       type: 'PREMIUM',
-      description: 'Full access to the official practice vault.',
-      features: ['All Premium Mocks', 'All PYQs', 'AI Rationalizations', 'Readiness Score']
+      description: 'Unlock all subject-wise mastery tests.',
+      features: ['Subject Mocks', 'PYQ PDFs', 'Performance Stats']
     },
     { 
-      id: 'premium_yearly', 
-      name: 'Premium Yearly', 
-      price: 999, 
-      durationDays: 365, 
+      id: 'gold_pass', 
+      name: 'Gold Pass', 
+      price: 199, 
+      durationDays: 30, 
       active: true, 
       displayOrder: 3, 
       recommended: true,
       type: 'PREMIUM',
-      description: 'Maximum value for long-term preparation.',
-      features: ['Everything in Monthly', 'Lifetime Updates', 'Mentorship Access', 'Priority Support']
+      description: 'Complete institutional preparation vault.',
+      features: ['500+ Full Mocks', 'AI Rationalizations', 'Readiness Score', 'Priority Alerts']
     }
   ];
 
