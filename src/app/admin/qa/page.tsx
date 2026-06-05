@@ -105,13 +105,15 @@ export default function QADashboard() {
           <h1 className="text-5xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Audit Console</h1>
           <p className="text-slate-500 mt-2 text-lg font-medium">Systematic scan for broken MCQs, incomplete mocks, and pattern mismatches.</p>
         </div>
-        <Button 
-          onClick={handleRunScan} 
-          disabled={isScanning}
-          className="bg-primary hover:bg-primary/90 h-16 px-10 rounded-2xl font-black uppercase tracking-widest text-xs gap-3 shadow-2xl shadow-primary/20"
-        >
-          <RefreshCw className={`h-5 w-5 ${isScanning ? 'animate-spin' : ''}`} /> {isScanning ? "Scanning Repo..." : "Run Integrity Scan"}
-        </Button>
+        <div className="flex gap-4">
+           <Button 
+            onClick={handleRunScan} 
+            disabled={isScanning}
+            className="bg-primary hover:bg-primary/90 h-16 px-10 rounded-2xl font-black uppercase tracking-widest text-xs gap-3 shadow-2xl shadow-primary/20"
+           >
+            <RefreshCw className={`h-5 w-5 ${isScanning ? 'animate-spin' : ''}`} /> {isScanning ? "Scanning Repo..." : "Run Integrity Scan"}
+           </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -141,14 +143,14 @@ export default function QADashboard() {
                         issues.brokenQuestions.map((q: any) => (
                            <TableRow key={q.id} className="border-slate-50 hover:bg-slate-50 transition-colors">
                               <TableCell className="px-10 py-6 max-w-md text-left">
-                                 <p className="font-bold text-[#0F172A] line-clamp-1">{q.questionEn || "Untitled Content"}</p>
+                                 <p className="font-bold text-[#000000] line-clamp-1">{q.questionEn || "Untitled Content"}</p>
                                  <code className="text-[9px] text-slate-400 font-mono">UUID: {q.id}</code>
                               </TableCell>
                               <TableCell className="text-center">
                                  <div className="flex flex-wrap justify-center gap-2">
-                                    {!q.correctAnswer && <Badge className="bg-rose-50 text-rose-600 border-none text-[8px]">No Answer</Badge>}
-                                    {!q.explanationEn && <Badge className="bg-orange-50 text-orange-600 border-none text-[8px]">No Rationale</Badge>}
-                                    {!q.questionPa && <Badge className="bg-blue-50 text-blue-600 border-none text-[8px]">No Punjabi</Badge>}
+                                    {!q.correctAnswer && <Badge className="bg-rose-50 text-rose-600 border-none text-[8px] font-black uppercase">No Answer</Badge>}
+                                    {!q.explanationEn && <Badge className="bg-orange-50 text-orange-600 border-none text-[8px] font-black uppercase">No Rationale</Badge>}
+                                    {!q.questionPa && <Badge className="bg-blue-50 text-blue-600 border-none text-[8px] font-black uppercase">No Punjabi</Badge>}
                                  </div>
                               </TableCell>
                               <TableCell className="text-right px-10">
@@ -164,7 +166,7 @@ export default function QADashboard() {
                            </TableRow>
                         ))
                      ) : (
-                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic text-slate-400">No broken questions detected in registry.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic text-slate-400 font-black uppercase text-[10px] tracking-widest">No broken questions detected in registry.</TableCell></TableRow>
                      )}
                   </TableBody>
                </Table>
@@ -191,12 +193,12 @@ export default function QADashboard() {
                         issues.brokenMocks.map((m: any) => (
                            <TableRow key={m.id} className="border-slate-50 hover:bg-slate-50 transition-colors">
                               <TableCell className="px-10 py-6 text-left">
-                                 <p className="font-bold text-[#0F172A]">{m.title}</p>
+                                 <p className="font-bold text-[#000000] uppercase">{m.title}</p>
                                  <code className="text-[9px] text-slate-400 font-mono">{m.boardId} • {m.examId}</code>
                               </TableCell>
                               <TableCell className="text-center">
-                                 <Badge className="bg-rose-50 text-rose-600 border-none px-4 py-1 text-[9px] uppercase font-black">
-                                    {m.questionIds?.length || 0} / {m.totalQuestions} Questions Linked
+                                 <Badge className="bg-rose-50 text-rose-600 border-none px-4 py-1 text-[9px] uppercase font-black tracking-widest">
+                                    {m.questionIds?.length || 0} / {m.totalQuestions} Linked
                                  </Badge>
                               </TableCell>
                               <TableCell className="text-right px-10">
@@ -212,7 +214,7 @@ export default function QADashboard() {
                            </TableRow>
                         ))
                      ) : (
-                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic text-slate-400">All mock series passed the structural audit.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic text-slate-400 font-black uppercase text-[10px] tracking-widest">All mock series passed the structural audit.</TableCell></TableRow>
                      )}
                   </TableBody>
                </Table>

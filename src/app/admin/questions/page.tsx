@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Database, Filter, Eye, AlertCircle, CheckSquare, History, X, Loader2 } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Database, Filter, Eye, AlertCircle, CheckSquare, History, X, Loader2, Zap } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, deleteDoc, doc, where, writeBatch } from "firebase/firestore"
@@ -18,10 +18,12 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors"
 
 /**
- * @fileOverview Institutional Asset Ledger (Global Bank) v3.2.
- * Fixed: Robust Bulk Purge Engine and Slim Selection HUD for pro-grade management.
+ * @fileOverview Institutional Asset Ledger (Global Bank) v3.5.
+ * Features: High-Performance Bulk Purge Engine & "Purge All Filtered" Node.
  */
 
 export default function QuestionBank() {
@@ -71,27 +73,21 @@ export default function QuestionBank() {
     )
   }
 
-  const handleDeleteSingle = async (id: string) => {
-    if (!confirm("Permanently purge this asset from the global bank?")) return
-    try {
-      await deleteDoc(doc(db!, "questions", id))
-      toast({ title: "Asset Purged", description: "Node removed from registry." })
-      setSelectedIds(prev => prev.filter(i => i !== id))
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Purge Failed", description: e.message })
-    }
-  }
+  const handlePurgeIds = async (ids: string[], isGlobal = false) => {
+    if (!db || ids.length === 0) return
+    
+    const confirmMsg = isGlobal 
+      ? `CRITICAL AUDIT: This will permanently purge ALL ${ids.length} visible nodes in this filter. Irreversible. Continue?`
+      : `CRITICAL AUDIT: Permanently purge ${ids.length} selected nodes from registry?`;
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.length === 0 || !db) return
-    if (!confirm(`CRITICAL AUDIT: You are about to permanently purge ${selectedIds.length} questions from the global bank. This action is irreversible. Proceed?`)) return
+    if (!confirm(confirmMsg)) return
 
     setIsDeleting(true)
     
     try {
       const batchSize = 400
-      for (let i = 0; i < selectedIds.length; i += batchSize) {
-        const chunk = selectedIds.slice(i, i + batchSize)
+      for (let i = 0; i < ids.length; i += batchSize) {
+        const chunk = ids.slice(i, i + batchSize)
         const batch = writeBatch(db)
         chunk.forEach(id => {
           batch.delete(doc(db, "questions", id))
@@ -101,19 +97,34 @@ export default function QuestionBank() {
 
       toast({ 
         title: "Audit Success", 
-        description: `${selectedIds.length} items successfully purged from registry.` 
+        description: `${ids.length} items successfully purged from registry.` 
       })
       setSelectedIds([])
     } catch (e: any) {
-      console.error("Bulk Purge Failed:", e)
-      toast({ 
-        variant: "destructive", 
-        title: "Audit Interrupted", 
-        description: "Institutional security prevented full registry sync." 
-      })
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: 'questions/bulk',
+        operation: 'delete',
+      }))
+      toast({ variant: "destructive", title: "Audit Error", description: "Cloud registry sync failed." })
     } finally {
       setIsDeleting(false)
     }
+  }
+
+  const handleDeleteSingle = (id: string) => {
+    if (!confirm("Permanently purge this asset from the global bank?")) return
+    const qRef = doc(db!, "questions", id)
+    deleteDoc(qRef)
+      .then(() => {
+        toast({ title: "Asset Purged", description: "Node removed from registry." })
+        setSelectedIds(prev => prev.filter(i => i !== id))
+      })
+      .catch(async () => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: qRef.path,
+          operation: 'delete',
+        } satisfies SecurityRuleContext))
+      });
   }
 
   const allSelected = filteredQuestions.length > 0 && selectedIds.length === filteredQuestions.length;
@@ -139,15 +150,16 @@ export default function QuestionBank() {
         </div>
       </div>
 
+      {/* Persistent High-Fidelity Selection HUD */}
       {selectedIds.length > 0 && (
-         <div className="mx-4 bg-[#0F172A] p-4 rounded-2xl flex flex-wrap items-center justify-between animate-in fade-in slide-in-from-top-4 duration-300 shadow-2xl text-white sticky top-20 z-50 border border-white/10">
-            <div className="flex items-center gap-4">
+         <div className="mx-4 bg-[#0B1528] p-4 rounded-2xl flex flex-wrap items-center justify-between animate-in fade-in slide-in-from-top-4 duration-300 shadow-4xl text-white sticky top-2 z-[60] border border-white/10">
+            <div className="flex items-center gap-6">
                <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shadow-inner">
                   <CheckSquare className="h-5 w-5" />
                </div>
                <div className="text-left">
-                  <p className="text-lg font-headline font-black leading-none">{selectedIds.length} Nodes Active</p>
-                  <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1">Bulk Buffer Terminal</p>
+                  <p className="text-lg font-headline font-black leading-none uppercase">{selectedIds.length} Assets Targeted</p>
+                  <p className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400 mt-1">Bulk Audit Terminal</p>
                </div>
             </div>
             <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
@@ -156,17 +168,25 @@ export default function QuestionBank() {
                 size="sm"
                 onClick={() => setSelectedIds([])} 
                 disabled={isDeleting} 
-                className="h-10 px-4 rounded-xl font-black uppercase text-[8px] tracking-widest text-slate-400 hover:text-white"
+                className="h-10 px-4 rounded-xl font-black uppercase text-[9px] tracking-widest text-slate-400 hover:text-white"
                >
                   Cancel
                </Button>
                <Button 
-                onClick={handleBulkDelete} 
+                onClick={() => handlePurgeIds(filteredQuestions.map(q => q.id), true)} 
                 disabled={isDeleting}
-                className="h-12 flex-1 md:flex-none px-8 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-[9px] tracking-[0.1em] gap-2 shadow-xl transition-all active:scale-95"
+                variant="outline"
+                className="h-12 px-6 rounded-xl border-white/20 bg-white/5 text-white font-black uppercase text-[9px] tracking-widest gap-2 hover:bg-white/10"
+               >
+                  Purge All Filtered ({filteredQuestions.length})
+               </Button>
+               <Button 
+                onClick={() => handlePurgeIds(selectedIds)} 
+                disabled={isDeleting}
+                className="h-12 flex-1 md:flex-none px-8 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-[9px] tracking-[0.2em] gap-3 shadow-2xl transition-all active:scale-95"
                >
                   {isDeleting ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> Purging...</>
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Purging Registry...</>
                   ) : (
                     <><Trash2 className="h-4 w-4" /> Purge Selection</>
                   )}
@@ -258,10 +278,10 @@ export default function QuestionBank() {
                     </TableCell>
                     <TableCell className="text-right px-8">
                       <div className="flex justify-end gap-2 opacity-30 group-hover:opacity-100 transition-all duration-300">
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-white hover:text-primary shadow-sm border border-transparent hover:border-slate-100" asChild>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-white hover:text-primary shadow-sm border border-transparent hover:border-slate-100" asChild title="Edit Node">
                           <Link href={`/admin/questions/add?id=${q.id}`}><Edit className="h-4 w-4" /></Link>
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-rose-50 hover:text-rose-500 shadow-sm border border-transparent hover:border-rose-100" onClick={() => handleDeleteSingle(q.id)}><Trash2 className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-rose-50 hover:text-rose-500 shadow-sm border border-transparent hover:border-rose-100" onClick={() => handleDeleteSingle(q.id)} title="Purge Node"><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </TableCell>
                   </TableRow>
