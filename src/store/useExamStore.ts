@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import { AttemptState, ExamLanguage, QuestionStatus, Question } from '@/types';
-import { Firestore, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { initializeFirebase } from '@/firebase';
 
 /**
- * @fileOverview Enterprise CBT Global Store v16.0.
- * Hardened: atomic state updates, network resilience, and drift-corrected timer.
+ * @fileOverview Enterprise CBT Global Store v17.0.
+ * Hardened: atomic state updates and stable Firestore registry access.
+ * Replaced window fallback with official initialization node.
  */
 
 interface ExamStore extends AttemptState {
@@ -24,13 +26,13 @@ interface ExamStore extends AttemptState {
   setPaletteVisible: (visible: boolean) => void;
   togglePalette: () => void;
   setCurrentIdx: (idx: number) => void;
-  setAnswer: (idx: number, optionIdx: number | null, db: Firestore) => Promise<void>;
-  clearAnswer: (idx: number, db: Firestore) => Promise<void>;
-  markForReview: (idx: number, db: Firestore) => Promise<void>;
-  saveAndNext: (db: Firestore) => void;
+  setAnswer: (idx: number, optionIdx: number | null, db: any) => Promise<void>;
+  clearAnswer: (idx: number, db: any) => Promise<void>;
+  markForReview: (idx: number, db: any) => Promise<void>;
+  saveAndNext: (db: any) => void;
   tick: () => void;
-  addViolation: (db: Firestore) => void;
-  toggleBookmark: (idx: number, db: Firestore) => void;
+  addViolation: (db: any) => void;
+  toggleBookmark: (idx: number, db: any) => void;
 }
 
 export const useExamStore = create<ExamStore>((set, get) => ({
@@ -56,7 +58,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
   initExam: (mockId, mockTitle, userId, questions, duration, savedState) => {
     const now = Date.now();
-    // Use persistent endTime from Firestore if resuming, otherwise calculate new
     const endTime = savedState?.endTime || now + (duration * 60 * 1000);
     const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
     
@@ -68,7 +69,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       timeLeft,
       startTime: savedState?.startTime || now,
       endTime,
-      // Spread previous state nodes
       answers: savedState?.answers || {},
       status: savedState?.status || {},
       visited: Array.from(new Set([...(savedState?.visited || []), 0])),
@@ -97,16 +97,13 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       currentSectionId: questions[idx]?.sectionId || ''
     });
     
-    // Non-blocking position sync
     if (userId && mockId) {
-      const db = (window as any)._firestore; // Safe fallback for global access if needed
-      if (db) {
-         updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), {
-            currentIdx: idx,
-            visited: newVisited,
-            updatedAt: serverTimestamp()
-         }).catch(() => {});
-      }
+      const { firestore: db } = initializeFirebase();
+      updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), {
+         currentIdx: idx,
+         visited: newVisited,
+         updatedAt: serverTimestamp()
+      }).catch(() => {});
     }
   },
 
@@ -127,13 +124,12 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
     set({ answers: newAnswers, status: newStatus });
 
-    // Enterprise: Optimistic Firestore Sync
     const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
     updateDoc(attemptRef, {
       [`answers.${idx}`]: optionIdx,
       [`status.${idx}`]: newStatus[idx],
       updatedAt: serverTimestamp()
-    }).catch(e => console.warn("[AUDIT] Auto-save node failed, retrying on next action."));
+    }).catch(() => {});
   },
 
   clearAnswer: async (idx, db) => {
@@ -199,7 +195,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     if (!isPaused && !isSubmitting && endTime > 0) {
       const now = Date.now();
       const remain = Math.max(0, Math.floor((endTime - now) / 1000));
-      // Atomic tick to prevent race conditions on UI re-renders
       if (get().timeLeft !== remain) {
         set({ timeLeft: remain });
       }
