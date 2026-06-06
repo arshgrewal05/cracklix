@@ -34,7 +34,8 @@ import {
   History,
   Languages,
   Smartphone,
-  CheckCircle2
+  CheckCircle2,
+  ChevronDown
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
 import { collection, doc, setDoc, serverTimestamp, query, where, limit, getDocs } from "firebase/firestore"
@@ -43,8 +44,9 @@ import { MockType, Difficulty, AccessType } from "@/types"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Mock Architect v8.0.
+ * @fileOverview Institutional Mock Architect v8.5.
  * Features: PSSSB Standard Section Registry, Modular Assembly, and Targeted Ingestion.
+ * Fixed: Layout overflow in bank header and scrollable subject nodes.
  */
 
 const PSSSB_SECTIONS = [
@@ -373,7 +375,7 @@ function MockBuilderContent() {
                                    <SelectValue placeholder="Choose Subject" />
                                 </div>
                              </SelectTrigger>
-                             <SelectContent>
+                             <SelectContent className="max-h-[300px]">
                                 <SelectItem value="all">All Subjects</SelectItem>
                                 {subjects?.map((s: any) => (
                                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
@@ -383,21 +385,21 @@ function MockBuilderContent() {
                        </div>
                     </div>
 
-                    <div className="bg-[#0F172A] p-6 rounded-3xl mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 text-white shadow-2xl">
-                       <div className="flex items-center gap-8 px-2">
-                          <div className="space-y-2 text-left">
+                    <div className="bg-[#0F172A] p-6 rounded-3xl mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-6 text-white shadow-2xl overflow-hidden">
+                       <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10 flex-1 min-w-0">
+                          <div className="space-y-2 text-left min-w-0 flex-1 max-w-md">
                              <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">Target Subject Node</Label>
                              <Select value={activeSectionId} onValueChange={setActiveSectionId}>
-                                <SelectTrigger className="h-11 w-64 bg-white/10 border-white/5 text-white font-black text-[10px] rounded-xl uppercase tracking-widest">
+                                <SelectTrigger className="h-11 w-full bg-white/10 border-white/5 text-white font-black text-[10px] rounded-xl uppercase tracking-widest overflow-hidden">
                                    <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="max-h-[300px]">
                                    {sections.map(s => <SelectItem key={s.id} value={s.id} className="uppercase font-bold text-[10px]">{s.name}</SelectItem>)}
                                 </SelectContent>
                              </Select>
                           </div>
-                          <div className="h-12 w-px bg-white/10 hidden md:block" />
-                          <div className="flex items-center gap-3">
+                          
+                          <div className="flex items-center gap-4 shrink-0 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-10">
                              <Checkbox 
                                checked={filteredBank.length > 0 && bankSelection.length === filteredBank.length} 
                                onCheckedChange={(v) => {
@@ -405,11 +407,19 @@ function MockBuilderContent() {
                                   else setBankSelection([])
                                }}
                              />
-                             <p className="font-black uppercase text-[10px] tracking-widest text-slate-400">Select All ({bankSelection.length})</p>
+                             <div className="text-left">
+                                <p className="font-black uppercase text-[10px] tracking-widest text-white">Select All</p>
+                                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">({bankSelection.length} Nodes)</p>
+                             </div>
                           </div>
                        </div>
-                       <div className="flex gap-3">
-                         <Button disabled={bankSelection.length === 0} onClick={handleBulkLink} className="bg-emerald-600 hover:bg-emerald-700 h-12 px-10 rounded-xl text-[10px] uppercase font-black tracking-[0.2em] shadow-xl transition-all active:scale-95">
+
+                       <div className="shrink-0">
+                         <Button 
+                           disabled={bankSelection.length === 0} 
+                           onClick={handleBulkLink} 
+                           className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 h-14 px-12 rounded-xl text-[10px] uppercase font-black tracking-[0.2em] shadow-xl transition-all active:scale-95"
+                         >
                             Link {bankSelection.length} Nodes
                          </Button>
                        </div>
@@ -469,7 +479,7 @@ function MockBuilderContent() {
                                 <Plus className="h-3 w-3 text-primary mr-2" /> 
                                 <SelectValue placeholder="Add PSSSB Subject" />
                              </SelectTrigger>
-                             <SelectContent>
+                             <SelectContent className="max-h-[300px]">
                                 {PSSSB_SECTIONS.map(s => <SelectItem key={s} value={s} className="font-bold text-[10px] uppercase">{s}</SelectItem>)}
                              </SelectContent>
                           </Select>
@@ -520,7 +530,7 @@ function MockBuilderContent() {
                                          <span className="font-black text-[10px] text-slate-300 shrink-0">#{qIdx+1}</span>
                                          <p className="font-bold text-xs text-[#0F172A] truncate">{q.englishQuestion || q.questionEn || q.questionText}</p>
                                       </div>
-                                      <Button size="icon" variant="ghost" className="h-9 w-9 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 opacity-20 group-hover/q:opacity-100 transition-all" onClick={() => removeQuestion(section.id, q.id)}>
+                                      <Button size="icon" variant="ghost" className="h-9 w-9 rounded-lg text-slate-300 hover:text-rose-50 hover:bg-rose-50 opacity-20 group-hover/q:opacity-100 transition-all" onClick={() => removeQuestion(section.id, q.id)}>
                                          <Trash2 className="h-4 w-4" />
                                       </Button>
                                    </div>
