@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -5,7 +6,7 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import AdPlacement from "@/components/ads/AdPlacement"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, query } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -28,24 +29,48 @@ import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Final Exam Gateway Node.
- * Updated: Resilient Board Icon rendering and fixed font scaling for mobile.
+ * Updated: Real-time aggregation for Full Mocks, Subjects, PYQs, and Sectionals.
+ * Purged: Fake numbering and hardcoded multipliers.
  */
 
 export default function MocksGatewayPage() {
   const db = useFirestore()
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({})
   
-  const examsQuery = useMemo(() => {
-    if (!db) return null
-    return query(collection(db, "exams"))
-  }, [db])
-
+  const examsQuery = useMemo(() => (db ? query(collection(db, "exams")) : null), [db])
   const boardsQuery = useMemo(() => (db ? query(collection(db, "boards")) : null), [db])
+  const mocksQuery = useMemo(() => (db ? query(collection(db, "mocks"), where("published", "==", true)) : null), [db])
 
   const { data: exams, loading: examsLoading } = useCollection<any>(examsQuery)
   const { data: boards } = useCollection<any>(boardsQuery)
+  const { data: mocks, loading: mocksLoading } = useCollection<any>(mocksQuery)
 
-  const stateEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png";
+  // Dynamic Aggregation Hub
+  const statsMap = useMemo(() => {
+    if (!mocks) return {};
+    const map: Record<string, any> = {};
+    
+    mocks.forEach(m => {
+      const eid = m.examId;
+      if (!eid) return;
+      
+      if (!map[eid]) {
+        map[eid] = {
+          full: 0,
+          pyq: 0,
+          sectional: 0,
+          subjects: new Set<string>()
+        };
+      }
+      
+      if (m.mockType === 'FULL') map[eid].full++;
+      if (m.mockType === 'PYQ') map[eid].pyq++;
+      if (m.mockType === 'SECTIONAL') map[eid].sectional++;
+      if (m.subjectId) map[eid].subjects.add(m.subjectId);
+    });
+    
+    return map;
+  }, [mocks]);
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50 font-body">
@@ -69,10 +94,11 @@ export default function MocksGatewayPage() {
         <AdPlacement placement="MOCK_LISTING" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-           {examsLoading ? (
+           {examsLoading || mocksLoading ? (
              Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-[450px] w-full rounded-[3.5rem]" />)
-           ) : exams?.sort((a: any, b: any) => (b.totalMocks || 0) - (a.totalMocks || 0)).map((exam: any) => {
+           ) : exams?.sort((a: any, b: any) => a.name.localeCompare(b.name)).map((exam: any) => {
              const board = boards?.find(b => b.id === exam.boardId)
+             const stats = statsMap[exam.id] || { full: 0, pyq: 0, sectional: 0, subjects: new Set() };
              const isImgFailed = failedImages[exam.id];
 
              return (
@@ -109,11 +135,12 @@ export default function MocksGatewayPage() {
                             </p>
                          </div>
 
+                         {/* Reactive Inventory Matrix */}
                          <div className="mt-12 pt-8 border-t border-slate-50 grid grid-cols-2 gap-4">
-                            <InventoryNode icon={<Zap className="text-primary h-3.5 w-3.5" />} count={exam.totalMocks || 0} label="Full Mocks" />
-                            <InventoryNode icon={<BookOpen className="text-blue-500 h-3.5 w-3.5" />} count={Math.round((exam.totalMocks || 1) * 3.5)} label="Subject" />
-                            <InventoryNode icon={<FileText className="text-emerald-500 h-3.5 w-3.5" />} count={Math.round((exam.totalMocks || 1) * 1.2)} label="PYQs" />
-                            <InventoryNode icon={<Layout className="text-orange-500 h-3.5 w-3.5" />} count={Math.round((exam.totalMocks || 1) * 2)} label="Sectional" />
+                            <InventoryNode icon={<Zap className="text-primary h-3.5 w-3.5" />} count={stats.full} label="Full Mocks" />
+                            <InventoryNode icon={<BookOpen className="text-blue-500 h-3.5 w-3.5" />} count={stats.subjects.size} label="Subject" />
+                            <InventoryNode icon={<FileText className="text-emerald-500 h-3.5 w-3.5" />} count={stats.pyq} label="PYQs" />
+                            <InventoryNode icon={<Layout className="text-orange-500 h-3.5 w-3.5" />} count={stats.sectional} label="Sectional" />
                          </div>
 
                          <div className="mt-10">

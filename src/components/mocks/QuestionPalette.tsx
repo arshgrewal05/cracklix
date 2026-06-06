@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -15,11 +16,11 @@ interface QuestionPaletteProps {
 }
 
 /**
- * @fileOverview Paginated Institutional Audit Matrix v6.0.
+ * @fileOverview Paginated Institutional Audit Matrix v6.5.
  * Rules Enforcement:
- * 1. FIXED CIRCLE OVERLAP: Explicit gap-4 and w-10 h-10 nodes.
- * 2. EXACT 25 NODES: Pagination Hub calibrated.
- * 3. NO SCROLLING: Fits within standard mobile viewports.
+ * 1. FIXED CIRCLE OVERLAP: Explicit gap-3 and box-sizing: border-box.
+ * 2. EXACT 25 NODES: Pagination Hub calibrated for mobile focus.
+ * 3. NO SCROLLING: Elements sized to fit within standard viewports.
  */
 
 export default function QuestionPalette({
@@ -99,7 +100,7 @@ export default function QuestionPalette({
 
       {/* High-Density Matrix (FIXED OVERLAP) */}
       <div className="flex-1 overflow-y-auto no-scrollbar pt-2">
-         <div className="grid grid-cols-5 gap-4">
+         <div className="grid grid-cols-5 gap-3">
             {currentQuestions.map((q) => {
               const idx = q.globalIdx;
               const isCurrent = currentIndex === idx
@@ -118,7 +119,7 @@ export default function QuestionPalette({
                     isCurrent ? "border-primary bg-white text-primary z-20 shadow-xl ring-2 ring-primary ring-offset-2" : "border-transparent",
                     !isCurrent && isBoth && "bg-purple-600 text-white border-purple-600",
                     !isCurrent && isAnswered && !isFlagged && "bg-emerald-600 text-white border-emerald-600",
-                    !isCurrent && isFlagged && !isAnswered && "bg-amber-500 text-white border-amber-500",
+                    !isCurrent && isFlagged && !isAnswered && "bg-amber-50 text-white border-amber-500",
                     !isCurrent && isVisited && !isAnswered && !isFlagged && "bg-rose-500 text-white border-rose-500",
                     !isCurrent && !isVisited && "bg-slate-50 text-slate-300 border-slate-100",
                   )}
