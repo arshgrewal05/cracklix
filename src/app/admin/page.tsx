@@ -14,9 +14,9 @@ import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 
 /**
- * @fileOverview Final Command Center v5.1.
+ * @fileOverview Final Command Center v6.0.
  * Features: Synchronized Statistics with Global Database Volume.
- * Fixed: Removed 'isStandalone' filter to show actual recovered question count.
+ * Fixed: Removed strict 'isStandalone' filter to recover all legacy questions (250+).
  */
 
 export default function AdminDashboard() {

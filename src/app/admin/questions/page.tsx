@@ -1,21 +1,19 @@
 
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Database, Filter, Eye, AlertCircle, CheckSquare, History, X, Loader2, Zap, AlertTriangle, Layers, Copy, ChevronLeft, ChevronRight } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Database, Filter, Eye, AlertCircle, CheckSquare, History, X, Loader2, Zap, AlertTriangle, Layers, Copy, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { useCollection, useFirestore } from "@/firebase"
-import { collection, query, deleteDoc, doc, where, writeBatch, setDoc, serverTimestamp, limit, orderBy } from "firebase/firestore"
+import { useFirestore, useCollection } from "@/firebase"
+import { collection, query, deleteDoc, doc, where, writeBatch, setDoc, serverTimestamp, limit, orderBy, getDocs, startAfter } from "firebase/firestore"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { errorEmitter } from "@/firebase/error-emitter"
@@ -28,9 +26,9 @@ import {
 } from "@/components/ui/tooltip"
 
 /**
- * @fileOverview Institutional Asset Ledger (Global Bank) v5.2.
- * Fixed: Removed strict 'isStandalone' filter to recover legacy questions.
- * Added: Comprehensive search including document ID.
+ * @fileOverview Institutional Asset Ledger (Global Bank) v6.0.
+ * Optimized for Massive Scale: Uses manual fetch with pagination instead of real-time listeners.
+ * Prevents Firestore Assertion Failures and handles missing indexes gracefully.
  */
 
 export default function QuestionBank() {
@@ -41,33 +39,62 @@ export default function QuestionBank() {
   const [subjectFilter, setSubjectFilter] = useState("all")
   const [boardFilter, setBoardFilter] = useState("all")
   const [examFilter, setExamFilter] = useState("all")
-  const [showUnusedOnly, setShowUnusedOnly] = useState(false)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
-  const [pageLimit, setPageLimit] = useState(50)
-
-  // Optimized Scalable Query - Removed strict 'isStandalone' to show legacy data
-  const qQuery = useMemo(() => {
-    if (!db) return null
-    let constraints: any[] = [orderBy("createdAt", "desc"), limit(pageLimit)];
-    
-    if (examFilter !== "all") constraints.unshift(where("examId", "==", examFilter));
-    else if (boardFilter !== "all") constraints.unshift(where("boardId", "==", boardFilter));
-    
-    return query(collection(db, "questions"), ...constraints)
-  }, [db, boardFilter, examFilter, pageLimit])
+  const [loading, setLoading] = useState(true)
+  const [questions, setQuestions] = useState<any[]>([])
+  const [lastDoc, setLastDoc] = useState<any>(null)
+  const [hasMore, setLastHasMore] = useState(true)
 
   const mocksQuery = useMemo(() => (db ? collection(db, "mocks") : null), [db])
-
-  const { data: allQuestions, loading } = useCollection<any>(qQuery)
   const { data: allMocks } = useCollection<any>(mocksQuery)
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
-  const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
   const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects") : null), [db]))
+
+  // Fetch Logic - Manual trigger to prevent "Assertion Failed" recursion
+  const fetchQuestions = useCallback(async (isNext = false) => {
+    if (!db) return
+    setLoading(true)
+    try {
+      let constraints: any[] = [orderBy("createdAt", "desc"), limit(50)]
+      
+      if (examFilter !== "all") constraints.unshift(where("examId", "==", examFilter))
+      else if (boardFilter !== "all") constraints.unshift(where("boardId", "==", boardFilter))
+      
+      if (isNext && lastDoc) {
+        constraints.push(startAfter(lastDoc))
+      }
+
+      const q = query(collection(db, "questions"), ...constraints)
+      const snap = await getDocs(q)
+      
+      const newQs = snap.docs.map(d => ({ ...d.data(), id: d.id }))
+      
+      if (isNext) {
+        setQuestions(prev => [...prev, ...newQs])
+      } else {
+        setQuestions(newQs)
+      }
+      
+      setLastDoc(snap.docs[snap.docs.length - 1])
+      setLastHasMore(snap.docs.length === 50)
+    } catch (e: any) {
+      console.error("Fetch Error:", e)
+      if (e.code === 'failed-precondition') {
+        toast({ variant: "destructive", title: "Index Required", description: "This combination needs a composite index. Check console for link." })
+      }
+    } finally {
+      setLoading(false)
+    }
+  }, [db, boardFilter, examFilter, lastDoc, toast])
+
+  useEffect(() => {
+    fetchQuestions()
+  }, [boardFilter, examFilter, db])
 
   // Usage Matrix Generator
   const usageMap = useMemo(() => {
-    if (!allQuestions || !allMocks) return {};
+    if (!questions || !allMocks) return {};
     const map: Record<string, string[]> = {};
     allMocks.forEach(m => {
        m.questionIds?.forEach((qid: string) => {
@@ -76,22 +103,19 @@ export default function QuestionBank() {
        });
     });
     return map;
-  }, [allQuestions, allMocks]);
+  }, [questions, allMocks]);
 
   const filteredQuestions = useMemo(() => {
-    if (!allQuestions) return []
-    return allQuestions
-      .filter(q => {
+    if (!questions) return []
+    return questions.filter(q => {
         const term = searchTerm.toLowerCase();
         const matchesSearch = (q.questionEn || q.titleEn || "").toLowerCase().includes(term) || 
                              (q.displayId || "").toLowerCase().includes(term) ||
                              (q.id || "").toLowerCase().includes(term);
         const matchesSub = subjectFilter === "all" || q.subjectId === subjectFilter
-        const usageCount = usageMap[q.id]?.length || 0;
-        const matchesUnused = !showUnusedOnly || usageCount === 0
-        return matchesSearch && matchesSub && matchesUnused
+        return matchesSearch && matchesSub
       })
-  }, [allQuestions, searchTerm, subjectFilter, showUnusedOnly, usageMap])
+  }, [questions, searchTerm, subjectFilter])
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -109,24 +133,21 @@ export default function QuestionBank() {
     if (!db || ids.length === 0) return
     const usedIds = ids.filter(id => (usageMap[id]?.length || 0) > 0);
     const confirmMsg = usedIds.length > 0 
-      ? `CRITICAL AUDIT: ${usedIds.length} questions in your selection are ACTIVE in mocks. Deleting them will break those tests. Continue?`
+      ? `CRITICAL AUDIT: ${usedIds.length} questions are ACTIVE in mocks. Deleting them will break those tests. Continue?`
       : `Audit: Permanently purge ${ids.length} nodes from registry?`;
 
     if (!confirm(confirmMsg)) return
 
     setIsDeleting(true)
     try {
-      const batchSize = 400
-      for (let i = 0; i < ids.length; i += batchSize) {
-        const chunk = ids.slice(i, i + batchSize)
-        const batch = writeBatch(db)
-        chunk.forEach(id => { batch.delete(doc(db, "questions", id)) })
-        await batch.commit()
-      }
+      const batch = writeBatch(db)
+      ids.forEach(id => { batch.delete(doc(db, "questions", id)) })
+      await batch.commit()
       toast({ title: "Audit Success", description: `${ids.length} items successfully purged.` })
       setSelectedIds([])
+      fetchQuestions()
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Audit Error", description: "Registry sync failed." })
+      toast({ variant: "destructive", title: "Sync Failed" })
     } finally {
       setIsDeleting(false)
     }
@@ -135,12 +156,15 @@ export default function QuestionBank() {
   const handleDeleteSingle = (id: string) => {
     const usage = usageMap[id] || [];
     if (usage.length > 0) {
-      if (!confirm(`WARNING: This question is used in ${usage.length} mocks. Deleting it will cause errors. Proceed?`)) return;
+      if (!confirm(`WARNING: This question is used in ${usage.length} mocks. Proceed?`)) return;
     } else if (!confirm("Permanently purge this asset?")) return;
     
     const qRef = doc(db!, "questions", id)
     deleteDoc(qRef)
-      .then(() => toast({ title: "Asset Purged" }))
+      .then(() => {
+        toast({ title: "Asset Purged" })
+        fetchQuestions()
+      })
       .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: qRef.path, operation: 'delete' })));
   }
 
@@ -152,15 +176,15 @@ export default function QuestionBank() {
         <div className="text-left">
           <div className="flex items-center gap-3 mb-1.5">
             <Database className="h-5 w-5 text-primary" />
-            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Scalable Asset Bank</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Atomic Asset Bank</span>
           </div>
           <h1 className="text-4xl font-black font-headline text-primary uppercase tracking-tight">Question Bank</h1>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">Enterprise grade management for 1M+ MCQ nodes.</p>
+          <p className="text-muted-foreground mt-1 text-sm font-medium">Managing legacy and standalone MCQ nodes.</p>
         </div>
         <div className="flex gap-4">
-           <Button asChild variant="outline" className="h-12 px-6 rounded-2xl font-black uppercase text-[9px] tracking-widest gap-2 shadow-sm bg-white border-slate-200">
-              <Link href="/admin/bulk-import"><Plus className="h-4 w-4" /> Bulk Ingestion</Link>
-           </Button>
+          <Button variant="outline" onClick={() => fetchQuestions()} className="h-12 px-6 rounded-2xl bg-white shadow-sm gap-2">
+            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} /> Refresh
+          </Button>
           <Button asChild className="bg-[#0F172A] hover:bg-black text-white gap-2 font-black shadow-2xl h-12 px-8 rounded-2xl uppercase tracking-widest text-[9px]">
             <Link href="/admin/questions/add"><Plus className="h-4 w-4" /> Add Manual</Link>
           </Button>
@@ -172,7 +196,7 @@ export default function QuestionBank() {
             <div className="flex items-center gap-6 px-4">
                <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary"><CheckSquare className="h-5 w-5" /></div>
                <div>
-                  <p className="text-lg font-headline font-black leading-none uppercase">{selectedIds.length} Assets Targeted</p>
+                  <p className="text-lg font-headline font-black leading-none uppercase">{selectedIds.length} Nodes Selected</p>
                   <p className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400 mt-1">Bulk Audit Terminal</p>
                </div>
             </div>
@@ -191,17 +215,11 @@ export default function QuestionBank() {
               <Input className="pl-12 h-12 rounded-xl bg-white border-none shadow-inner" placeholder="Search by ID or Text..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Select value={boardFilter} onValueChange={v => { setBoardFilter(v); setExamFilter("all"); }}>
+              <Select value={boardFilter} onValueChange={v => setBoardFilter(v)}>
                 <SelectTrigger className="rounded-xl h-11 bg-white border-none w-36 shadow-sm font-bold text-xs">
                   <SelectValue placeholder="Board" />
                 </SelectTrigger>
                 <SelectContent><SelectItem value="all">All Boards</SelectItem>{boards?.map(b => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
-              </Select>
-              <Select value={examFilter} onValueChange={setExamFilter}>
-                <SelectTrigger className="rounded-xl h-11 bg-white border-none w-48 shadow-sm font-bold text-xs">
-                  <SelectValue placeholder="Target Exam" />
-                </SelectTrigger>
-                <SelectContent><SelectItem value="all">All Exams</SelectItem>{exams?.filter(e => boardFilter === "all" || e.boardId === boardFilter).map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={subjectFilter} onValueChange={setSubjectFilter}>
                 <SelectTrigger className="rounded-xl h-11 bg-white border-none w-36 shadow-sm font-bold text-xs">
@@ -226,8 +244,8 @@ export default function QuestionBank() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                Array.from({ length: 10 }).map((_, i) => (
+              {loading && questions.length === 0 ? (
+                Array.from({ length: 8 }).map((_, i) => (
                   <TableRow key={i}><TableCell colSpan={5} className="px-8 py-6"><Skeleton className="h-12 w-full rounded-xl" /></TableCell></TableRow>
                 ))
               ) : filteredQuestions.length > 0 ? filteredQuestions.map((q: any) => {
@@ -238,7 +256,6 @@ export default function QuestionBank() {
                     <TableCell className="px-4 py-8 max-w-xl text-left">
                       <div className="flex items-center gap-3 mb-2">
                         <Badge className="bg-[#0F172A] text-white border-none text-[8px] font-black uppercase px-2 py-0.5">{q.displayId || 'Q-NODE'}</Badge>
-                        <Badge variant="outline" className="text-[7px] font-bold uppercase">{q.questionType}</Badge>
                         <code className="text-[7px] text-slate-400 font-mono">ID: {q.id}</code>
                       </div>
                       <p className="font-bold text-[#000000] text-base leading-snug line-clamp-2">{q.questionEn}</p>
@@ -279,11 +296,22 @@ export default function QuestionBank() {
         </CardContent>
       </Card>
       
-      <div className="flex justify-center items-center gap-4 mt-8">
-         <Button variant="outline" size="sm" onClick={() => setPageLimit(prev => Math.max(50, prev - 50))} disabled={pageLimit <= 50} className="rounded-xl font-black text-[9px] uppercase"><ChevronLeft className="h-4 w-4" /> Prev Nodes</Button>
-         <span className="text-[10px] font-black text-slate-400 uppercase">Audit Limit: {pageLimit}</span>
-         <Button variant="outline" size="sm" onClick={() => setPageLimit(prev => prev + 50)} className="rounded-xl font-black text-[9px] uppercase">Next Nodes <ChevronRight className="h-4 w-4" /></Button>
-      </div>
+      {hasMore && (
+        <div className="flex justify-center mt-8">
+          <Button 
+            onClick={() => fetchQuestions(true)} 
+            disabled={loading}
+            className="rounded-xl h-12 px-12 bg-white border border-slate-200 text-[#0F172A] font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 shadow-sm gap-3"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4" />}
+            Load More Assets
+          </Button>
+        </div>
+      )}
     </div>
   )
+}
+
+function ChevronDown(props: any) {
+  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
 }
