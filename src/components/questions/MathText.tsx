@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -11,8 +12,8 @@ interface MathTextProps {
 }
 
 /**
- * @fileOverview Precision Math Renderer v3.5.
- * Hardened to prevent plain text labels from inheriting serif font styles.
+ * @fileOverview Precision Math Renderer v4.0.
+ * Hardened to handle root symbols and complex multi-line derivations beautifully.
  */
 export default function MathText({ text, className }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,9 +26,10 @@ export default function MathText({ text, className }: MathTextProps) {
         const renderedLines = lines.map(line => {
           if (!line.trim()) return '<div class="h-4"></div>';
 
-          // Standardize math symbols
-          const processedLine = line
-            .replace(/√/g, '\\sqrt')
+          // 1. Standardize and Wrap Math Symbols for LaTeX
+          let processedLine = line
+            .replace(/√\[?([^\]]+)\]?/g, '\\sqrt{$1}') // Handles √[data] or √data
+            .replace(/√(\d+)/g, '\\sqrt{$1}')          // Handles √7056
             .replace(/×/g, '\\times')
             .replace(/÷/g, '\\div')
             .replace(/\^2|²/g, '^2')
@@ -35,17 +37,20 @@ export default function MathText({ text, className }: MathTextProps) {
             .replace(/≤/g, '\\leq')
             .replace(/≥/g, '\\geq');
 
-          // Narrow check: Only use KaTeX if specific math symbols are found, 
-          // avoiding triggers on simple colons or slashes in labels.
+          // 2. Identify if line is purely mathematical or contains specific triggers
           const hasSignificantMath = /[\\√×÷²³≤≥^]/.test(processedLine) || 
                                      (/[=]/.test(processedLine) && /\d/.test(processedLine));
 
           if (hasSignificantMath) {
             try {
-              return `<div class="py-1">${katex.renderToString(processedLine, {
+              // Wrap in display mode if it starts with a key variable like s= or Area=
+              const isDerivation = /^(s|Area|Area of triangle|ਖੇਤਰਫਲ|ਅੱਧ-ਪਰਿਮਾਪ)\s*=/i.test(line);
+              
+              return `<div class="${isDerivation ? 'py-2 overflow-x-auto' : 'py-1'}">${katex.renderToString(processedLine, {
                 throwOnError: false,
                 displayMode: false,
-                trust: true
+                trust: true,
+                strict: false
               })}</div>`;
             } catch (e) {
               return `<div>${line}</div>`;

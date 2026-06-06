@@ -1,8 +1,8 @@
 
 /**
- * @fileOverview Institutional Compact Parser v12.0.
- * Optimized for "Line 1 EN / Line 2 PA" and "Inline Options (A)/(B)/(C)/(D)" format.
- * Strictly non-AI. Deterministic mapping to High-Fidelity registry.
+ * @fileOverview Institutional Compact Parser v14.0.
+ * Optimized for "Question EN \n Question PA \n Inline Options (A)/(B)/(C)/(D)" format.
+ * Features: High-fidelity explanation extraction and formula preservation.
  */
 
 import { Question } from "@/types";
@@ -32,9 +32,6 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
   const errors: string[] = [];
 
   blocks.forEach((block, index) => {
-    const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    if (lines.length < 3) return;
-
     try {
       const q: any = { 
         ...metadata,
@@ -52,17 +49,18 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
         explanationPa: ""
       };
 
+      const rawLines = block.split('\n').map(l => l.trim());
+      
       // 1. Extract Question Text
-      // English is the first line after Q#
-      q.questionEn = lines[0].replace(/^Q\d+[\.\s]*/i, '').trim();
+      q.questionEn = rawLines[0].replace(/^Q\d+[\.\s]*/i, '').trim();
 
-      // Punjabi is usually the second line
-      if (lines[1] && !lines[1].includes('(A)')) {
-        q.questionPa = lines[1].replace(/^(ਪ੍ਰਸ਼ਨ|ਪ੍ਰਸ਼ਨ)\s*\d+[\.\s]*/, '').trim();
+      // Punjabi statement is usually the next line if it doesn't contain (A)
+      if (rawLines[1] && !rawLines[1].includes('(A)')) {
+        q.questionPa = rawLines[1].replace(/^(ਪ੍ਰਸ਼ਨ|ਪ੍ਰਸ਼ਨ)\s*\d+[\.\s]*/, '').trim();
       }
 
-      // 2. Extract Options (Handles both Multi-line and Inline compact format)
-      const fullBlockText = lines.join(' ');
+      // 2. Extract Options (Deterministic Inline Split)
+      const fullBlockText = block.replace(/\n/g, ' ');
       
       const extractOption = (key: string, nextKey: string | null) => {
         const startMarker = `(${key})`;
@@ -70,6 +68,7 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
         if (startIndex === -1) return "";
         
         let endIndex = nextKey ? fullBlockText.indexOf(`(${nextKey})`, startIndex) : fullBlockText.indexOf('Correct Answer', startIndex);
+        if (endIndex === -1) endIndex = fullBlockText.indexOf('• English Explanation', startIndex);
         if (endIndex === -1) endIndex = fullBlockText.length;
         
         return fullBlockText.substring(startIndex + startMarker.length, endIndex).replace(/[\/]/g, '').trim();
@@ -81,32 +80,30 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
       q.optionDEn = extractOption('D', null);
 
       // 3. Extract Correct Answer
-      const ansLine = lines.find(l => l.toLowerCase().includes('correct answer') || l.toLowerCase().includes('ਸਹੀ ਉੱਤਰ'));
+      const ansLine = rawLines.find(l => l.toLowerCase().includes('correct answer') || l.toLowerCase().includes('ਸਹੀ ਉੱਤਰ'));
       if (ansLine) {
         const match = ansLine.match(/(?:correct answer|ans)[:\s]*\(?([A-D])\)?/i);
         if (match) q.correctAnswer = match[1].toUpperCase();
         q.correctAnswerRaw = ansLine.trim();
       }
 
-      // 4. Extract Explanations (Vertical Flow Preservation)
-      const rawLines = block.split('\n').map(l => l.trim());
-      
-      const expEnStart = rawLines.findIndex(l => l.includes('• English Explanation:'));
-      const expPaStart = rawLines.findIndex(l => l.includes('• ਪੰਜਾਬੀ ਵਿਆਖਿਆ:'));
+      // 4. Extract Explanations (Vertical Block Preservation)
+      const expEnStart = rawLines.findIndex(l => l.includes('English Explanation:'));
+      const expPaStart = rawLines.findIndex(l => l.includes('ਪੰਜਾਬੀ ਵਿਆਖਿਆ:'));
 
       if (expEnStart !== -1) {
         const end = expPaStart !== -1 ? expPaStart : rawLines.length;
-        q.explanationEn = rawLines.slice(expEnStart).join('\n').replace('• English Explanation:', '').trim();
+        q.explanationEn = rawLines.slice(expEnStart + 1, end).join('\n').trim();
       }
 
       if (expPaStart !== -1) {
-        q.explanationPa = rawLines.slice(expPaStart).join('\n').replace('• ਪੰਜਾਬੀ ਵਿਆਖਿਆ:', '').trim();
+        q.explanationPa = rawLines.slice(expPaStart + 1).join('\n').trim();
       }
 
       if (q.questionEn && q.correctAnswer) {
         questions.push(q);
       } else {
-        errors.push(`Block ${index + 1}: Missing Question or Answer.`);
+        errors.push(`Block ${index + 1}: Check English Statement and Correct Answer Node.`);
       }
     } catch (err: any) {
       errors.push(`Block ${index + 1}: ${err.message}`);

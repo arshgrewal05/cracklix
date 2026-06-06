@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -13,9 +14,9 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Institutional Solution Page Renderer v3.0 (Testbook / PSSSB Style).
- * - Exact Font Sync: Question, Answer, and Explanation now share the same readable size.
- * - Vertical Gap Enforcement: Precision spacing between language blocks.
+ * @fileOverview Institutional Solution Page Renderer v4.5 (Testbook / PSSSB Style).
+ * - Exact Font Sync: Question, Answer, and Explanation now share the same 22px bold scale.
+ * - Vertical Spacing: Hardcoded blank lines between every segment.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -50,7 +51,7 @@ export default function QuestionRenderer({
             if (!content) return null;
 
             return (
-              <div key={key} className="text-[17px] md:text-[20px] font-bold text-slate-700 flex gap-2">
+              <div key={key} className="text-[17px] md:text-[21px] font-bold text-slate-700 flex gap-2">
                 <span className="shrink-0">({key})</span>
                 <MathText text={content} className="inline" />
               </div>
@@ -73,26 +74,26 @@ export default function QuestionRenderer({
          )}
       </div>
 
-      {/* 5. Solution Hub - SYNCED FONT SIZE */}
+      {/* 5. Solution Hub - SYNCED FONT SIZE & STRUCTURE */}
       {showSolution && (
         <div className="bg-[#121212] rounded-2xl md:rounded-[3rem] p-8 md:p-12 text-white shadow-4xl relative overflow-hidden border border-white/5 mt-10">
            <div className="space-y-0 relative z-10">
               
               {/* English Explanation */}
-              {question.explanationEn && (
+              {(question.explanationEn || question.explanation) && (
                 <div className="space-y-6">
                    <div className="flex items-center gap-3">
                       <span className="text-[15px] md:text-[17px] font-black uppercase tracking-[0.2em] text-primary bg-primary/10 px-3 py-1 rounded">
                         • English Explanation:
                       </span>
                    </div>
-                   <div className="text-[17px] md:text-[21px] text-slate-100 font-medium leading-relaxed antialiased">
-                      <MathText text={question.explanationEn} />
+                   <div className="text-[18px] md:text-[22px] text-slate-100 font-medium leading-relaxed antialiased">
+                      <MathText text={question.explanationEn || (question as any).explanation} />
                    </div>
                 </div>
               )}
 
-              {question.explanationEn && question.explanationPa && <div className="h-16" />}
+              {(question.explanationEn || (question as any).explanation) && question.explanationPa && <div className="h-16" />}
 
               {/* Punjabi Explanation */}
               {question.explanationPa && (
@@ -102,7 +103,7 @@ export default function QuestionRenderer({
                         • ਪੰਜਾਬੀ ਵਿਆਖਿਆ:
                       </span>
                    </div>
-                   <div className="text-[17px] md:text-[21px] text-slate-100 font-medium leading-relaxed antialiased">
+                   <div className="text-[18px] md:text-[22px] text-slate-100 font-medium leading-relaxed antialiased">
                       <MathText text={question.explanationPa} />
                    </div>
                 </div>

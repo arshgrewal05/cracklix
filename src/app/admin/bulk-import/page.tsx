@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo } from "react"
@@ -31,7 +32,7 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 /**
- * @fileOverview Exam Content Ingestion Hub v11.0.
+ * @fileOverview Exam Content Ingestion Hub v12.0.
  * Focus: High-fidelity reading layout with Edit/Delete capabilities for staged questions.
  */
 export default function BulkImportPage() {
