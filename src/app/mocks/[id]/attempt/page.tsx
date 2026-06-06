@@ -3,8 +3,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useFirestore, useUser, useDoc } from "@/firebase";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, getDocs, query, where } from "firebase/firestore";
+import { useFirestore, useUser } from "@/firebase";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { useExamStore } from "@/store/useExamStore";
 import ExamHeader from "@/components/exam/ExamHeader";
 import TacticalFooter from "@/components/exam/TacticalFooter";
@@ -12,7 +12,7 @@ import AntiCheat from "@/components/exam/AntiCheat";
 import QuestionRenderer from "@/components/questions/QuestionRenderer";
 import QuestionPalette from "@/components/mocks/QuestionPalette";
 import { Button } from "@/components/ui/button";
-import { Loader2, Play, ShieldCheck, CheckCircle2, Bookmark, AlertTriangle, Flag } from "lucide-react";
+import { Loader2, Play, ShieldCheck, CheckCircle2, History, Zap, Trophy, TrendingUp, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -24,6 +24,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+/**
+ * @fileOverview Final Production-Grade CBT Evaluation Hub.
+ * Strictly implements Auto-Save, Resume, and High-Density professional layout.
+ */
 export default function MockAttemptPage() {
   const params = useParams();
   const router = useRouter();
@@ -44,7 +48,7 @@ export default function MockAttemptPage() {
       if (!db || !user || !mockId) return;
       try {
         const mockSnap = await getDoc(doc(db, "mocks", mockId));
-        if (!mockSnap.exists()) throw new Error("Mock test not found.");
+        if (!mockSnap.exists()) throw new Error("Mock series not found in registry.");
         const mockData = mockSnap.data();
 
         const qSnaps = await Promise.all(
@@ -52,10 +56,14 @@ export default function MockAttemptPage() {
         );
         const questions = qSnaps.map(s => ({ ...s.data(), id: s.id })).filter(Boolean) as any[];
 
+        // RESUME LOGIC HUB
         const attemptSnap = await getDoc(doc(db, "attempts", `${user.uid}_${mockId}`));
         const savedState = attemptSnap.exists() ? attemptSnap.data() : undefined;
 
         if (!attemptSnap.exists()) {
+           const startTime = Date.now();
+           const endTime = startTime + (mockData.duration * 60 * 1000);
+           
            await setDoc(doc(db, 'attempts', `${user.uid}_${mockId}`), {
               userId: user.uid,
               mockId,
@@ -66,14 +74,15 @@ export default function MockAttemptPage() {
               status: {},
               visited: [0],
               currentIdx: 0,
-              timeLeft: mockData.duration * 60,
-              endTime: Date.now() + (mockData.duration * 60 * 1000)
+              startTime,
+              endTime,
+              violations: 0
            });
         }
 
         examStore.initExam(mockId, mockData.title, user.uid, questions, mockData.duration, savedState);
       } catch (err: any) {
-        toast({ variant: "destructive", title: "Sync Error", description: err.message });
+        toast({ variant: "destructive", title: "CBT Sync Failure", description: err.message });
         router.push(`/mocks/${mockId}`);
       } finally {
         setIsInitializing(false);
@@ -82,13 +91,18 @@ export default function MockAttemptPage() {
     loadExam();
   }, [db, user, mockId]);
 
+  // Global Timer Tick
   useEffect(() => {
     if (isInitializing) return;
     const interval = setInterval(() => {
       examStore.tick();
+      // Auto-submit if time expires
+      if (examStore.timeLeft <= 0 && !isSubmittingFinal) {
+         handleSubmitFinal();
+      }
     }, 1000);
     return () => clearInterval(interval);
-  }, [isInitializing]);
+  }, [isInitializing, examStore.timeLeft]);
 
   const stats = useMemo(() => {
     const s = { answered: 0, marked: 0, notAnswered: 0, notVisited: 0, ansMarked: 0 };
@@ -112,7 +126,8 @@ export default function MockAttemptPage() {
       examStore.questions.forEach((q, idx) => {
         const studentAnsIdx = examStore.answers[idx];
         const correctAnsIdx = ['A', 'B', 'C', 'D'].indexOf(q.correctAnswer);
-        if (studentAnsIdx === correctAnsIdx) score++;
+        if (studentAnsIdx === correctAnsIdx) score += (q.positiveMarks || 1);
+        else if (studentAnsIdx !== undefined) score -= (q.negativeMarks || 0.25);
       });
 
       const accuracy = Math.round((score / (Object.keys(examStore.answers).length || 1)) * 100);
@@ -132,10 +147,10 @@ export default function MockAttemptPage() {
       await setDoc(doc(db, "results", `${user.uid}_${mockId}`), resultPayload);
       await updateDoc(doc(db, "attempts", `${user.uid}_${mockId}`), { status: 'COMPLETED', updatedAt: serverTimestamp() });
       
-      toast({ title: "Evaluation Complete" });
+      toast({ title: "Audit Synchronized" });
       router.push(`/results/${mockId}`);
     } catch (e) {
-      toast({ variant: "destructive", title: "Cloud Sync Failed" });
+      toast({ variant: "destructive", title: "Cloud Registry Sync Error" });
     } finally {
       setIsSubmittingFinal(false);
       setShowSubmitModal(false);
@@ -144,21 +159,35 @@ export default function MockAttemptPage() {
 
   if (isInitializing) return (
     <div className="h-screen flex flex-col items-center justify-center bg-white space-y-6">
-       <Loader2 className="h-10 w-10 text-primary animate-spin" />
-       <p className="font-black uppercase text-[10px] tracking-[0.4em] text-slate-400">Syncing Registry Node...</p>
+       <Loader2 className="h-10 w-10 text-[#F97316] animate-spin" />
+       <div className="text-center">
+          <p className="font-black uppercase text-[10px] tracking-[0.4em] text-[#F97316]">Institutional Node</p>
+          <p className="text-sm font-bold text-slate-400 mt-2">Syncing Evaluation Engine...</p>
+       </div>
     </div>
   );
 
   const q = examStore.questions[examStore.currentIdx];
-  const selectedOption = examStore.answers[examStore.currentIdx];
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-50 font-body select-none">
       <AntiCheat />
       <ExamHeader onPaletteToggle={() => setIsPaletteOpen(true)} />
       
-      {/* SECTION NAVIGATION */}
-      <div className="h-12 bg-white border-b border-slate-200 flex items-center px-6 overflow-x-auto no-scrollbar gap-2 shrink-0">
+      {/* MULTI-SECTION NAVIGATION (Testbook Standard) */}
+      <div className="h-14 bg-white border-b border-slate-200 flex items-center px-6 overflow-x-auto no-scrollbar gap-2 shrink-0 shadow-sm z-40">
+         {['PART A', 'PART B'].map(part => (
+           <button
+             key={part}
+             className={cn(
+               "px-8 h-full flex items-center justify-center text-[11px] font-black uppercase tracking-widest border-b-[3px] transition-all whitespace-nowrap",
+               part === 'PART B' ? "border-[#F97316] text-[#F97316] bg-orange-50/50" : "border-transparent text-slate-400 hover:text-slate-600"
+             )}
+           >
+             {part}
+           </button>
+         ))}
+         <div className="h-6 w-px bg-slate-200 mx-4" />
          {Array.from(new Set(examStore.questions.map(q => q.sectionId))).map(sid => (
            <button
              key={sid}
@@ -167,8 +196,8 @@ export default function MockAttemptPage() {
                 examStore.setCurrentIdx(firstIdx);
              }}
              className={cn(
-               "px-6 h-full flex items-center justify-center text-[11px] font-black uppercase tracking-widest border-b-2 transition-all whitespace-nowrap",
-               examStore.currentSectionId === sid ? "border-primary text-primary bg-primary/5" : "border-transparent text-slate-400 hover:text-slate-600"
+               "px-6 h-full flex items-center justify-center text-[10px] font-bold uppercase tracking-wider border-b-2 transition-all whitespace-nowrap",
+               examStore.currentSectionId === sid ? "border-slate-800 text-slate-900 bg-slate-50" : "border-transparent text-slate-400 hover:text-slate-600"
              )}
            >
              {sid.replace(/-/g, ' ')}
@@ -177,105 +206,47 @@ export default function MockAttemptPage() {
       </div>
 
       <main className="flex-1 flex overflow-hidden relative">
+        {/* RESUME INTERFACE (Institutional Summary) */}
         {examStore.isPaused && (
            <div className="absolute inset-0 z-[100] bg-[#0B1528]/95 backdrop-blur-xl flex items-center justify-center animate-in fade-in duration-300 p-6">
-              <div className="max-w-md w-full bg-white rounded-[3rem] shadow-5xl overflow-hidden text-center">
-                 <div className="bg-slate-50 p-10 border-b flex flex-col items-center space-y-4">
-                    <div className="h-20 w-20 bg-primary/10 rounded-[2rem] flex items-center justify-center text-primary shadow-2xl">
+              <div className="max-w-xl w-full bg-white rounded-[3rem] shadow-5xl overflow-hidden">
+                 <div className="bg-slate-50 p-12 border-b border-slate-100 text-center space-y-6">
+                    <div className="h-20 w-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto text-[#F97316] shadow-2xl">
                        <Play className="h-10 w-10 fill-current" />
                     </div>
-                    <h2 className="text-3xl font-headline font-black text-[#0F172A] uppercase">TEST PAUSED</h2>
-                 </div>
-                 <div className="p-10 space-y-8">
-                    <div className="grid grid-cols-2 gap-4">
-                       <StatBox label="Answered" val={stats.answered} color="bg-emerald-500" />
-                       <StatBox label="Marked" val={stats.marked} color="bg-purple-600" />
-                       <StatBox label="Time Left" val={`${Math.floor(examStore.timeLeft / 60)}m`} color="bg-[#0F172A]" />
-                       <StatBox label="Total Qs" val={examStore.questions.length} color="bg-slate-200" textColor="text-slate-600" />
+                    <div>
+                       <h2 className="text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">TEST PAUSED</h2>
+                       <p className="text-slate-500 font-medium uppercase text-[10px] tracking-widest mt-2">Institutional Progress Audit</p>
                     </div>
-                    <Button onClick={() => examStore.setPaused(false)} className="w-full h-16 bg-primary hover:bg-orange-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-3xl gap-3">
-                       <Play className="h-5 w-5 fill-current" /> RESUME EVALUATION
-                    </Button>
+                 </div>
+                 <div className="p-12 space-y-12">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                       <ResumeStat label="Answered" val={stats.answered} color="bg-blue-600" />
+                       <ResumeStat label="Not Answered" val={stats.notAnswered} color="bg-slate-400" />
+                       <ResumeStat label="Marked" val={stats.marked} color="bg-pink-500" />
+                       <ResumeStat label="Remaining" val={stats.notVisited} color="bg-slate-100" textColor="text-slate-400" />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                       <Button onClick={() => examStore.setPaused(false)} className="w-full h-20 bg-[#F97316] hover:bg-orange-600 text-white rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] shadow-3xl gap-4">
+                          <Play className="h-6 w-6 fill-current" /> RESUME EVALUATION
+                       </Button>
+                       <Button variant="ghost" onClick={() => setShowSubmitModal(true)} className="w-full text-slate-400 font-bold uppercase text-[10px] tracking-widest">Submit Final Assessment</Button>
+                    </div>
                  </div>
               </div>
            </div>
         )}
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
-           <div className="max-w-[900px] mx-auto space-y-10">
-              
-              {/* Q-META */}
-              <div className="flex items-center justify-between border-b border-slate-100 pb-6">
-                 <div className="flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-2xl bg-[#0F172A] text-white flex items-center justify-center text-xl font-black shadow-lg">
-                       {examStore.currentIdx + 1}
-                    </div>
-                    <div className="flex gap-2">
-                       <Badge className="bg-emerald-50 text-emerald-600 border-none px-3 font-black uppercase text-[9px]">+1.0 Marks</Badge>
-                       <Badge className="bg-rose-50 text-rose-600 border-none px-3 font-black uppercase text-[9px]">-0.25 Negative</Badge>
-                    </div>
-                 </div>
-                 <div className="flex gap-4">
-                    <button 
-                      onClick={() => examStore.toggleBookmark(examStore.currentIdx, db!)}
-                      className={cn("h-12 w-12 rounded-xl flex items-center justify-center transition-all", examStore.bookmarks.includes(examStore.currentIdx) ? "bg-primary text-white shadow-xl" : "bg-white text-slate-300 hover:text-primary")}
-                    >
-                       <Bookmark className="h-6 w-6" />
-                    </button>
-                    <button className="h-12 w-12 rounded-xl bg-white text-slate-300 hover:text-rose-500 flex items-center justify-center"><Flag className="h-6 w-6" /></button>
-                 </div>
-              </div>
-
-              {/* QUESTION TEXT */}
-              <div className="space-y-6">
-                 {(examStore.language === 'en' || examStore.language === 'bi') && (
-                    <div className="text-[22px] md:text-[28px] font-[700] text-[#111111] leading-tight">
-                       {q.englishQuestion}
-                    </div>
-                 )}
-                 {(examStore.language === 'pa' || examStore.language === 'bi') && (
-                    <div className="text-[22px] md:text-[28px] font-[700] text-[#111111] leading-tight pt-2 border-t-2 border-dashed border-slate-100">
-                       {q.punjabiQuestion}
-                    </div>
-                 )}
-              </div>
-
-              {/* OPTIONS MATRIX */}
-              <div className="grid grid-cols-1 gap-3 pt-6">
-                 {['A', 'B', 'C', 'D'].map((key, i) => {
-                    const isSelected = selectedOption === i;
-                    const enVal = (q as any)[`option${key}English`];
-                    const paVal = (q as any)[`option${key}Punjabi`];
-                    
-                    return (
-                       <button
-                         key={i}
-                         onClick={() => examStore.setAnswer(examStore.currentIdx, i, db!)}
-                         className={cn(
-                           "flex items-center gap-6 p-5 rounded-2xl border-2 transition-all text-left shadow-sm min-h-[80px] group",
-                           isSelected 
-                             ? "border-primary bg-primary/5 ring-4 ring-primary/5" 
-                             : "border-slate-100 bg-white hover:border-slate-200"
-                         )}
-                       >
-                          <div className={cn(
-                             "h-10 w-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 transition-all",
-                             isSelected ? "bg-primary text-white shadow-lg" : "bg-slate-50 text-slate-400 group-hover:bg-[#0F172A] group-hover:text-white"
-                          )}>
-                             {key}
-                          </div>
-                          <div className="flex-1 space-y-1">
-                             {(examStore.language === 'en' || examStore.language === 'bi') && <p className="font-bold text-[18px] text-[#111111] leading-snug">{enVal}</p>}
-                             {(examStore.language === 'pa' || examStore.language === 'bi') && <p className="font-bold text-[18px] text-[#111111] leading-snug">{paVal || enVal}</p>}
-                          </div>
-                       </button>
-                    )
-                 })}
-              </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
+           <div className="max-w-[900px] mx-auto">
+              <QuestionRenderer 
+                 language={examStore.language} 
+                 question={{...q, displayId: (examStore.currentIdx + 1).toString()}} 
+              />
            </div>
         </div>
 
-        <aside className="hidden lg:block w-[350px] shrink-0 border-l border-slate-200">
+        <aside className="hidden lg:block w-[350px] shrink-0">
            <QuestionPalette onSelect={(idx) => examStore.setCurrentIdx(idx)} />
         </aside>
       </main>
@@ -289,27 +260,30 @@ export default function MockAttemptPage() {
       </Sheet>
 
       <Dialog open={showSubmitModal} onOpenChange={setShowSubmitModal}>
-         <DialogContent className="max-w-md rounded-[3rem] p-10 bg-white border-none shadow-5xl">
-            <DialogHeader className="text-center space-y-4">
+         <DialogContent className="max-w-xl rounded-[3rem] p-12 bg-white border-none shadow-5xl">
+            <DialogHeader className="text-center space-y-6">
                <div className="h-20 w-20 bg-emerald-50 rounded-[2rem] flex items-center justify-center mx-auto text-emerald-600 shadow-2xl">
                   <ShieldCheck className="h-10 w-10" />
                </div>
-               <DialogTitle className="text-3xl font-headline font-black text-[#0F172A] uppercase">FINAL SUBMISSION</DialogTitle>
+               <div>
+                  <DialogTitle className="text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">COMMIT ASSESSMENT</DialogTitle>
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Audit Registry for {examStore.mockTitle}</p>
+               </div>
             </DialogHeader>
 
-            <div className="py-8 grid grid-cols-2 gap-4">
-               <SubmissionNode label="Attempted" val={stats.answered + stats.ansMarked} color="text-emerald-600" />
-               <SubmissionNode label="Marked" val={stats.marked + stats.ansMarked} color="text-purple-600" />
-               <SubmissionNode label="Total Qs" val={examStore.questions.length} color="text-[#0F172A]" />
-               <SubmissionNode label="Remaining" val={`${Math.floor(examStore.timeLeft / 60)}m`} color="text-primary" />
+            <div className="py-10 grid grid-cols-2 gap-4">
+               <SubmissionNode label="Attempted Nodes" val={stats.answered + stats.ansMarked} color="text-blue-600" icon={<CheckCircle2 className="h-4 w-4" />} />
+               <SubmissionNode label="Logic Review" val={stats.marked + stats.ansMarked} color="text-pink-500" icon={<Zap className="h-4 w-4" />} />
+               <SubmissionNode label="Total Atomic Qs" val={examStore.questions.length} color="text-[#0F172A]" icon={<Trophy className="h-4 w-4" />} />
+               <SubmissionNode label="Registry Time" val={`${Math.floor(examStore.timeLeft / 60)}m`} color="text-[#F97316]" icon={<History className="h-4 w-4" />} />
             </div>
 
-            <DialogFooter className="flex flex-col gap-3">
-               <Button onClick={handleSubmitFinal} disabled={isSubmittingFinal} className="w-full h-16 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl shadow-xl">
-                  {isSubmittingFinal ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <CheckCircle2 className="h-5 w-5 mr-2" />}
-                  COMMIT ASSESSMENT
+            <DialogFooter className="flex flex-col gap-4">
+               <Button onClick={handleSubmitFinal} disabled={isSubmittingFinal} className="w-full h-20 bg-[#F97316] hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[11px] rounded-[1.5rem] shadow-3xl">
+                  {isSubmittingFinal ? <Loader2 className="h-5 w-5 animate-spin mr-3" /> : <ShieldCheck className="h-6 w-6 mr-3" />}
+                  FINALIZE & SYNC REGISTRY
                </Button>
-               <Button variant="ghost" onClick={() => setShowSubmitModal(false)} className="w-full text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">CANCEL & REVIEW</Button>
+               <Button variant="ghost" onClick={() => setShowSubmitModal(false)} className="w-full text-slate-400 font-black uppercase text-[10px] tracking-widest">RE-AUDIT QUESTIONS</Button>
             </DialogFooter>
          </DialogContent>
       </Dialog>
@@ -317,22 +291,27 @@ export default function MockAttemptPage() {
   );
 }
 
-function StatBox({ label, val, color, textColor = "text-white" }: any) {
+function ResumeStat({ label, val, color, textColor = "text-white" }: any) {
    return (
-      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center">
-         <span className="text-[10px] font-black uppercase text-slate-400 mb-2">{label}</span>
-         <div className={cn("h-10 w-12 rounded-xl flex items-center justify-center text-lg font-black shadow-lg", color, textColor)}>
+      <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center">
+         <span className="text-[9px] font-black uppercase text-slate-400 mb-2 tracking-tighter">{label}</span>
+         <div className={cn("h-10 w-14 rounded-xl flex items-center justify-center text-lg font-black shadow-lg", color, textColor)}>
             {val}
          </div>
       </div>
    )
 }
 
-function SubmissionNode({ label, val, color }: any) {
+function SubmissionNode({ label, val, color, icon }: any) {
    return (
-      <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
-         <p className="text-[9px] font-black uppercase text-slate-400 mb-2">{label}</p>
-         <p className={cn("text-2xl font-headline font-black", color)}>{val}</p>
+      <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 text-left space-y-4">
+         <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center bg-white shadow-sm", color)}>
+            {icon}
+         </div>
+         <div className="space-y-0.5">
+            <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{label}</p>
+            <p className={cn("text-3xl font-headline font-black", color)}>{val}</p>
+         </div>
       </div>
    )
 }

@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { AttemptState, ExamLanguage, QuestionStatus, Question } from '@/types';
-import { Firestore, doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { Firestore, doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 interface ExamStore extends AttemptState {
   questions: Question[];
@@ -17,13 +17,13 @@ interface ExamStore extends AttemptState {
   setLanguage: (lang: ExamLanguage) => void;
   setPaused: (paused: boolean) => void;
   setCurrentIdx: (idx: number) => void;
-  setAnswer: (idx: number, optionIdx: number | null, db?: Firestore) => Promise<void>;
-  clearAnswer: (idx: number, db?: Firestore) => Promise<void>;
-  markForReview: (idx: number, db?: Firestore) => Promise<void>;
-  saveAndNext: (db?: Firestore) => void;
+  setAnswer: (idx: number, optionIdx: number | null, db: Firestore) => Promise<void>;
+  clearAnswer: (idx: number, db: Firestore) => Promise<void>;
+  markForReview: (idx: number, db: Firestore) => Promise<void>;
+  saveAndNext: (db: Firestore) => void;
   tick: () => void;
-  addViolation: (db?: Firestore) => void;
-  toggleBookmark: (idx: number, db?: Firestore) => void;
+  addViolation: (db: Firestore) => void;
+  toggleBookmark: (idx: number, db: Firestore) => void;
 }
 
 export const useExamStore = create<ExamStore>((set, get) => ({
@@ -71,9 +71,10 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
   setCurrentIdx: (idx) => {
     const { visited, questions } = get();
+    const newVisited = Array.from(new Set([...visited, idx]));
     set({ 
       currentIdx: idx, 
-      visited: Array.from(new Set([...visited, idx])),
+      visited: newVisited,
       currentSectionId: questions[idx]?.sectionId || ''
     });
   },
@@ -93,14 +94,13 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
     set({ answers: newAnswers, status: newStatus });
 
-    if (db && userId && mockId) {
-      const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
-      await updateDoc(attemptRef, {
-        [`answers.${idx}`]: optionIdx,
-        [`status.${idx}`]: newStatus[idx],
-        updatedAt: serverTimestamp()
-      });
-    }
+    // Auto-Save Every Click logic
+    const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
+    updateDoc(attemptRef, {
+      [`answers.${idx}`]: optionIdx,
+      [`status.${idx}`]: newStatus[idx],
+      updatedAt: serverTimestamp()
+    }).catch(() => {});
   },
 
   clearAnswer: async (idx, db) => {
@@ -111,14 +111,12 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     newStatus[idx] = 'not-answered';
     set({ answers: newAnswers, status: newStatus });
 
-    if (db && userId && mockId) {
-      const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
-      await updateDoc(attemptRef, {
-        [`answers.${idx}`]: null,
-        [`status.${idx}`]: 'not-answered',
-        updatedAt: serverTimestamp()
-      });
-    }
+    const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
+    updateDoc(attemptRef, {
+      [`answers.${idx}`]: null,
+      [`status.${idx}`]: 'not-answered',
+      updatedAt: serverTimestamp()
+    }).catch(() => {});
   },
 
   markForReview: async (idx, db) => {
@@ -128,30 +126,32 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     newStatus[idx] = hasAnswer ? 'answered-marked' : 'marked';
     set({ status: newStatus });
 
-    if (db && userId && mockId) {
-      const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
-      await updateDoc(attemptRef, {
-        [`status.${idx}`]: newStatus[idx],
-        updatedAt: serverTimestamp()
-      });
-    }
+    const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
+    updateDoc(attemptRef, {
+      [`status.${idx}`]: newStatus[idx],
+      updatedAt: serverTimestamp()
+    }).catch(() => {});
+    
     get().saveAndNext(db);
   },
 
   saveAndNext: (db) => {
-    const { currentIdx, questions, userId, mockId } = get();
+    const { currentIdx, questions, userId, mockId, visited } = get();
     if (currentIdx < questions.length - 1) {
       const nextIdx = currentIdx + 1;
-      get().setCurrentIdx(nextIdx);
+      const newVisited = Array.from(new Set([...visited, nextIdx]));
+      set({ 
+        currentIdx: nextIdx, 
+        visited: newVisited,
+        currentSectionId: questions[nextIdx]?.sectionId || ''
+      });
       
-      if (db && userId && mockId) {
-        const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
-        updateDoc(attemptRef, {
-          currentIdx: nextIdx,
-          visited: get().visited,
-          updatedAt: serverTimestamp()
-        });
-      }
+      const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
+      updateDoc(attemptRef, {
+        currentIdx: nextIdx,
+        visited: newVisited,
+        updatedAt: serverTimestamp()
+      }).catch(() => {});
     }
   },
 
@@ -168,8 +168,8 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     const { violations, userId, mockId } = get();
     const newVal = (violations || 0) + 1;
     set({ violations: newVal });
-    if (db && userId && mockId) {
-      await updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), { violations: newVal });
+    if (userId && mockId) {
+      updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), { violations: newVal }).catch(() => {});
     }
   },
 
@@ -177,8 +177,8 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     const { bookmarks, userId, mockId } = get();
     const next = bookmarks.includes(idx) ? bookmarks.filter(i => i !== idx) : [...bookmarks, idx];
     set({ bookmarks: next });
-    if (db && userId && mockId) {
-      await updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), { bookmarks: next });
+    if (userId && mockId) {
+      updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), { bookmarks: next }).catch(() => {});
     }
   }
 }));
