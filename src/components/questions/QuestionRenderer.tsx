@@ -5,7 +5,7 @@ import React from 'react';
 import { Question } from '@/types';
 import { cn } from '@/lib/utils';
 import MathText from './MathText';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
 
 interface QuestionRendererProps {
   question: Partial<Question> & { displayId?: string };
@@ -15,8 +15,8 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Institutional CBT Renderer v40.0.
- * Redesign: Responsive font sizes, zero-bleed logic, high-fidelity spacing.
+ * @fileOverview Institutional CBT Language Isolation Engine v45.0.
+ * Redesign: Standardized font weights, language-specific labels, zero cross-bleed.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -30,44 +30,47 @@ export default function QuestionRenderer({
   const isBi = language === 'bilingual';
 
   return (
-    <div className="w-full text-left font-body text-black bg-transparent">
-      {/* 1. Question Statement - Responsive Font */}
-      <div className="space-y-4">
+    <div className="w-full text-left font-body text-[#0F172A] bg-transparent">
+      
+      {/* 1. LANGUAGE-LOCKED STATEMENT */}
+      <div className="space-y-6">
+         {/* EN Mode or BI Mode (English Part) */}
          {(isEn || isBi) && (
-            <div className="text-[17px] sm:text-[19px] md:text-[23px] font-black leading-[1.6] antialiased text-[#000000] tracking-wide">
+            <div className="text-[19px] md:text-[22px] font-black leading-[1.6] antialiased text-[#0F172A] tracking-tight">
                <MathText text={question.englishQuestion || ""} />
             </div>
          )}
+         
+         {/* PA Mode or BI Mode (Punjabi Part) */}
          {(isPa || isBi) && (
             <div className={cn(
-               "text-[17px] sm:text-[19px] md:text-[23px] font-black leading-[1.6] antialiased text-[#000000] tracking-wide",
-               isBi && "pt-4 border-t border-slate-100 mt-4"
+               "text-[19px] md:text-[22px] font-black leading-[1.6] antialiased text-[#0F172A] tracking-tight",
+               isBi && "pt-6 border-t border-slate-100 mt-6"
             )}>
                <MathText text={question.punjabiQuestion || ""} />
             </div>
          )}
       </div>
 
-      <div className="h-6 md:h-8" />
+      <div className="h-8 md:h-12" />
 
-      {/* 2. Options Hub - Rendered outside for 'hideOptions' support in Attempt Page */}
+      {/* 2. DISCRETE OPTION HUB */}
       {!hideOptions && (
-        <div className="flex flex-col space-y-3">
+        <div className="flex flex-col space-y-4">
           {['A', 'B', 'C', 'D'].map(key => {
             const en = (question as any)[`option${key}English`];
             const pa = (question as any)[`option${key}Punjabi`];
 
             return (
-              <div key={key} className="text-[15px] sm:text-[17px] md:text-[20px] font-black text-[#000000] flex gap-3 md:gap-4 leading-normal items-start group tracking-wide p-2 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
-                <span className="shrink-0 font-black px-2 py-0.5 bg-slate-100 rounded border border-slate-200 group-hover:bg-[#0B1528] group-hover:text-white group-hover:border-[#0B1528] transition-all">({key})</span>
+              <div key={key} className="text-[16px] md:text-[19px] font-black flex gap-4 leading-normal items-start group p-4 rounded-2xl border-2 border-slate-50 hover:border-primary/20 hover:bg-slate-50 transition-all">
+                <span className="shrink-0 font-black px-3 py-1 bg-[#0F172A] text-white rounded-lg text-xs md:text-sm">({key})</span>
                 <div className="flex-1 pt-0.5">
                    {isEn && <MathText text={en || ""} />}
                    {isPa && <MathText text={pa || ""} />}
                    {isBi && (
-                      <div className="flex flex-wrap items-baseline gap-2">
-                         <MathText text={en || ""} className="inline" />
-                         <span className="text-primary/30 mx-1">/</span>
-                         <MathText text={pa || ""} className="inline" />
+                      <div className="space-y-1">
+                         <MathText text={en || ""} className="block" />
+                         <MathText text={pa || ""} className="block text-slate-400 font-bold" />
                       </div>
                    )}
                 </div>
@@ -77,50 +80,58 @@ export default function QuestionRenderer({
         </div>
       )}
 
-      {/* 3. Solution Hub - Only shown post-submission */}
+      {/* 3. SUBMIT-GATED SOLUTION HUB */}
       {showSolution && (
-        <div className="mt-8 md:mt-12 space-y-6 md:space-y-10">
-           <div className="bg-emerald-50/50 border-2 border-emerald-100 p-6 md:p-8 rounded-2xl md:rounded-3xl text-left">
-              <div className="space-y-4">
-                 {(isEn || isBi) && (
+        <div className="mt-12 md:mt-20 space-y-10 animate-in fade-in slide-in-from-top-4 duration-700">
+           
+           {/* Unified Answer Key */}
+           <div className="bg-emerald-50 border-2 border-emerald-100 p-8 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+              <div className="flex items-center gap-5">
+                 <div className="h-14 w-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                    <CheckCircle2 className="h-8 w-8" />
+                 </div>
+                 <div className="text-left">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1">Institutional Audit Key</p>
+                    <h4 className="text-2xl md:text-3xl font-headline font-black text-emerald-900 uppercase">Option {question.correctAnswer}</h4>
+                 </div>
+              </div>
+              <div className="text-left md:text-right border-t md:border-t-0 md:border-l border-emerald-200 pt-6 md:pt-0 md:pl-10">
+                 {isEn && <p className="font-black text-emerald-800 text-lg">{(question as any)[`option${question.correctAnswer}English`]}</p>}
+                 {isPa && <p className="font-black text-emerald-800 text-lg">{(question as any)[`option${question.correctAnswer}Punjabi`]}</p>}
+                 {isBi && (
                     <div className="space-y-1">
-                       <p className="text-emerald-600 uppercase tracking-widest text-[9px] md:text-[11px] font-black">Correct Answer:</p>
-                       <p className="text-[#000000] font-black text-lg md:text-xl">({question.correctAnswer}) {(question as any)[`option${question.correctAnswer}English`]}</p>
-                    </div>
-                 )}
-                 {(isPa || isBi) && (
-                    <div className={cn("space-y-1", isBi && "pt-4 border-t border-emerald-100/50")}>
-                       <p className="text-emerald-600 uppercase tracking-widest text-[9px] md:text-[11px] font-black">ਸਹੀ ਉੱਤਰ:</p>
-                       <p className="text-[#000000] font-black text-lg md:text-xl">{(question as any)[`option${question.correctAnswer}Punjabi`]}</p>
+                       <p className="font-black text-emerald-800 text-lg">{(question as any)[`option${question.correctAnswer}English`]}</p>
+                       <p className="font-bold text-emerald-600 text-sm">{(question as any)[`option${question.correctAnswer}Punjabi`]}</p>
                     </div>
                  )}
               </div>
            </div>
 
-           <div className="bg-[#121212] rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 text-white shadow-2xl relative overflow-hidden h-auto min-h-0">
-              <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none">
-                 <CheckCircle2 className="h-40 w-40" />
-              </div>
+           {/* Strategic Rationale Block */}
+           <div className="bg-[#121212] rounded-[3.5rem] p-10 md:p-16 text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-12 opacity-[0.03] rotate-12"><Zap className="h-64 w-64" /></div>
 
-              <div className="relative z-10 space-y-10 md:space-y-12 h-auto">
+              <div className="relative z-10 space-y-12">
                  {(isEn || isBi) && (
-                    <div className="space-y-4 md:space-y-6 h-auto">
-                       <span className="inline-block text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-primary/10 px-4 md:px-6 py-1.5 rounded-full border border-primary/20">
-                          • English Explanation
-                       </span>
-                       <div className="text-[15px] sm:text-[17px] md:text-[21px] text-slate-100 leading-[1.8] md:leading-[2.2] font-medium h-auto overflow-visible">
-                          <MathText text={question.englishExplanation || ""} />
+                    <div className="space-y-8">
+                       <div className="flex items-center gap-4">
+                          <span className="h-2 w-2 rounded-full bg-primary" />
+                          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">English Rationale</p>
+                       </div>
+                       <div className="text-[17px] md:text-[20px] text-slate-100 leading-[2.2] font-medium tracking-wide">
+                          <MathText text={question.englishExplanation || "Detailed logic gated by Arsh Grewal Management."} />
                        </div>
                     </div>
                  )}
 
                  {(isPa || isBi) && (
-                    <div className={cn("space-y-4 md:space-y-6 h-auto", isBi && "pt-10 md:pt-12 border-t border-white/5")}>
-                       <span className="inline-block text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 bg-emerald-500/10 px-4 md:px-6 py-1.5 rounded-full border border-emerald-500/20">
-                          • ਪੰਜਾਬੀ ਵਿਆਖਿਆ
-                       </span>
-                       <div className="text-[15px] sm:text-[17px] md:text-[21px] text-slate-100 leading-[1.8] md:leading-[2.2] font-medium h-auto overflow-visible">
-                          <MathText text={question.punjabiExplanation || ""} />
+                    <div className={cn("space-y-8", isBi && "pt-12 border-t border-white/5")}>
+                       <div className="flex items-center gap-4">
+                          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500">ਪੰਜਾਬੀ ਵਿਆਖਿਆ</p>
+                       </div>
+                       <div className="text-[17px] md:text-[20px] text-slate-100 leading-[2.2] font-medium tracking-wide">
+                          <MathText text={question.punjabiExplanation || "ਵਿਸਥਾਰਪੂਰਵਕ ਤਰਕ ਪ੍ਰਬੰਧਨ ਦੁਆਰਾ ਸੁਰੱਖਿਅਤ ਹੈ।"} />
                        </div>
                     </div>
                  )}
