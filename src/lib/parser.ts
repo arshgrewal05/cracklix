@@ -1,7 +1,7 @@
 /**
- * @fileOverview Institutional High-Fidelity Ingestion Engine v4.0.
- * Features: Absolute Formatting Preservation, Bilingual Pipe Detection,
- * and Original Numbering Extraction (Q291, etc.).
+ * @fileOverview Institutional High-Fidelity Ingestion Engine v5.0.
+ * Features: Absolute Formatting Cleanse, Bilingual Pipe Detection,
+ * and Auto-Sequential Numbering.
  */
 
 import { Question, Difficulty, ContentStatus } from "@/types";
@@ -13,47 +13,16 @@ export interface ParsedResults {
 }
 
 /**
- * Strips boundary markers from the start of a text block but preserves 
- * internal formatting and whitespace.
+ * Splits text into blocks based on '---' or question markers.
  */
-function cleanText(text: string): string {
-  if (!text) return "";
-  // Purge leading numbering artifacts specifically while keeping internal whitespace
-  return text
-    .replace(/^(\s*\**\s*(?:Q|Question|QUESTION NO\.)?\s*\d+[\.\):-]*\s*\*?\s*)/i, '')
-    .trim();
-}
+function splitIntoBlocks(text: string): string[] {
+  // Split by horizontal line separator or question number patterns
+  const parts = text.split(/\n\s*---\s*\n/);
+  if (parts.length > 1) return parts.filter(p => p.trim().length > 10);
 
-/**
- * Splits text into blocks while preserving the original boundary markers 
- * for extraction as display IDs.
- */
-function splitIntoBlocks(text: string): { marker: string, content: string }[] {
-  // Look for patterns like Q291., 1., Question 1
-  const boundaryRegex = /(?:\n|^)\s*((?:Q|Question|QUESTION NO\.)?\s*(\d+)[\.\):\s-]*)/gi;
-  
-  const blocks: { marker: string, content: string }[] = [];
-  let match;
-  let lastIndex = 0;
-  let lastMarker = "";
-
-  while ((match = boundaryRegex.exec(text)) !== null) {
-    if (lastIndex !== 0 || text.substring(0, match.index).trim().length > 0) {
-      const content = text.substring(lastIndex, match.index).trim();
-      if (content || lastMarker) {
-        blocks.push({ marker: lastMarker, content });
-      }
-    }
-    lastMarker = match[1].trim().replace(/\.$/, ''); // Store Q291 part
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Final block
-  if (lastIndex < text.length) {
-    blocks.push({ marker: lastMarker, content: text.substring(lastIndex).trim() });
-  }
-
-  return blocks.filter(b => b.content.length > 5);
+  // Fallback: split by Q1, Q2...
+  const boundaryRegex = /(?:\n|^)\s*(?:\*\*)?(?:Q|Question|QUESTION NO\.)?\s*\d+[\.\):\s-]*/gi;
+  return text.split(boundaryRegex).filter(p => p.trim().length > 10);
 }
 
 export function parseBulkQuestions(
@@ -72,55 +41,47 @@ export function parseBulkQuestions(
   
   const blocks = splitIntoBlocks(rawText);
 
-  if (blocks.length === 0) {
-    return { questions: [], errors: ["No question patterns detected. Use Q1, Q291 or 1. at start of questions."], confidence: 0 };
-  }
-
   blocks.forEach((block, index) => {
     try {
-      const parsed = parseFidelityBlock(block.content, metadata);
-
+      const parsed = parseFidelityBlock(block, metadata);
       questions.push({
         ...parsed,
-        displayId: block.marker || `Q${index + 1}`,
-        isStandalone: true,
+        displayId: `Q${index + 1}`, // Auto-sequential numbering
         status: metadata.status || "PUBLISHED",
       });
-
     } catch (err: any) {
-      errors.push(`Node ${block.marker || index + 1}: ${err.message}`);
+      errors.push(`Block ${index + 1}: ${err.message}`);
     }
   });
 
-  const confidence = Math.round((questions.length / (questions.length + (errors.length || 0))) * 100);
+  const confidence = blocks.length > 0 ? Math.round((questions.length / blocks.length) * 100) : 0;
   return { questions, errors, confidence };
 }
 
 function parseFidelityBlock(block: string, metadata: any): Partial<Question> {
-  // Regex to extract options without collapsing internal whitespace
-  const optionRegex = /(?:\n|^)\s*\**([A-D])[\.\)]\s*\*?\s*([\s\S]*?)(?=\n\s*\**[A-D][\.\)]|\n\s*\**Correct Answer|\n\s*\**Answer|\n\s*\**Correct Option|\n\s*\**Explanation|\n\s*\**ਵਿਆਖਿਆ|$)/gi;
-  const answerRegex = /(?:Correct Answer|Answer|Correct Option|ਜਵਾਬ):?\s*\**([A-D])\b/i;
-  const explanationRegex = /(?:Explanation|ਵਿਆਖਿਆ):?\s*\**([\s\S]*)$/i;
+  // 1. Clean stars and unwanted formatting
+  const cleanBlock = block.replace(/\*\*/g, '').trim();
 
-  const firstOptionMatch = optionRegex.exec(block);
-  optionRegex.lastIndex = 0;
+  // 2. Extract Question (Bilingual split by first newline)
+  const lines = cleanBlock.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  let questionEn = lines[0] || "";
+  let questionPa = "";
   
-  const questionPart = firstOptionMatch 
-    ? block.substring(0, firstOptionMatch.index).trim() 
-    : block.split('\n')[0];
+  // Strip leading question markers from EN question
+  questionEn = questionEn.replace(/^(?:Q|Question|QUESTION NO\.)?\s*\d+[\.\):\s-]*/i, '').trim();
 
-  // Bilingual split for question - Detect first major script change or newline block
-  const qLines = questionPart.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-  const questionEn = qLines[0] || "";
-  const questionPa = qLines.length > 1 ? qLines.slice(1).join('\n') : "";
+  // If second line isn't an option, it's Punjabi question
+  if (lines[1] && !lines[1].match(/^[A-D][\.\)]/i)) {
+    questionPa = lines[1];
+  }
 
-  // Extract Options with pipe support
+  // 3. Extract Options with Pipe Support
   const options: Record<string, { en: string; pa: string }> = {};
+  const optionRegex = /(?:\n|^)\s*([A-D])[\.\)]\s*(.*)/gi;
   let match;
-  while ((match = optionRegex.exec(block)) !== null) {
+  while ((match = optionRegex.exec(cleanBlock)) !== null) {
     const label = match[1].toUpperCase();
     const content = match[2].trim();
-    
     if (content.includes('|')) {
       const [en, pa] = content.split('|').map(s => s.trim());
       options[label] = { en, pa };
@@ -129,18 +90,21 @@ function parseFidelityBlock(block: string, metadata: any): Partial<Question> {
     }
   }
 
-  // Answer
-  const ansMatch = block.match(answerRegex);
-  const correctAnswer = (ansMatch?.[1].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
+  // 4. Extract Answer & Explanation
+  const answerMatch = cleanBlock.match(/(?:Correct Answer|ਸਹੀ ਉੱਤਰ|Answer|ਜਵਾਬ):?\s*([A-D])/i);
+  const correctAnswer = (answerMatch?.[1].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
 
-  // Explanation
-  const expMatch = block.match(explanationRegex);
-  const explanationPart = expMatch ? expMatch[1].trim() : "";
+  const expMatch = cleanBlock.match(/(?:Explanation|ਵਿਆਖਿਆ):?\s*([\s\S]*)$/i);
+  const expPart = expMatch ? expMatch[1].trim() : "";
   
-  // Split explanation if bilingual
-  const expLines = explanationPart.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-  const explanationEn = expLines[0] || "";
-  const explanationPa = expLines.length > 1 ? expLines.slice(1).join('\n') : "";
+  // Split explanation if bilingual markers present
+  let explanationEn = expPart;
+  let explanationPa = "";
+  if (expPart.includes('ਵਿਆਖਿਆ:')) {
+    const parts = expPart.split(/ਵਿਆਖਿਆ:/);
+    explanationEn = parts[0].trim();
+    explanationPa = parts[1].trim();
+  }
 
   return {
     ...metadata,
@@ -157,6 +121,6 @@ function parseFidelityBlock(block: string, metadata: any): Partial<Question> {
     optionDPa: options['D']?.pa || "",
     correctAnswer,
     explanationEn,
-    explanationPa: explanationPa || ""
+    explanationPa
   };
 }
