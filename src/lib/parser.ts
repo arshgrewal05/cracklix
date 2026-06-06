@@ -1,9 +1,7 @@
 /**
- * @fileOverview Institutional High-Fidelity Regex Parser v28.0.
+ * @fileOverview Institutional High-Fidelity Regex Parser v29.0.
  * Deterministic extraction with robust boundary detection and detailed validation.
  */
-
-import { Question } from "@/types";
 
 export interface ParsedResults {
   questions: any[];
@@ -47,37 +45,35 @@ export function parseBulkQuestions(rawText: string, metadata: any): ParsedResult
       q.debug.QuestionPaFound = q.questionPa ? "YES" : "NO";
 
       // 2. Extract Options (A-D) - Support both multiline and inline (A) / (B)
-      const extractOptionValue = (letter: string) => {
-        const regex = new RegExp(`\\(${letter}\\)\\s*(.*)`, 'i');
-        const line = lines.find(l => regex.test(l));
-        if (line) {
-          const match = line.match(regex);
-          return match ? match[1].trim() : "";
-        }
-        return "";
+      // We take everything between (A) and (B), (B) and (C), etc.
+      const getOption = (letter: string, next: string | null) => {
+        const regex = next 
+          ? new RegExp(`\\(${letter}\\)\\s*([\\s\\S]*?)(?=\\(${next}\\)|Correct Answer|Answer|Answer Key|•|$)`, 'i')
+          : new RegExp(`\\(${letter}\\)\\s*([\\s\\S]*?)(?=Correct Answer|Answer|Answer Key|•|$)`, 'i');
+        
+        const match = fullText.match(regex);
+        return match ? match[1].trim() : "";
       };
 
-      q.optionAEn = extractOptionValue('A');
-      q.optionBEn = extractOptionValue('B');
-      q.optionCEn = extractOptionValue('C');
-      q.optionDEn = extractOptionValue('D');
+      q.optionAEn = getOption('A', 'B');
+      q.optionBEn = getOption('B', 'C');
+      q.optionCEn = getOption('C', 'D');
+      q.optionDEn = getOption('D', null);
 
       q.debug.OptionAFound = q.optionAEn ? "YES" : "NO";
       q.debug.OptionBFound = q.optionBEn ? "YES" : "NO";
       q.debug.OptionCFound = q.optionCEn ? "YES" : "NO";
       q.debug.OptionDFound = q.optionDEn ? "YES" : "NO";
 
-      // 3. Correct Answer Extraction (A-D)
-      // Marker Variations: Correct Answer, Answer, Answer Key, Correct Option
+      // 3. Correct Answer Extraction (Extract Code Only)
       const ansMatch = fullText.match(/(?:Correct Answer|Answer|Answer Key|Correct Option)[:\s]*\(?([A-D])\)?/i);
       if (ansMatch) q.correctAnswer = ansMatch[1].toUpperCase();
 
       q.debug.CorrectAnswerFound = q.correctAnswer ? "YES" : "NO";
 
       // 4. Explanation Extraction (EN / PA)
-      // Supports variations like English Logic, English Rationale, etc.
-      const enMarkerRegex = /(?:•?\s*English\s+(?:Explanation|Logic|Rationale))/i;
-      const paMarkerRegex = /(?:•?\s*(?:ਪੰਜਾਬੀ ਵਿਆਖਿਆ|Punjabi\s+(?:Explanation|Logic|Rationale)))/i;
+      const enMarkerRegex = /(?:•?\s*English\s+(?:Explanation|Logic|Rationale)[:\s]*)/i;
+      const paMarkerRegex = /(?:•?\s*(?:ਪੰਜਾਬੀ ਵਿਆਖਿਆ|Punjabi\s+(?:Explanation|Logic|Rationale))[:\s]*)/i;
 
       const enMatch = fullText.match(enMarkerRegex);
       const paMatch = fullText.match(paMarkerRegex);
@@ -89,29 +85,28 @@ export function parseBulkQuestions(rawText: string, metadata: any): ParsedResult
         q.explanationEn = fullText.substring(enStartIndex, paStartIndex).trim();
         
         const finalPaStartIndex = paStartIndex + paMatch[0].length;
-        // From PA marker until the end of the block
         q.explanationPa = fullText.substring(finalPaStartIndex).trim();
       }
 
       q.debug.ExplanationEnFound = q.explanationEn ? "YES" : "NO";
       q.debug.ExplanationPaFound = q.explanationPa ? "YES" : "NO";
 
-      // 5. Institutional Validation Protocol
-      const missingFields = [];
-      if (!q.questionEn) missingFields.push("English Question");
-      if (!q.questionPa) missingFields.push("Punjabi Question");
-      if (!q.optionAEn) missingFields.push("Option A");
-      if (!q.optionBEn) missingFields.push("Option B");
-      if (!q.optionCEn) missingFields.push("Option C");
-      if (!q.optionDEn) missingFields.push("Option D");
-      if (!q.correctAnswer) missingFields.push("Correct Answer");
-      if (!q.explanationEn) missingFields.push("English Explanation");
-      if (!q.explanationPa) missingFields.push("Punjabi Explanation");
+      // 5. Validation Check
+      const missing = [];
+      if (!q.questionEn) missing.push("EN Question");
+      if (!q.questionPa) missing.push("PA Question");
+      if (!q.optionAEn) missing.push("Option A");
+      if (!q.optionBEn) missing.push("Option B");
+      if (!q.optionCEn) missing.push("Option C");
+      if (!q.optionDEn) missing.push("Option D");
+      if (!q.correctAnswer) missing.push("Answer Key");
+      if (!q.explanationEn) missing.push("EN Logic");
+      if (!q.explanationPa) missing.push("PA Logic");
 
-      if (missingFields.length === 0) {
+      if (missing.length === 0) {
         results.push(q);
       } else {
-        errors.push(`Block ${index + 1} Rejection: Missing ${missingFields.join(', ')}`);
+        errors.push(`Block ${index + 1} Reject: Missing ${missing.join(', ')}`);
       }
     } catch (err: any) {
       errors.push(`Block ${index + 1} Logic Error: ${err.message}`);

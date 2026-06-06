@@ -13,8 +13,8 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Institutional High-Fidelity Renderer v12.0.
- * Hardened Spacing, Label Visibility, and Auto-Expanding Logic.
+ * @fileOverview Institutional High-Fidelity Renderer v13.0.
+ * Vertical Option Flow, Multi-line Answers, and Auto-Expanding Logic.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -22,35 +22,41 @@ export default function QuestionRenderer({
   hideOptions = false 
 }: QuestionRendererProps) {
   
+  // Extract Answer Parts for Bilingual Display
+  const fullAnsValue = (question as any)[`option${question.correctAnswer}En`] || "";
+  const [ansEn, ansPa] = fullAnsValue.split('/').map((s: string) => s.trim());
+
   return (
     <div className="w-full text-left font-body space-y-0 text-[#0F172A] bg-transparent">
       {/* 1. English Question Statement */}
-      <div className="text-[20px] md:text-[22px] font-black leading-relaxed antialiased">
+      <div className="text-[18px] md:text-[22px] font-black leading-relaxed antialiased">
          <MathText text={question.questionEn || ""} className="inline" />
       </div>
 
-      <div className="h-4" />
+      <div className="h-6" />
 
       {/* 2. Punjabi Question Statement */}
       {question.questionPa && (
-        <div className="text-[20px] md:text-[22px] font-black leading-relaxed antialiased text-slate-800">
+        <div className="text-[18px] md:text-[22px] font-black leading-relaxed antialiased text-slate-800">
            <MathText text={question.questionPa} />
         </div>
       )}
 
       <div className="h-8" />
 
-      {/* 3. Options List - Bold Labels, No Faint Colors */}
+      {/* 3. Options List - STRICT VERTICAL FLOW */}
       {!hideOptions && (
-        <div className="space-y-4">
+        <div className="flex flex-col space-y-6">
           {['A', 'B', 'C', 'D'].map(key => {
             const content = (question as any)[`option${key}En`];
             if (!content) return null;
 
             return (
-              <div key={key} className="text-[19px] md:text-[22px] font-bold text-[#0F172A] flex gap-3 leading-snug">
+              <div key={key} className="text-[18px] md:text-[22px] font-bold text-[#0F172A] flex gap-4 leading-snug items-start">
                 <span className="shrink-0 font-black">({key})</span>
-                <MathText text={content} className="inline" />
+                <div className="flex-1">
+                   <MathText text={content} className="inline" />
+                </div>
               </div>
             )
           })}
@@ -59,44 +65,50 @@ export default function QuestionRenderer({
 
       <div className="h-8" />
 
-      {/* 4. Correct Answer Indicator - Unified Large Font */}
-      <div className="text-[20px] md:text-[22px] font-black text-[#0F172A] border-y border-slate-100 py-6 mb-8 bg-slate-50/30 px-4 rounded-xl">
-         <p className="flex flex-wrap items-center gap-3">
-           <span className="text-emerald-600 uppercase tracking-tight">Correct Answer:</span>
-           <span className="uppercase">({question.correctAnswer}) {(question as any)[`option${question.correctAnswer}En`]}</span>
-         </p>
+      {/* 4. Correct Answer Indicator - Institutional Multi-line */}
+      <div className="text-[18px] md:text-[22px] font-black text-[#0F172A] border-y border-slate-100 py-8 mb-10 bg-slate-50/50 px-6 rounded-2xl shadow-inner">
+         <div className="space-y-4">
+            <p className="flex items-center gap-3">
+               <span className="text-emerald-600 uppercase tracking-tight">Correct Answer:</span>
+               <span>({question.correctAnswer}) {ansEn}</span>
+            </p>
+            {ansPa && (
+               <p className="flex items-center gap-3 text-slate-700">
+                  <span className="text-emerald-600 uppercase tracking-tight">ਸਹੀ ਉੱਤਰ:</span>
+                  <span>{ansPa}</span>
+               </p>
+            )}
+         </div>
       </div>
 
-      {/* 5. Solution Hub - AUTO-EXPANDING HEIGHT (No Overflow) */}
+      {/* 5. Solution Hub - AUTO-EXPANDING HEIGHT */}
       {showSolution && (
-        <div className="bg-[#121212] rounded-[2rem] md:rounded-[3.5rem] p-8 md:p-14 text-white shadow-4xl border border-white/5 h-auto min-h-0 overflow-visible">
-           <div className="space-y-0 h-auto">
+        <div className="bg-[#121212] rounded-[2rem] md:rounded-[3rem] p-8 md:p-14 text-white shadow-4xl border border-white/5 h-auto overflow-visible">
+           <div className="space-y-12">
               
               {/* English Explanation */}
               {question.explanationEn && (
-                <div className="space-y-8 h-auto">
-                   <div className="flex items-center gap-3">
-                      <span className="text-[16px] md:text-[18px] font-black uppercase tracking-[0.2em] text-primary bg-primary/10 px-4 py-2 rounded-lg border border-primary/20">
+                <div className="space-y-6">
+                   <div className="flex items-center">
+                      <span className="text-[14px] md:text-[16px] font-black uppercase tracking-[0.2em] text-primary bg-primary/10 px-4 py-1.5 rounded-lg border border-primary/20">
                         • English Explanation:
                       </span>
                    </div>
-                   <div className="text-[19px] md:text-[22px] text-slate-100 font-bold leading-relaxed antialiased whitespace-pre-wrap break-words h-auto">
+                   <div className="text-[18px] md:text-[20px] text-slate-100 font-bold leading-relaxed antialiased whitespace-pre-wrap break-words">
                       <MathText text={question.explanationEn} />
                    </div>
                 </div>
               )}
 
-              {question.explanationEn && question.explanationPa && <div className="h-12 border-b border-white/5 mb-12" />}
-
               {/* Punjabi Explanation */}
               {question.explanationPa && (
-                <div className="space-y-8 h-auto">
-                   <div className="flex items-center gap-3">
-                      <span className="text-[16px] md:text-[18px] font-black uppercase tracking-[0.2em] text-emerald-500 bg-emerald-500/10 px-4 py-2 rounded-lg border border-emerald-500/20">
+                <div className="space-y-6 pt-6 border-t border-white/5">
+                   <div className="flex items-center">
+                      <span className="text-[14px] md:text-[16px] font-black uppercase tracking-[0.2em] text-emerald-500 bg-emerald-500/10 px-4 py-1.5 rounded-lg border border-emerald-500/20">
                         • ਪੰਜਾਬੀ ਵਿਆਖਿਆ:
                       </span>
                    </div>
-                   <div className="text-[19px] md:text-[22px] text-slate-100 font-bold leading-relaxed antialiased whitespace-pre-wrap break-words h-auto">
+                   <div className="text-[18px] md:text-[20px] text-slate-100 font-bold leading-relaxed antialiased whitespace-pre-wrap break-words">
                       <MathText text={question.explanationPa} />
                    </div>
                 </div>
