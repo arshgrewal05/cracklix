@@ -2,8 +2,9 @@
 import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v7.0.
- * Optimized: Purged duplicate subjects and added missing modules for 2026 patterns.
+ * @fileOverview Institutional Seeding Engine v8.0.
+ * Optimized: Purged duplicate subjects and standardized IDs to prevent UI redundancy.
+ * Features: Unique Mapping for Punjabi, Quant, and ICT nodes.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Global Institutional Registry Sync...');
@@ -25,9 +26,9 @@ export async function seedInitialData(db: Firestore) {
     await setDoc(doc(db, 'boards', b.id), { ...b, updatedAt: serverTimestamp() }, { merge: true });
   }
 
-  // 2. Exam Verticals (Strict Isolation)
+  // 2. Exam Verticals (Strict Hub Isolation)
   const exams = [
-    // Teaching Registry
+    // Teaching Hubs
     { id: 'ctet-p1', boardId: 'ctet-board', name: 'CTET Paper 1', category: 'TEACHING', description: 'Primary Stage (Classes I-V)' },
     { id: 'ctet-p2', boardId: 'ctet-board', name: 'CTET Paper 2', category: 'TEACHING', description: 'Elementary Stage (Classes VI-VIII)' },
     { id: 'pstet-p1', boardId: 'edu-dept', name: 'PSTET Paper 1', category: 'TEACHING', description: 'Punjab State Teacher Eligibility Test P1' },
@@ -37,14 +38,14 @@ export async function seedInitialData(db: Firestore) {
     { id: 'lecturer-cadre', boardId: 'edu-dept', name: 'Lecturer Cadre', category: 'TEACHING', description: 'Higher Secondary Recruitment' },
     { id: 'punjab-anganwadi', boardId: 'psssb', name: 'Anganwadi Supervisor', category: 'TEACHING', description: 'Social Security & Child Development' },
 
-    // Punjab State Registry
+    // Punjab State Hubs
     { id: 'psssb-clerk', boardId: 'psssb', name: 'PSSSB Clerk', category: 'STATE', description: 'General, IT, and Accounts Verticals' },
     { id: 'punjab-patwari', boardId: 'psssb', name: 'Revenue Patwari', category: 'STATE', description: 'Revenue and Canal Department' },
     { id: 'police-si', boardId: 'punjab-police', name: 'Police SI', category: 'STATE', description: 'Sub-Inspector Technical & District' },
     { id: 'pspcl-clerk', boardId: 'psssb', name: 'PSPCL LDC', category: 'STATE', description: 'Punjab Power Lower Division Clerk' },
     { id: 'high-court-clerk', boardId: 'high-court-board', name: 'High Court Clerk', category: 'STATE', description: 'SSSC Judicial Recruitment' },
 
-    // Central Registry
+    // Central Hubs
     { id: 'ssc-cgl', boardId: 'central-ssc', name: 'SSC CGL', category: 'CENTRAL', description: 'Combined Graduate Level' },
     { id: 'army-agniveer', boardId: 'defense-army', name: 'Army Agniveer', category: 'CENTRAL', description: 'Defense Recruitment' },
     { id: 'banking-ibps', boardId: 'central-ssc', name: 'IBPS PO/Clerk', category: 'CENTRAL', description: 'Banking Personnel Selection' }
@@ -54,19 +55,19 @@ export async function seedInitialData(db: Firestore) {
     await setDoc(doc(db, 'exams', e.id), { ...e, updatedAt: serverTimestamp() }, { merge: true });
   }
 
-  // 3. Subjects Registry (CLEAN & DEDUPLICATED)
+  // 3. Subject Registry (DEFINITIVE DEDUPLICATED LIST)
   const subjects = [
     { id: 'punjab-gk', name: 'Punjab GK & History' },
     { id: 'punjabi-qualifying', name: 'Punjabi Qualifying (Paper A)' },
     { id: 'punjabi-language', name: 'Punjabi Language' },
     { id: 'mental-ability', name: 'Mental Ability & Reasoning' },
     { id: 'quant-maths', name: 'Quantitative Aptitude' },
-    { id: 'ict-computers', name: 'ICT / Computers' },
+    { id: 'ict-computers', name: 'ICT & Digital Literacy' },
     { id: 'english-lang', name: 'English Language' },
     { id: 'current-affairs', name: 'Current Affairs' },
     { id: 'general-science', name: 'General Science' },
     { id: 'agriculture-node', name: 'Agriculture (Patwari Spec.)' },
-    { id: 'police-laws', name: 'Police Laws & Digital Literacy' },
+    { id: 'police-laws', name: 'Police Laws & Ethics' },
     { id: 'child-pedagogy', name: 'Child Development & Pedagogy' },
     { id: 'india-gk', name: 'Indian Polity & Constitution' }
   ];
