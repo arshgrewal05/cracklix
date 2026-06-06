@@ -16,8 +16,8 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Professional CBT Question Area v1.1.
- * Added field fallbacks to prevent "Loading question..." issues with legacy data.
+ * @fileOverview Hardened CBT Question Renderer v2.0.
+ * Features: Comprehensive field fallbacks for instant content restoration from legacy data registries.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -32,17 +32,19 @@ export default function QuestionRenderer({
 
   const typographyClass = "font-[700] leading-[1.4] antialiased tracking-normal text-[#111111] text-[20px] md:text-[24px]";
 
-  // Field Fallbacks for legacy/varied data structures
-  const englishQ = question.englishQuestion || (question as any).questionEn || (question as any).english_question;
-  const punjabiQ = question.punjabiQuestion || (question as any).questionPa || (question as any).punjabi_question;
-  const englishExp = question.englishExplanation || (question as any).explanationEn || (question as any).english_explanation;
-  const punjabiExp = question.punjabiExplanation || (question as any).explanationPa || (question as any).punjabi_explanation;
+  // Comprehensive Field Fallbacks (Handles all snake_case and camelCase variations)
+  const q = question as any;
+  const englishQ = q.englishQuestion || q.questionEn || q.question_english || q.titleEn || q.questionText;
+  const punjabiQ = q.punjabiQuestion || q.questionPa || q.question_punjabi || q.titlePa;
+  
+  const englishExp = q.englishExplanation || q.explanationEn || q.explanation_english || q.rationalization;
+  const punjabiExp = q.punjabiExplanation || q.explanationPa || q.explanation_punjabi;
 
   return (
     <div className="w-full text-left font-body bg-transparent h-auto min-h-0 flex flex-col select-none">
       
-      {/* 1. TOP INFO BAR (Marks & Bookmarks) */}
-      <div className="flex items-center justify-between mb-8 border-b border-slate-100 pb-4">
+      {/* 1. TOP INFO BAR */}
+      <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
          <div className="flex items-center gap-6">
             <div className="flex flex-col">
                <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Question No.</span>
@@ -65,10 +67,10 @@ export default function QuestionRenderer({
       </div>
 
       {/* 2. CORE QUESTION STATEMENT */}
-      <div className="flex flex-col gap-6 mb-12">
+      <div className="flex flex-col gap-6 mb-10">
          {(isEn || isBi) && (
             <div className={typographyClass}>
-               <MathText text={englishQ || "Loading question statement..."} />
+               <MathText text={englishQ || "Restoring question logic..."} />
             </div>
          )}
          
@@ -83,10 +85,10 @@ export default function QuestionRenderer({
 
       {/* 3. OPTION HUB */}
       {!hideOptions && (
-        <div className="flex flex-col space-y-3 mb-8">
+        <div className="flex flex-col space-y-3 mb-6">
           {['A', 'B', 'C', 'D'].map(key => {
-            const en = (question as any)[`option${key}English`] || (question as any)[`option_${key.toLowerCase()}_english`];
-            const pa = (question as any)[`option${key}Punjabi`] || (question as any)[`option_${key.toLowerCase()}_punjabi`];
+            const en = q[`option${key}English`] || q[`option_${key.toLowerCase()}_english`];
+            const pa = q[`option${key}Punjabi`] || q[`option_${key.toLowerCase()}_punjabi`];
 
             return (
               <div key={key} className="flex gap-5 items-center group p-4 rounded-xl border-2 border-slate-100 hover:border-[#F97316]/30 transition-all bg-white shadow-sm cursor-pointer hover:shadow-xl active:scale-[0.99]">

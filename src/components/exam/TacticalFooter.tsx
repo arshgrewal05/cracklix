@@ -7,8 +7,9 @@ import { ChevronLeft, ChevronRight, CheckCircle2, RotateCcw } from 'lucide-react
 import { useFirestore } from '@/firebase';
 
 /**
- * @fileOverview Testbook-Style Fixed Navigation Belt v2.0.
- * Reordered buttons to place "Save & Next" to the left of the tactical group.
+ * @fileOverview Tactical Navigation Belt v3.0.
+ * Reordered: [PREVIOUS] ... [SAVE & NEXT] [MARK FOR REVIEW] [CLEAR RESPONSE].
+ * This places the primary action closest to the palette area for better ergonomic flow.
  */
 export default function TacticalFooter({ onSubmit }: { onSubmit: () => void }) {
   const { currentIdx, questions, clearAnswer, markForReview, saveAndNext, setCurrentIdx } = useExamStore();
@@ -25,15 +26,15 @@ export default function TacticalFooter({ onSubmit }: { onSubmit: () => void }) {
           variant="outline" 
           onClick={() => setCurrentIdx(Math.max(0, currentIdx - 1))}
           disabled={currentIdx === 0}
-          className="h-11 px-5 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] border-slate-200 text-slate-500 hover:bg-slate-50"
+          className="h-11 px-6 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] border-slate-200 text-slate-500 hover:bg-slate-50"
         >
           <ChevronLeft className="h-4 w-4 mr-2" /> Previous
         </Button>
       </div>
 
-      {/* RIGHT: TACTICAL GROUP (Reordered) */}
+      {/* RIGHT: TACTICAL GROUP (Ergonomically Reordered) */}
       <div className="flex items-center gap-3">
-        {/* Primary Action on the left of the group */}
+        {/* Primary Action is now on the left of the tactical group */}
         {isLast ? (
           <Button 
             onClick={onSubmit}
