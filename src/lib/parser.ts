@@ -1,8 +1,7 @@
 /**
- * @fileOverview Institutional High-Fidelity Ingestion Engine v20.0.
- * Rules Enforcement:
- * 1. PREFIX PURGE: Strictly strips labels.
- * 2. OPTION BOUNDARY: Fixes "Option A contains (B)" error.
+ * @fileOverview Exam-Grade Regex Parser for Deterministic Ingestion.
+ * Strictly non-AI. Deterministic pattern matching for English/Punjabi MCQs.
+ * Optimized for Testbook/PSSSB style data blocks.
  */
 
 import { Question } from "@/types";
@@ -10,80 +9,111 @@ import { Question } from "@/types";
 export interface ParsedResults {
   questions: Partial<Question>[];
   errors: string[];
-  confidence: number;
 }
-
-const sanitizeText = (text: string = "") => {
-  return text
-    .replace(/^Q\d+[\.\):\s-]*/i, '')      
-    .replace(/^ਪ੍ਰਸ਼ਨ\s*\d+[\.\):\s-]*/, '') 
-    .replace(/^ਪ੍ਰਸ਼ਨ\s*\d+[\.\):\s-]*/, '')
-    .replace(/^\d+[\.\):\s-]*/, '')        
-    .replace(/^\(?[A-D]\)?[\.\):\s-]*/i, '') 
-    .replace(/^Option\s*[A-D][\.\s-]*/i, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-};
 
 export function parseBulkQuestions(rawText: string, metadata: any): ParsedResults {
-  const blocks = rawText.split(/(?=Q\d+[\.\):\s-])/g).filter(p => p.trim().length > 10);
+  // Normalize line endings and split by Q followed by a number
+  const cleanRaw = rawText.replace(/\r\n/g, '\n');
   
-  const parsed = blocks.map((block, index) => {
-    try {
-      const q = parseStandardBlock(block, metadata);
-      if (!q.questionEn) return null;
-      return { ...q, displayId: `Q${index + 1}`, status: metadata.status || "PUBLISHED" };
-    } catch (err) {
-      return null;
+  // Pattern to find boundaries of questions (e.g., Q1., Q24., Q100.)
+  const blocks = cleanRaw.split(/\n(?=Q\d+[\.\s])/g).filter(b => b.trim().length > 10);
+  
+  // Fallback for cases where the very first question doesn't have a preceding newline
+  if (blocks.length === 1 && !blocks[0].trim().startsWith('Q')) {
+    const initialSplit = cleanRaw.split(/(?=Q\d+[\.\s])/g).filter(b => b.trim().length > 10);
+    if (initialSplit.length > 0 && initialSplit[0].trim().startsWith('Q')) {
+      return parseBlocks(initialSplit, metadata);
     }
-  }).filter(Boolean) as Partial<Question>[];
+  }
 
-  return { questions: parsed, errors: [], confidence: blocks.length > 0 ? 100 : 0 };
+  return parseBlocks(blocks, metadata);
 }
 
-function parseStandardBlock(block: string, metadata: any): Partial<Question> {
-  const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-  
-  let questionEn = "";
-  let questionPa = "";
-  const options: Record<string, { en: string; pa: string }> = {};
-  let correctAnswer: 'A' | 'B' | 'C' | 'D' = 'A';
-  let explanationEn = "";
-  let explanationPa = "";
+function parseBlocks(blocks: string[], metadata: any): ParsedResults {
+  const questions: Partial<Question>[] = [];
+  const errors: string[] = [];
 
-  lines.forEach((line, idx) => {
-    if (line.match(/^Q\d+[\.\):\s-]/i)) {
-      questionEn = sanitizeText(line);
-      if (lines[idx+1] && !lines[idx+1].match(/^\([A-D]\)/i) && !lines[idx+1].match(/^Q\d+/i)) {
-        questionPa = sanitizeText(lines[idx+1]);
+  blocks.forEach((block, index) => {
+    const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length < 3) return;
+
+    try {
+      const q: any = { 
+        ...metadata,
+        id: `temp-${Date.now()}-${index}`,
+        status: metadata.status || "PUBLISHED",
+        isStandalone: true,
+        questionEn: "",
+        questionPa: "",
+        optionAEn: "", optionAPa: "",
+        optionBEn: "", optionBPa: "",
+        optionCEn: "", optionCPa: "",
+        optionDEn: "", optionDPa: "",
+        correctAnswer: "",
+        explanationEn: "",
+        explanationPa: ""
+      };
+
+      // 1. Extract Question Text
+      // The first line is English, second is Punjabi (if it doesn't look like an option)
+      q.questionEn = lines[0].replace(/^Q\d+[\.\s]*/i, '').trim();
+
+      let nextIdx = 1;
+      if (lines[nextIdx] && !lines[nextIdx].match(/^\(?[A-D][\.\)\s]/i)) {
+        q.questionPa = lines[nextIdx].replace(/^(ਪ੍ਰਸ਼ਨ|ਪ੍ਰਸ਼ਨ)\s*\d+[\.\s]*/, '').trim();
+        nextIdx++;
       }
-    } 
-    else if (line.match(/^\([A-D]\)/i) || line.match(/^[A-D]\)/i)) {
-      const labelMatch = line.match(/^\(?([A-D])\)?/i);
-      if (labelMatch) {
-        const label = labelMatch[1].toUpperCase();
-        const content = line.replace(/^\(?([A-D])\)?[\.\s-]*/i, '').trim();
-        if (content.includes('/')) {
-          const parts = content.split('/');
-          options[label] = { en: sanitizeText(parts[0]), pa: sanitizeText(parts[1]) };
-        } else {
-          options[label] = { en: sanitizeText(content), pa: "" };
+
+      // 2. Extract Options (A-D)
+      const optionPattern = /^\(?([A-D])[\.\)\s]+(.*)/i;
+      for (let i = nextIdx; i < lines.length; i++) {
+        const line = lines[i];
+        const optMatch = line.match(optionPattern);
+        if (optMatch) {
+          const letter = optMatch[1].toUpperCase();
+          const content = optMatch[2].trim();
+          
+          // Split by / to handle bilingual options: "84 cm² / 84 ਵਰਗ ਸੈਂਟੀਮੀਟਰ"
+          if (content.includes('/')) {
+            const parts = content.split('/');
+            q[`option${letter}En`] = parts[0]?.trim() || "";
+            q[`option${letter}Pa`] = parts[1]?.trim() || "";
+          } else {
+            q[`option${letter}En`] = content;
+          }
         }
       }
-    } 
-    else if (line.toLowerCase().includes('correct answer:')) {
-      const ansMatch = line.match(/Correct Answer:\s*(?:\()?([A-D])(?:\))?/i);
-      if (ansMatch) correctAnswer = ansMatch[1].toUpperCase() as any;
+
+      // 3. Extract Correct Answer
+      const ansLine = lines.find(l => l.toLowerCase().includes('correct answer') || l.toLowerCase().startsWith('ans:'));
+      if (ansLine) {
+        const match = ansLine.match(/(?:correct answer|ans)[:\s]*\(?([A-D])\)?/i);
+        if (match) q.correctAnswer = match[1].toUpperCase();
+      }
+
+      // 4. Extract Explanations
+      const expEnStart = lines.findIndex(l => l.toLowerCase().includes('english explanation'));
+      const expPaStart = lines.findIndex(l => l.toLowerCase().includes('ਪੰਜਾਬੀ ਵਿਆਖਿਆ'));
+
+      if (expEnStart !== -1) {
+        const end = expPaStart !== -1 ? expPaStart : lines.length;
+        q.explanationEn = lines.slice(expEnStart + 1, end).join('\n').trim();
+      }
+
+      if (expPaStart !== -1) {
+        q.explanationPa = lines.slice(expPaStart + 1).join('\n').trim();
+      }
+
+      // Final Validations before pushing
+      if (!q.questionEn) throw new Error(`Missing English question text in Block ${index + 1}`);
+      if (!q.correctAnswer) throw new Error(`Missing correct answer in Block ${index + 1}`);
+      if (!q.optionAEn || !q.optionBEn) throw new Error(`Insufficient options in Block ${index + 1}`);
+
+      questions.push(q);
+    } catch (err: any) {
+      errors.push(err.message);
     }
   });
 
-  return {
-    ...metadata,
-    questionEn, questionPa,
-    optionAEn: options['A']?.en || "Option A", optionAPa: options['A']?.pa || "",
-    optionBEn: options['B']?.en || "Option B", optionBPa: options['B']?.pa || "",
-    optionCEn: options['C']?.en || "Option C", optionCPa: options['C']?.pa || "",
-    optionDEn: options['D']?.en || "Option D", optionDPa: options['D']?.pa || "",
-    correctAnswer, explanationEn, explanationPa
-  };
+  return { questions, errors };
 }
