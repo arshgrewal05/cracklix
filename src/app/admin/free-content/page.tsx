@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Trash2, Edit, Save, Search, LayoutGrid, FileText, Zap, Globe, FileStack, Loader2, X } from "lucide-react"
+import { Plus, Trash2, Edit, Save, Search, LayoutGrid, FileText, Zap, Globe, FileStack, Loader2, X, Sparkles, TrendingUp } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, doc, setDoc, deleteDoc, query, orderBy, serverTimestamp } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -17,8 +17,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Free Content CMS Node.
- * Allows Admin to manage Mock Tests, PDFs, PYQs, and Analysis articles from one hub.
+ * @fileOverview Institutional Free Content CMS Node v2.0.
+ * Optimized for "Gagan Pratap" style high-fidelity data distribution.
  */
 
 export default function AdminFreeContent() {
@@ -33,6 +33,11 @@ export default function AdminFreeContent() {
 
   const handleSave = async () => {
     if (!db || !editingItem) return
+    if (!editingItem.title || !editingItem.type) {
+       toast({ variant: "destructive", title: "Audit Blocked", description: "Title and Type are mandatory." })
+       return
+    }
+
     const id = editingItem.id || `free-${Date.now()}`
     const docRef = doc(db, "free_content", id)
     
@@ -46,7 +51,7 @@ export default function AdminFreeContent() {
 
     try {
       await setDoc(docRef, payload, { merge: true })
-      toast({ title: "Hub Synced", description: "Content successfully updated in Free Hub." })
+      toast({ title: "Registry Synced", description: "Content successfully updated in Free Hub." })
       setEditingItem(null)
     } catch (e: any) {
       toast({ variant: "destructive", title: "Save Failed", description: e.message })
@@ -68,28 +73,28 @@ export default function AdminFreeContent() {
   }, [content, searchTerm])
 
   return (
-    <div className="space-y-10 pb-20 text-left">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+    <div className="space-y-12 pb-24 text-left">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 px-4">
         <div>
            <div className="flex items-center gap-3 mb-2">
-              <Zap className="h-6 w-6 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Free Content Registry</span>
+              <Sparkles className="h-6 w-6 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Free Content Master Registry</span>
            </div>
-          <h1 className="text-5xl font-black font-headline text-primary uppercase tracking-tight">Free Study Hub</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">Manage Mocks, PDFs, and News for the public repository.</p>
+          <h1 className="text-5xl font-black font-headline text-[#0F172A] uppercase tracking-tight leading-none">Free Hub CMS</h1>
+          <p className="text-slate-500 mt-2 text-lg font-medium">Coordinate high-fidelity Mocks, PDFs, and News for the public feed.</p>
         </div>
-        <Button onClick={() => setEditingItem({ title: "", description: "", type: "pdf", link: "", fileUrl: "" })} className="bg-primary hover:bg-orange-600 gap-3 h-16 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl">
-          <Plus className="h-5 w-5" /> Initialize Content
+        <Button onClick={() => setEditingItem({ title: "", description: "", type: "pdf", link: "", fileUrl: "" })} className="bg-primary hover:bg-orange-600 gap-3 h-16 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all active:scale-95">
+          <Plus className="h-5 w-5" /> Initialize Free Content
         </Button>
       </div>
 
-      <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden">
+      <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden mx-4">
         <CardHeader className="p-10 border-b border-slate-50 bg-slate-50/30">
            <div className="relative w-full md:w-[45%]">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
               <Input 
-                className="pl-16 h-16 rounded-[1.5rem] bg-white border-none shadow-inner text-lg font-medium" 
-                placeholder="Search free registry..." 
+                className="pl-16 h-16 rounded-[1.5rem] bg-white border-none shadow-inner text-lg font-medium text-[#0F172A]" 
+                placeholder="Search free repository..." 
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
@@ -100,8 +105,8 @@ export default function AdminFreeContent() {
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-slate-50 h-20">
                 <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Asset Identity</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500">Type Hub</TableHead>
-                <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Management</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500">Hub Type</TableHead>
+                <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Audit Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -110,29 +115,34 @@ export default function AdminFreeContent() {
                   <TableRow key={i}><TableCell colSpan={3} className="px-10 py-8"><Skeleton className="h-14 w-full rounded-2xl bg-slate-50" /></TableCell></TableRow>
                 ))
               ) : filteredContent.map((item) => (
-                <TableRow key={item.id} className="hover:bg-slate-50 border-slate-50 transition-all">
-                  <TableCell className="px-10 py-8">
+                <TableRow key={item.id} className="hover:bg-slate-50 border-slate-50 transition-all group">
+                  <TableCell className="px-10 py-8 text-left">
                     <div className="flex items-center gap-6">
-                       <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
-                          {item.type === 'mock' ? <Zap className="text-primary" /> : <FileText className="text-blue-500" />}
+                       <div className={cn(
+                         "h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner transition-transform group-hover:scale-105",
+                         item.type === 'mock' ? 'bg-orange-50 text-primary' : 'bg-blue-50 text-blue-600'
+                       )}>
+                          {item.type === 'mock' ? <Zap className="h-6 w-6" /> : 
+                           item.type === 'pdf' ? <FileText className="h-6 w-6" /> : 
+                           item.type === 'current' ? <TrendingUp className="h-6 w-6" /> : <FileStack className="h-6 w-6" />}
                        </div>
                        <div>
-                          <p className="font-black text-[#0F172A] text-lg uppercase tracking-tight leading-none">{item.title}</p>
-                          <p className="text-[9px] font-bold text-slate-400 mt-2 uppercase truncate max-w-xs">{item.description}</p>
+                          <p className="font-black text-[#0F172A] text-xl uppercase tracking-tight leading-none">{item.title}</p>
+                          <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase truncate max-w-xs">{item.description}</p>
                        </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-white border-slate-200 text-slate-500 text-[8px] font-black uppercase px-2 py-0.5 rounded-md">
-                       {item.type?.toUpperCase()}
+                  <TableCell className="text-left">
+                    <Badge variant="outline" className="bg-white border-slate-200 text-slate-500 text-[9px] font-black uppercase px-3 py-1 rounded-lg">
+                       {item.type?.toUpperCase()} HUB
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right px-10">
-                    <div className="flex justify-end gap-2 opacity-20 group-hover:opacity-100 transition-all">
-                       <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-white shadow-sm" onClick={() => setEditingItem(item)}>
+                    <div className="flex justify-end gap-3 opacity-20 group-hover:opacity-100 transition-all">
+                       <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 hover:bg-white hover:text-primary shadow-sm" onClick={() => setEditingItem(item)}>
                         <Edit className="h-5 w-5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDelete(item.id)}>
+                      <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-slate-50 hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDelete(item.id)}>
                         <Trash2 className="h-5 w-5" />
                       </Button>
                     </div>
@@ -148,7 +158,7 @@ export default function AdminFreeContent() {
         <DialogContent className="sm:max-w-xl rounded-[3rem] bg-white border-none shadow-4xl p-0 overflow-hidden text-left">
           <div className="h-2 w-full bg-[#0F172A]" />
           <DialogHeader className="p-10 pb-0">
-            <DialogTitle className="text-3xl font-black font-headline uppercase text-[#0F172A]">Content Node Config</DialogTitle>
+            <DialogTitle className="text-3xl font-black font-headline uppercase text-[#0F172A]">Free Asset Registry</DialogTitle>
           </DialogHeader>
           
           <div className="p-10 space-y-6">
@@ -158,37 +168,37 @@ export default function AdminFreeContent() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Abstract Description</Label>
-              <Textarea value={editingItem?.description || ""} onChange={e => setEditingItem({...editingItem, description: e.target.value})} className="rounded-xl border-slate-100 bg-slate-50 h-24" />
+              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Marketing Abstract (Description)</Label>
+              <Textarea value={editingItem?.description || ""} onChange={e => setEditingItem({...editingItem, description: e.target.value})} className="rounded-xl border-slate-100 bg-slate-50 h-24 font-medium" />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
                <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Thematic Type</Label>
-                <select value={editingItem?.type} onChange={e => setEditingItem({...editingItem, type: e.target.value})} className="w-full h-14 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none">
-                  <option value="mock">Mock Test</option>
-                  <option value="pdf">Blueprint PDF</option>
-                  <option value="current">Current Affairs</option>
-                  <option value="pyq">PYQ Archive</option>
-                  <option value="note">Study Note</option>
+                <select value={editingItem?.type} onChange={e => setEditingItem({...editingItem, type: e.target.value})} className="w-full h-14 bg-slate-50 border-none rounded-xl px-4 font-black uppercase text-[10px] outline-none">
+                  <option value="mock">FREE MOCK</option>
+                  <option value="pdf">BLUEPRINT PDF</option>
+                  <option value="current">STRATEGIC NEWS</option>
+                  <option value="pyq">OFFICIAL PYQ</option>
+                  <option value="note">STUDY NOTE</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Institutional Category</Label>
-                <Input value="free" disabled className="h-14 rounded-xl border-none bg-slate-50 font-black uppercase text-[10px] tracking-widest" />
+                <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">State Registry</Label>
+                <Input value="PUNJAB" disabled className="h-14 rounded-xl border-none bg-slate-50 font-black uppercase text-[10px] tracking-[0.2em]" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Redirect URI (Link or File URL)</Label>
-              <Input value={editingItem?.link || ""} onChange={e => setEditingItem({...editingItem, link: e.target.value})} className="h-14 rounded-xl border-slate-100 bg-slate-50 font-bold" placeholder="https://..." />
+              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Asset Link (Test URI or PDF URL)</Label>
+              <Input value={editingItem?.link || ""} onChange={e => setEditingItem({...editingItem, link: e.target.value})} className="h-14 rounded-xl border-slate-100 bg-slate-50 font-bold text-primary" placeholder="https://..." />
             </div>
           </div>
 
           <DialogFooter className="p-10 pt-0 flex gap-4">
             <Button variant="ghost" onClick={() => setEditingItem(null)} className="rounded-xl h-14 font-black uppercase text-[10px]">Cancel Draft</Button>
-            <Button onClick={handleSave} className="bg-[#0F172A] hover:bg-black h-14 px-10 rounded-xl font-black uppercase text-[10px] tracking-widest flex-1 shadow-xl">
-              Commit to Free Hub
+            <Button onClick={handleSave} className="bg-[#0F172A] hover:bg-black h-14 px-10 rounded-xl font-black uppercase text-[10px] tracking-widest flex-1 shadow-xl transition-all active:scale-95">
+              Commit to Registry
             </Button>
           </DialogFooter>
         </DialogContent>
