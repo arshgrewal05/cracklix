@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo } from "react"
@@ -28,10 +27,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import BackButton from "@/components/navigation/BackButton"
 
 /**
  * @fileOverview Institutional Deep Performance Analysis Node.
- * Optimized: Client-side sorting for Results to bypass composite index requirements.
+ * Updated: Reusable Back Button added for consistent navigation flow.
  */
 
 export default function DeepAnalytics() {
@@ -39,7 +39,6 @@ export default function DeepAnalytics() {
   const db = useFirestore()
   const router = useRouter()
 
-  // Simplified query to bypass composite index requirement
   const resultsQuery = useMemo(() => {
     if (!db || !user) return null
     return query(collection(db, "results"), where("userId", "==", user.uid))
@@ -71,7 +70,6 @@ export default function DeepAnalytics() {
       score: r.score || 0
     }))
 
-    // Simulated subject mastery based on stats
     const subjects = ["Mental Ability", "Punjab GK", "Quant", "Languages", "ICT"];
     const mastery = subjects.map(s => ({
       name: s,
@@ -98,13 +96,12 @@ export default function DeepAnalytics() {
       
       <main className="container mx-auto px-4 py-8 max-w-6xl space-y-10 text-left">
          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="flex items-center gap-6">
-               <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl h-12 w-12 border border-slate-200 bg-white">
-                  <ArrowLeft className="h-6 w-6 text-[#0F172A]" />
-               </Button>
+            <div className="flex items-center gap-4">
+               <BackButton label="Dashboard" fallback="/dashboard" />
+               <div className="h-8 w-px bg-slate-200 hidden md:block" />
                <div>
                   <h1 className="text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Performance Deep-Audit</h1>
-                  <p className="text-slate-500 font-medium">Registry analysis for your preparation trajectory.</p>
+                  <p className="text-slate-500 font-medium text-sm">Registry analysis for your preparation trajectory.</p>
                </div>
             </div>
             <div className="flex gap-4">
@@ -135,7 +132,7 @@ export default function DeepAnalytics() {
                      <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={analytics.chartData}>
                            <defs>
-                              <linearGradient id="colorAcc" x1="0" y1="0" x2="0" y2="1">
+                              <linearGradient id="colorAcc" x1="0" x2="0" x2="0" y2="1">
                                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
                                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                               </linearGradient>
@@ -161,7 +158,7 @@ export default function DeepAnalytics() {
                      <div className="space-y-8">
                         {analytics.subjectMastery.map((s, i) => (
                            <div key={i} className="space-y-3">
-                              <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-400">
+                              <div className="flex justify-between items-end text-[10px] font-black uppercase text-slate-400">
                                  <span>{s.name}</span>
                                  <span className="text-white">{s.value}%</span>
                               </div>

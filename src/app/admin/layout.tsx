@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
@@ -10,10 +9,11 @@ import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { signOut } from "firebase/auth"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import BackButton from "@/components/navigation/BackButton";
 
 /**
  * @fileOverview Administrative Sidebar & Navigation Layout.
- * Mobile: Optimized with native-style Sheet trigger and responsive inset padding.
+ * Updated: Universal Back Button integrated into the sticky header for sub-page context.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -40,6 +40,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (loading) return <div className="h-screen w-full bg-[#0F172A] flex items-center justify-center"><ShieldCheck className="h-10 w-10 text-primary animate-pulse" /></div>
   
   if (!user || !isAdmin) return null
+
+  const showBack = pathname !== "/admin";
 
   const SideNavContent = () => (
     <div className="flex flex-col h-full bg-[#0F172A]">
@@ -97,8 +99,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </Sidebar>
         
         <SidebarInset className="flex flex-col bg-white">
-          <header className="h-14 md:h-16 border-b border-slate-200 flex items-center px-4 md:px-6 justify-between bg-white sticky top-0 z-50 shrink-0">
-            <div className="flex items-center gap-3">
+          <header className="h-14 md:h-16 border-b border-slate-200 flex items-center px-4 md:px-6 justify-between bg-white sticky top-0 z-[100] shrink-0">
+            <div className="flex items-center gap-1 md:gap-3">
               {/* Mobile Menu Trigger */}
               <div className="lg:hidden">
                  <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -112,10 +114,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                  </Sheet>
               </div>
               <SidebarTrigger className="hidden lg:flex text-[#0F172A]" />
+              
+              {showBack && (
+                <div className="flex items-center">
+                  <div className="h-4 w-[1px] bg-slate-200 mx-2 hidden md:block" />
+                  <BackButton label="Dashboard" fallback="/admin" />
+                </div>
+              )}
+
               <div className="h-4 w-[1px] bg-slate-200 mx-1 hidden sm:block" />
               <div className="flex items-center gap-2 truncate">
                  <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
-                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#0F172A] truncate">Cracklix Management System</span>
+                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#0F172A] truncate">CMS Governance</span>
               </div>
             </div>
           </header>

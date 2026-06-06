@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
@@ -25,7 +24,8 @@ import {
   History,
   Timer,
   ArrowRight,
-  RefreshCw
+  RefreshCw,
+  LayoutGrid
 } from "lucide-react"
 import { useFirestore, useUser, useCollection } from "@/firebase"
 import { collection, query, where, doc, getDoc, deleteDoc } from "firebase/firestore"
@@ -33,10 +33,11 @@ import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import QuestionRenderer from "@/components/questions/QuestionRenderer"
+import BackButton from "@/components/navigation/BackButton"
 
 /**
- * @fileOverview Institutional Result Engine v2.8.
- * Features: Re-attempt logic, Registry Purge, and High-Fidelity Solutions.
+ * @fileOverview Institutional Result Engine v3.0.
+ * Updated: Reusable Back Button added to result header.
  */
 export default function ResultPage() {
   const params = useParams()
@@ -145,6 +146,12 @@ export default function ResultPage() {
     <div className="flex flex-col min-h-screen bg-slate-50/50">
       <Navbar />
       <main className="container mx-auto px-4 py-6 md:py-12 max-w-7xl">
+        <div className="flex items-center gap-4 mb-8">
+           <BackButton label="Dashboard" fallback="/dashboard" />
+           <div className="h-6 w-px bg-slate-200" />
+           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Audit Summary</p>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
           
           <div className="lg:col-span-8 space-y-6 md:space-y-10 text-left">
@@ -215,7 +222,6 @@ export default function ResultPage() {
                
                <div className="space-y-4 md:space-y-6">
                   {questions.map((q, idx) => {
-                     // Fix index resolution for JSON objects with string keys
                      const studentAnsIdx = sessionData.answers?.[idx] !== undefined 
                        ? sessionData.answers[idx] 
                        : sessionData.answers?.[idx.toString()];

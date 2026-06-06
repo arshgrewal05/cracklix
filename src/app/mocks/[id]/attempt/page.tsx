@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -13,7 +12,7 @@ import AntiCheat from "@/components/exam/AntiCheat";
 import QuestionRenderer from "@/components/questions/QuestionRenderer";
 import QuestionPalette from "@/components/mocks/QuestionPalette";
 import { Button } from "@/components/ui/button";
-import { Loader2, Play, ShieldCheck, CheckCircle2, Trophy, AlertTriangle } from "lucide-react";
+import { Loader2, Play, ShieldCheck, CheckCircle2, Trophy, AlertTriangle, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,8 +25,8 @@ import {
 } from "@/components/ui/dialog";
 
 /**
- * @fileOverview Hardened CBT Attempt Hub v15.0.
- * Optimized: Unified timer sync, state restoration, and multi-node validation.
+ * @fileOverview Hardened CBT Attempt Hub v16.0.
+ * Updated: Universal Exit confirmation protocol added to prevent accidental departures.
  */
 
 export default function MockAttemptPage() {
@@ -41,6 +40,7 @@ export default function MockAttemptPage() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
   const [isSubmittingFinal, setIsSubmittingFinal] = useState(false);
 
   const examStore = useExamStore();
@@ -190,7 +190,10 @@ export default function MockAttemptPage() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[#000000] font-body select-none">
       <AntiCheat />
-      <ExamHeader onPaletteToggle={() => setIsMobilePaletteOpen(true)} />
+      <ExamHeader 
+        onPaletteToggle={() => setIsMobilePaletteOpen(true)} 
+        onExitRequest={() => setShowExitModal(true)}
+      />
       <SubjectTabs />
 
       <main className="flex-1 flex overflow-hidden relative">
@@ -293,6 +296,28 @@ export default function MockAttemptPage() {
                   FINALIZE & SYNC REGISTRY
                </Button>
                <Button variant="ghost" onClick={() => setShowSubmitModal(false)} className="w-full h-8 text-slate-400 font-black uppercase text-[9px] tracking-widest hover:text-[#0F172A]">RE-AUDIT QUESTIONS</Button>
+            </DialogFooter>
+         </DialogContent>
+      </Dialog>
+
+      <Dialog open={showExitModal} onOpenChange={setShowExitModal}>
+         <DialogContent className="max-w-[400px] w-[90vw] rounded-[2rem] p-8 bg-white border-none shadow-5xl text-center">
+            <DialogHeader className="space-y-4">
+               <div className="h-16 w-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto text-rose-500 shadow-lg">
+                  <AlertTriangle className="h-8 w-8" />
+               </div>
+               <DialogTitle className="text-2xl font-headline font-black text-[#0F172A] uppercase">Leave Evaluation?</DialogTitle>
+               <p className="text-slate-500 font-medium text-sm leading-relaxed">
+                  Your progress is auto-saved, but the timer will continue to run in the background. Are you sure you want to exit the CBT node?
+               </p>
+            </DialogHeader>
+            <DialogFooter className="flex flex-col gap-3 mt-8">
+               <Button onClick={() => setShowExitModal(false)} className="w-full h-14 bg-[#0F172A] text-white rounded-xl font-black uppercase text-[10px] tracking-widest">
+                  Continue Evaluation
+               </Button>
+               <Button variant="ghost" onClick={() => router.push('/dashboard')} className="w-full h-10 text-rose-500 hover:bg-rose-50 font-black uppercase text-[10px] tracking-widest gap-2">
+                  <LogOut className="h-4 w-4" /> Leave Assessment
+               </Button>
             </DialogFooter>
          </DialogContent>
       </Dialog>
