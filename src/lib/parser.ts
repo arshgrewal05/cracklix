@@ -4,7 +4,7 @@
  * 1. Simple Format (Q1. Text, A., B., C., D., Answer: B)
  * 2. High-Fidelity Tagged Format (QUESTION_TYPE: ..., QUESTION_EN: ..., etc.)
  * 3. Contextual Sets (DI_SET, PASSAGE)
- * Updated: Resilient regex for Markdown bolding and bilingual pipe separators.
+ * Updated: Aggressive sanitization to strip Markdown artifacts (**), redundant dots, and numbering.
  */
 
 import { Question, Difficulty, ContentStatus, QuestionType } from "@/types";
@@ -13,6 +13,18 @@ export interface ParsedResults {
   questions: Partial<Question>[];
   errors: string[];
   confidence: number;
+}
+
+/**
+ * Strips Markdown artifacts, redundant dots, and extra whitespace.
+ */
+function cleanText(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/^[\s\d\.\*]+/, '') // Remove leading numbers, dots, stars
+    .replace(/[\*\_]{1,}/g, '')  // Remove Markdown bold/italic markers (*, **, _, __)
+    .replace(/\s+/g, ' ')        // Normalize whitespace
+    .trim();
 }
 
 export function parseBulkQuestions(
@@ -77,7 +89,7 @@ function parseTaggedBlock(block: string, metadata: any): Partial<Question> {
   const getTag = (tag: string) => {
     const regex = new RegExp(`${tag}:?\\s*([\\s\\S]*?)(?=\\n[A-Z_\\d\\s]+:?|$)`, 'i');
     const match = block.match(regex);
-    return match ? match[1].trim() : null;
+    return match ? cleanText(match[1]) : null;
   };
 
   const qType = (getTag("QUESTION_TYPE") || "MCQ").toUpperCase() as QuestionType;
@@ -119,18 +131,15 @@ function parseTaggedBlock(block: string, metadata: any): Partial<Question> {
 }
 
 function parseSimpleBlock(block: string, metadata: any): Partial<Question> {
-  // Strip Markdown bolding and question numbers
-  const cleanBlock = block.replace(/^(\**Q?\d+[\.\)]\s*\*?)/i, '').trim();
-  
   // Split parts based on typical labels
-  const parts = cleanBlock.split(/(?=\n\s*\**[A-D][\.\)]\s*\*?|(?:\n\s*\**Correct Answer:?\**)|(?:\n\s*\**Explanation:?\**))/i);
+  const parts = block.split(/(?=\n\s*\**[A-D][\.\)]\s*\*?|(?:\n\s*\**Correct Answer:?\**)|(?:\n\s*\**Explanation:?\**))/i);
   
   const questionPart = parts[0]?.trim();
   const qLines = questionPart.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   
   // Bilingual question detection (Line 1: EN, Line 2: PA)
-  const questionEn = qLines[0] || "";
-  const questionPa = qLines.length > 1 ? qLines.slice(1).join('\n') : questionEn;
+  const questionEn = cleanText(qLines[0] || "");
+  const questionPa = qLines.length > 1 ? cleanText(qLines.slice(1).join('\n')) : questionEn;
 
   const findRawPart = (prefix: string) => {
     return parts.find(p => {
@@ -143,18 +152,16 @@ function parseSimpleBlock(block: string, metadata: any): Partial<Question> {
     const raw = findRawPart(prefix);
     if (!raw) return { en: `Option ${prefix}`, pa: "" };
     
-    // Remove the A) or B. prefix
+    // Remove the A) or B. prefix and cleaning markers
     const content = raw.trim().replace(new RegExp(`^\\**${prefix}[\\.\\)]?\\s*\\**`, 'i'), '').trim();
     
     // Handle pipe separator for bilingual options
     if (content.includes('|')) {
       const [en, pa] = content.split('|').map(s => s.trim());
-      // Further clean the second part if it repeats the prefix like "A) EN | A) PA"
-      const cleanPa = pa.replace(new RegExp(`^\\**${prefix}[\\.\\)]?\\s*\\**`, 'i'), '').trim();
-      return { en, pa: cleanPa };
+      return { en: cleanText(en), pa: cleanText(pa) };
     }
     
-    return { en: content, pa: "" };
+    return { en: cleanText(content), pa: "" };
   };
 
   const optA = extractOption("A");
@@ -167,8 +174,8 @@ function parseSimpleBlock(block: string, metadata: any): Partial<Question> {
 
   const expPart = findRawPart("Explanation") || "";
   const expLines = expPart.replace(/^\**Explanation:?\**\s*/i, '').split('\n').filter(l => l.trim().length > 0);
-  const explanationEn = expLines[0] || "Rationale available in bank.";
-  const explanationPa = expLines.length > 1 ? expLines.slice(1).join('\n') : "";
+  const explanationEn = cleanText(expLines[0] || "Rationale available in bank.");
+  const explanationPa = expLines.length > 1 ? cleanText(expLines.slice(1).join('\n')) : "";
 
   return {
     ...metadata,
