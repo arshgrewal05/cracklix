@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -15,11 +16,11 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Institutional Neat & Clean Renderer v18.0.
+ * @fileOverview Institutional Neat & Clean Renderer v20.0.
  * Rules Enforcement:
- * 1. MAXIMUM VISIBILITY: Forced black color for questions to prevent "invisible" text.
- * 2. MAXIMUM SPACING: High vertical margins and line heights.
- * 3. PREMIUM THEME: High-contrast Solution Hub with #121212 background.
+ * 1. MAXIMUM VISIBILITY: Forced black color for questions and options.
+ * 2. VERTICAL SPACING: Mandatory gaps between English/Punjabi segments.
+ * 3. BILINGUAL OPTIONS: Renders combined strings vertically with bold labels.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -38,7 +39,7 @@ export default function QuestionRenderer({
          <MathText text={question.questionEn || ""} />
       </div>
 
-      <div className="h-10" />
+      <div className="h-6" />
 
       {/* 2. Punjabi Question Statement - FORCED BLACK */}
       {question.questionPa && (
@@ -51,14 +52,14 @@ export default function QuestionRenderer({
 
       {/* 3. Options List - STRICT VERTICAL FLOW */}
       {!hideOptions && (
-        <div className="flex flex-col space-y-10">
+        <div className="flex flex-col space-y-6">
           {['A', 'B', 'C', 'D'].map(key => {
             const content = (question as any)[`option${key}En`];
             if (!content) return null;
 
             return (
               <div key={key} className="text-[18px] md:text-[22px] font-black text-[#000000] flex gap-5 leading-relaxed items-start group tracking-wide">
-                <span className="shrink-0 font-black px-3 py-1 bg-slate-100 rounded-lg border border-slate-200 group-hover:border-primary/40 transition-colors">({key})</span>
+                <span className="shrink-0 font-black px-3 py-1 bg-slate-50 rounded-lg border border-slate-200 group-hover:border-primary/40 transition-colors">({key})</span>
                 <div className="flex-1 pt-1">
                    <MathText text={content} />
                 </div>
@@ -73,15 +74,15 @@ export default function QuestionRenderer({
       {/* 4. Correct Answer Indicator - Institutional Multi-line */}
       <div className="text-[18px] md:text-[22px] font-black text-[#000000] border-y-2 border-slate-100 py-12 mb-16 bg-slate-50/50 px-10 rounded-[2.5rem] shadow-inner tracking-wide">
          <div className="space-y-8">
-            <p className="flex items-start gap-5">
-               <span className="text-emerald-600 uppercase tracking-tighter shrink-0 border-b-2 border-emerald-100">Correct Answer:</span>
-               <span className="text-[#000000]">({question.correctAnswer}) {ansEn}</span>
-            </p>
+            <div className="space-y-2">
+               <p className="text-emerald-600 uppercase tracking-tighter text-[14px]">Correct Answer:</p>
+               <p className="text-[#000000]">({question.correctAnswer}) {ansEn}</p>
+            </div>
             {ansPa && (
-               <p className="flex items-start gap-5">
-                  <span className="text-emerald-600 uppercase tracking-tighter shrink-0 border-b-2 border-emerald-100">ਸਹੀ ਉੱਤਰ:</span>
-                  <span className="text-[#000000]">{ansPa}</span>
-               </p>
+               <div className="space-y-2 pt-4 border-t border-slate-100/50">
+                  <p className="text-emerald-600 uppercase tracking-tighter text-[14px]">ਸਹੀ ਉੱਤਰ:</p>
+                  <p className="text-[#000000]">{ansPa}</p>
+               </div>
             )}
          </div>
       </div>
@@ -98,9 +99,9 @@ export default function QuestionRenderer({
               {/* English Explanation Block */}
               {(question.explanationEn || (question as any).englishExplanation) && (
                 <div className="flex flex-col">
-                   <div className="flex items-center mb-12">
+                   <div className="flex items-center mb-10">
                       <span className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] text-primary bg-primary/10 px-8 py-2.5 rounded-full border border-primary/20 shadow-2xl">
-                        • English Explanation
+                        • English Explanation:
                       </span>
                    </div>
                    <div className="text-[18px] md:text-[22px] text-slate-100 leading-[2.2] antialiased whitespace-pre-wrap break-words px-2 tracking-wide">
@@ -111,10 +112,10 @@ export default function QuestionRenderer({
 
               {/* Punjabi Explanation Block */}
               {(question.explanationPa || (question as any).punjabiExplanation) && (
-                <div className="flex flex-col mt-24 pt-20 border-t border-white/5">
-                   <div className="flex items-center mb-12">
+                <div className="flex flex-col mt-20 pt-16 border-t border-white/5">
+                   <div className="flex items-center mb-10">
                       <span className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] text-emerald-500 bg-emerald-500/10 px-8 py-2.5 rounded-full border border-emerald-500/20 shadow-2xl">
-                        • ਪੰਜਾਬੀ ਵਿਆਖਿਆ
+                        • ਪੰਜਾਬੀ ਵਿਆਖਿਆ:
                       </span>
                    </div>
                    <div className="text-[18px] md:text-[22px] text-slate-100 leading-[2.2] antialiased whitespace-pre-wrap break-words px-2 tracking-wide">

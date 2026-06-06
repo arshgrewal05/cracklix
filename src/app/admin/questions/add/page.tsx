@@ -19,6 +19,12 @@ import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors"
 import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
+/**
+ * @fileOverview Institutional Manual Entry Node v25.0.
+ * Updated: Unified Bilingual Options Hub to prevent data fragmentation.
+ * Spacing: Hardcoded vertical rhythm for high-fidelity rendering.
+ */
+
 export default function QuestionEntryPage() {
   return (
     <Suspense fallback={<div className="h-screen flex items-center justify-center bg-white"><Loader2 className="h-10 w-10 text-primary animate-spin" /></div>}>
@@ -48,10 +54,10 @@ function QuestionEntryContent() {
     questionType: "MCQ",
     diagramType: "none",
     questionEn: "", questionPa: "",
-    optionAEn: "", optionAPa: "",
-    optionBEn: "", optionBPa: "",
-    optionCEn: "", optionCPa: "",
-    optionDEn: "", optionDPa: "",
+    optionAEn: "", 
+    optionBEn: "", 
+    optionCEn: "", 
+    optionDEn: "", 
     correctAnswer: "A", 
     explanationEn: "", explanationPa: "",
     imageUrl: "",
@@ -65,14 +71,10 @@ function QuestionEntryContent() {
         questionEn: existingData.questionEn || "",
         questionPa: existingData.questionPa || "",
         optionAEn: existingData.optionAEn || "",
-        optionAPa: existingData.optionAPa || "",
         optionBEn: existingData.optionBEn || "",
-        optionBPa: existingData.optionBPa || "",
         optionCEn: existingData.optionCEn || "",
-        optionCPa: existingData.optionCPa || "",
         optionDEn: existingData.optionDEn || "",
-        optionDPa: existingData.optionDPa || "",
-        explanationEn: existingData.explanationEn || existingData.explanation || "",
+        explanationEn: existingData.explanationEn || "",
         explanationPa: existingData.explanationPa || "",
         subjectId: existingData.subjectId || "",
         boardId: existingData.boardId || "",
@@ -149,8 +151,8 @@ function QuestionEntryContent() {
         <div className="lg:col-span-7 space-y-8 text-left">
           <Tabs defaultValue="content" className="w-full">
             <TabsList className="bg-slate-100 rounded-2xl p-1.5 h-16 mb-6 flex gap-1 h-auto overflow-x-auto no-scrollbar">
-              <TabsTrigger value="content" className="rounded-xl px-8 font-black uppercase text-[10px] h-12 flex-1"><Database className="h-4 w-4 mr-2" /> English Hub</TabsTrigger>
-              <TabsTrigger value="punjabi" className="rounded-xl px-8 font-black uppercase text-[10px] h-12 flex-1"><Languages className="h-4 w-4 mr-2" /> ਪੰਜਾਬੀ ਸੈਕਸ਼ਨ</TabsTrigger>
+              <TabsTrigger value="content" className="rounded-xl px-8 font-black uppercase text-[10px] h-12 flex-1"><Database className="h-4 w-4 mr-2" /> Content Hub (Bilingual)</TabsTrigger>
+              <TabsTrigger value="punjabi" className="rounded-xl px-8 font-black uppercase text-[10px] h-12 flex-1"><Languages className="h-4 w-4 mr-2" /> Secondary Lang (PA)</TabsTrigger>
               <TabsTrigger value="metadata" className="rounded-xl px-8 font-black uppercase text-[10px] h-12 flex-1"><Layers className="h-4 w-4 mr-2" /> Classification</TabsTrigger>
             </TabsList>
 
@@ -192,13 +194,21 @@ function QuestionEntryContent() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-6">
-                    {['A','B','C','D'].map(opt => (
-                      <div key={opt} className="space-y-2 text-left">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Option {opt} (EN)</Label>
-                        <Input value={formData[`option${opt}En`]} onChange={e => setFormData({...formData, [`option${opt}En`]: e.target.value})} className="h-12 rounded-xl bg-slate-50 border-slate-100 font-bold" />
-                      </div>
-                    ))}
+                  <div className="space-y-3 pt-4 border-t border-slate-100">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">Bilingual Options (EN / PA)</p>
+                    <div className="grid grid-cols-1 gap-6">
+                      {['A','B','C','D'].map(opt => (
+                        <div key={opt} className="space-y-2 text-left">
+                          <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Option {opt} Hub</Label>
+                          <Input 
+                            value={formData[`option${opt}En`]} 
+                            onChange={e => setFormData({...formData, [`option${opt}En`]: e.target.value})} 
+                            className="h-14 rounded-xl bg-slate-50 border-slate-100 font-bold text-lg" 
+                            placeholder={`e.g. 15 days / 15 ਦਿਨ`}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="space-y-3 pt-6 border-t border-slate-100 text-left">
@@ -206,8 +216,8 @@ function QuestionEntryContent() {
                     <Textarea 
                       value={formData.explanationEn} 
                       onChange={e => setFormData({...formData, explanationEn: e.target.value})} 
-                      className="min-h-[100px] rounded-2xl bg-emerald-50/30 border-emerald-100 p-6 font-medium" 
-                      placeholder="Detailed explanation..."
+                      className="min-h-[150px] rounded-2xl bg-emerald-50/30 border-emerald-100 p-6 font-medium leading-relaxed" 
+                      placeholder="Detailed explanation with formulas..."
                     />
                   </div>
                </Card>
@@ -216,23 +226,22 @@ function QuestionEntryContent() {
             <TabsContent value="punjabi" className="space-y-6">
                <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] p-12 space-y-10">
                   <div className="space-y-3 text-left">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">ਸਵਾਲ (Question Statement)</Label>
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">ਸਵਾਲ (Punjabi Statement)</Label>
                     <Textarea value={formData.questionPa} onChange={e => setFormData({...formData, questionPa: e.target.value})} className="min-h-[120px] rounded-2xl bg-slate-50 border-slate-100 p-6 text-lg font-bold" />
                   </div>
-                  <div className="grid grid-cols-2 gap-6">
-                    {['A','B','C','D'].map(opt => (
-                      <div key={opt} className="space-y-2 text-left">
-                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">ਵਿਕਲਪ {opt}</Label>
-                        <Input value={formData[`option${opt}Pa`]} onChange={e => setFormData({...formData, [`option${opt}Pa`]: e.target.value})} className="h-12 rounded-xl bg-slate-50 border-slate-100 font-bold" />
-                      </div>
-                    ))}
+                  
+                  <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100 flex items-center gap-4">
+                     <BarChart3 className="h-5 w-5 text-amber-600" />
+                     <p className="text-[10px] font-bold text-amber-800 uppercase tracking-tight">Options are managed in the primary Content Hub to maintain bilingual synchronization.</p>
                   </div>
+
                   <div className="space-y-3 pt-6 border-t border-slate-100 text-left">
                     <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">ਵਿਆਖਿਆ (Punjabi Rationale)</Label>
                     <Textarea 
                       value={formData.explanationPa} 
                       onChange={e => setFormData({...formData, explanationPa: e.target.value})} 
-                      className="min-h-[100px] rounded-2xl bg-emerald-50/30 border-emerald-100 p-6 font-medium" 
+                      className="min-h-[150px] rounded-2xl bg-emerald-50/30 border-emerald-100 p-6 font-medium leading-relaxed" 
+                      placeholder="Detailed Punjabi logic..."
                     />
                   </div>
                </Card>
