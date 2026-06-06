@@ -15,11 +15,11 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Institutional High-Fidelity Renderer v15.0.
+ * @fileOverview Institutional Neat & Clean Renderer v16.0.
  * Rules Enforcement:
- * 1. LINE-HEIGHT 2.0: For maximum readability of math steps.
- * 2. NO CLIPPING: Auto-expanding containers for vertical calculations.
- * 3. BILINGUAL SPLIT: Clear separation between EN and PA answer labels.
+ * 1. HIGH VERTICAL SPACING: Generous margins between all logic steps.
+ * 2. ZERO CLUMPING: Math and Text are visually separated for clarity.
+ * 3. PREMIUM THEME: High-contrast Solution Hub with #121212 background.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -34,33 +34,33 @@ export default function QuestionRenderer({
   return (
     <div className="w-full text-left font-body space-y-0 text-[#0F172A] bg-transparent">
       {/* 1. English Question Statement */}
-      <div className="text-[18px] md:text-[22px] font-black leading-relaxed antialiased">
-         <MathText text={question.questionEn || ""} className="inline" />
+      <div className="text-[18px] md:text-[22px] font-black leading-[1.8] antialiased">
+         <MathText text={question.questionEn || ""} />
       </div>
 
       <div className="h-6" />
 
       {/* 2. Punjabi Question Statement */}
       {question.questionPa && (
-        <div className="text-[18px] md:text-[22px] font-black leading-relaxed antialiased text-slate-800">
+        <div className="text-[18px] md:text-[22px] font-black leading-[1.8] antialiased text-slate-800">
            <MathText text={question.questionPa} />
         </div>
       )}
 
-      <div className="h-8" />
+      <div className="h-10" />
 
       {/* 3. Options List - STRICT VERTICAL FLOW */}
       {!hideOptions && (
-        <div className="flex flex-col space-y-6">
+        <div className="flex flex-col space-y-8">
           {['A', 'B', 'C', 'D'].map(key => {
             const content = (question as any)[`option${key}En`];
             if (!content) return null;
 
             return (
-              <div key={key} className="text-[18px] md:text-[22px] font-bold text-[#0F172A] flex gap-4 leading-snug items-start">
-                <span className="shrink-0 font-black">({key})</span>
-                <div className="flex-1">
-                   <MathText text={content} className="inline" />
+              <div key={key} className="text-[18px] md:text-[22px] font-bold text-[#0F172A] flex gap-4 leading-snug items-start group">
+                <span className="shrink-0 font-black px-3 py-1 bg-slate-50 rounded-lg border border-slate-100 group-hover:border-primary/20 transition-colors">({key})</span>
+                <div className="flex-1 pt-1">
+                   <MathText text={content} />
                 </div>
               </div>
             )
@@ -68,38 +68,42 @@ export default function QuestionRenderer({
         </div>
       )}
 
-      <div className="h-8" />
+      <div className="h-12" />
 
       {/* 4. Correct Answer Indicator - Institutional Multi-line */}
-      <div className="text-[18px] md:text-[22px] font-black text-[#0F172A] border-y border-slate-100 py-8 mb-10 bg-slate-50/50 px-6 rounded-2xl shadow-inner">
-         <div className="space-y-4">
-            <p className="flex items-start gap-3">
-               <span className="text-emerald-600 uppercase tracking-tight shrink-0">Correct Answer:</span>
-               <span>({question.correctAnswer}) {ansEn}</span>
+      <div className="text-[18px] md:text-[22px] font-black text-[#0F172A] border-y-2 border-slate-100 py-10 mb-12 bg-slate-50/30 px-8 rounded-[2rem] shadow-inner">
+         <div className="space-y-6">
+            <p className="flex items-start gap-4">
+               <span className="text-emerald-600 uppercase tracking-tighter shrink-0 border-b-2 border-emerald-100">Correct Answer:</span>
+               <span className="text-[#0F172A]">({question.correctAnswer}) {ansEn}</span>
             </p>
             {ansPa && (
-               <p className="flex items-start gap-3 text-slate-700">
-                  <span className="text-emerald-600 uppercase tracking-tight shrink-0">ਸਹੀ ਉੱਤਰ:</span>
-                  <span>{ansPa}</span>
+               <p className="flex items-start gap-4 text-slate-700">
+                  <span className="text-emerald-600 uppercase tracking-tighter shrink-0 border-b-2 border-emerald-100">ਸਹੀ ਉੱਤਰ:</span>
+                  <span className="text-[#0F172A]">{ansPa}</span>
                </p>
             )}
          </div>
       </div>
 
-      {/* 5. Solution Hub - AUTO-EXPANDING HEIGHT & LINE-HEIGHT 2.0 */}
+      {/* 5. Solution Hub - AUTO-EXPANDING HEIGHT & NEAT SPACING */}
       {showSolution && (
-        <div className="bg-[#121212] rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 text-white shadow-4xl border border-white/5 h-auto min-h-0 overflow-visible">
-           <div className="space-y-12">
+        <div className="bg-[#121212] rounded-[3rem] p-8 md:p-14 text-white shadow-4xl border border-white/10 h-auto min-h-0 overflow-visible relative">
+           <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+              <CheckCircle2 className="h-40 w-40" />
+           </div>
+
+           <div className="space-y-16 relative z-10">
               
               {/* English Explanation Block */}
               {(question.explanationEn || (question as any).englishExplanation) && (
-                <div className="space-y-6">
+                <div className="space-y-8">
                    <div className="flex items-center">
-                      <span className="text-[14px] md:text-[16px] font-black uppercase tracking-[0.2em] text-primary bg-primary/10 px-4 py-1.5 rounded-lg border border-primary/20">
-                        • English Explanation:
+                      <span className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] text-primary bg-primary/10 px-6 py-2 rounded-full border border-primary/20 shadow-xl">
+                        • English Explanation
                       </span>
                    </div>
-                   <div className="text-[18px] md:text-[20px] text-slate-100 font-medium leading-[2] antialiased whitespace-pre-wrap break-words px-2">
+                   <div className="text-[18px] md:text-[21px] text-slate-100 leading-[2.2] antialiased whitespace-pre-wrap break-words px-2">
                       <MathText text={question.explanationEn || (question as any).englishExplanation || ""} />
                    </div>
                 </div>
@@ -107,13 +111,13 @@ export default function QuestionRenderer({
 
               {/* Punjabi Explanation Block */}
               {(question.explanationPa || (question as any).punjabiExplanation) && (
-                <div className="space-y-6 pt-10 border-t border-white/5">
+                <div className="space-y-8 pt-16 border-t border-white/5">
                    <div className="flex items-center">
-                      <span className="text-[14px] md:text-[16px] font-black uppercase tracking-[0.2em] text-emerald-500 bg-emerald-500/10 px-4 py-1.5 rounded-lg border border-emerald-500/20">
-                        • ਪੰਜਾਬੀ ਵਿਆਖਿਆ:
+                      <span className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.3em] text-emerald-500 bg-emerald-500/10 px-6 py-2 rounded-full border border-emerald-500/20 shadow-xl">
+                        • ਪੰਜਾਬੀ ਵਿਆਖਿਆ
                       </span>
                    </div>
-                   <div className="text-[18px] md:text-[20px] text-slate-100 font-medium leading-[2] antialiased whitespace-pre-wrap break-words px-2">
+                   <div className="text-[18px] md:text-[21px] text-slate-100 leading-[2.2] antialiased whitespace-pre-wrap break-words px-2">
                       <MathText text={question.explanationPa || (question as any).punjabiExplanation || ""} />
                    </div>
                 </div>

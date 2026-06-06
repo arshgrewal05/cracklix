@@ -11,11 +11,12 @@ interface MathTextProps {
 }
 
 /**
- * @fileOverview Precision Math Renderer v7.0.
- * Optimized for institutional symbols: √, ×, ÷, ², ³, ≤, ≥, %.
+ * @fileOverview Precision Neat & Clean Math Renderer v8.0.
+ * Optimized to prevent word clumping while ensuring beautiful formula typesetting.
  * Rules:
- * 1. PRESERVE VERTICALITY: Every line in source text remains a line in output.
- * 2. SYMBOL CLEANLINESS: Zero broken symbols for roots and products.
+ * 1. PRESERVE SPACES: Renders plain text as HTML to keep spaces.
+ * 2. SYMBOL PRECISION: Only applies KaTeX to detected math operators or formula blocks.
+ * 3. NEAT VERTICALITY: Maintains user-provided line breaks exactly.
  */
 export default function MathText({ text, className }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,48 +25,58 @@ export default function MathText({ text, className }: MathTextProps) {
     if (!containerRef.current) return;
 
     try {
-      // Split text into lines to preserve vertical structure exactly as provided
       const lines = text.split('\n');
       
       const renderedHtml = lines.map(line => {
         const trimmed = line.trim();
-        if (!trimmed) return '<div class="h-6"></div>'; // Preserve blank lines for spacing
+        if (!trimmed) return '<div class="h-6"></div>';
 
-        // 1. Symbol Normalization (Unicode to LaTeX)
+        // Normalize symbols for logic detection
         let processed = trimmed
-          .replace(/√\[?([^\]\s]+)\]?/g, '\\sqrt{$1}') 
-          .replace(/√/g, '\\sqrt')
           .replace(/×/g, '\\times')
           .replace(/÷/g, '\\div')
           .replace(/²/g, '^2')
           .replace(/³/g, '^3')
-          .replace(/≤/g, '\\leq')
-          .replace(/≥/g, '\\geq');
+          .replace(/√\[?([^\]\s]+)\]?/g, '\\sqrt{$1}')
+          .replace(/√/g, '\\sqrt');
 
-        // 2. Detection logic for math lines
-        const hasMath = /[√\\×÷²³≤≥%=]/.test(processed) || /Area|Semi-perimeter|s=|ਖੇਤਰਫਲ|ਪਰਿਮਾਪ/i.test(processed);
-        
-        // 3. Section Label Logic: Bold sections like "Formula:", "Calculation:", etc.
-        const isLabel = /^(Formula|Calculation|Final Answer|ਸੂਤਰ|ਹਿਸਾਬ|ਅੰਤਿਮ ਉੱਤਰ):/i.test(trimmed);
+        // Logic: Is this line a pure formula or text with math?
+        // We look for common math indicators but avoid rendering plain sentences as KaTeX.
+        const isPureFormula = /^[sabcxyz\d\s\+\-\*\/\=\(\)\\\^\sqrt{}]+$/i.test(trimmed) && trimmed.includes('=');
+        const hasSymbols = /[√\\×÷²³≤≥]/.test(trimmed);
 
-        if (hasMath) {
+        if (isPureFormula || (hasSymbols && !/[a-z]{4,}/i.test(trimmed))) {
+          // Render as a centered or clean formula block
           try {
-            return `<div class="py-1 overflow-x-auto no-scrollbar">${katex.renderToString(processed, {
+            return `<div class="py-2 overflow-x-auto no-scrollbar font-sans text-xl md:text-2xl">${katex.renderToString(processed, {
               throwOnError: false,
               displayMode: false,
-              trust: true,
-              strict: false
+              trust: true
             })}</div>`;
           } catch (e) {
-            return `<div class="py-1">${trimmed}</div>`;
+            return `<div class="py-2">${trimmed}</div>`;
           }
         }
+
+        // If it's descriptive text (e.g., "Total age of 20 students = 300"), 
+        // we render it as HTML to preserve spaces, but we can still highlight 
+        // the calculation part if it has one.
+        if (trimmed.includes('=')) {
+          const parts = trimmed.split('=');
+          return `<div class="py-2 flex flex-wrap items-baseline gap-2">
+            <span class="font-bold text-slate-100">${parts[0].trim()}</span>
+            <span class="text-primary font-black">=</span>
+            <span class="font-black text-white">${parts[1].trim()}</span>
+          </div>`;
+        }
         
-        if (isLabel) {
-           return `<div class="font-black text-primary mt-4 mb-2 uppercase tracking-widest text-xs md:text-sm">${trimmed}</div>`;
+        // Header detection for "Formula:", "Calculation:", etc.
+        if (trimmed.endsWith(':')) {
+           return `<div class="font-black text-primary/80 mt-6 mb-2 uppercase tracking-[0.2em] text-xs md:text-sm border-l-4 border-primary/40 pl-4 bg-primary/5 py-2 rounded-r-lg">${trimmed}</div>`;
         }
 
-        return `<div class="py-1">${trimmed}</div>`;
+        // Standard neat text line
+        return `<div class="py-1.5 text-slate-200 font-medium leading-relaxed">${trimmed}</div>`;
       }).join('');
 
       containerRef.current.innerHTML = renderedHtml;
