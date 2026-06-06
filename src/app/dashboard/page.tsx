@@ -243,7 +243,7 @@ export default function StudentDashboard() {
                    <ActionTile icon={<FileText className="text-emerald-500 h-5 w-5" />} label="PYQ" href="/pyqs" />
                    <ActionTile icon={<LayoutGrid className="text-orange-500 h-5 w-5" />} label="Hubs" href="/exams" />
                 </div>
-             </ActionTile>
+             </Card>
 
              {/* Elite Mode CTA */}
              <Card className="border-primary/20 bg-primary/5 rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-12 space-y-6 border shadow-xl relative overflow-hidden">
