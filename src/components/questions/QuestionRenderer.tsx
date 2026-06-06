@@ -15,9 +15,9 @@ interface QuestionRendererProps {
 
 /**
  * @fileOverview Official Exam Solution Renderer (Testbook/PSSSB Style).
- * - Clean dark theme for solutions (#121212)
+ * - High-Fidelity structured explanations
  * - KaTeX math rendering support
- * - Pure statement output (No prefixes)
+ * - Strict Language Segregation
  */
 export default function QuestionRenderer({ 
   question, 
@@ -63,7 +63,7 @@ export default function QuestionRenderer({
       <div className="space-y-4">
         {content.en && (
           <div className="text-[16px] md:text-[19px] font-bold text-[#0F172A] leading-relaxed antialiased">
-             {question.displayId && <span className="mr-2">{question.displayId}.</span>}
+             {question.displayId && <span className="mr-2 text-primary">{question.displayId}.</span>}
              <MathText text={content.en} className="inline" />
           </div>
         )}
@@ -85,13 +85,13 @@ export default function QuestionRenderer({
             const showPa = isPunjabiSubject || language === 'pa' || language === 'bilingual';
 
             return (
-              <div key={key} className="flex items-center gap-4 p-4 md:p-5 bg-white border border-slate-200 rounded-xl hover:border-primary/40 transition-colors">
+              <div key={key} className="flex items-center gap-4 p-4 md:p-5 bg-white border border-slate-200 rounded-xl hover:border-primary/40 transition-colors shadow-sm">
                 <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center font-black text-[11px] text-[#0F172A] shrink-0 border border-slate-200">
                   {key}
                 </div>
-                <div className="text-[15px] md:text-[17px] font-medium text-slate-800 leading-snug">
+                <div className="text-[15px] md:text-[17px] font-bold text-slate-800 leading-snug">
                   {showEn && <MathText text={en} className="inline" />}
-                  {showEn && showPa && pa && <span className="text-slate-300 mx-2">/</span>}
+                  {showEn && showPa && pa && <span className="text-primary/30 mx-2">/</span>}
                   {showPa && <MathText text={pa || (!showEn ? en : "")} className="inline" />}
                 </div>
               </div>
@@ -100,7 +100,7 @@ export default function QuestionRenderer({
         </div>
       )}
 
-      {/* 3. Solution Hub (Testbook Style) */}
+      {/* 3. Solution Hub (Institutional Structured Flow) */}
       {showSolution && (
         <div className="mt-12 bg-[#121212] rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
            <div className="absolute top-0 right-0 p-8 opacity-5">
@@ -109,39 +109,43 @@ export default function QuestionRenderer({
               </svg>
            </div>
 
-           <div className="space-y-10 relative z-10">
+           <div className="space-y-12 relative z-10">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
                  <div className="space-y-1">
                     <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Official Answer Key</p>
                     <h4 className="text-3xl font-black uppercase leading-tight">Correct Option: ({question.correctAnswer})</h4>
                  </div>
                  <div className="bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
-                    <p className="text-[14px] font-bold text-white leading-none">
+                    <p className="text-[15px] font-black text-white leading-none">
                        {cleanText((question as any)[`option${question.correctAnswer}En` || `option${question.correctAnswer}Pa` || ""])}
                     </p>
                  </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                 {/* English Explanation */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20">
+                 {/* English Explanation Segment */}
                  {expEn && (
                    <div className="space-y-6">
                       <div className="flex items-center gap-3">
                          <div className="h-1 w-12 bg-primary rounded-full" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">English Explanation</span>
+                         <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">• English Explanation:</span>
                       </div>
-                      <MathText text={expEn} className="text-[15px] md:text-[16px] text-slate-300 font-medium leading-relaxed" />
+                      <div className="space-y-6 text-[15px] md:text-[17px] text-slate-300 font-medium leading-relaxed antialiased">
+                         <MathText text={expEn} />
+                      </div>
                    </div>
                  )}
 
-                 {/* Punjabi Explanation */}
+                 {/* Punjabi Explanation Segment */}
                  {expPa && (
                    <div className="space-y-6">
                       <div className="flex items-center gap-3">
                          <div className="h-1 w-12 bg-emerald-500 rounded-full" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">ਪੰਜਾਬੀ ਵਿਆਖਿਆ</span>
+                         <span className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-500">• ਪੰਜਾਬੀ ਵਿਆਖਿਆ:</span>
                       </div>
-                      <MathText text={expPa} className="text-[15px] md:text-[16px] text-slate-300 font-medium leading-relaxed" />
+                      <div className="space-y-6 text-[15px] md:text-[17px] text-slate-300 font-medium leading-relaxed antialiased">
+                         <MathText text={expPa} />
+                      </div>
                    </div>
                  )}
               </div>

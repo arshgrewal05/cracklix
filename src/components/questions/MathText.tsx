@@ -11,19 +11,26 @@ interface MathTextProps {
 }
 
 /**
- * @fileOverview Exam-Grade Math Renderer.
- * Automatically identifies math symbols and renders them using KaTeX.
+ * @fileOverview Exam-Grade Math Renderer v2.0.
+ * Standardizes math symbols and renders LaTeX formulas with zero broken glyphs.
  */
 export default function MathText({ text, className }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (containerRef.current) {
-      // Find math parts in text. This is a simplified regex for exam-style math.
-      // E.g. symbols like √, ^, _, fractions, etc.
-      // For full support, we replace the entire block with KaTeX rendered HTML.
       try {
-        const parts = text.split(/(\$.*?\$)/g);
+        // Clean common math characters to ensure compatibility
+        const cleanText = text
+          .replace(/−/g, '-')
+          .replace(/×/g, '\\times ')
+          .replace(/÷/g, '\\div ')
+          .replace(/√/g, '\\sqrt ');
+
+        // Identify LaTeX blocks or render entire text as standard markup
+        // Supporting both $...$ and plain text with math symbols
+        const parts = cleanText.split(/(\$.*?\$)/g);
+        
         containerRef.current.innerHTML = parts.map(part => {
           if (part.startsWith('$') && part.endsWith('$')) {
             const math = part.slice(1, -1);
@@ -32,13 +39,17 @@ export default function MathText({ text, className }: MathTextProps) {
               displayMode: false
             });
           }
-          return part;
+          
+          // For non-LaTeX parts, we still want to ensure nice formatting
+          return part.replace(/\n/g, '<br/>');
         }).join('');
+        
       } catch (err) {
-        console.error("KaTeX Error:", err);
+        console.error("KaTeX Rendering Audit Failed:", err);
+        containerRef.current.textContent = text;
       }
     }
   }, [text]);
 
-  return <div ref={containerRef} className={className} />;
+  return <div ref={containerRef} className={cn("whitespace-pre-wrap", className)} />;
 }

@@ -1,7 +1,8 @@
+
 /**
- * @fileOverview Exam-Grade Regex Parser for Deterministic Ingestion.
- * Strictly non-AI. Deterministic pattern matching for English/Punjabi MCQs.
- * Optimized for Testbook/PSSSB style data blocks.
+ * @fileOverview Exam-Grade Regex Parser for Deterministic Ingestion v9.0.
+ * Strictly non-AI. Optimized for "Line 1 English / Line 2 Punjabi" format.
+ * Features: High-precision explanation extraction and formula preservation.
  */
 
 import { Question } from "@/types";
@@ -40,7 +41,7 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
     try {
       const q: any = { 
         ...metadata,
-        id: `temp-${Date.now()}-${index}`,
+        id: `q-node-${Date.now()}-${index}`,
         status: metadata.status || "PUBLISHED",
         isStandalone: true,
         questionEn: "",
@@ -54,8 +55,7 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
         explanationPa: ""
       };
 
-      // 1. Extract Question Text
-      // The first line is English, second is Punjabi (if it doesn't look like an option)
+      // 1. Extract Question Text (Line 1 EN, Line 2 PA)
       q.questionEn = lines[0].replace(/^Q\d+[\.\s]*/i, '').trim();
 
       let nextIdx = 1;
@@ -64,7 +64,7 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
         nextIdx++;
       }
 
-      // 2. Extract Options (A-D)
+      // 2. Extract Options (A-D) with strict "/" split
       const optionPattern = /^\(?([A-D])[\.\)\s]+(.*)/i;
       for (let i = nextIdx; i < lines.length; i++) {
         const line = lines[i];
@@ -73,7 +73,6 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
           const letter = optMatch[1].toUpperCase();
           const content = optMatch[2].trim();
           
-          // Split by / to handle bilingual options: "84 cm² / 84 ਵਰਗ ਸੈਂਟੀਮੀਟਰ"
           if (content.includes('/')) {
             const parts = content.split('/');
             q[`option${letter}En`] = parts[0]?.trim() || "";
@@ -84,14 +83,19 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
         }
       }
 
-      // 3. Extract Correct Answer
-      const ansLine = lines.find(l => l.toLowerCase().includes('correct answer') || l.toLowerCase().startsWith('ans:'));
+      // 3. Extract Correct Answer (Key logic)
+      const ansLine = lines.find(l => 
+        l.toLowerCase().includes('correct answer') || 
+        l.toLowerCase().includes('ਸਹੀ ਉੱਤਰ') ||
+        l.toLowerCase().startsWith('ans:')
+      );
+      
       if (ansLine) {
-        const match = ansLine.match(/(?:correct answer|ans)[:\s]*\(?([A-D])\)?/i);
+        const match = ansLine.match(/(?:correct answer|ans|ਸਹੀ ਉੱਤਰ)[:\s]*\(?([A-D])\)?/i);
         if (match) q.correctAnswer = match[1].toUpperCase();
       }
 
-      // 4. Extract Explanations
+      // 4. Extract Explanations with High-Fidelity preservation
       const expEnStart = lines.findIndex(l => l.toLowerCase().includes('english explanation'));
       const expPaStart = lines.findIndex(l => l.toLowerCase().includes('ਪੰਜਾਬੀ ਵਿਆਖਿਆ'));
 
@@ -104,10 +108,10 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
         q.explanationPa = lines.slice(expPaStart + 1).join('\n').trim();
       }
 
-      // Final Validations before pushing
-      if (!q.questionEn) throw new Error(`Missing English question text in Block ${index + 1}`);
-      if (!q.correctAnswer) throw new Error(`Missing correct answer in Block ${index + 1}`);
-      if (!q.optionAEn || !q.optionBEn) throw new Error(`Insufficient options in Block ${index + 1}`);
+      // Validations
+      if (!q.questionEn) throw new Error(`Missing Statement in Block ${index + 1}`);
+      if (!q.correctAnswer) throw new Error(`Missing Answer Key in Block ${index + 1}`);
+      if (!q.optionAEn || !q.optionBEn) throw new Error(`Insufficient Options in Block ${index + 1}`);
 
       questions.push(q);
     } catch (err: any) {
