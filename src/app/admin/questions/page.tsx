@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState, useEffect, useCallback } from "react"
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/tooltip"
 
 /**
- * @fileOverview Institutional Asset Ledger (Global Bank) v10.0.
+ * @fileOverview Institutional Asset Ledger (Global Bank) v11.0.
  * Hardened: Robust Firestore instance validation to prevent runtime collection() errors.
  */
 
@@ -45,16 +46,18 @@ export default function QuestionBank() {
   const [hasMore, setLastHasMore] = useState(true)
 
   // Double-gated queries for registry safety
-  const mocksQuery = useMemo(() => (db && typeof db === 'object' ? query(collection(db, "mocks")) : null), [db])
-  const boardsQuery = useMemo(() => (db && typeof db === 'object' ? query(collection(db, "boards")) : null), [db])
-  const subjectsQuery = useMemo(() => (db && typeof db === 'object' ? query(collection(db, "subjects")) : null), [db])
+  const isValidDb = db && typeof db === 'object' && (db as any).type === 'firestore';
+
+  const mocksQuery = useMemo(() => (isValidDb ? query(collection(db, "mocks")) : null), [isValidDb, db])
+  const boardsQuery = useMemo(() => (isValidDb ? query(collection(db, "boards")) : null), [isValidDb, db])
+  const subjectsQuery = useMemo(() => (isValidDb ? query(collection(db, "subjects")) : null), [isValidDb, db])
 
   const { data: allMocks } = useCollection<any>(mocksQuery)
   const { data: boards } = useCollection<any>(boardsQuery)
   const { data: subjects } = useCollection<any>(subjectsQuery)
 
   const fetchQuestions = useCallback(async (isNext = false) => {
-    if (!db || typeof db !== 'object') return
+    if (!isValidDb) return
     setLoading(true)
     
     try {
@@ -86,11 +89,11 @@ export default function QuestionBank() {
     } finally {
       setLoading(false)
     }
-  }, [db, boardFilter, examFilter, lastDoc, toast])
+  }, [isValidDb, db, boardFilter, examFilter, lastDoc, toast])
 
   useEffect(() => {
-    if (db && typeof db === 'object') fetchQuestions()
-  }, [boardFilter, examFilter, db, fetchQuestions])
+    if (isValidDb) fetchQuestions()
+  }, [boardFilter, examFilter, isValidDb, fetchQuestions])
 
   const usageMap = useMemo(() => {
     if (!questions || !allMocks) return {};
@@ -130,7 +133,7 @@ export default function QuestionBank() {
   }
 
   const handlePurgeIds = async (ids: string[]) => {
-    if (!db || ids.length === 0) return
+    if (!isValidDb || ids.length === 0) return
     const usedIds = ids.filter(id => (usageMap[id]?.length || 0) > 0);
     const confirmMsg = usedIds.length > 0 
       ? `CRITICAL AUDIT: ${usedIds.length} questions are ACTIVE in mocks. Deleting them will break those tests. Continue?`
@@ -154,7 +157,7 @@ export default function QuestionBank() {
   }
 
   const handleDeleteSingle = (id: string) => {
-    if (!db) return;
+    if (!isValidDb) return;
     const usage = usageMap[id] || [];
     if (usage.length > 0) {
       if (!confirm(`WARNING: This question is used in ${usage.length} mocks. Proceed?`)) return;

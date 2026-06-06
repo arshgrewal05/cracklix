@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Database, Users, ShieldCheck, Rocket, Zap, RefreshCw, ChevronRight, ListTree, Loader2, FileText, Newspaper, Landmark, BookOpen } from "lucide-react"
+import { Plus, Database, Users, ShieldCheck, Rocket, Zap, RefreshCw, ChevronRight, ListTree, Loader2, FileText, Newspaper, Landmark, BookOpen, Send } from "lucide-react"
 import Link from "next/link"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query } from "firebase/firestore"
@@ -12,18 +12,26 @@ import { seedInitialData } from "@/services/seed-data"
 import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+/**
+ * @fileOverview Institutional Command Center.
+ * Hardened: Verified Firestore instance checks to prevent runtime collection() errors.
+ */
+
 export default function AdminDashboard() {
   const db = useFirestore()
   const { toast } = useToast()
   const [isSyncing, setIsSyncing] = useState(false)
 
-  const { data: users } = useCollection<any>(useMemo(() => (db ? collection(db, "users") : null), [db]))
-  const { data: questions, loading: qLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "questions") : null), [db]))
-  const { data: mocks } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]))
-  const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects") : null), [db]))
-  const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
-  const { data: notes } = useCollection<any>(useMemo(() => (db ? collection(db, "notes") : null), [db]))
-  const { data: pyqs } = useCollection<any>(useMemo(() => (db ? collection(db, "pyqs") : null), [db]))
+  // Double-gated instance validation
+  const isValidDb = db && typeof db === 'object' && (db as any).type === 'firestore';
+
+  const { data: users } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "users") : null), [isValidDb, db]))
+  const { data: questions, loading: qLoading } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "questions") : null), [isValidDb, db]))
+  const { data: mocks } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "mocks") : null), [isValidDb, db]))
+  const { data: subjects } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "subjects") : null), [isValidDb, db]))
+  const { data: exams } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "exams") : null), [isValidDb, db]))
+  const { data: notes } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "notes") : null), [isValidDb, db]))
+  const { data: pyqs } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "pyqs") : null), [isValidDb, db]))
 
   const proUsers = useMemo(() => users?.filter((u: any) => u.status && u.status !== 'Free') || [], [users]);
 
@@ -45,12 +53,12 @@ export default function AdminDashboard() {
      }).sort((a, b) => b.count - a.count);
   }, [questions, exams]);
 
-  const handleSyncDatabase = async () => {
-    if (!db) return
+  const handlePushToRegistry = async () => {
+    if (!isValidDb) return
     setIsSyncing(true)
     try {
       await seedInitialData(db)
-      toast({ title: "Registry Synced", description: "Official Punjab Exam hierarchy pushed." })
+      toast({ title: "Registry Synced", description: "Official Punjab Exam hierarchy pushed to live registry." })
     } catch (e: any) {
       toast({ variant: "destructive", title: "Sync Failed", description: e.message })
     } finally {
@@ -70,10 +78,10 @@ export default function AdminDashboard() {
           <p className="text-slate-500 mt-2 text-lg font-medium">Registry Volume: {questions?.length || 0} Atomic Nodes Locked.</p>
         </div>
         <div className="flex gap-4">
-           <Button onClick={handleSyncDatabase} disabled={isSyncing} variant="outline" className="h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest gap-3 border-slate-200 bg-white">
-              {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />} Repo Sync
+           <Button onClick={handlePushToRegistry} disabled={isSyncing} className="bg-emerald-600 hover:bg-emerald-700 h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest gap-3 shadow-2xl text-white">
+              {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Push to Registry
            </Button>
-           <Button asChild className="bg-primary hover:bg-primary/90 rounded-2xl h-14 px-10 font-black shadow-2xl uppercase tracking-widest text-xs">
+           <Button asChild className="bg-[#0F172A] hover:bg-black text-white rounded-2xl h-14 px-10 font-black shadow-2xl uppercase tracking-widest text-xs">
             <Link href="/admin/bulk-import"><Plus className="mr-3 h-5 w-5" /> Bulk Import</Link>
           </Button>
         </div>

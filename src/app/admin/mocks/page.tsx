@@ -19,8 +19,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Ultimate Mock Management Ledger v5.0.
- * Features: Pass Tier Visibility, High-Fidelity Table, Duplicate Engine.
+ * @fileOverview Ultimate Mock Management Ledger v5.5.
+ * Hardened: Verified Firestore instance checks to prevent runtime collection() errors.
  */
 
 export default function MockManagement() {
@@ -31,14 +31,17 @@ export default function MockManagement() {
   const [boardFilter, setBoardFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
 
+  // Double-gated instance validation
+  const isValidDb = db && typeof db === 'object' && (db as any).type === 'firestore';
+
   const mocksQuery = useMemo(() => {
-    if (!db) return null
+    if (!isValidDb) return null
     return query(collection(db, "mocks"))
-  }, [db])
+  }, [isValidDb, db])
 
   const { data: rawMocks, loading } = useCollection<any>(mocksQuery)
-  const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
-  const { data: passes } = useCollection<any>(useMemo(() => (db ? collection(db, "passes") : null), [db]))
+  const { data: boards } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "boards") : null), [isValidDb, db]))
+  const { data: passes } = useCollection<any>(useMemo(() => (isValidDb ? collection(db, "passes") : null), [isValidDb, db]))
 
   const mocks = useMemo(() => {
     if (!rawMocks) return []
@@ -57,8 +60,8 @@ export default function MockManagement() {
   }, [rawMocks, searchTerm, boardFilter, typeFilter])
 
   const handleDelete = async (id: string) => {
-    if (!confirm("CRITICAL: Permanently purge this mock blueprint? This is irreversible.")) return
-    const mockRef = doc(db!, "mocks", id)
+    if (!isValidDb || !confirm("CRITICAL: Permanently purge this mock blueprint? This is irreversible.")) return
+    const mockRef = doc(db, "mocks", id)
     deleteDoc(mockRef)
       .then(() => toast({ title: "Series Purged", description: "Mock test removed from cloud registry." }))
       .catch(async (serverError) => {
@@ -67,6 +70,7 @@ export default function MockManagement() {
   }
 
   const handleDuplicate = async (mock: any) => {
+    if (!isValidDb) return
     const newId = `mock-${Date.now()}`
     const newMock = {
       ...mock,
@@ -76,12 +80,13 @@ export default function MockManagement() {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     }
-    await setDoc(doc(db!, "mocks", newId), newMock)
+    await setDoc(doc(db, "mocks", newId), newMock)
     toast({ title: "Module Cloned", description: "Draft duplicate created successfully." })
   }
 
   const togglePublish = async (id: string, current: boolean) => {
-    await setDoc(doc(db!, "mocks", id), { published: !current, updatedAt: serverTimestamp() }, { merge: true })
+    if (!isValidDb) return
+    await setDoc(doc(db, "mocks", id), { published: !current, updatedAt: serverTimestamp() }, { merge: true })
     toast({ title: "Registry Updated", description: `Test is now ${!current ? 'Live' : 'Hidden'}.` })
   }
 
