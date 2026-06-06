@@ -1,11 +1,12 @@
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Database, Users, ShieldCheck, Rocket, Zap, Activity, ShieldAlert, Megaphone, ClipboardList, TrendingUp, DollarSign, RefreshCw, Layers, CreditCard, Globe, Newspaper, FileText, Gem, SearchCode, Settings } from "lucide-react"
+import { Plus, Database, Users, ShieldCheck, Rocket, Zap, Activity, ShieldAlert, Megaphone, ClipboardList, TrendingUp, DollarSign, RefreshCw, Layers, CreditCard, Globe, Newspaper, FileText, Gem, SearchCode, Settings, Target } from "lucide-react"
 import Link from "next/link"
 import { useCollection, useFirestore, useUser } from "@/firebase"
-import { collection } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { useMemo, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { seedInitialData } from "@/services/seed-data"
@@ -13,8 +14,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 
 /**
- * @fileOverview Final Command Center v4.1.
- * Features: High-visibility Repo Sync and Quick Access Hub Grid.
+ * @fileOverview Final Command Center v4.2.
+ * Synchronized with homepage real-time statistics.
  */
 
 export default function AdminDashboard() {
@@ -23,13 +24,23 @@ export default function AdminDashboard() {
   const { toast } = useToast()
   const [isSyncing, setIsSyncing] = useState(false)
 
+  // Real-time Collections
   const { data: users } = useCollection<any>(useMemo(() => (db ? collection(db, "users") : null), [db]))
   const { data: questions } = useCollection<any>(useMemo(() => (db ? collection(db, "questions") : null), [db]))
   const { data: mocks } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]))
   const { data: reports } = useCollection<any>(useMemo(() => (db ? collection(db, "reports") : null), [db]))
   const { data: results } = useCollection<any>(useMemo(() => (db ? collection(db, "results") : null), [db]))
+  const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
 
   const proUsers = useMemo(() => users?.filter((u: any) => u.status && u.status !== 'Free') || [], [users]);
+
+  // Global Accuracy Registry
+  const globalAccuracy = useMemo(() => {
+    if (!results || results.length === 0) return 0;
+    const totalCorrect = results.reduce((acc: number, r: any) => acc + (r.score || 0), 0);
+    const totalQs = results.reduce((acc: number, r: any) => acc + (r.totalQuestions || 0), 0);
+    return totalQs > 0 ? Math.round((totalCorrect / totalQs) * 100) : 0;
+  }, [results]);
 
   const isFounder = user?.email === 'arshdeepgrewal1122@gmail.com';
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
@@ -41,13 +52,13 @@ export default function AdminDashboard() {
       await seedInitialData(db)
       toast({
         title: "Repository Synced",
-        description: "Official Punjab Exam hierarchy (Boards, Exams, Subjects) including PSPCL and EVS nodes pushed to Firestore.",
+        description: "Official Punjab Exam hierarchy pushed to Firestore.",
       })
     } catch (e: any) {
       toast({
         variant: "destructive",
         title: "Sync Failed",
-        description: e.message || "Failed to push collection hierarchy.",
+        description: e.message,
       })
     } finally {
       setIsSyncing(false)
@@ -63,7 +74,7 @@ export default function AdminDashboard() {
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Governance Hub</span>
            </div>
           <h1 className="text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Command Center</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. PSPCL & EVS Nodes Ready.</p>
+          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. {exams?.length || 0} Exam Nodes.</p>
         </div>
         <div className="flex gap-4">
            {isAdmin && (
@@ -88,7 +99,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
          <StatCard label="Aspirant Nodes" value={users?.length || 0} icon={<Users className="text-blue-500" />} />
          <StatCard label="Pro Subscribers" value={proUsers.length} icon={<CreditCard className="text-emerald-600" />} color="text-emerald-600" />
-         <StatCard label="Attempts Logged" value={results?.length || 0} icon={<Activity className="text-primary" />} />
+         <StatCard label="Live Accuracy" value={`${globalAccuracy}%`} icon={<Target className="text-amber-500" />} color="text-amber-600" />
          <StatCard label="Audit Flags" value={reports?.filter((r:any) => r.status === 'PENDING').length || 0} icon={<ShieldAlert className="text-rose-500" />} color="text-rose-500" />
       </div>
 
@@ -128,15 +139,15 @@ export default function AdminDashboard() {
                         <div className="space-y-4 pt-2">
                            <div className="flex justify-between items-center">
                               <span className="text-xs font-bold text-slate-400">Silver Passes</span>
-                              <span className="font-black text-blue-500">{proUsers.filter((u:any) => u.status === 'Silver').length}</span>
+                              <span className="font-black text-blue-500">{proUsers.filter((u:any) => u.status?.toLowerCase().includes('silver')).length}</span>
                            </div>
                            <div className="flex justify-between items-center">
                               <span className="text-xs font-bold text-slate-400">Gold Passes</span>
-                              <span className="font-black text-amber-500">{proUsers.filter((u:any) => u.status === 'Gold').length}</span>
+                              <span className="font-black text-amber-500">{proUsers.filter((u:any) => u.status?.toLowerCase().includes('gold')).length}</span>
                            </div>
                            <div className="flex justify-between items-center">
                               <span className="text-xs font-bold text-slate-400">Elite Passes</span>
-                              <span className="font-black text-primary">{proUsers.filter((u:any) => u.status === 'Premium').length}</span>
+                              <span className="font-black text-primary">{proUsers.filter((u:any) => u.status?.toLowerCase().includes('premium') || u.status?.toLowerCase().includes('platinum')).length}</span>
                            </div>
                         </div>
                      </div>

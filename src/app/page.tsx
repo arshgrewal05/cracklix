@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useMemo } from "react";
@@ -9,37 +10,65 @@ import Features from "@/components/home/Features";
 import AppPreview from "@/components/home/AppPreview";
 import Footer from "@/components/layout/Footer";
 import { useCollection, useFirestore } from "@/firebase";
-import { collection, query, limit } from "firebase/firestore";
+import { collection, query, limit, where } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Zap, BookOpen, Users, Bell, ShieldCheck } from "lucide-react";
+import { Zap, BookOpen, Users, Bell, ShieldCheck, Target } from "lucide-react";
 import Link from "next/link";
 
 /**
  * @fileOverview High-Density Mobile-First Homepage.
- * Calibrated vertical spacing and typography for modern education app aesthetic.
+ * Activated with real-time Firestore statistics.
  */
 
 export default function HomePage() {
   const db = useFirestore();
 
-  const noticeQuery = useMemo(() => (db ? query(collection(db, "notifications"), limit(3)) : null), [db]);
-  const { data: notices } = useCollection<any>(noticeQuery);
+  // Real-time Data Ingestion
+  const { data: users } = useCollection<any>(useMemo(() => (db ? collection(db, "users") : null), [db]));
+  const { data: questions } = useCollection<any>(useMemo(() => (db ? collection(db, "questions") : null), [db]));
+  const { data: mocks } = useCollection<any>(useMemo(() => (db ? query(collection(db, "mocks"), where("published", "==", true)) : null), [db]));
+  const { data: results } = useCollection<any>(useMemo(() => (db ? collection(db, "results") : null), [db]));
+  const { data: notices } = useCollection<any>(useMemo(() => (db ? query(collection(db, "notifications"), limit(3)) : null), [db]));
+
+  // Institutional Accuracy Calculation
+  const globalAccuracy = useMemo(() => {
+    if (!results || results.length === 0) return 0;
+    const totalCorrect = results.reduce((acc: number, r: any) => acc + (r.score || 0), 0);
+    const totalQs = results.reduce((acc: number, r: any) => acc + (r.totalQuestions || 0), 0);
+    return totalQs > 0 ? Math.round((totalCorrect / totalQs) * 100) : 0;
+  }, [results]);
 
   return (
     <main className="min-h-screen bg-white font-body pb-safe overflow-x-hidden">
       <Navbar />
       <Hero />
 
-      {/* High-Density Trust Bar */}
+      {/* High-Density Real-Time Trust Bar */}
       <section className="bg-white py-4 md:py-12 border-b border-slate-50">
          <div className="container mx-auto px-4 max-w-7xl">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-10">
-               <TrustNode icon={<BookOpen className="text-primary h-3.5 w-3.5 md:h-6 md:w-6" />} label="MCQ Bank" val="10k+" />
-               <TrustNode icon={<Zap className="text-blue-500 h-3.5 w-3.5 md:h-6 md:w-6" />} label="Mocks Live" val="500+" />
-               <TrustNode icon={<Users className="text-emerald-500 h-3.5 w-3.5 md:h-6 md:w-6" />} label="Aspirants" val="15k+" />
-               <TrustNode icon={<ShieldCheck className="text-amber-500 h-3.5 w-3.5 md:h-6 md:w-6" />} label="Accuracy" val="94%" />
+               <TrustNode 
+                 icon={<BookOpen className="text-primary h-3.5 w-3.5 md:h-6 md:w-6" />} 
+                 label="MCQ Bank" 
+                 val={questions?.length ? `${(questions.length / 1000).toFixed(1)}k+` : "0"} 
+               />
+               <TrustNode 
+                 icon={<Zap className="text-blue-500 h-3.5 w-3.5 md:h-6 md:w-6" />} 
+                 label="Mocks Live" 
+                 val={mocks?.length || "0"} 
+               />
+               <TrustNode 
+                 icon={<Users className="text-emerald-500 h-3.5 w-3.5 md:h-6 md:w-6" />} 
+                 label="Aspirants" 
+                 val={users?.length ? users.length.toLocaleString() : "0"} 
+               />
+               <TrustNode 
+                 icon={<Target className="text-amber-500 h-3.5 w-3.5 md:h-6 md:w-6" />} 
+                 label="Avg Accuracy" 
+                 val={`${globalAccuracy}%`} 
+               />
             </div>
          </div>
       </section>

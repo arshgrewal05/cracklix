@@ -1,27 +1,34 @@
+
 'use client';
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Zap, ShieldCheck, Trophy, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useCollection, useFirestore } from "@/firebase";
+import { collection } from "firebase/firestore";
 
 /**
  * @fileOverview High-Density Mobile-First Hero.
- * Calibrated for 320px mobile height with desktop expansion.
+ * Calibrated for real-time success metrics.
  */
 
 export default function Hero() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const db = useFirestore();
+  const [queryText, setQueryText] = useState("");
   const policeImage = "https://punjabpolice.gov.in/media/images/pp10.original.jpg";
+
+  // Real-time user count for hero badge
+  const { data: users } = useCollection<any>(useMemo(() => (db ? collection(db, "users") : null), [db]));
 
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+    if (queryText.trim()) {
+      router.push(`/search?q=${encodeURIComponent(queryText.trim())}`);
     }
   };
 
@@ -58,8 +65,8 @@ export default function Hero() {
                   <Search className="absolute left-3 h-3.5 w-3.5 md:h-5 md:w-5 text-slate-400" />
                   <Input 
                     placeholder="Search Patwari, SI, Army..." 
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    value={queryText}
+                    onChange={(e) => setQueryText(e.target.value)}
                     className="h-10 md:h-16 pl-9 md:pl-12 pr-4 border-none text-xs md:text-lg font-medium text-[#0F172A] bg-transparent focus-visible:ring-0 w-full"
                   />
                   <Button 
@@ -96,8 +103,8 @@ export default function Hero() {
                      <ShieldCheck className="h-6 w-6 text-white" />
                   </div>
                   <div className="text-left pr-4">
-                     <p className="text-[8px] font-black uppercase text-slate-400 leading-none mb-1">Official Registry</p>
-                     <p className="text-lg font-headline font-black text-[#0F172A] leading-none uppercase">Verified 2026</p>
+                     <p className="text-[8px] font-black uppercase text-slate-400 leading-none mb-1">Live Success</p>
+                     <p className="text-lg font-headline font-black text-[#0F172A] leading-none uppercase">{users?.length?.toLocaleString() || "0"} Aspirants</p>
                   </div>
                </div>
             </div>
