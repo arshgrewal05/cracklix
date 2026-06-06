@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from "react";
@@ -25,6 +24,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+/**
+ * @fileOverview Final Production-Grade CBT Attempt Hub v4.0.
+ * Optimized: Reduced sizes for high-density mobile-friendly experience.
+ */
 
 export default function MockAttemptPage() {
   const params = useParams();
@@ -180,27 +184,27 @@ export default function MockAttemptPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-[100] bg-[#0B1528]/95 backdrop-blur-xl flex items-center justify-center p-6"
+              className="absolute inset-0 z-[100] bg-[#0B1528]/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-6"
             >
-              <div className="max-w-xl w-full bg-white rounded-[2.5rem] shadow-5xl overflow-hidden">
-                 <div className="bg-slate-50 p-8 border-b border-slate-100 text-center space-y-4">
-                    <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-[#F97316] shadow-xl">
-                       <Play className="h-7 w-7 fill-current" />
+              <div className="max-w-md w-full bg-white rounded-[2rem] shadow-5xl overflow-hidden">
+                 <div className="bg-slate-50 p-6 border-b border-slate-100 text-center space-y-3">
+                    <div className="h-12 w-12 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-[#F97316] shadow-xl">
+                       <Play className="h-6 w-6 fill-current" />
                     </div>
                     <div>
-                       <h2 className="text-2xl md:text-3xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-none">TEST PAUSED</h2>
+                       <h2 className="text-xl md:text-2xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-none">TEST PAUSED</h2>
                        <p className="text-slate-500 font-medium uppercase text-[8px] tracking-widest mt-1">Institutional Progress Audit</p>
                     </div>
                  </div>
-                 <div className="p-8 md:p-10 space-y-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                 <div className="p-6 md:p-8 space-y-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                        <ResumeStat label="Answered" val={stats.answered + stats.ansMarked} color="bg-blue-600" />
                        <ResumeStat label="Not Ans." val={stats.notAnswered} color="bg-slate-400" />
                        <ResumeStat label="Marked" val={stats.marked + stats.ansMarked} color="bg-pink-500" />
                        <ResumeStat label="Remaining" val={stats.notVisited} color="bg-slate-50" textColor="text-slate-300" />
                     </div>
-                    <Button onClick={() => examStore.setPaused(false)} className="w-full h-16 bg-[#F97316] hover:bg-orange-600 text-white rounded-[1.25rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-3xl gap-4">
-                       <Play className="h-5 w-5 fill-current" /> RESUME EVALUATION
+                    <Button onClick={() => examStore.setPaused(false)} className="w-full h-14 bg-[#F97316] hover:bg-orange-600 text-white rounded-[1rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-3xl gap-4">
+                       <Play className="h-4 w-4 fill-current" /> RESUME EVALUATION
                     </Button>
                  </div>
               </div>
@@ -208,7 +212,7 @@ export default function MockAttemptPage() {
           )}
         </AnimatePresence>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-10">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-3 md:p-8">
            <div className="max-w-[900px] mx-auto pb-24">
               {q ? (
                 <QuestionRenderer 
@@ -217,8 +221,8 @@ export default function MockAttemptPage() {
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full opacity-20">
-                   <AlertTriangle className="h-12 w-12 mb-4" />
-                   <p className="font-black uppercase tracking-widest text-xs">Node Missing</p>
+                   <AlertTriangle className="h-10 w-10 mb-4" />
+                   <p className="font-black uppercase tracking-widest text-[10px]">Node Missing</p>
                 </div>
               )}
            </div>
@@ -243,37 +247,37 @@ export default function MockAttemptPage() {
       
       <Sheet open={isMobilePaletteOpen} onOpenChange={setIsMobilePaletteOpen}>
         <SheetContent side="right" className="w-[320px] p-0 border-none">
-          <SheetHeader className="p-6 border-b">
-             <SheetTitle className="text-sm font-black uppercase tracking-[0.2em]">Navigation Palette</SheetTitle>
+          <SheetHeader className="p-4 border-b">
+             <SheetTitle className="text-xs font-black uppercase tracking-[0.2em]">Navigation Palette</SheetTitle>
           </SheetHeader>
           <QuestionPalette onSelect={(idx) => { examStore.setCurrentIdx(idx); setIsMobilePaletteOpen(false); }} onSubmit={() => setShowSubmitModal(true)} />
         </SheetContent>
       </Sheet>
 
       <Dialog open={showSubmitModal} onOpenChange={setShowSubmitModal}>
-         <DialogContent className="max-w-xl rounded-[3rem] p-12 bg-white border-none shadow-5xl text-left">
-            <DialogHeader className="text-center space-y-6">
-               <div className="h-20 w-20 bg-emerald-50 rounded-[2rem] flex items-center justify-center mx-auto text-emerald-600 shadow-2xl">
-                  <ShieldCheck className="h-10 w-10" />
+         <DialogContent className="max-w-lg rounded-[2.5rem] p-6 md:p-10 bg-white border-none shadow-5xl text-left">
+            <DialogHeader className="text-center space-y-4">
+               <div className="h-14 w-14 bg-emerald-50 rounded-[1.5rem] flex items-center justify-center mx-auto text-emerald-600 shadow-2xl">
+                  <ShieldCheck className="h-8 w-8" />
                </div>
                <div>
-                  <DialogTitle className="text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">COMMIT ASSESSMENT</DialogTitle>
-                  <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Audit Registry for {examStore.mockTitle}</p>
+                  <DialogTitle className="text-2xl md:text-3xl font-headline font-black text-[#0F172A] uppercase tracking-tight">COMMIT ASSESSMENT</DialogTitle>
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px] mt-2">Audit Registry for {examStore.mockTitle}</p>
                </div>
             </DialogHeader>
 
-            <div className="py-10 grid grid-cols-2 gap-4">
-               <SubmissionNode label="Attempted Nodes" val={stats.answered + stats.ansMarked} color="text-emerald-600" icon={<CheckCircle2 className="h-4 w-4" />} />
+            <div className="py-8 grid grid-cols-2 gap-3">
+               <SubmissionNode label="Attempted Nodes" val={stats.answered + stats.ansMarked} color="text-emerald-600" icon={<CheckCircle2 className="h-3.5 w-3.5" />} />
                <SubmissionNode label="Logic Review" val={stats.marked + stats.ansMarked} color="text-violet-600" />
-               <SubmissionNode label="Total Atomic Qs" val={examStore.questions.length} color="text-[#0F172A]" icon={<Trophy className="h-4 w-4" />} />
+               <SubmissionNode label="Total Atomic Qs" val={examStore.questions.length} color="text-[#0F172A]" icon={<Trophy className="h-3.5 w-3.5" />} />
             </div>
 
-            <DialogFooter className="flex flex-col gap-4">
-               <Button onClick={handleSubmitFinal} disabled={isSubmittingFinal} className="w-full h-20 bg-[#F97316] hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[11px] rounded-[1.5rem] shadow-3xl">
-                  {isSubmittingFinal ? <Loader2 className="h-5 w-5 animate-spin mr-3" /> : <ShieldCheck className="h-6 w-6 mr-3" />}
+            <DialogFooter className="flex flex-col gap-3">
+               <Button onClick={handleSubmitFinal} disabled={isSubmittingFinal} className="w-full h-16 bg-[#F97316] hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-[1.25rem] shadow-3xl">
+                  {isSubmittingFinal ? <Loader2 className="h-5 w-5 animate-spin mr-3" /> : <ShieldCheck className="h-5 w-5 mr-3" />}
                   FINALIZE & SYNC REGISTRY
                </Button>
-               <Button variant="ghost" onClick={() => setShowSubmitModal(false)} className="w-full text-slate-400 font-black uppercase text-[10px] tracking-widest">RE-AUDIT QUESTIONS</Button>
+               <Button variant="ghost" onClick={() => setShowSubmitModal(false)} className="w-full h-10 text-slate-400 font-black uppercase text-[10px] tracking-widest">RE-AUDIT QUESTIONS</Button>
             </DialogFooter>
          </DialogContent>
       </Dialog>
@@ -283,9 +287,9 @@ export default function MockAttemptPage() {
 
 function ResumeStat({ label, val, color, textColor = "text-white" }: any) {
    return (
-      <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center">
+      <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center">
          <span className="text-[7px] font-black uppercase text-slate-400 mb-1 tracking-tighter text-center">{label}</span>
-         <div className={cn("h-8 w-10 rounded-lg flex items-center justify-center text-sm font-black shadow-md", color, textColor)}>
+         <div className={cn("h-7 w-9 rounded-lg flex items-center justify-center text-xs font-black shadow-md", color, textColor)}>
             {val}
          </div>
       </div>
@@ -294,11 +298,11 @@ function ResumeStat({ label, val, color, textColor = "text-white" }: any) {
 
 function SubmissionNode({ label, val, color, icon }: any) {
    return (
-      <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 text-left space-y-4">
-         {icon && <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center bg-white shadow-sm", color)}>{icon}</div>}
+      <div className="p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 text-left space-y-3">
+         {icon && <div className={cn("h-7 w-7 rounded-lg flex items-center justify-center bg-white shadow-sm", color)}>{icon}</div>}
          <div className="space-y-0.5">
             <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{label}</p>
-            <p className={cn("text-3xl font-headline font-black", color)}>{val}</p>
+            <p className={cn("text-2xl md:text-3xl font-headline font-black", color)}>{val}</p>
          </div>
       </div>
    )
