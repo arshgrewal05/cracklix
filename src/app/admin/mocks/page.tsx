@@ -1,87 +1,129 @@
 
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Eye, MoreVertical, Search, Filter, Trash2, Edit, ClipboardList } from "lucide-react"
+import { Plus, Eye, MoreVertical, Search, Filter, Trash2, Edit, ClipboardList, Layers, History, CheckCircle2, XCircle, Copy } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, query, deleteDoc, doc } from "firebase/firestore"
+import { collection, query, deleteDoc, doc, setDoc, serverTimestamp } from "firebase/firestore"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/errors"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Admin Mock Registry.
- * Updated: Client-side sorting implemented to resolve Firebase Index requirements.
+ * @fileOverview Ultimate Mock Management Ledger v4.5.
+ * Features: High-Fidelity Table, Duplicate Engine, and Exam Filtering.
  */
 
 export default function MockManagement() {
   const db = useFirestore()
   const { toast } = useToast()
   
+  const [searchTerm, setSearchTerm] = useState("")
+  const [boardFilter, setBoardFilter] = useState("all")
+  const [typeFilter, setTypeFilter] = useState("all")
+
   const mocksQuery = useMemo(() => {
     if (!db) return null
     return query(collection(db, "mocks"))
   }, [db])
 
   const { data: rawMocks, loading } = useCollection<any>(mocksQuery)
+  const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
 
   const mocks = useMemo(() => {
     if (!rawMocks) return []
-    return [...rawMocks].sort((a, b) => {
-      const timeA = a.createdAt?.seconds || 0
-      const timeB = b.createdAt?.seconds || 0
-      return timeB - timeA
-    })
-  }, [rawMocks])
+    return [...rawMocks]
+      .filter(m => {
+        const matchesSearch = m.title?.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesBoard = boardFilter === "all" || m.boardId === boardFilter
+        const matchesType = typeFilter === "all" || m.mockType === typeFilter
+        return matchesSearch && matchesBoard && matchesType
+      })
+      .sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0
+        const timeB = b.createdAt?.seconds || 0
+        return timeB - timeA
+      })
+  }, [rawMocks, searchTerm, boardFilter, typeFilter])
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this mock series permanently?")) return
+    if (!confirm("CRITICAL: Permanently purge this mock blueprint? This is irreversible.")) return
     const mockRef = doc(db!, "mocks", id)
     deleteDoc(mockRef)
-      .then(() => {
-        toast({ title: "Series Purged", description: "Mock test removed from platform." })
-      })
+      .then(() => toast({ title: "Series Purged", description: "Mock test removed from cloud registry." }))
       .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: mockRef.path,
-          operation: 'delete',
-        } satisfies SecurityRuleContext);
-        errorEmitter.emit('permission-error', permissionError);
+        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: mockRef.path, operation: 'delete' }));
       });
+  }
+
+  const handleDuplicate = async (mock: any) => {
+    const newId = `mock-${Date.now()}`
+    const newMock = {
+      ...mock,
+      id: newId,
+      title: `${mock.title} (Clone)`,
+      published: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    }
+    await setDoc(doc(db!, "mocks", newId), newMock)
+    toast({ title: "Module Cloned", description: "Draft duplicate created successfully." })
+  }
+
+  const togglePublish = async (id: string, current: boolean) => {
+    await setDoc(doc(db!, "mocks", id), { published: !current, updatedAt: serverTimestamp() }, { merge: true })
+    toast({ title: "Registry Updated", description: `Test is now ${!current ? 'Live' : 'Hidden'}.` })
   }
 
   return (
     <div className="space-y-12 text-left">
-      <div className="flex justify-between items-center px-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-4 gap-8">
         <div>
-          <h1 className="text-4xl font-headline font-black text-primary uppercase tracking-tight">Mock Registry</h1>
-          <p className="text-muted-foreground mt-1">Oversee and distribute all platform-wide test assessments.</p>
+           <div className="flex items-center gap-3 mb-2">
+              <Layers className="h-6 w-6 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Institutional Mock Registry</span>
+           </div>
+          <h1 className="text-5xl font-headline font-black text-primary uppercase tracking-tight">Mock Manager</h1>
+          <p className="text-slate-500 mt-1 font-medium">Complete CRUD control for 500+ official patterns and sectional tests.</p>
         </div>
-        <Button asChild className="bg-primary hover:bg-primary/90 gap-2 font-black shadow-2xl shadow-primary/20 rounded-2xl h-14 px-10 uppercase tracking-widest text-[10px]">
+        <Button asChild className="bg-primary hover:bg-orange-600 gap-2 font-black shadow-2xl rounded-2xl h-16 px-12 uppercase tracking-widest text-[10px]">
           <Link href="/admin/mocks/builder">
-            <Plus className="h-5 w-5" /> Assemble New Series
+            <Plus className="h-5 w-5" /> Assemble New Blueprint
           </Link>
         </Button>
       </div>
 
       <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden mx-4">
         <CardHeader className="p-10 border-b border-slate-50 bg-slate-50/30">
-          <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-            <div className="relative w-full md:w-96">
+          <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+            <div className="relative w-full lg:w-[35%]">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-              <Input className="pl-12 h-14 rounded-2xl bg-white border-slate-100 shadow-inner" placeholder="Search by title or board..." />
+              <Input className="pl-12 h-14 rounded-2xl bg-white border-slate-100 shadow-inner" placeholder="Search by title..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="gap-2 rounded-xl h-10 px-5 border-slate-200 bg-white font-black text-[9px] uppercase tracking-widest shadow-sm">
-                <Filter className="h-4 w-4 text-slate-400" /> Filter Hubs
-              </Button>
+            <div className="flex flex-wrap items-center gap-4">
+              <Select value={boardFilter} onValueChange={setBoardFilter}>
+                <SelectTrigger className="rounded-xl h-11 bg-white border-none w-44 shadow-sm font-bold text-xs"><SelectValue placeholder="Board Hub" /></SelectTrigger>
+                <SelectContent><SelectItem value="all" className="font-bold">All Boards</SelectItem>{boards?.map(b => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
+              </Select>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="rounded-xl h-11 bg-white border-none w-44 shadow-sm font-bold text-xs"><SelectValue placeholder="Content Type" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="font-bold">All Types</SelectItem>
+                  <SelectItem value="FULL">Full Mocks</SelectItem>
+                  <SelectItem value="SECTIONAL">Sectionals</SelectItem>
+                  <SelectItem value="CHAPTER">Chapter Tests</SelectItem>
+                  <SelectItem value="PYQ">PYQ Archives</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>
@@ -89,83 +131,72 @@ export default function MockManagement() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-slate-50 h-20">
-                <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Series Information</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Difficulty</TableHead>
+                <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Mock Identity & Context</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Matrix</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Status</TableHead>
-                <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Management</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Last Audit</TableHead>
+                <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Control</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i} className="border-slate-50">
-                    <TableCell className="px-10 py-6"><Skeleton className="h-12 w-full rounded-xl bg-slate-50" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-20 rounded-lg bg-slate-50" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-12 rounded-lg bg-slate-50" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-24 rounded-lg bg-slate-50" /></TableCell>
-                    <TableCell className="text-right px-10"><Skeleton className="h-10 w-24 ml-auto rounded-xl bg-slate-50" /></TableCell>
-                  </TableRow>
+                  <TableRow key={i} className="border-slate-50"><TableCell colSpan={5} className="px-10 py-8"><Skeleton className="h-16 w-full rounded-2xl" /></TableCell></TableRow>
                 ))
-              ) : mocks && mocks.length > 0 ? (
+              ) : mocks.length > 0 ? (
                 mocks.map((mock: any) => (
                   <TableRow key={mock.id} className="hover:bg-slate-50 group border-slate-50 transition-colors">
-                    <TableCell className="px-10 py-8">
+                    <TableCell className="px-10 py-10">
                       <div className="flex items-center gap-6">
-                        <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
-                          <ClipboardList className="h-6 w-6 text-slate-400 group-hover:text-primary transition-colors" />
+                        <div className="h-16 w-16 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                          <ClipboardList className="h-7 w-7 text-slate-400 group-hover:text-primary transition-colors" />
                         </div>
-                        <div>
-                          <p className="font-black text-[#0F172A] text-lg uppercase tracking-tight">{mock.title}</p>
-                          <div className="flex items-center gap-3 mt-2">
+                        <div className="space-y-1.5">
+                          <p className="font-black text-[#0F172A] text-xl uppercase tracking-tight leading-none">{mock.title}</p>
+                          <div className="flex items-center gap-3">
                              <Badge variant="outline" className="border-slate-200 text-[8px] font-black uppercase px-2 py-0.5">{mock.boardId}</Badge>
-                             <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{mock.mockType || 'Standard'} Node</span>
+                             <div className="h-1 w-1 rounded-full bg-slate-300" />
+                             <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{mock.mockType} NODE</span>
                           </div>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={`text-[9px] uppercase font-black px-4 py-1.5 border-none rounded-xl shadow-sm ${
-                        mock.difficulty === 'Easy' ? 'bg-emerald-50 text-emerald-600' :
-                        mock.difficulty === 'Hard' ? 'bg-rose-50 text-rose-600' : 'bg-orange-50 text-orange-600'
-                      }`}>
-                        {mock.difficulty || 'Medium'}
-                      </Badge>
+                       <div className="space-y-1">
+                          <p className="font-headline font-black text-[#0F172A] text-2xl leading-none">{mock.totalQuestions}</p>
+                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Questions Indexed</p>
+                       </div>
+                    </TableCell>
+                    <TableCell>
+                       <button onClick={() => togglePublish(mock.id, mock.published)} className="flex items-center gap-3 group/status">
+                          <div className={cn("h-2.5 w-2.5 rounded-full", mock.published ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-slate-300')} />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover/status:text-primary transition-colors">{mock.published ? 'PUBLISHED' : 'DRAFT NODE'}</span>
+                       </button>
                     </TableCell>
                     <TableCell>
                        <div className="space-y-1">
-                          <p className="font-headline font-black text-[#0F172A] text-xl leading-none">{mock.totalQuestions}</p>
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Questions</p>
-                       </div>
-                    </TableCell>
-                    <TableCell>
-                       <div className="flex items-center gap-3">
-                          <div className={`h-2.5 w-2.5 rounded-full ${mock.published ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`} />
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{mock.published ? 'Published' : 'Draft Node'}</span>
+                          <p className="text-xs font-bold text-slate-500">{new Date(mock.updatedAt?.seconds * 1000 || Date.now()).toLocaleDateString()}</p>
+                          <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Cloud Synced</p>
                        </div>
                     </TableCell>
                     <TableCell className="text-right px-10">
-                      <div className="flex justify-end gap-3 opacity-20 group-hover:opacity-100 transition-all duration-300">
-                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-[1.25rem] hover:bg-white hover:text-primary shadow-sm border border-transparent hover:border-slate-100" asChild title="View Student Hub">
+                      <div className="flex justify-end gap-3 opacity-20 group-hover:opacity-100 transition-all">
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-white hover:text-primary shadow-sm" asChild title="View Student Hub">
                           <Link href={`/mocks/${mock.id}`}><Eye className="h-5 w-5" /></Link>
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-[1.25rem] hover:bg-white hover:text-primary shadow-sm border border-transparent hover:border-slate-100" asChild title="Edit Blueprint">
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-white hover:text-blue-500 shadow-sm" onClick={() => handleDuplicate(mock)} title="Clone Blueprint">
+                          <Copy className="h-5 w-5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-white hover:text-primary shadow-sm" asChild title="Edit Blueprint">
                           <Link href={`/admin/mocks/builder?id=${mock.id}`}><Edit className="h-5 w-5" /></Link>
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-[1.25rem] hover:bg-rose-50 hover:text-rose-500 shadow-sm border border-transparent hover:border-rose-100" onClick={() => handleDelete(mock.id)} title="Purge Series"><Trash2 className="h-5 w-5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDelete(mock.id)} title="Purge Module"><Trash2 className="h-5 w-5" /></Button>
                       </div>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-60 text-center">
-                    <div className="flex flex-col items-center justify-center text-slate-300 opacity-20 space-y-6">
-                      <ClipboardList className="h-16 w-16" />
-                      <p className="font-headline font-black uppercase text-xl tracking-[0.4em]">No Series Found</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <TableRow><TableCell colSpan={5} className="h-80 text-center opacity-20 font-black uppercase text-xs tracking-widest">No mocks matched the current audit filter.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Database, Users, ShieldCheck, Rocket, Zap, Activity, ShieldAlert, Megaphone, ClipboardList, TrendingUp, DollarSign, RefreshCw, Layers, CreditCard, Globe, Newspaper, FileText, Gem, SearchCode, Settings, Target } from "lucide-react"
+import { Plus, Database, Users, ShieldCheck, Rocket, Zap, Activity, ShieldAlert, Megaphone, ClipboardList, TrendingUp, DollarSign, RefreshCw, Layers, CreditCard, Globe, Newspaper, FileText, Gem, SearchCode, Settings, Target, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { useCollection, useFirestore, useUser } from "@/firebase"
 import { collection, query, where } from "firebase/firestore"
@@ -14,8 +14,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 
 /**
- * @fileOverview Final Command Center v4.2.
- * Synchronized with homepage real-time statistics.
+ * @fileOverview Final Command Center v5.0.
+ * Features: High-Fidelity Exam Breakdown and Live Content Statistics.
  */
 
 export default function AdminDashboard() {
@@ -31,6 +31,8 @@ export default function AdminDashboard() {
   const { data: reports } = useCollection<any>(useMemo(() => (db ? collection(db, "reports") : null), [db]))
   const { data: results } = useCollection<any>(useMemo(() => (db ? collection(db, "results") : null), [db]))
   const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
+  const { data: notes } = useCollection<any>(useMemo(() => (db ? collection(db, "notes") : null), [db]))
+  const { data: pyqs } = useCollection<any>(useMemo(() => (db ? collection(db, "pyqs") : null), [db]))
 
   const proUsers = useMemo(() => users?.filter((u: any) => u.status && u.status !== 'Free') || [], [users]);
 
@@ -42,24 +44,25 @@ export default function AdminDashboard() {
     return totalQs > 0 ? Math.round((totalCorrect / totalQs) * 100) : 0;
   }, [results]);
 
-  const isFounder = user?.email === 'arshdeepgrewal1122@gmail.com';
-  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
+  // Exam-wise Content Matrix
+  const examBreakdown = useMemo(() => {
+    if (!exams || !mocks) return [];
+    return exams.map(e => ({
+      id: e.id,
+      name: e.name,
+      mockCount: mocks.filter(m => m.examId === e.id).length,
+      publishedCount: mocks.filter(m => m.examId === e.id && m.published).length
+    })).sort((a, b) => b.mockCount - a.mockCount);
+  }, [exams, mocks]);
 
   const handleSyncDatabase = async () => {
     if (!db) return
     setIsSyncing(true)
     try {
       await seedInitialData(db)
-      toast({
-        title: "Repository Synced",
-        description: "Official Punjab Exam hierarchy pushed to Firestore.",
-      })
+      toast({ title: "Repository Synced", description: "Official Punjab Exam hierarchy pushed to Firestore." })
     } catch (e: any) {
-      toast({
-        variant: "destructive",
-        title: "Sync Failed",
-        description: e.message,
-      })
+      toast({ variant: "destructive", title: "Sync Failed", description: e.message })
     } finally {
       setIsSyncing(false)
     }
@@ -71,130 +74,103 @@ export default function AdminDashboard() {
         <div className="text-left">
            <div className="flex items-center gap-3 mb-2">
               <ShieldCheck className="h-5 w-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Governance Hub</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Live Content Overview</span>
            </div>
           <h1 className="text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Command Center</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">System Audit: {questions?.length || 0} Questions Live. {exams?.length || 0} Exam Nodes.</p>
+          <p className="text-slate-500 mt-2 text-lg font-medium">Audit: {questions?.length || 0} Questions • {mocks?.filter(m => m.published).length || 0} Live Mocks.</p>
         </div>
         <div className="flex gap-4">
-           {isAdmin && (
-             <div className="relative group">
-                <div className="absolute -inset-1 bg-emerald-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                <Button 
-                  onClick={handleSyncDatabase} 
-                  disabled={isSyncing}
-                  className="relative bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black h-14 px-8 text-xs uppercase tracking-widest gap-3 shadow-xl transition-all active:scale-95"
-                >
-                  {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
-                  {isSyncing ? "Syncing Registry..." : "Global Repo Sync"}
-                </Button>
-             </div>
-           )}
+           <Button onClick={handleSyncDatabase} disabled={isSyncing} variant="outline" className="h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest gap-3 border-slate-200 bg-white">
+              {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />} Repo Sync
+           </Button>
            <Button asChild className="bg-primary hover:bg-primary/90 rounded-2xl h-14 px-10 font-black shadow-2xl uppercase tracking-widest text-xs">
             <Link href="/admin/mocks/builder"><Plus className="mr-3 h-5 w-5" /> Assemble Mock</Link>
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-         <StatCard label="Aspirant Nodes" value={users?.length || 0} icon={<Users className="text-blue-500" />} />
-         <StatCard label="Pro Subscribers" value={proUsers.length} icon={<CreditCard className="text-emerald-600" />} color="text-emerald-600" />
-         <StatCard label="Live Accuracy" value={`${globalAccuracy}%`} icon={<Target className="text-amber-500" />} color="text-amber-600" />
-         <StatCard label="Audit Flags" value={reports?.filter((r:any) => r.status === 'PENDING').length || 0} icon={<ShieldAlert className="text-rose-500" />} color="text-rose-500" />
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+         <StatCard label="Live Mocks" value={mocks?.filter(m => m.published).length || 0} icon={<Zap className="text-primary" />} />
+         <StatCard label="Draft Nodes" value={mocks?.filter(m => !m.published).length || 0} icon={<Layers className="text-slate-400" />} />
+         <StatCard label="Atomic Bank" value={questions?.length || 0} icon={<Database className="text-blue-500" />} />
+         <StatCard label="Audit PYQs" value={pyqs?.length || 0} icon={<FileText className="text-emerald-500" />} />
+         <StatCard label="Support Notes" value={notes?.length || 0} icon={<Newspaper className="text-orange-500" />} />
       </div>
 
-      <section className="space-y-6">
-         <h3 className="font-headline font-black text-xs uppercase tracking-[0.3em] text-slate-400">Quick Access Matrix</h3>
-         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            <HubLink href="/admin/exams" icon={<Globe className="text-blue-400" />} label="Authority Hub" />
-            <HubLink href="/admin/questions" icon={<Database className="text-primary" />} label="Atomic Bank" />
-            <HubLink href="/admin/passes" icon={<Gem className="text-amber-400" />} label="Pass Registry" />
-            <HubLink href="/admin/current-affairs" icon={<Newspaper className="text-emerald-400" />} label="Analysis Feed" />
-            <HubLink href="/admin/notifications" icon={<Megaphone className="text-orange-400" />} label="Exam Gazette" />
-            <HubLink href="/admin/settings" icon={<Settings className="text-slate-400" />} label="System Portal" />
-         </div>
-      </section>
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-         <div className="lg:col-span-8 space-y-10">
-            <Card className="border-slate-100 shadow-3xl bg-white rounded-[3.5rem] overflow-hidden text-left">
-               <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/50">
-                  <div className="flex items-center gap-4">
-                     <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                        <DollarSign className="h-6 w-6" />
-                     </div>
-                     <div className="text-left">
-                        <CardTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Revenue Engine</CardTitle>
-                        <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Institutional monetization and subscriber metrics.</CardDescription>
-                     </div>
+         {/* Exam Distribution Matrix */}
+         <Card className="lg:col-span-8 border-none shadow-3xl bg-white rounded-[3.5rem] overflow-hidden text-left">
+            <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/30">
+               <div className="flex items-center justify-between">
+                  <div className="text-left">
+                     <CardTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Exam Distribution</CardTitle>
+                     <CardDescription className="text-xs font-bold uppercase tracking-widest text-slate-400">Content density across recruitment verticals.</CardDescription>
                   </div>
-               </CardHeader>
-               <CardContent className="p-12 space-y-10">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                     <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6 shadow-inner text-left">
-                        <div className="space-y-1">
-                           <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Projected Growth</p>
-                           <h4 className="text-xl font-headline font-black text-[#0F172A] uppercase">Active Pass Volume</h4>
+                  <Button variant="ghost" asChild className="text-primary font-black uppercase text-[10px] tracking-widest">
+                     <Link href="/admin/exams">Registry Hub <ChevronRight className="h-3 w-3 ml-2" /></Link>
+                  </Button>
+               </div>
+            </CardHeader>
+            <CardContent className="p-0">
+               <div className="divide-y divide-slate-50 max-h-[500px] overflow-y-auto custom-scrollbar">
+                  {examBreakdown.map((e) => (
+                     <div key={e.id} className="p-8 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                        <div className="flex items-center gap-6">
+                           <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400">
+                              {e.name[0]}
+                           </div>
+                           <div>
+                              <p className="font-black text-[#0B1528] text-lg uppercase leading-none">{e.name}</p>
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2">{e.publishedCount} Published • {e.mockCount - e.publishedCount} Drafts</p>
+                           </div>
                         </div>
-                        <div className="space-y-4 pt-2">
-                           <div className="flex justify-between items-center">
-                              <span className="text-xs font-bold text-slate-400">Silver Passes</span>
-                              <span className="font-black text-blue-500">{proUsers.filter((u:any) => u.status?.toLowerCase().includes('silver')).length}</span>
+                        <div className="flex items-center gap-8 text-right">
+                           <div className="space-y-1">
+                              <p className="text-2xl font-headline font-black text-[#0B1528]">{e.mockCount}</p>
+                              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Total Mocks</p>
                            </div>
-                           <div className="flex justify-between items-center">
-                              <span className="text-xs font-bold text-slate-400">Gold Passes</span>
-                              <span className="font-black text-amber-500">{proUsers.filter((u:any) => u.status?.toLowerCase().includes('gold')).length}</span>
-                           </div>
-                           <div className="flex justify-between items-center">
-                              <span className="text-xs font-bold text-slate-400">Elite Passes</span>
-                              <span className="font-black text-primary">{proUsers.filter((u:any) => u.status?.toLowerCase().includes('premium') || u.status?.toLowerCase().includes('platinum')).length}</span>
-                           </div>
+                           <Button size="icon" variant="ghost" className="h-10 w-10 rounded-xl bg-slate-50"><ChevronRight className="h-4 w-4" /></Button>
                         </div>
                      </div>
-
-                     <div className="p-8 bg-[#0F172A] rounded-[2.5rem] shadow-2xl space-y-6 flex flex-col justify-center text-left">
-                        <div className="space-y-1">
-                           <p className="text-[10px] font-black uppercase text-primary tracking-widest">Platform Lifetime</p>
-                           <h4 className="text-3xl font-headline font-black text-white uppercase">Gross Nodes</h4>
-                        </div>
-                        <p className="text-5xl font-black text-primary leading-none tracking-tighter">₹{proUsers.length * 199}</p>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-left">Aggregated simulation via Gold Baseline</p>
-                     </div>
-                  </div>
-               </CardContent>
-            </Card>
-         </div>
+                  ))}
+               </div>
+            </CardContent>
+         </Card>
 
          <div className="lg:col-span-4 space-y-10">
-            <Card className="border-slate-100 bg-white rounded-[3.5rem] p-12 space-y-10 shadow-3xl text-left">
-               <div className="space-y-2 text-left">
-                  <h3 className="text-2xl font-headline font-black text-[#0F172A] uppercase flex items-center gap-4 text-left">
-                     <TrendingUp className="h-6 w-6 text-emerald-600" /> Conversion
-                  </h3>
-               </div>
-               <div className="space-y-6">
-                  <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100 space-y-4 shadow-inner text-left">
-                     <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase text-slate-500">Status</span>
-                        <Badge className="bg-emerald-600 text-white border-none text-[9px] font-black">STABLE</Badge>
-                     </div>
-                     <p className="text-4xl font-headline font-black text-[#0F172A] text-left">{Math.round((proUsers.length / (users?.length || 1)) * 100)}%</p>
-                     <p className="text-xs text-slate-500 font-medium text-left leading-relaxed">Free-to-Pro institutional conversion rate.</p>
+            <Card className="border-none bg-[#0F172A] text-white shadow-3xl rounded-[3.5rem] p-12 overflow-hidden relative group">
+               <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform"><ShieldCheck className="h-48 w-48" /></div>
+               <div className="relative z-10 space-y-8 text-left">
+                  <div className="space-y-2">
+                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">System Integrity</p>
+                     <h3 className="text-3xl font-headline font-black uppercase">Content Audit</h3>
                   </div>
+                  <div className="space-y-6">
+                     <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-400 font-bold">Pending Reports</span>
+                        <span className="text-rose-500 font-black">{reports?.filter(r => r.status === 'PENDING').length || 0}</span>
+                     </div>
+                     <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-400 font-bold">Unused Questions</span>
+                        <span className="text-emerald-500 font-black">{questions?.filter(q => (q.usageCount || 0) === 0).length || 0}</span>
+                     </div>
+                  </div>
+                  <Button asChild className="w-full bg-primary hover:bg-orange-600 text-white font-black uppercase h-14 rounded-2xl text-[10px] tracking-widest shadow-2xl">
+                     <Link href="/admin/qa">Scan for Anamolies</Link>
+                  </Button>
                </div>
             </Card>
 
-            <Card className="border-primary/20 bg-primary/5 rounded-[3.5rem] p-12 space-y-6 border shadow-xl text-left">
-               <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                  <Layers className="h-8 w-8" />
+            <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] p-10 space-y-6 text-left">
+               <h4 className="font-headline font-black text-xs uppercase tracking-[0.3em] text-slate-400">Revenue Monitor</h4>
+               <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase text-slate-500">Gross Estimation</p>
+                  <p className="text-5xl font-headline font-black text-[#0B1528] tracking-tighter">₹{proUsers.length * 199}</p>
                </div>
-               <h4 className="text-2xl font-headline font-black text-[#0F172A] uppercase leading-tight text-left">Monetization Active</h4>
-               <p className="text-slate-600 text-sm font-medium leading-relaxed text-left">
-                  The Pass System is now live. Ensure the board registry is synced for latest official logos.
-               </p>
-               <Button asChild className="w-full bg-[#0F172A] hover:bg-black text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl">
-                  <Link href="/admin/passes">Audit Pricing Hub</Link>
-               </Button>
+               <div className="flex items-center gap-3 text-emerald-600">
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Growth Stable</span>
+               </div>
             </Card>
          </div>
       </div>
@@ -202,33 +178,18 @@ export default function AdminDashboard() {
   )
 }
 
-function StatCard({ label, value, icon, color }: any) {
+function StatCard({ label, value, icon }: any) {
    return (
-      <Card className="border-slate-100 shadow-xl bg-white p-8 rounded-[3rem] group hover:translate-y-[-4px] transition-all overflow-hidden text-left">
+      <Card className="border-none shadow-xl bg-white p-6 rounded-[2.5rem] group hover:translate-y-[-4px] transition-all text-left">
          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shrink-0 shadow-inner">
+            <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
                {icon}
             </div>
             <div className="min-w-0">
-               <p className={`font-headline font-black tracking-tighter truncate text-left text-4xl ${color || 'text-[#0F172A]'}`}>
-                 {value}
-               </p>
-               <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1 truncate text-left">{label}</p>
+               <p className="text-2xl font-headline font-black text-[#0F172A] leading-none">{value}</p>
+               <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1 truncate">{label}</p>
             </div>
          </div>
       </Card>
-   )
-}
-
-function HubLink({ href, icon, label }: any) {
-   return (
-      <Link href={href}>
-         <div className="bg-white border border-slate-100 p-6 rounded-[2rem] flex flex-col items-center gap-4 shadow-sm hover:shadow-2xl hover:border-primary/20 transition-all duration-300 h-full group">
-            <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors shadow-inner">
-               {icon}
-            </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 text-center">{label}</span>
-         </div>
-      </Link>
    )
 }

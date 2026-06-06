@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -35,7 +36,6 @@ import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/e
 export default function QADashboard() {
   const db = useFirestore()
   const { toast } = useToast()
-  const [isScanning, setIsScanning] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
 
   const { data: questions, loading: qLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "questions") : null), [db]))
@@ -45,7 +45,7 @@ export default function QADashboard() {
   const audit = useMemo(() => {
     if (!questions || !mocks) return { dummyMocks: [], brokenQuestions: [], orphanMocks: [], stats: { dummy: 0, critical: 0 } }
 
-    const dummyKeywords = ["TEST", "DUMMY", "DEMO", "SAMPLE", "MOCK 1", "MOCK 2", "MOCK 3"];
+    const dummyKeywords = ["TEST", "DUMMY", "DEMO", "SAMPLE", "MOCK 1", "MOCK 2", "MOCK 3", "PLACEHOLDER"];
     
     const dummyMocks = mocks.filter((m: any) => 
       dummyKeywords.some(kw => m.title?.toUpperCase().includes(kw)) ||
@@ -131,47 +131,44 @@ export default function QADashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-         <QAStatCard label="Dummy Detections" value={audit.stats.dummy} color="text-rose-600" desc="Flagged based on Demo/Test keywords" />
-         <QAStatCard label="Orphan Series" value={audit.orphanMocks.length} color="text-orange-600" desc="Mocks with zero linked questions" />
-         <QAStatCard label="Bank Integrity" value={`${questions && questions.length > 0 ? Math.round(((questions.length - audit.brokenQuestions.length) / questions.length) * 100) : 100}%`} color="text-emerald-600" desc="Validated high-fidelity MCQ nodes" />
+         <QAStatCard label="Dummy Detections" value={audit.stats.dummy} color="text-rose-600" desc="Flagged based on Demo/Test/Placeholder keywords" />
+         <QAStatCard label="Broken/Orphan Nodes" value={audit.stats.critical} color="text-orange-600" desc="Questions with missing data or mocks with 0 items" />
+         <QAStatCard label="Registry Integrity" value={`${questions && questions.length > 0 ? Math.round(((questions.length - audit.brokenQuestions.length) / questions.length) * 100) : 100}%`} color="text-emerald-600" desc="Validated high-fidelity MCQ nodes" />
       </div>
 
       <div className="space-y-12 px-4">
          <section className="space-y-6">
             <h3 className="text-2xl font-headline font-black uppercase flex items-center gap-4">
-               <Archive className="h-6 w-6 text-rose-600" /> Dummy & Demo Review Queue
+               <Archive className="h-6 w-6 text-rose-600" /> Integrity Review Queue
             </h3>
             <Card className="border-slate-100 shadow-3xl bg-white rounded-[2.5rem] overflow-hidden">
                <Table>
                   <TableHeader className="bg-slate-50/50">
                      <TableRow className="border-slate-50 h-16">
-                        <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Resource Title</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase text-center text-slate-500">Anomaly Type</TableHead>
-                        <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Isolation Action</TableHead>
+                        <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Blueprint Identity</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-center text-slate-500">Anomaly Context</TableHead>
+                        <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Audit Action</TableHead>
                      </TableRow>
                   </TableHeader>
                   <TableBody>
                      {mLoading ? (
                         <TableRow><TableCell colSpan={3} className="p-10"><Skeleton className="h-12 w-full rounded-xl" /></TableCell></TableRow>
-                     ) : audit.dummyMocks.length > 0 ? (
-                        audit.dummyMocks.map((m: any) => (
-                           <TableRow key={m.id} className="border-slate-50 hover:bg-slate-50 transition-colors group">
+                     ) : [...audit.dummyMocks, ...audit.orphanMocks].length > 0 ? (
+                        [...audit.dummyMocks, ...audit.orphanMocks].slice(0, 20).map((m: any, idx: number) => (
+                           <TableRow key={`${m.id}-${idx}`} className="border-slate-50 hover:bg-slate-50 transition-colors group">
                               <TableCell className="px-10 py-6 text-left">
                                  <p className="font-bold text-[#000000] uppercase">{m.title || "Untitled Blueprint"}</p>
-                                 <code className="text-[9px] text-slate-400 font-mono">{m.boardId} • {m.examId}</code>
+                                 <code className="text-[9px] text-slate-400 font-mono uppercase tracking-widest">ID: {m.id?.slice(-8)} • {m.boardId}</code>
                               </TableCell>
                               <TableCell className="text-center">
                                  <Badge className="bg-rose-50 text-rose-600 border-none px-4 py-1 text-[9px] uppercase font-black">
-                                    {m.isDummy ? 'MANUAL_DUMMY' : 'KEYWORD_FLAG'}
+                                    {m.totalQuestions === 0 ? 'EMPTY_MOCK' : 'DUMMY_KEYWORD'}
                                  </Badge>
                               </TableCell>
                               <TableCell className="text-right px-10">
                                  <div className="flex justify-end gap-3 opacity-20 group-hover:opacity-100 transition-all">
                                     <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-600" asChild>
                                        <Link href={`/admin/mocks/builder?id=${m.id}`}><Edit className="h-4 w-4" /></Link>
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-orange-50 text-orange-600" onClick={() => handleMoveToReview(m.id, 'mocks')}>
-                                       <Archive className="h-4 w-4" />
                                     </Button>
                                     <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-rose-50 text-rose-600" onClick={() => handleMoveToReview(m.id, 'mocks')}>
                                        <Trash2 className="h-4 w-4" />
@@ -181,7 +178,7 @@ export default function QADashboard() {
                            </TableRow>
                         ))
                      ) : (
-                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic font-black uppercase text-[10px]">Zero dummy nodes detected in active registry.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic font-black uppercase text-[10px]">Registry audit complete. Zero anomalies detected.</TableCell></TableRow>
                      )}
                   </TableBody>
                </Table>
