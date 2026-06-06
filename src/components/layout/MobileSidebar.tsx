@@ -37,8 +37,7 @@ import { useState } from "react";
 /**
  * @fileOverview Ultra-Compact Mobile Navigation Hub (180px).
  * Optimized: Entire content (Profile + Menu) scrolls as a single unit. 
- * Sidebar positioned flush with header.
- * Fixed: ReferenceError for onClose inside MenuLink.
+ * Profile node ultra-compacted with badge repositioned and avatar lifted.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -85,12 +84,12 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
       {/* 1. UNIFIED SCROLLABLE CONTENT (Profile + Menu) */}
       <div className="flex-1 overflow-y-auto no-scrollbar pb-8">
         
-        {/* HIGH-DENSITY PROFILE HUB (Now Scrolls) */}
-        <div className="px-3 pt-2 pb-1.5 bg-[#0B1528] border-b border-white/5 mb-1">
-          <div className="flex flex-col gap-1.5">
+        {/* HIGH-DENSITY PROFILE HUB (Ultra-Compact) */}
+        <div className="px-3 pt-1.5 pb-1 bg-[#0B1528] border-b border-white/5 mb-1">
+          <div className="flex flex-col gap-1">
             <StudentAvatar 
               profile={profile} 
-              className="h-7 w-7 border border-white/10 rounded-md shrink-0 shadow-lg" 
+              className="h-6 w-6 border border-white/10 rounded-md shrink-0 shadow-lg -mt-0.5" 
               iconClassName="h-3/4 w-3/4"
             />
             <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
