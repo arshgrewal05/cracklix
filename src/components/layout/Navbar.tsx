@@ -26,8 +26,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * @fileOverview Global Navigation Node.
- * Features: Optimized for ultra-slender mobile sidebar (180px) starting flush below header.
- * Fixed: Top offset calibrated to 56px for perfect header alignment.
+ * Features: Enabled Sidebar for Desktop and calibrated Top offset to 56px/60px for zero-gap alignment.
  */
 
 export default function Navbar() {
@@ -66,13 +65,17 @@ export default function Navbar() {
             <div className="flex items-center gap-1 md:gap-4">
                <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
                  <SheetTrigger asChild>
-                   <button className="lg:hidden text-white p-1.5 hover:bg-white/5 rounded-xl transition-all active:scale-90">
+                   <button className="text-white p-1.5 hover:bg-white/5 rounded-xl transition-all active:scale-90">
                      <Menu className="h-5 w-5" />
                    </button>
                  </SheetTrigger>
                  <SheetContent 
                    side="left" 
-                   className="p-0 border-r border-slate-100 !w-[180px] !max-w-[180px] top-[56px] h-[calc(100vh-56px)] overflow-hidden shadow-2xl"
+                   className={cn(
+                     "p-0 border-r border-slate-100 !w-[180px] !max-w-[180px] overflow-hidden shadow-2xl transition-all duration-300",
+                     "top-[52px] h-[calc(100vh-52px)]",
+                     "lg:top-[60px] lg:h-[calc(100vh-60px)]"
+                   )}
                  >
                    <SheetHeader className="sr-only"><SheetTitle>Aspirant Menu</SheetTitle></SheetHeader>
                    <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
