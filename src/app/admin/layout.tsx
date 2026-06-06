@@ -1,7 +1,8 @@
+
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { LayoutDashboard, Database, ClipboardList, LogOut, ShieldCheck, Zap, Newspaper, Megaphone, Globe, MousePointer2, Layers, CheckCircle2, Gem, BookOpen, FileStack, Upload, ListTree, Landmark, Menu } from "lucide-react"
+import { LayoutDashboard, Database, ClipboardList, LogOut, ShieldCheck, Zap, Newspaper, Megaphone, Globe, MousePointer2, Layers, CheckCircle2, Gem, BookOpen, FileStack, Upload, ListTree, Landmark, Menu, HeartPulse } from "lucide-react"
 import Link from "next/link"
 import Logo from "@/components/brand/Logo"
 import { useUser, useAuth } from "@/firebase"
@@ -13,7 +14,7 @@ import BackButton from "@/components/navigation/BackButton";
 
 /**
  * @fileOverview Administrative Sidebar & Navigation Layout.
- * Updated: Universal Back Button integrated into the sticky header for sub-page context.
+ * Updated: System Health Monitor node added to Operations.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -53,6 +54,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Operations</SidebarGroupLabel>
             <SidebarMenu>
               <AdminNavItem icon={<LayoutDashboard />} label="Dashboard" href="/admin" active={pathname === "/admin"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<HeartPulse className="text-rose-400" />} label="System Health" href="/admin/health" active={pathname === "/admin/health"} onClick={() => setIsMobileMenuOpen(false)} />
               <AdminNavItem icon={<Globe className="text-blue-400" />} label="Authority Hub" href="/admin/exams" active={pathname === "/admin/exams"} onClick={() => setIsMobileMenuOpen(false)} />
               <AdminNavItem icon={<Landmark className="text-amber-400" />} label="Exam Registry" href="/admin/exam-registry" active={pathname === "/admin/exam-registry"} onClick={() => setIsMobileMenuOpen(false)} />
               <AdminNavItem icon={<Database />} label="Atomic Bank" href="/admin/questions" active={pathname === "/admin/questions"} onClick={() => setIsMobileMenuOpen(false)} />
