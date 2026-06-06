@@ -15,9 +15,9 @@ interface QuestionRendererProps {
 
 /**
  * @fileOverview Official Exam Solution Renderer (Testbook/PSSSB Style).
- * - Dark theme for solutions
- * - KaTeX math rendering
- * - No redundant prefixes (Q1., A, B, C, D)
+ * - Clean dark theme for solutions (#121212)
+ * - KaTeX math rendering support
+ * - Pure statement output (No prefixes)
  */
 export default function QuestionRenderer({ 
   question, 
@@ -113,11 +113,11 @@ export default function QuestionRenderer({
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
                  <div className="space-y-1">
                     <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Official Answer Key</p>
-                    <h4 className="text-3xl font-black uppercase">Correct Option: ({question.correctAnswer})</h4>
+                    <h4 className="text-3xl font-black uppercase leading-tight">Correct Option: ({question.correctAnswer})</h4>
                  </div>
                  <div className="bg-white/10 px-6 py-3 rounded-2xl border border-white/10">
                     <p className="text-[14px] font-bold text-white leading-none">
-                       {cleanText((question as any)[`option${question.correctAnswer}En` || `option${question.correctAnswer}Pa`])}
+                       {cleanText((question as any)[`option${question.correctAnswer}En` || `option${question.correctAnswer}Pa` || ""])}
                     </p>
                  </div>
               </div>
@@ -139,7 +139,7 @@ export default function QuestionRenderer({
                    <div className="space-y-6">
                       <div className="flex items-center gap-3">
                          <div className="h-1 w-12 bg-emerald-500 rounded-full" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">ਪੰਜਾਬੀ ਵਿਆਖਿਆ (Punjabi)</span>
+                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">ਪੰਜਾਬੀ ਵਿਆਖਿਆ</span>
                       </div>
                       <MathText text={expPa} className="text-[15px] md:text-[16px] text-slate-300 font-medium leading-relaxed" />
                    </div>

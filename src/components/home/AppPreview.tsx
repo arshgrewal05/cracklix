@@ -3,15 +3,15 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Smartphone, CheckCircle2, Map as MapIcon, Globe, ShieldCheck } from "lucide-react";
+import { Smartphone, CheckCircle2, Map as MapIcon, Globe, ShieldCheck, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Apple, Play } from "lucide-react";
 import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Final Geographic Registry Hub v6.1.
- * Features: Dynamic Play Store and App Store links from global settings.
+ * @fileOverview Final Geographic Registry Hub v6.2.
+ * Fixed: duration-[2s] ambiguous class warning resolved to duration-[2000ms].
  */
 
 export default function AppPreview() {
@@ -43,12 +43,12 @@ export default function AppPreview() {
               <span className="text-primary">YOUR POCKET</span>
             </h2>
             <p className="text-xl text-slate-500 font-medium leading-relaxed max-w-lg">
-              Download the official mobile node to access high-fidelity mocks and AI rationalizations anywhere in Punjab.
+              Download the official mobile app to access high-fidelity mocks and exam solutions anywhere in Punjab.
             </p>
 
             <ul className="space-y-5 pt-4">
                <FeatureItem text="Bilingual CBT Interface (PA/EN)" />
-               <FeatureItem text="AI-Powered Audit Rationalizations" />
+               <FeatureItem text="Exam Pattern Rationalizations" />
                <FeatureItem text="All Punjab State Ranking Index" />
             </ul>
 
@@ -77,7 +77,6 @@ export default function AppPreview() {
           <div className="space-y-16">
              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 relative">
                 
-                {/* Punjab Registry Node */}
                 <motion.div 
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -87,13 +86,13 @@ export default function AppPreview() {
                    <div className="w-full aspect-[3/4] relative">
                       <img 
                         src={punjabMap} 
-                        className="w-full h-full object-contain transition-all duration-[2s] group-hover:scale-105" 
+                        className="w-full h-full object-contain transition-all duration-[2000ms] group-hover:scale-105" 
                         referrerPolicy="no-referrer"
                         alt="Punjab Hub"
                       />
                    </div>
                    
-                   <div className="flex items-center gap-4 px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl shadow-sm transition-all group-hover:border-primary/20">
+                   <div className="flex items-center gap-4 px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl shadow-sm transition-all hover:border-primary/20">
                       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                          <MapIcon className="h-4 w-4" />
                       </div>
@@ -104,7 +103,6 @@ export default function AppPreview() {
                    </div>
                 </motion.div>
 
-                {/* National Registry Node */}
                 <motion.div 
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -115,13 +113,13 @@ export default function AppPreview() {
                    <div className="w-full aspect-[3/4] relative">
                       <img 
                         src={indiaMap} 
-                        className="w-full h-full object-contain transition-all duration-[2s] group-hover:scale-105" 
+                        className="w-full h-full object-contain transition-all duration-[2000ms] group-hover:scale-105" 
                         referrerPolicy="no-referrer"
                         alt="National Hub"
                       />
                    </div>
                    
-                   <div className="flex items-center gap-4 px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl shadow-sm transition-all group-hover:border-blue-200">
+                   <div className="flex items-center gap-4 px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl shadow-sm transition-all hover:border-blue-200">
                       <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
                          <Globe className="h-4 w-4" />
                       </div>
@@ -133,7 +131,6 @@ export default function AppPreview() {
                 </motion.div>
              </div>
 
-             {/* Founder & Developer Credit Node */}
              <motion.div 
                initial={{ opacity: 0 }}
                whileInView={{ opacity: 1 }}
@@ -144,9 +141,9 @@ export default function AppPreview() {
                    <ShieldCheck className="h-6 w-6" />
                 </div>
                 <div className="text-left">
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Architect & Authority</p>
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Platform Founder</p>
                    <p className="text-base font-bold text-[#0F172A]">
-                      Founder & Developer: <span className="text-primary font-black uppercase tracking-tighter ml-1">Arsh Grewal</span>
+                      Developed by <span className="text-primary font-black uppercase tracking-tighter ml-1">Arsh Grewal</span>
                    </p>
                 </div>
              </motion.div>
