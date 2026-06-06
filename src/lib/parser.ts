@@ -1,6 +1,6 @@
 /**
- * @fileOverview Institutional High-Fidelity Regex Parser v29.0.
- * Deterministic extraction with robust boundary detection and detailed validation.
+ * @fileOverview Institutional High-Fidelity Regex Parser v32.0.
+ * Deterministic extraction with mandatory explanation capturing and vertical preservation.
  */
 
 export interface ParsedResults {
@@ -21,7 +21,7 @@ export function parseBulkQuestions(rawText: string, metadata: any): ParsedResult
   blocks.forEach((block, index) => {
     try {
       const fullText = block.trim();
-      const lines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const lines = fullText.split('\n').map(l => l.trim());
       
       const q: any = { 
         ...metadata,
@@ -31,21 +31,21 @@ export function parseBulkQuestions(rawText: string, metadata: any): ParsedResult
         debug: {}
       };
 
-      // 1. Identify Option A line to find Question parts
+      // 1. Identify Question Statements (EN and PA)
+      // Logic: Everything before (A) is question statement. 
+      // Line 0 is EN, rest is PA.
       const optionAIndex = lines.findIndex(l => /^\(A\)/i.test(l));
       
       if (optionAIndex !== -1) {
-        // Line 0 is the EN Question Statement
         q.questionEn = lines[0].replace(/^(?:Q|Question)\s*\d+[\.\s]*/i, '').trim();
-        // Lines between index 1 and Option A are PA Question Statement
-        q.questionPa = lines.slice(1, optionAIndex).join('\n').trim();
+        q.questionPa = lines.slice(1, optionAIndex).filter(l => l.length > 0).join('\n').trim();
       }
 
       q.debug.QuestionEnFound = q.questionEn ? "YES" : "NO";
       q.debug.QuestionPaFound = q.questionPa ? "YES" : "NO";
 
-      // 2. Extract Options (A-D) - Support both multiline and inline (A) / (B)
-      // We take everything between (A) and (B), (B) and (C), etc.
+      // 2. Extract Options (A-D)
+      // Logic: Extract text between markers, preserving slashes and combined text.
       const getOption = (letter: string, next: string | null) => {
         const regex = next 
           ? new RegExp(`\\(${letter}\\)\\s*([\\s\\S]*?)(?=\\(${next}\\)|Correct Answer|Answer|Answer Key|•|$)`, 'i')
@@ -65,15 +65,16 @@ export function parseBulkQuestions(rawText: string, metadata: any): ParsedResult
       q.debug.OptionCFound = q.optionCEn ? "YES" : "NO";
       q.debug.OptionDFound = q.optionDEn ? "YES" : "NO";
 
-      // 3. Correct Answer Extraction (Extract Code Only)
+      // 3. Correct Answer Extraction (Code Only: A, B, C, or D)
       const ansMatch = fullText.match(/(?:Correct Answer|Answer|Answer Key|Correct Option)[:\s]*\(?([A-D])\)?/i);
       if (ansMatch) q.correctAnswer = ansMatch[1].toUpperCase();
 
       q.debug.CorrectAnswerFound = q.correctAnswer ? "YES" : "NO";
 
       // 4. Explanation Extraction (EN / PA)
-      const enMarkerRegex = /(?:•?\s*English\s+(?:Explanation|Logic|Rationale)[:\s]*)/i;
-      const paMarkerRegex = /(?:•?\s*(?:ਪੰਜਾਬੀ ਵਿਆਖਿਆ|Punjabi\s+(?:Explanation|Logic|Rationale))[:\s]*)/i;
+      // Logic: Capture multi-line text between language markers
+      const enMarkerRegex = /(?:English\s+(?:Explanation|Logic|Rationale)[:\s]*)/i;
+      const paMarkerRegex = /(?:(?:ਪੰਜਾਬੀ ਵਿਆਖਿਆ|Punjabi\s+(?:Explanation|Logic|Rationale))[:\s]*)/i;
 
       const enMatch = fullText.match(enMarkerRegex);
       const paMatch = fullText.match(paMarkerRegex);
@@ -82,10 +83,14 @@ export function parseBulkQuestions(rawText: string, metadata: any): ParsedResult
         const enStartIndex = fullText.indexOf(enMatch[0]) + enMatch[0].length;
         const paStartIndex = fullText.indexOf(paMatch[0]);
         
+        // Use full text to preserve all newlines/spacing
         q.explanationEn = fullText.substring(enStartIndex, paStartIndex).trim();
         
         const finalPaStartIndex = paStartIndex + paMatch[0].length;
         q.explanationPa = fullText.substring(finalPaStartIndex).trim();
+      } else if (enMatch) {
+         const enStartIndex = fullText.indexOf(enMatch[0]) + enMatch[0].length;
+         q.explanationEn = fullText.substring(enStartIndex).trim();
       }
 
       q.debug.ExplanationEnFound = q.explanationEn ? "YES" : "NO";

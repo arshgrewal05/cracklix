@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -12,9 +11,11 @@ interface MathTextProps {
 }
 
 /**
- * @fileOverview Precision Math Renderer v6.0.
+ * @fileOverview Precision Math Renderer v7.0.
  * Optimized for institutional symbols: √, ×, ÷, ², ³, ≤, ≥, %.
- * Strictly preserves vertical formula lines.
+ * Rules:
+ * 1. PRESERVE VERTICALITY: Every line in source text remains a line in output.
+ * 2. SYMBOL CLEANLINESS: Zero broken symbols for roots and products.
  */
 export default function MathText({ text, className }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,12 +24,12 @@ export default function MathText({ text, className }: MathTextProps) {
     if (!containerRef.current) return;
 
     try {
-      // Split text into lines to preserve vertical structure
+      // Split text into lines to preserve vertical structure exactly as provided
       const lines = text.split('\n');
       
       const renderedHtml = lines.map(line => {
         const trimmed = line.trim();
-        if (!trimmed) return '<div class="h-4"></div>';
+        if (!trimmed) return '<div class="h-6"></div>'; // Preserve blank lines for spacing
 
         // 1. Symbol Normalization (Unicode to LaTeX)
         let processed = trimmed
@@ -41,12 +42,15 @@ export default function MathText({ text, className }: MathTextProps) {
           .replace(/≤/g, '\\leq')
           .replace(/≥/g, '\\geq');
 
-        // 2. Detection logic: if line contains math markers, render as KaTeX
+        // 2. Detection logic for math lines
         const hasMath = /[√\\×÷²³≤≥%=]/.test(processed) || /Area|Semi-perimeter|s=|ਖੇਤਰਫਲ|ਪਰਿਮਾਪ/i.test(processed);
+        
+        // 3. Section Label Logic: Bold sections like "Formula:", "Calculation:", etc.
+        const isLabel = /^(Formula|Calculation|Final Answer|ਸੂਤਰ|ਹਿਸਾਬ|ਅੰਤਿਮ ਉੱਤਰ):/i.test(trimmed);
 
         if (hasMath) {
           try {
-            return `<div class="py-1.5 overflow-x-auto no-scrollbar">${katex.renderToString(processed, {
+            return `<div class="py-1 overflow-x-auto no-scrollbar">${katex.renderToString(processed, {
               throwOnError: false,
               displayMode: false,
               trust: true,
@@ -57,6 +61,10 @@ export default function MathText({ text, className }: MathTextProps) {
           }
         }
         
+        if (isLabel) {
+           return `<div class="font-black text-primary mt-4 mb-2 uppercase tracking-widest text-xs md:text-sm">${trimmed}</div>`;
+        }
+
         return `<div class="py-1">${trimmed}</div>`;
       }).join('');
 

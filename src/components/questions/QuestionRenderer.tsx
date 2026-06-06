@@ -4,6 +4,8 @@ import React from 'react';
 import { Question } from '@/types';
 import { cn } from '@/lib/utils';
 import MathText from './MathText';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2 } from 'lucide-react';
 
 interface QuestionRendererProps {
   question: Partial<Question> & { displayId?: string };
@@ -13,8 +15,11 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Institutional High-Fidelity Renderer v13.0.
- * Vertical Option Flow, Multi-line Answers, and Auto-Expanding Logic.
+ * @fileOverview Institutional High-Fidelity Renderer v15.0.
+ * Rules Enforcement:
+ * 1. LINE-HEIGHT 2.0: For maximum readability of math steps.
+ * 2. NO CLIPPING: Auto-expanding containers for vertical calculations.
+ * 3. BILINGUAL SPLIT: Clear separation between EN and PA answer labels.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -68,48 +73,48 @@ export default function QuestionRenderer({
       {/* 4. Correct Answer Indicator - Institutional Multi-line */}
       <div className="text-[18px] md:text-[22px] font-black text-[#0F172A] border-y border-slate-100 py-8 mb-10 bg-slate-50/50 px-6 rounded-2xl shadow-inner">
          <div className="space-y-4">
-            <p className="flex items-center gap-3">
-               <span className="text-emerald-600 uppercase tracking-tight">Correct Answer:</span>
+            <p className="flex items-start gap-3">
+               <span className="text-emerald-600 uppercase tracking-tight shrink-0">Correct Answer:</span>
                <span>({question.correctAnswer}) {ansEn}</span>
             </p>
             {ansPa && (
-               <p className="flex items-center gap-3 text-slate-700">
-                  <span className="text-emerald-600 uppercase tracking-tight">ਸਹੀ ਉੱਤਰ:</span>
+               <p className="flex items-start gap-3 text-slate-700">
+                  <span className="text-emerald-600 uppercase tracking-tight shrink-0">ਸਹੀ ਉੱਤਰ:</span>
                   <span>{ansPa}</span>
                </p>
             )}
          </div>
       </div>
 
-      {/* 5. Solution Hub - AUTO-EXPANDING HEIGHT */}
+      {/* 5. Solution Hub - AUTO-EXPANDING HEIGHT & LINE-HEIGHT 2.0 */}
       {showSolution && (
-        <div className="bg-[#121212] rounded-[2rem] md:rounded-[3rem] p-8 md:p-14 text-white shadow-4xl border border-white/5 h-auto overflow-visible">
+        <div className="bg-[#121212] rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 text-white shadow-4xl border border-white/5 h-auto min-h-0 overflow-visible">
            <div className="space-y-12">
               
-              {/* English Explanation */}
-              {question.explanationEn && (
+              {/* English Explanation Block */}
+              {(question.explanationEn || (question as any).englishExplanation) && (
                 <div className="space-y-6">
                    <div className="flex items-center">
                       <span className="text-[14px] md:text-[16px] font-black uppercase tracking-[0.2em] text-primary bg-primary/10 px-4 py-1.5 rounded-lg border border-primary/20">
                         • English Explanation:
                       </span>
                    </div>
-                   <div className="text-[18px] md:text-[20px] text-slate-100 font-bold leading-relaxed antialiased whitespace-pre-wrap break-words">
-                      <MathText text={question.explanationEn} />
+                   <div className="text-[18px] md:text-[20px] text-slate-100 font-medium leading-[2] antialiased whitespace-pre-wrap break-words px-2">
+                      <MathText text={question.explanationEn || (question as any).englishExplanation || ""} />
                    </div>
                 </div>
               )}
 
-              {/* Punjabi Explanation */}
-              {question.explanationPa && (
-                <div className="space-y-6 pt-6 border-t border-white/5">
+              {/* Punjabi Explanation Block */}
+              {(question.explanationPa || (question as any).punjabiExplanation) && (
+                <div className="space-y-6 pt-10 border-t border-white/5">
                    <div className="flex items-center">
                       <span className="text-[14px] md:text-[16px] font-black uppercase tracking-[0.2em] text-emerald-500 bg-emerald-500/10 px-4 py-1.5 rounded-lg border border-emerald-500/20">
                         • ਪੰਜਾਬੀ ਵਿਆਖਿਆ:
                       </span>
                    </div>
-                   <div className="text-[18px] md:text-[20px] text-slate-100 font-bold leading-relaxed antialiased whitespace-pre-wrap break-words">
-                      <MathText text={question.explanationPa} />
+                   <div className="text-[18px] md:text-[20px] text-slate-100 font-medium leading-[2] antialiased whitespace-pre-wrap break-words px-2">
+                      <MathText text={question.explanationPa || (question as any).punjabiExplanation || ""} />
                    </div>
                 </div>
               )}
