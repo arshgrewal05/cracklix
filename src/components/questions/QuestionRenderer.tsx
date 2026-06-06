@@ -13,8 +13,8 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview High-Fidelity Question Renderer v7.0.
- * Optimized: Full Bilingual Option Support and Artifact Cleanup.
+ * @fileOverview High-Fidelity Question Renderer v8.0.
+ * Optimized: Unified Bilingual Option Line with auto-cleaning of duplicate markers.
  */
 
 export default function QuestionRenderer({ question, language, showSolution = false }: QuestionRendererProps) {
@@ -56,21 +56,27 @@ export default function QuestionRenderer({ question, language, showSolution = fa
         )}
       </div>
 
-      {/* MCQ Options Rendering */}
+      {/* MCQ Options Rendering - Unified Line Format */}
       <div className="grid grid-cols-1 gap-3 mb-10">
         {['A', 'B', 'C', 'D'].map((key) => {
-          const optEn = (question as any)[`option${key}En`];
-          const optPa = (question as any)[`option${key}Pa`];
+          // Clean duplicate markers (e.g., A) Text -> Text)
+          const rawEn = (question as any)[`option${key}En`] || "";
+          const rawPa = (question as any)[`option${key}Pa`] || "";
+          
+          const optEn = rawEn.replace(/^[A-D][\.\):\s-]*/i, '').trim();
+          const optPa = rawPa.replace(/^[A-D][\.\):\s-]*/i, '').trim();
+          
           if (!optEn && !optPa) return null;
 
           return (
-            <div key={key} className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/30">
+            <div key={key} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/30">
                <div className="h-7 w-7 rounded-lg bg-[#0F172A] text-white flex items-center justify-center text-xs font-black shrink-0 shadow-lg">
                   {key}
                </div>
-               <div className="space-y-2 flex-1">
-                  {showEn && optEn && <p className="text-[15px] font-bold text-slate-800 leading-tight">{optEn}</p>}
-                  {showPa && optPa && <p className={cn("text-[15px] font-bold text-slate-800 leading-tight", showEn && optEn ? "pt-2 border-t border-slate-100/50" : "")}>{optPa}</p>}
+               <div className="flex-1">
+                  <p className="text-[15px] md:text-[16px] font-bold text-slate-800 leading-tight">
+                     {optEn}{optPa ? ` / ${optPa}` : ''}
+                  </p>
                </div>
             </div>
           )

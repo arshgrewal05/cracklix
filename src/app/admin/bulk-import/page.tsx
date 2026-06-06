@@ -23,7 +23,8 @@ import {
   Upload, 
   CheckCircle2, 
   FileWarning,
-  Edit3
+  Edit3,
+  Languages
 } from "lucide-react"
 import { useFirestore, useCollection, useStorage } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
@@ -35,7 +36,7 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
 /**
  * @fileOverview Institutional High-Fidelity Bulk Ingestion Hub.
- * Features: Inline Editing, Media Uploads, and Absolute Formatting Preservation.
+ * Optimized: Full Bilingual Option Editing & Unrestricted Preview Visibility.
  */
 
 export default function BulkImportPage() {
@@ -233,11 +234,11 @@ export default function BulkImportPage() {
                 <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/30 flex flex-row justify-between items-center">
                    <div className="space-y-2">
                       <CardTitle className="font-headline font-black text-3xl uppercase">Validated Matrix ({parsedQuestions.length})</CardTitle>
-                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Formatting preserved. Inline editing enabled.</p>
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Formatting preserved. Full Bilingual Editing enabled.</p>
                    </div>
                    <Badge className="bg-emerald-100 text-emerald-600 border-none font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest">FIDELITY SECURE</Badge>
                 </CardHeader>
-                <CardContent className="p-12 space-y-12 max-h-[1000px] overflow-y-auto custom-scrollbar">
+                <CardContent className="p-12 space-y-12">
                    {parsedQuestions.map((q, idx) => (
                       <div key={idx} className="p-10 bg-slate-50/30 rounded-[3rem] border border-slate-100 space-y-8 group/item relative hover:bg-white transition-all shadow-sm">
                          <div className="flex items-center justify-between">
@@ -273,24 +274,37 @@ export default function BulkImportPage() {
                          
                          <div className="border-t border-slate-100 pt-8">
                             {editingIdx === idx ? (
-                               <div className="space-y-6 animate-in fade-in duration-300">
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                               <div className="space-y-8 animate-in fade-in duration-300">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                      <div className="space-y-2">
                                         <Label className="text-[9px] font-black uppercase text-slate-400">Statement (EN)</Label>
-                                        <Textarea value={q.questionEn} onChange={e => handleUpdateQuestion(idx, 'questionEn', e.target.value)} className="rounded-xl h-24 text-sm font-bold" />
+                                        <Textarea value={q.questionEn} onChange={e => handleUpdateQuestion(idx, 'questionEn', e.target.value)} className="rounded-xl h-32 text-sm font-bold" />
                                      </div>
                                      <div className="space-y-2">
                                         <Label className="text-[9px] font-black uppercase text-slate-400">ਸਵਾਲ (PA)</Label>
-                                        <Textarea value={q.questionPa} onChange={e => handleUpdateQuestion(idx, 'questionPa', e.target.value)} className="rounded-xl h-24 text-sm font-bold" />
+                                        <Textarea value={q.questionPa} onChange={e => handleUpdateQuestion(idx, 'questionPa', e.target.value)} className="rounded-xl h-32 text-sm font-bold" />
                                      </div>
                                   </div>
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                     {['A', 'B', 'C', 'D'].map(opt => (
-                                        <div key={opt} className="space-y-2">
-                                           <Label className="text-[9px] font-black uppercase text-slate-400">Option {opt}</Label>
-                                           <Input value={(q as any)[`option${opt}En`]} onChange={e => handleUpdateQuestion(idx, `option${opt}En`, e.target.value)} className="rounded-xl h-10 text-xs font-bold" />
-                                        </div>
-                                     ))}
+                                  
+                                  <div className="space-y-6">
+                                     <div className="flex items-center gap-3">
+                                        <Languages className="h-4 w-4 text-primary" />
+                                        <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Bilingual Options Registry</p>
+                                     </div>
+                                     <div className="grid grid-cols-1 gap-6">
+                                        {['A', 'B', 'C', 'D'].map(opt => (
+                                           <div key={opt} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-white border border-slate-100 rounded-2xl shadow-inner">
+                                              <div className="space-y-2">
+                                                 <Label className="text-[9px] font-black uppercase text-slate-400">Option {opt} (EN)</Label>
+                                                 <Input value={(q as any)[`option${opt}En`]} onChange={e => handleUpdateQuestion(idx, `option${opt}En`, e.target.value)} className="rounded-xl h-11 text-xs font-bold bg-slate-50 border-none" />
+                                              </div>
+                                              <div className="space-y-2">
+                                                 <Label className="text-[9px] font-black uppercase text-slate-400">ਵਿਕਲਪ {opt} (PA)</Label>
+                                                 <Input value={(q as any)[`option${opt}Pa`]} onChange={e => handleUpdateQuestion(idx, `option${opt}Pa`, e.target.value)} className="rounded-xl h-11 text-xs font-bold bg-emerald-50/30 border-none" />
+                                              </div>
+                                           </div>
+                                        ))}
+                                     </div>
                                   </div>
                                </div>
                             ) : (
