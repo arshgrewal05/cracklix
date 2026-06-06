@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from "next/link";
@@ -26,7 +25,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * @fileOverview Global Navigation Node.
- * Features: Enabled Sidebar for Desktop and calibrated Top offset to 56px/60px for zero-gap alignment.
+ * Features: Responsive Sidebar width (180px mobile / 280px desktop).
  */
 
 export default function Navbar() {
@@ -72,7 +71,7 @@ export default function Navbar() {
                  <SheetContent 
                    side="left" 
                    className={cn(
-                     "p-0 border-r border-slate-100 !w-[180px] !max-w-[180px] overflow-hidden shadow-2xl transition-all duration-300",
+                     "p-0 border-r border-slate-100 !w-[180px] !max-w-[180px] lg:!w-[280px] lg:!max-w-[280px] overflow-hidden shadow-2xl transition-all duration-300",
                      "top-[52px] h-[calc(100vh-52px)]",
                      "lg:top-[60px] lg:h-[calc(100vh-60px)]"
                    )}
@@ -125,7 +124,7 @@ export default function Navbar() {
                   
                   <DropdownMenuItem 
                     onClick={handleLogout} 
-                    className="flex items-center gap-4 px-4 py-3.5 cursor-pointer rounded-2xl transition-all focus:bg-rose-500/10 focus:text-rose-500 text-rose-500/80"
+                    className="flex items-center gap-4 px-4 py-3.5 cursor-pointer rounded-2xl transition-all focus:bg-rose-50/10 focus:text-rose-500 text-rose-500/80"
                   >
                     <LogOut className="h-5 w-5 shrink-0" />
                     <span className="font-bold text-sm tracking-tight">Logout</span>
