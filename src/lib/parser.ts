@@ -1,8 +1,8 @@
 
 /**
- * @fileOverview Institutional Compact Parser v14.0.
- * Optimized for "Question EN \n Question PA \n Inline Options (A)/(B)/(C)/(D)" format.
- * Features: High-fidelity explanation extraction and formula preservation.
+ * @fileOverview Institutional Compact Parser v15.0.
+ * Optimized for "Line 1 EN / Line 2 PA / Inline Options / Vertical Explanations" format.
+ * Features: High-fidelity math block extraction and bilingual logic mapping.
  */
 
 import { Question } from "@/types";
@@ -51,15 +51,14 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
 
       const rawLines = block.split('\n').map(l => l.trim());
       
-      // 1. Extract Question Text
+      // 1. Extract Question Text (Line 1 EN, Line 2 PA)
       q.questionEn = rawLines[0].replace(/^Q\d+[\.\s]*/i, '').trim();
 
-      // Punjabi statement is usually the next line if it doesn't contain (A)
       if (rawLines[1] && !rawLines[1].includes('(A)')) {
         q.questionPa = rawLines[1].replace(/^(ਪ੍ਰਸ਼ਨ|ਪ੍ਰਸ਼ਨ)\s*\d+[\.\s]*/, '').trim();
       }
 
-      // 2. Extract Options (Deterministic Inline Split)
+      // 2. Extract Options (Deterministic Inline or Vertical)
       const fullBlockText = block.replace(/\n/g, ' ');
       
       const extractOption = (key: string, nextKey: string | null) => {
@@ -71,7 +70,8 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
         if (endIndex === -1) endIndex = fullBlockText.indexOf('• English Explanation', startIndex);
         if (endIndex === -1) endIndex = fullBlockText.length;
         
-        return fullBlockText.substring(startIndex + startMarker.length, endIndex).replace(/[\/]/g, '').trim();
+        const data = fullBlockText.substring(startIndex + startMarker.length, endIndex);
+        return data.trim();
       };
 
       q.optionAEn = extractOption('A', 'B');
@@ -79,17 +79,17 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
       q.optionCEn = extractOption('C', 'D');
       q.optionDEn = extractOption('D', null);
 
-      // 3. Extract Correct Answer
-      const ansLine = rawLines.find(l => l.toLowerCase().includes('correct answer') || l.toLowerCase().includes('ਸਹੀ ਉੱਤਰ'));
+      // 3. Extract Correct Answer Key
+      const ansLine = rawLines.find(l => /Correct Answer|ਸਹੀ ਉੱਤਰ/i.test(l));
       if (ansLine) {
-        const match = ansLine.match(/(?:correct answer|ans)[:\s]*\(?([A-D])\)?/i);
+        const match = ansLine.match(/(?:Correct Answer|ਸਹੀ ਉੱਤਰ|Ans)[:\s]*\(?([A-D])\)?/i);
         if (match) q.correctAnswer = match[1].toUpperCase();
         q.correctAnswerRaw = ansLine.trim();
       }
 
       // 4. Extract Explanations (Vertical Block Preservation)
-      const expEnStart = rawLines.findIndex(l => l.includes('English Explanation:'));
-      const expPaStart = rawLines.findIndex(l => l.includes('ਪੰਜਾਬੀ ਵਿਆਖਿਆ:'));
+      const expEnStart = rawLines.findIndex(l => /English Explanation/i.test(l));
+      const expPaStart = rawLines.findIndex(l => /ਪੰਜਾਬੀ ਵਿਆਖਿਆ/i.test(l));
 
       if (expEnStart !== -1) {
         const end = expPaStart !== -1 ? expPaStart : rawLines.length;
@@ -103,7 +103,7 @@ function parseBlocks(blocks: string[], metadata: any): ParsedResults {
       if (q.questionEn && q.correctAnswer) {
         questions.push(q);
       } else {
-        errors.push(`Block ${index + 1}: Check English Statement and Correct Answer Node.`);
+        errors.push(`Block ${index + 1}: Check statements or Correct Answer Node.`);
       }
     } catch (err: any) {
       errors.push(`Block ${index + 1}: ${err.message}`);

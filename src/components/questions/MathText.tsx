@@ -12,8 +12,8 @@ interface MathTextProps {
 }
 
 /**
- * @fileOverview Precision Math Renderer v4.0.
- * Hardened to handle root symbols and complex multi-line derivations beautifully.
+ * @fileOverview Precision Math Renderer v5.0.
+ * Hardened to handle roots, slashes, and complex derivations for PSSSB content.
  */
 export default function MathText({ text, className }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,12 +24,12 @@ export default function MathText({ text, className }: MathTextProps) {
         const lines = text.split('\n');
         
         const renderedLines = lines.map(line => {
-          if (!line.trim()) return '<div class="h-4"></div>';
+          const trimmed = line.trim();
+          if (!trimmed) return '<div class="h-4"></div>';
 
-          // 1. Standardize and Wrap Math Symbols for LaTeX
-          let processedLine = line
-            .replace(/√\[?([^\]]+)\]?/g, '\\sqrt{$1}') // Handles √[data] or √data
-            .replace(/√(\d+)/g, '\\sqrt{$1}')          // Handles √7056
+          // 1. Symbol Normalization Registry
+          let processed = trimmed
+            .replace(/√\[?([^\]\s]+)\]?/g, '\\sqrt{$1}') // Handles √[7056] or √7056
             .replace(/×/g, '\\times')
             .replace(/÷/g, '\\div')
             .replace(/\^2|²/g, '^2')
@@ -37,27 +37,24 @@ export default function MathText({ text, className }: MathTextProps) {
             .replace(/≤/g, '\\leq')
             .replace(/≥/g, '\\geq');
 
-          // 2. Identify if line is purely mathematical or contains specific triggers
-          const hasSignificantMath = /[\\√×÷²³≤≥^]/.test(processedLine) || 
-                                     (/[=]/.test(processedLine) && /\d/.test(processedLine));
+          // 2. Identification of Mathematical Statements
+          const isEquation = processed.includes('=') && /[\d\sqrt\\times\+]/.test(processed);
+          const isFormula = /Area|Semi-perimeter|s=|ਖੇਤਰਫਲ|ਪਰਿਮਾਪ/i.test(processed);
 
-          if (hasSignificantMath) {
+          if (isEquation || isFormula || /[\\√×²³]/.test(processed)) {
             try {
-              // Wrap in display mode if it starts with a key variable like s= or Area=
-              const isDerivation = /^(s|Area|Area of triangle|ਖੇਤਰਫਲ|ਅੱਧ-ਪਰਿਮਾਪ)\s*=/i.test(line);
-              
-              return `<div class="${isDerivation ? 'py-2 overflow-x-auto' : 'py-1'}">${katex.renderToString(processedLine, {
+              return `<div class="py-2 overflow-x-auto custom-scrollbar">${katex.renderToString(processed, {
                 throwOnError: false,
                 displayMode: false,
                 trust: true,
                 strict: false
               })}</div>`;
             } catch (e) {
-              return `<div>${line}</div>`;
+              return `<div class="py-1">${trimmed}</div>`;
             }
           }
           
-          return `<div>${line}</div>`;
+          return `<div class="py-1">${trimmed}</div>`;
         });
 
         containerRef.current.innerHTML = renderedLines.join('');
