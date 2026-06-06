@@ -1,6 +1,6 @@
 /**
- * @fileOverview Institutional High-Fidelity Ingestion Engine v9.0.
- * Permanent Fix: Intelligent inline option splitting and robust bilingual detection.
+ * @fileOverview Institutional High-Fidelity Ingestion Engine v10.0.
+ * Optimized for: "Question En / Question Pa" and "(A) Opt En / Opt Pa" format.
  */
 
 import { Question } from "@/types";
@@ -11,23 +11,11 @@ export interface ParsedResults {
   confidence: number;
 }
 
-function splitIntoBlocks(text: string): string[] {
-  // Try splitting by common question markers if no newlines exist
-  const boundaryRegex = /(?:\n|^|---)\s*(?:\*\*)?(?:Q|Question|QUESTION NO\.)?\s*\d+[\.\):\s-]*/gi;
-  const parts = text.split(boundaryRegex).filter(p => p.trim().length > 15);
-  
-  if (parts.length > 0) return parts;
-  
-  // Fallback to splitting by explicit separator
-  return text.split(/\n\s*---\s*\n/).filter(p => p.trim().length > 10);
-}
-
 const sanitizeText = (text: string = "") => {
   return text
-    .replace(/^[A-D][\.\):\s-]*/i, '') // Remove starting A.
-    .replace(/^\d+[\.\):\s-]*/, '')    // Remove starting numbers
-    .replace(/\*\*/g, '')              // Remove stars
-    .replace(/\s+/g, ' ')              // Collapse extra whitespace
+    .replace(/^\*\*|\*\*$/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 };
 
@@ -35,10 +23,12 @@ export function parseBulkQuestions(
   rawText: string,
   metadata: any
 ): ParsedResults {
-  const blocks = splitIntoBlocks(rawText);
+  // Split by Question markers (Q1, Q2, Q24, etc.)
+  const blocks = rawText.split(/(?=Q\d+[\.\):\s-])/g).filter(p => p.trim().length > 10);
+  
   const parsed = blocks.map((block, index) => {
     try {
-      const q = parseFidelityBlock(block, metadata);
+      const q = parseStandardBlock(block, metadata);
       if (!q.questionEn) return null;
       return {
         ...q,
@@ -54,74 +44,52 @@ export function parseBulkQuestions(
   return { questions: parsed, errors: [], confidence };
 }
 
-function parseFidelityBlock(block: string, metadata: any): Partial<Question> {
-  // 1. Identify Answer & Explanation first (they usually come last)
-  const answerMatch = block.match(/(?:Correct Answer|ਸਹੀ ਉੱਤਰ|Answer|ਜਵਾਬ):?\s*(?:\()?\s*([A-D])\s*(?:\))?/i);
-  const correctAnswer = (answerMatch?.[1].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
+function parseStandardBlock(block: string, metadata: any): Partial<Question> {
+  // 1. Extract Question Statement (Everything before (A))
+  const qMatch = block.match(/Q\d+[\.\):\s-](.*?)(?=\s*\(A\))/s);
+  const qFullText = qMatch ? qMatch[1].trim() : "";
+  let questionEn = qFullText;
+  let questionPa = qFullText;
 
-  const expMatch = block.match(/(?:Explanation|ਵਿਆਖਿਆ):?\s*([\s\S]*)$/i);
-  const expPart = expMatch ? expMatch[1].replace(answerMatch?.[0] || "", "").trim() : "";
+  if (qFullText.includes('/')) {
+    const parts = qFullText.split('/');
+    questionEn = sanitizeText(parts[0]);
+    questionPa = sanitizeText(parts[1] || parts[0]);
+  }
 
-  // 2. Extract Options using global regex (handles one-line text)
+  // 2. Extract Options (A, B, C, D)
   const options: Record<string, { en: string; pa: string }> = {};
-  const optionLabels = ['A', 'B', 'C', 'D'];
-  
-  // Find positions of options to isolate the question text
-  let firstOptionPos = block.length;
-  
-  optionLabels.forEach(label => {
-    const regex = new RegExp(`(?:\\s|^|\\n|\\))\\s*(?:\\()?${label}[\\.\\):\\s-](.*?)(?=\\s*(?:\\()?[A-D][\\.\\):\\s-]|Correct Answer|Explanation|Answer|ਵਿਆਖਿਆ|$)`, 'gi');
-    const match = regex.exec(block);
+  ['A', 'B', 'C', 'D'].forEach(label => {
+    const nextLabel = label === 'A' ? 'B' : label === 'B' ? 'C' : label === 'C' ? 'D' : 'Correct Answer';
+    const regex = new RegExp(`\\(${label}\\)(.*?)(?=\\s*\\(${nextLabel}\\)|\\s*${nextLabel}|$)`, 's');
+    const match = block.match(regex);
     if (match) {
-      if (match.index < firstOptionPos) firstOptionPos = match.index;
-      const content = match[1].trim();
-      
-      if (content.includes('/') || content.includes('|')) {
-        const sep = content.includes('|') ? '|' : '/';
-        const parts = content.split(sep).map(p => sanitizeText(p));
-        options[label] = { en: parts[0], pa: parts[1] || "" };
+      const optText = match[1].trim();
+      if (optText.includes('/')) {
+        const parts = optText.split('/');
+        options[label] = { en: sanitizeText(parts[0]), pa: sanitizeText(parts[1] || parts[0]) };
       } else {
-        options[label] = { en: sanitizeText(content), pa: "" };
+        options[label] = { en: sanitizeText(optText), pa: "" };
       }
     }
   });
 
-  // 3. Question Statement is everything before the first option
-  const questionBlock = block.substring(0, firstOptionPos).trim();
-  let questionEn = "";
-  let questionPa = "";
+  // 3. Extract Correct Answer
+  const answerMatch = block.match(/(?:Correct Answer|ਸਹੀ ਉੱਤਰ|Answer|ਜਵਾਬ):?\s*(?:\()?\s*([A-D])\s*(?:\))?/i);
+  const correctAnswer = (answerMatch?.[1].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
 
-  if (questionBlock.includes('/') || questionBlock.includes('|')) {
-    const sep = questionBlock.includes('|') ? '|' : '/';
-    const parts = questionBlock.split(sep).map(p => sanitizeText(p));
-    questionEn = parts[0];
-    questionPa = parts[1] || "";
-  } else {
-    questionEn = sanitizeText(questionBlock);
-    questionPa = questionEn;
-  }
+  // 4. Extract Explanations
+  const engExpMatch = block.match(/English Explanation:\s*(.*?)(?=\s*\*|Punjabi Explanation|$)/s);
+  const punExpMatch = block.match(/Punjabi Explanation:\s*(.*)$/s);
 
-  // 4. Handle Explanation Bilingualism
-  let explanationEn = expPart;
-  let explanationPa = "";
-  if (expPart.includes('ਵਿਆਖਿਆ:')) {
-    const parts = expPart.split(/ਵਿਆਖਿਆ:/);
-    explanationEn = sanitizeText(parts[0]);
-    explanationPa = sanitizeText(parts[1]);
-  } else if (expPart.includes('/') || expPart.includes('|')) {
-    const sep = expPart.includes('|') ? '|' : '/';
-    const parts = expPart.split(sep).map(p => sanitizeText(p));
-    explanationEn = parts[0];
-    explanationPa = parts[1] || "";
-  } else {
-    explanationEn = sanitizeText(expPart);
-  }
+  const explanationEn = sanitizeText(engExpMatch?.[1] || "");
+  const explanationPa = sanitizeText(punExpMatch?.[1] || "");
 
   return {
     ...metadata,
     questionType: 'MCQ',
     questionEn,
-    questionPa: questionPa || questionEn,
+    questionPa,
     optionAEn: options['A']?.en || "Option A",
     optionAPa: options['A']?.pa || "",
     optionBEn: options['B']?.en || "Option B",
@@ -131,7 +99,7 @@ function parseFidelityBlock(block: string, metadata: any): Partial<Question> {
     optionDEn: options['D']?.en || "Option D",
     optionDPa: options['D']?.pa || "",
     correctAnswer,
-    explanationEn,
+    explanationEn: explanationEn || explanationPa,
     explanationPa: explanationPa || explanationEn
   };
 }

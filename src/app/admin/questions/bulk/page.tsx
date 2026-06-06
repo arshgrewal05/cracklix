@@ -20,11 +20,6 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { MockType } from "@/types"
 
-/**
- * @fileOverview Institutional Bulk Ingestion Hub.
- * Optimized to prevent 'undefined' field errors in WriteBatch by using strict object cleanup.
- */
-
 export default function BulkImportPage() {
   const router = useRouter()
   const db = useFirestore()
@@ -60,20 +55,15 @@ export default function BulkImportPage() {
       return
     }
     
-    const results = parseBulkQuestions(rawText, {
-      ...metadata,
-      status: metadata.status || "PUBLISHED",
-      difficulty: metadata.difficulty || "Medium"
-    })
+    const results = parseBulkQuestions(rawText, metadata)
     
-    if (results.errors.length > 0) {
-      setParseErrors(results.errors)
+    if (results.questions.length === 0) {
+      toast({ variant: "destructive", title: "Parsing Failed", description: "Could not find any questions in that format." })
       setParsedQuestions([])
-      toast({ variant: "destructive", title: "Template Match Failed", description: "Correct block markers and try again." })
     } else {
-      setParseErrors([])
+      setParseErrors(results.errors)
       setParsedQuestions(results.questions)
-      toast({ title: "Extraction Success", description: `${results.questions.length} nodes successfully structured.` })
+      toast({ title: "Extraction Success", description: `${results.questions.length} questions structured.` })
     }
   }
 
@@ -85,7 +75,6 @@ export default function BulkImportPage() {
 
     parsedQuestions.forEach(q => {
       const newRef = doc(collection(db, "questions"))
-      
       const payload: any = {
         ...q,
         id: newRef.id,
@@ -93,10 +82,7 @@ export default function BulkImportPage() {
         updatedAt: serverTimestamp(),
         isStandalone: true
       };
-
-      // Strict cleanup of undefined values
       Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key]);
-
       batch.set(newRef, payload)
       ids.push(newRef.id)
     })
@@ -104,7 +90,7 @@ export default function BulkImportPage() {
     try {
       await batch.commit()
       setLastImportedIds(ids)
-      toast({ title: "Bank Updated", description: `${parsedQuestions.length} nodes deployed.` })
+      toast({ title: "Bank Updated", description: `${parsedQuestions.length} questions saved.` })
       setShowMockCreator(true)
     } catch (e) {
       errorEmitter.emit('permission-error', new FirestorePermissionError({ path: 'questions/bulk', operation: 'write' }));
@@ -115,10 +101,8 @@ export default function BulkImportPage() {
 
   const handleDeployMock = async () => {
     if (!db || lastImportedIds.length === 0) return
-    
     const mockId = `mock-${Date.now()}`
     const mockRef = doc(db, "mocks", mockId)
-    
     const payload: any = {
       id: mockId,
       title: `${metadata.boardId} ${metadata.mockType} Series - ${new Date().toLocaleDateString()}`,
@@ -132,29 +116,27 @@ export default function BulkImportPage() {
       published: true,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      isPremium: true
+      accessType: 'FREE'
     };
-
-    // Cleanup undefined
     Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key]);
 
     try {
       await setDoc(mockRef, payload)
-      toast({ title: "Series Deployed", description: "Mock test is now live for all aspirants." })
+      toast({ title: "Series Deployed", description: "Mock test is now live." })
       router.push("/admin/mocks")
     } catch (e) {
-      toast({ variant: "destructive", title: "Deployment Failed", description: "Could not initialize mock series." })
+      toast({ variant: "destructive", title: "Deployment Failed" })
     }
   }
 
-  const placeholderText = `[BLOCK_ID: Q71]
-ENG_Q: Question in English?
-PUN_Q: ਸਵਾਲ ਪੰਜਾਬੀ ਵਿੱਚ?
-ENG_OPT: A. Option 1 | B. Option 2 | C. Option 3 | D. Option 4
-PUN_OPT: A. ਵਿਕਲਪ 1 | B. ਵਿਕਲਪ 2 | C. ਵਿਕਲਪ 3 | D. ਵਿਕਲਪ 4
-ENG_ANS: B
-ENG_EXP: Explanation in English.
-PUN_EXP: ਵਿਆਖਿਆ ਪੰਜਾਬੀ ਵਿੱਚ.`;
+  const placeholderText = `Q1. English Question Statement / ਪੰਜਾਬੀ ਪ੍ਰਸ਼ਨ ਬਿਆਨ
+(A) Option A Eng / ਵਿਕਲਪ A ਪੰਜਾਬੀ
+(B) Option B Eng / ਵਿਕਲਪ B ਪੰਜਾਬੀ
+(C) Option C Eng / ਵਿਕਲਪ C ਪੰਜਾਬੀ
+(D) Option D Eng / ਵਿਕਲਪ D ਪੰਜਾਬੀ
+Correct Answer: (A)
+English Explanation: Details in English here...
+* Punjabi Explanation: ਵਿਆਖਿਆ ਪੰਜਾਬੀ ਵਿੱਚ...`;
 
   return (
     <div className="space-y-10 pb-20 max-w-[1600px] mx-auto text-[#0F172A]">
@@ -164,16 +146,13 @@ PUN_EXP: ਵਿਆਖਿਆ ਪੰਜਾਬੀ ਵਿੱਚ.`;
             <ChevronLeft className="h-8 w-8 text-[#0F172A]" />
           </Button>
           <div className="text-left">
-            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Bulk Ingestion Hub</h1>
-            <p className="text-slate-500 font-medium">Inject metadata and parse tagged institutional content.</p>
+            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Institutional Ingestion</h1>
+            <p className="text-slate-500 font-medium uppercase text-[10px] tracking-widest mt-1">High-Fidelity Bilingual Standard</p>
           </div>
         </div>
         <div className="flex gap-4">
-           <Button variant="outline" className="h-16 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 border-slate-200 bg-white shadow-sm" onClick={() => { setRawText(""); setParsedQuestions([]); setParseErrors([]); }}>
-              <DatabaseBackup className="h-5 w-5" /> Reset Buffer
-           </Button>
            <Button onClick={handleCommitToBank} disabled={isImporting || parsedQuestions.length === 0} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl h-16 px-12 gap-3 shadow-3xl shadow-emerald-900/20">
-              <Rocket className="h-5 w-5" /> {isImporting ? 'Syncing Repo...' : 'Deploy to Bank'}
+              <Rocket className="h-5 w-5" /> {isImporting ? 'Syncing...' : 'Deploy to Bank'}
            </Button>
         </div>
       </div>
@@ -184,122 +163,59 @@ PUN_EXP: ਵਿਆਖਿਆ ਪੰਜਾਬੀ ਵਿੱਚ.`;
             <div className="h-2 w-full bg-primary" />
             <CardHeader className="p-10 pb-4">
               <CardTitle className="font-headline font-black text-2xl uppercase flex items-center gap-4">
-                <Settings2 className="h-6 w-6 text-primary" /> Protocol & Metadata
+                <Settings2 className="h-6 w-6 text-primary" /> Metadata Node
               </CardTitle>
             </CardHeader>
             <CardContent className="p-10 pt-4 space-y-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Recruiting Board</Label>
+                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Board</Label>
                   <Select value={metadata.boardId} onValueChange={val => setMetadata({...metadata, boardId: val})}>
-                    <SelectTrigger className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm text-[#0F172A]"><SelectValue placeholder="Select Board" /></SelectTrigger>
+                    <SelectTrigger className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm"><SelectValue placeholder="Select Board" /></SelectTrigger>
                     <SelectContent>{boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Target Exam</Label>
-                   <Select value={metadata.examId} onValueChange={val => setMetadata({...metadata, examId: val})}>
-                     <SelectTrigger className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm text-[#0F172A]"><SelectValue placeholder="Select Exam" /></SelectTrigger>
-                     <SelectContent>{exams?.filter((e: any) => e.boardId === metadata.boardId).map((e: any) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}</SelectContent>
-                   </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
                    <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Subject</Label>
                    <Select value={metadata.subjectId} onValueChange={val => setMetadata({...metadata, subjectId: val})}>
-                     <SelectTrigger className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm text-[#0F172A]"><SelectValue placeholder="Select Subject" /></SelectTrigger>
+                     <SelectTrigger className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm"><SelectValue placeholder="Select Subject" /></SelectTrigger>
                      <SelectContent>{subjects?.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-                   </Select>
-                </div>
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Topic / Chapter</Label>
-                   <Input 
-                      placeholder="e.g. Blood Relations" 
-                      className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm"
-                      value={metadata.chapterId}
-                      onChange={(e) => setMetadata({...metadata, chapterId: e.target.value})}
-                   />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Duration (Mins)</Label>
-                   <Input 
-                      type="number"
-                      placeholder="120" 
-                      className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm"
-                      value={metadata.duration}
-                      onChange={(e) => setMetadata({...metadata, duration: parseInt(e.target.value) || 0})}
-                   />
-                </div>
-                <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Mock Type</Label>
-                   <Select value={metadata.mockType} onValueChange={(val: any) => setMetadata({...metadata, mockType: val})}>
-                     <SelectTrigger className="rounded-xl bg-slate-50 border-none h-14 font-bold text-sm text-[#0F172A]"><SelectValue /></SelectTrigger>
-                     <SelectContent>
-                        <SelectItem value="FULL">Full Mock</SelectItem>
-                        <SelectItem value="SUBJECT">Subject Test</SelectItem>
-                        <SelectItem value="SECTIONAL">Sectional</SelectItem>
-                        <SelectItem value="PYQ">PYQ Archive</SelectItem>
-                     </SelectContent>
                    </Select>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Paste Institutional Content (Batch 10–500)</Label>
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Paste Format: Question / ਸਵਾਲ + (A) Opt / ਵਿਕਲਪ</Label>
                 <Textarea 
                   placeholder={placeholderText}
-                  className="min-h-[400px] rounded-[2.5rem] bg-slate-50 border-none p-10 text-sm font-mono leading-relaxed shadow-inner custom-scrollbar text-[#0F172A]"
+                  className="min-h-[400px] rounded-[2.5rem] bg-slate-50 border-none p-10 text-sm font-bold leading-relaxed shadow-inner custom-scrollbar text-[#0F172A]"
                   value={rawText}
                   onChange={e => setRawText(e.target.value)}
                 />
               </div>
               
               <Button onClick={handleParse} className="w-full h-20 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.3em] gap-4 rounded-[2rem] shadow-4xl">
-                <Zap className="h-6 w-6 text-primary fill-current" /> Structure Nodes
+                <Zap className="h-6 w-6 text-primary fill-current" /> Parse Institutional Block
               </Button>
             </CardContent>
           </Card>
         </div>
 
         <div className="lg:col-span-7 text-left">
-          {parseErrors.length > 0 ? (
-            <Card className="border-rose-100 bg-rose-50/50 shadow-3xl rounded-[4rem] p-16 space-y-10">
-              <div className="flex items-center gap-6 text-rose-600">
-                <FileWarning className="h-16 w-16" />
-                <h3 className="text-3xl font-headline font-black uppercase">Ingestion Failed</h3>
-              </div>
-              <div className="space-y-4">
-                {parseErrors.map((err, i) => (
-                  <div key={i} className="flex items-start gap-4 p-6 bg-white rounded-3xl border border-rose-100 shadow-xl">
-                    <AlertTriangle className="h-5 w-5 text-rose-500 shrink-0 mt-1" />
-                    <p className="text-base font-bold text-rose-900 leading-tight">{err}</p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          ) : parsedQuestions.length > 0 ? (
+           {parsedQuestions.length > 0 ? (
             <Card className="border-none bg-white shadow-4xl rounded-[4rem] h-full flex flex-col overflow-hidden">
                <CardHeader className="p-16 bg-slate-50/50 border-b border-slate-50">
                   <CardTitle className="font-headline font-black text-3xl uppercase flex items-center gap-4 text-[#0F172A]">
-                    <CheckCircle2 className="h-8 w-8 text-emerald-600" /> Structure Ready ({parsedQuestions.length})
+                    <CheckCircle2 className="h-8 w-8 text-emerald-600" /> Standardized Questions ({parsedQuestions.length})
                   </CardTitle>
                </CardHeader>
                <CardContent className="p-16 flex-1 overflow-y-auto custom-scrollbar space-y-16">
                   {parsedQuestions.map((q, idx) => (
                     <div key={idx} className="space-y-10 pb-16 border-b border-slate-100 last:border-0 last:pb-0">
                        <div className="flex items-center justify-between">
-                          <Badge className="bg-primary/10 text-primary border-none text-[11px] font-black uppercase tracking-widest px-4 py-1 rounded-lg">Audit Node {idx + 1}</Badge>
-                          <div className="flex gap-4">
-                             <Badge variant="outline" className="text-[10px] font-bold uppercase">{q.difficulty}</Badge>
-                             <Badge variant="outline" className="text-[10px] font-bold uppercase">{q.subjectId}</Badge>
-                          </div>
+                          <Badge className="bg-[#0F172A] text-white border-none text-[11px] font-black uppercase tracking-widest px-4 py-1 rounded-lg">Question {idx + 1}</Badge>
                        </div>
-                       <QuestionRenderer language="bilingual" question={q} />
+                       <QuestionRenderer language="bilingual" question={q} showSolution={true} />
                     </div>
                   ))}
                </CardContent>
@@ -307,43 +223,24 @@ PUN_EXP: ਵਿਆਖਿਆ ਪੰਜਾਬੀ ਵਿੱਚ.`;
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-slate-300 opacity-20 py-60">
               <Database className="h-32 w-32 mb-8" />
-              <p className="font-headline font-black uppercase tracking-[0.4em] text-xl text-center px-10">Awaiting Ingestion Input<br/><span className="text-sm">Metadata must be selected before structuring.</span></p>
+              <p className="font-headline font-black uppercase tracking-[0.4em] text-xl text-center">Awaiting Standard Input</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Deployment Modal */}
       <Dialog open={showMockCreator} onOpenChange={setShowMockCreator}>
         <DialogContent className="sm:max-w-2xl rounded-[3rem] bg-[#0F172A] text-white border-white/10 p-0 overflow-hidden shadow-4xl">
           <div className="p-12 space-y-12">
             <div className="text-center space-y-4">
-               <div className="h-20 w-20 bg-primary/20 rounded-[2.5rem] flex items-center justify-center mx-auto text-primary shadow-2xl">
-                  <Rocket className="h-10 w-10" />
-               </div>
-               <h2 className="text-4xl font-headline font-black uppercase tracking-tight">Deploy Active Series</h2>
-               <p className="text-slate-400 text-lg font-medium px-10">
-                  {parsedQuestions.length} questions successfully saved. Create a live mock series using these nodes immediately?
-               </p>
+               <div className="h-20 w-20 bg-primary/20 rounded-[2.5rem] flex items-center justify-center mx-auto text-primary shadow-2xl"><Rocket className="h-10 w-10" /></div>
+               <h2 className="text-4xl font-headline font-black uppercase tracking-tight">Deploy Series</h2>
+               <p className="text-slate-400 text-lg font-medium">{parsedQuestions.length} questions saved. Create mock immediately?</p>
             </div>
-
-            <div className="grid grid-cols-2 gap-8 bg-white/5 p-8 rounded-[2.5rem] border border-white/5 shadow-inner">
-               <div className="space-y-2">
-                  <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Duration</span>
-                  <p className="text-2xl font-headline font-black text-primary">{metadata.duration} Mins</p>
-               </div>
-               <div className="space-y-2">
-                  <span className="text-[10px) font-black uppercase text-slate-500 tracking-widest">Type</span>
-                  <p className="text-2xl font-headline font-black text-white">{metadata.mockType} Mock</p>
-               </div>
-            </div>
-
             <DialogFooter className="flex flex-col sm:flex-row gap-4">
-               <Button variant="ghost" onClick={() => router.push("/admin/questions")} className="h-14 px-8 rounded-2xl text-slate-400 hover:text-white font-bold uppercase text-[10px] tracking-widest">
-                  View in Bank
-               </Button>
+               <Button variant="ghost" onClick={() => router.push("/admin/questions")} className="h-14 px-8 rounded-2xl text-slate-400 hover:text-white font-bold uppercase text-[10px]">View in Bank</Button>
                <Button onClick={handleDeployMock} className="flex-1 h-16 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl shadow-3xl shadow-primary/20 gap-3">
-                  <ClipboardCheck className="h-5 w-5" /> Initialize Live Series
+                  <ClipboardCheck className="h-5 w-5" /> Initialize Series
                </Button>
             </DialogFooter>
           </div>
