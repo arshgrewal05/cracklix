@@ -7,9 +7,8 @@ import { ChevronLeft, ChevronRight, CheckCircle2, RotateCcw, Flag } from 'lucide
 import { useFirestore } from '@/firebase';
 
 /**
- * @fileOverview Institutional Tactical Navigation Belt v7.0.
- * Re-ordered as requested: [PREVIOUS] ... [MARK FOR REVIEW] [CLEAR RESPONSE] [SAVE & NEXT]
- * Primary action anchored to the far right for ergonomics.
+ * @fileOverview Institutional Tactical Navigation Belt v8.0.
+ * Order: [PREVIOUS] ... [MARK FOR REVIEW] [CLEAR RESPONSE] [SAVE & NEXT]
  */
 export default function TacticalFooter({ onSubmit }: { onSubmit: () => void }) {
   const { currentIdx, questions, clearAnswer, markForReview, saveAndNext, setCurrentIdx } = useExamStore();
@@ -28,7 +27,7 @@ export default function TacticalFooter({ onSubmit }: { onSubmit: () => void }) {
           disabled={currentIdx === 0}
           className="h-9 px-4 md:px-6 rounded-lg font-black uppercase text-[9px] tracking-widest border-slate-200 text-slate-500 hover:bg-slate-50"
         >
-          <ChevronLeft className="h-3.5 w-3.5 mr-1 md:mr-2" /> Previous
+          <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Previous
         </Button>
       </div>
 

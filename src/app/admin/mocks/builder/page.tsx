@@ -66,11 +66,11 @@ function MockBuilderContent() {
   const mockId = searchParams.get("id")
   const isEditing = !!mockId
 
-  const { data: existingMock } = useDoc<any>(useMemo(() => (db && typeof db === 'object' && mockId ? doc(db, "mocks", mockId) : null), [db, mockId]))
-  const { data: boards } = useCollection<any>(useMemo(() => (db && typeof db === 'object' ? query(collection(db, "boards")) : null), [db]))
-  const { data: exams } = useCollection<any>(useMemo(() => (db && typeof db === 'object' ? query(collection(db, "exams")) : null), [db]))
-  const { data: subjects } = useCollection<any>(useMemo(() => (db && typeof db === 'object' ? query(collection(db, "subjects")) : null), [db]))
-  const { data: passes } = useCollection<any>(useMemo(() => (db && typeof db === 'object' ? query(collection(db, "passes"), where("active", "==", true)) : null), [db]))
+  const { data: existingMock } = useDoc<any>(useMemo(() => (db && mockId ? doc(db, "mocks", mockId) : null), [db, mockId]))
+  const { data: boards } = useCollection<any>(useMemo(() => (db ? query(collection(db, "boards")) : null), [db]))
+  const { data: exams } = useCollection<any>(useMemo(() => (db ? query(collection(db, "exams")) : null), [db]))
+  const { data: subjects } = useCollection<any>(useMemo(() => (db ? query(collection(db, "subjects")) : null), [db]))
+  const { data: passes } = useCollection<any>(useMemo(() => (db ? query(collection(db, "passes"), where("active", "==", true)) : null), [db]))
   
   const [bankLoading, setBankLoading] = useState(false)
   const [questionBank, setQuestionBank] = useState<any[]>([])
@@ -104,7 +104,7 @@ function MockBuilderContent() {
 
   useEffect(() => {
     async function fetchBank() {
-      if (!db || typeof db !== 'object') return
+      if (!db) return
       setBankLoading(true)
       try {
         const q = query(collection(db, "questions"), limit(1000))
@@ -171,7 +171,7 @@ function MockBuilderContent() {
   }
 
   const handlePublish = async () => {
-    if (!mockData.title || !mockData.boardId || !mockData.examId) {
+    if (!db || !mockData.title || !mockData.boardId || !mockData.examId) {
       toast({ variant: "destructive", title: "Audit Blocked", description: "Title, Board, and Exam are mandatory." })
       return
     }
@@ -179,7 +179,7 @@ function MockBuilderContent() {
     const totalQuestions = sections.reduce((acc, s) => acc + s.questions.length, 0);
     setIsPublishing(true)
     const finalId = mockId || `mock-${Date.now()}`
-    const mockRef = doc(db!, "mocks", finalId)
+    const mockRef = doc(db, "mocks", finalId)
     
     const flatQuestionIds = sections.flatMap(s => s.questions.map(q => q.id));
     const sectionMetadata = sections.map(s => ({ name: s.name, count: s.questions.length })).filter(s => s.count > 0);
@@ -212,7 +212,7 @@ function MockBuilderContent() {
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl border bg-white h-12 w-12 shadow-sm"><ChevronLeft className="h-6 w-6" /></Button>
           <div className="text-left">
             <h1 className="text-4xl font-black font-headline uppercase tracking-tight text-[#0F172A]">Mock Architect</h1>
-            <p className="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mt-1">Institutional CBT Blueprinting Engine</p>
+            <p className="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mt-1">Institutional Blueprinting Engine</p>
           </div>
         </div>
         <Button className="bg-primary hover:bg-orange-600 font-black px-12 h-16 rounded-2xl uppercase text-[11px] tracking-[0.2em] gap-3 shadow-3xl" onClick={handlePublish} disabled={isPublishing}>
@@ -234,14 +234,14 @@ function MockBuilderContent() {
                    <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Authority</Label>
                    <Select value={mockData.boardId} onValueChange={v => setMockData({...mockData, boardId: v, examId: ""})}>
                      <SelectTrigger className="rounded-xl h-12 bg-slate-50/50 border-none"><SelectValue placeholder="Select" /></SelectTrigger>
-                     <SelectContent className="max-h-60 overflow-y-auto">{boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
+                     <SelectContent className="max-h-64 overflow-y-auto">{boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
                    </Select>
                  </div>
                  <div className="space-y-2">
                    <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Exam Hub</Label>
                    <Select value={mockData.examId} onValueChange={v => setMockData({...mockData, examId: v})}>
                      <SelectTrigger className="rounded-xl h-12 bg-slate-50/50 border-none"><SelectValue placeholder="Select" /></SelectTrigger>
-                     <SelectContent className="max-h-60 overflow-y-auto">{exams?.filter((e: any) => e.boardId === mockData.boardId).map((e: any) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}</SelectContent>
+                     <SelectContent className="max-h-64 overflow-y-auto">{exams?.filter((e: any) => e.boardId === mockData.boardId).map((e: any) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}</SelectContent>
                    </Select>
                  </div>
                </div>
@@ -296,7 +296,7 @@ function MockBuilderContent() {
                        <div className="w-full md:w-44">
                           <Select value={bankFilter.boardId} onValueChange={v => setBankFilter({...bankFilter, boardId: v, examId: "all"})}>
                              <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs"><SelectValue placeholder="Board" /></SelectTrigger>
-                             <SelectContent className="max-h-60 overflow-y-auto">
+                             <SelectContent className="max-h-64 overflow-y-auto">
                                 <SelectItem value="all">All Boards</SelectItem>
                                 {boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}
                              </SelectContent>
@@ -305,7 +305,7 @@ function MockBuilderContent() {
                        <div className="w-full md:w-44">
                           <Select value={bankFilter.examId} onValueChange={v => setBankFilter({...bankFilter, examId: v})}>
                              <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs"><SelectValue placeholder="Exam Paper" /></SelectTrigger>
-                             <SelectContent className="max-h-60 overflow-y-auto">
+                             <SelectContent className="max-h-64 overflow-y-auto">
                                 <SelectItem value="all">All Exams</SelectItem>
                                 {exams?.filter((e: any) => bankFilter.boardId === 'all' || e.boardId === bankFilter.boardId).map((e: any) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
                              </SelectContent>
@@ -314,7 +314,7 @@ function MockBuilderContent() {
                        <div className="w-full md:w-44">
                           <Select value={bankFilter.subjectId} onValueChange={v => setBankFilter({...bankFilter, subjectId: v})}>
                              <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs"><SelectValue placeholder="Subject" /></SelectTrigger>
-                             <SelectContent className="max-h-60 overflow-y-auto">
+                             <SelectContent className="max-h-64 overflow-y-auto">
                                 <SelectItem value="all">All Subjects</SelectItem>
                                 {subjects?.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
                              </SelectContent>
@@ -322,7 +322,7 @@ function MockBuilderContent() {
                        </div>
                     </div>
 
-                    <div className="bg-[#0F172A] p-6 rounded-[2rem] mb-8 flex flex-col md:flex-row md:items-center justify-between gap-8 text-white shadow-2xl overflow-hidden relative">
+                    <div className="bg-[#0F172A] p-6 rounded-[2rem] mb-8 flex flex-col md:flex-row md:items-center justify-between gap-8 text-white shadow-2xl overflow-hidden">
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 flex-1 min-w-0">
                           <div className="space-y-1.5 text-left w-full">
                              <p className="text-[7px] font-black uppercase text-slate-500 tracking-[0.3em]">Target</p>
@@ -331,24 +331,22 @@ function MockBuilderContent() {
                                 <SelectTrigger className="h-12 w-full bg-white/10 border-white/10 text-white font-black text-[10px] rounded-xl uppercase tracking-widest">
                                    <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="max-h-[300px] overflow-y-auto">
+                                <SelectContent className="max-h-64 overflow-y-auto">
                                    {sections.map(s => <SelectItem key={s.id} value={s.id} className="uppercase font-bold text-[10px]">{s.name}</SelectItem>)}
                                 </SelectContent>
                              </Select>
                           </div>
                           
                           <div className="flex items-center gap-4 shrink-0 justify-center md:justify-start">
-                             <div className="relative h-6 w-6">
-                                <Checkbox 
-                                  id="select-all"
-                                  className="h-6 w-6 rounded-full border-primary data-[state=checked]:bg-primary"
-                                  checked={filteredBank.length > 0 && bankSelection.length === filteredBank.length} 
-                                  onCheckedChange={(v) => {
-                                     if (v) setBankSelection(filteredBank.map(q => q.id))
-                                     else setBankSelection([])
-                                  }}
-                                />
-                             </div>
+                             <Checkbox 
+                               id="select-all"
+                               className="h-6 w-6 rounded-full border-primary data-[state=checked]:bg-primary"
+                               checked={filteredBank.length > 0 && bankSelection.length === filteredBank.length} 
+                               onCheckedChange={(v) => {
+                                  if (v) setBankSelection(filteredBank.map(q => q.id))
+                                  else setBankSelection([])
+                               }}
+                             />
                              <div className="text-left">
                                 <Label htmlFor="select-all" className="font-black uppercase text-[10px] tracking-widest text-white cursor-pointer">Select All</Label>
                                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">({bankSelection.length} Nodes)</p>
@@ -380,7 +378,7 @@ function MockBuilderContent() {
                                 <Checkbox 
                                   checked={bankSelection.includes(q.id)} 
                                   onCheckedChange={() => {
-                                     setBankSelection(prev => prev.includes(q.id) ? prev.filter(id => id !== q.id) : [...prev, id])
+                                     setBankSelection(prev => prev.includes(q.id) ? prev.filter(id => id !== q.id) : [...prev, q.id])
                                   }}
                                 />
                                 <div className="min-w-0 flex-1">
@@ -398,16 +396,14 @@ function MockBuilderContent() {
 
                  <TabsContent value="assembly" className="p-10 flex-1 flex flex-col m-0">
                     <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 mb-10 flex items-center justify-between gap-6">
-                       <div className="space-y-1 text-left">
-                          <p className="font-black uppercase text-[11px] text-[#0F172A] tracking-widest">CBT Blueprint Sections ({sections.length})</p>
-                       </div>
+                       <p className="font-black uppercase text-[11px] text-[#0F172A] tracking-widest">Blueprint Sections ({sections.length})</p>
                        <div className="flex items-center gap-3">
                           <Select onValueChange={(val) => handleAddSection(val)}>
                              <SelectTrigger className="h-11 w-64 bg-white border-slate-200 rounded-xl font-black uppercase text-[9px] tracking-widest">
                                 <Plus className="h-3 w-3 text-primary mr-2" /> 
                                 <SelectValue placeholder="Add Standard Section" />
                              </SelectTrigger>
-                             <SelectContent className="max-h-60 overflow-y-auto">
+                             <SelectContent className="max-h-64 overflow-y-auto">
                                 {PSSSB_SECTIONS.map(s => <SelectItem key={s} value={s} className="font-bold text-[10px] uppercase">{s}</SelectItem>)}
                              </SelectContent>
                           </Select>

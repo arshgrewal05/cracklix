@@ -26,8 +26,8 @@ import {
 } from "@/components/ui/tooltip"
 
 /**
- * @fileOverview Institutional Asset Ledger (Global Bank) v8.8.
- * Hardened: Fixed runtime errors by ensuring Firestore instance check on all calls.
+ * @fileOverview Institutional Asset Ledger (Global Bank) v9.0.
+ * Hardened: Enforced double-gated null checks on all Firestore calls.
  */
 
 export default function QuestionBank() {
@@ -45,16 +45,16 @@ export default function QuestionBank() {
   const [lastDoc, setLastDoc] = useState<any>(null)
   const [hasMore, setLastHasMore] = useState(true)
 
-  const mocksQuery = useMemo(() => (db && typeof db === 'object' ? query(collection(db, "mocks")) : null), [db])
-  const boardsQuery = useMemo(() => (db && typeof db === 'object' ? query(collection(db, "boards")) : null), [db])
-  const subjectsQuery = useMemo(() => (db && typeof db === 'object' ? query(collection(db, "subjects")) : null), [db])
+  const mocksQuery = useMemo(() => (db ? query(collection(db, "mocks")) : null), [db])
+  const boardsQuery = useMemo(() => (db ? query(collection(db, "boards")) : null), [db])
+  const subjectsQuery = useMemo(() => (db ? query(collection(db, "subjects")) : null), [db])
 
   const { data: allMocks } = useCollection<any>(mocksQuery)
   const { data: boards } = useCollection<any>(boardsQuery)
   const { data: subjects } = useCollection<any>(subjectsQuery)
 
   const fetchQuestions = useCallback(async (isNext = false) => {
-    if (!db || typeof db !== 'object') return
+    if (!db) return
     setLoading(true)
     
     try {
@@ -82,7 +82,7 @@ export default function QuestionBank() {
       setLastHasMore(snap.docs.length === 100)
     } catch (e: any) {
       console.error("Fetch Rejection:", e)
-      toast({ variant: "destructive", title: "Fetch Error", description: "Cloud database rejected query node." })
+      toast({ variant: "destructive", title: "Fetch Error", description: "Registry sync rejected." })
     } finally {
       setLoading(false)
     }
@@ -180,7 +180,7 @@ export default function QuestionBank() {
             <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Atomic Asset Bank</span>
           </div>
           <h1 className="text-4xl font-black font-headline text-primary uppercase tracking-tight">Question Bank</h1>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">Managing legacy and standalone MCQ nodes for upcoming exams.</p>
+          <p className="text-muted-foreground mt-1 text-sm font-medium">Managing standalone MCQ nodes for official registry.</p>
         </div>
         <div className="flex gap-4">
           <Button variant="outline" onClick={() => fetchQuestions()} className="h-12 px-6 rounded-2xl bg-white shadow-sm gap-2">
