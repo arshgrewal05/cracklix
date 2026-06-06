@@ -1,7 +1,6 @@
-
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
 
 interface QuestionPaletteProps {
@@ -12,11 +11,15 @@ interface QuestionPaletteProps {
   visitedIndices: number[]
   onSelect: (index: number) => void
   subjectMap?: Record<string, string>
+  examName?: string
 }
 
 /**
- * @fileOverview Sectional Audit Matrix v3.0.
- * Features: Automatic Subject Grouping, High-Density Grid, and Active Node Highlighting.
+ * @fileOverview Paginated Institutional Audit Matrix v4.0.
+ * Rules Enforcement:
+ * 1. Exactly 25 questions per page view.
+ * 2. Exam Name visible at the top.
+ * 3. NO CIRCLE OVERLAP: Precise spacing and box-sizing.
  */
 
 export default function QuestionPalette({
@@ -26,24 +29,21 @@ export default function QuestionPalette({
   flaggedIndices,
   visitedIndices,
   onSelect,
-  subjectMap = {}
+  subjectMap = {},
+  examName = "OFFICIAL SERIES"
 }: QuestionPaletteProps) {
   
+  const [currentPage, setCurrentPage] = useState(0)
+  const PAGE_SIZE = 25
   const totalQuestions = questions.length
+  const totalPages = Math.ceil(totalQuestions / PAGE_SIZE)
 
-  const groupedQuestions = useMemo(() => {
-    const groups: Record<string, { startIdx: number; questions: any[] }> = {};
-    
-    questions.forEach((q, idx) => {
-      const subId = q.subjectId || 'GENERAL';
-      if (!groups[subId]) {
-        groups[subId] = { startIdx: idx, questions: [] };
-      }
-      groups[subId].questions.push({ ...q, globalIdx: idx });
-    });
-
-    return Object.entries(groups);
-  }, [questions]);
+  const currentQuestions = useMemo(() => {
+    return questions.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE).map((q, i) => ({
+        ...q,
+        globalIdx: (currentPage * PAGE_SIZE) + i
+    }));
+  }, [questions, currentPage])
 
   const summary = useMemo(() => {
     const answered = answeredIndices.length
@@ -60,55 +60,81 @@ export default function QuestionPalette({
   }, [totalQuestions, answeredIndices, flaggedIndices, visitedIndices])
 
   return (
-    <div className="space-y-6 flex flex-col h-full text-left">
-      {/* Stats Summary Bar */}
-      <div className="grid grid-cols-2 gap-2">
-         <PaletteStat count={summary.answered} label="Ans" color="bg-emerald-600" />
-         <PaletteStat count={summary.notAnswered} label="Unans" color="bg-rose-500" />
-         <PaletteStat count={summary.notVisited} label="Skip" color="bg-slate-100" textColor="text-slate-400" />
-         <PaletteStat count={summary.review} label="Rev" color="bg-amber-500" />
+    <div className="space-y-6 flex flex-col h-full text-left font-body">
+      {/* Dynamic Exam Branding */}
+      <div className="space-y-1 pb-4 border-b border-slate-100">
+         <p className="text-[7px] font-black text-primary uppercase tracking-[0.4em] leading-none">ACTIVE AUDIT</p>
+         <h3 className="text-[12px] font-black text-[#0F172A] uppercase leading-tight truncate">
+            {examName}
+         </h3>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-8 pt-4 border-t border-slate-100">
-         {groupedQuestions.map(([subId, data]) => (
-            <div key={subId} className="space-y-4">
-               <div className="flex items-center gap-3">
-                  <div className="h-1 w-6 bg-primary/20 rounded-full" />
-                  <h4 className="text-[10px] font-black uppercase text-slate-800 tracking-widest truncate">
-                    {subjectMap[subId] || subId.replace('-', ' ').toUpperCase()}
-                  </h4>
-               </div>
+      {/* Stats Summary Grid */}
+      <div className="grid grid-cols-2 gap-2">
+         <PaletteStat count={summary.answered} label="Answered" color="bg-emerald-600" />
+         <PaletteStat count={summary.notAnswered} label="Unanswered" color="bg-rose-500" />
+         <PaletteStat count={summary.notVisited} label="Not Visited" color="bg-slate-100" textColor="text-slate-400" />
+         <PaletteStat count={summary.review} label="Review" color="bg-amber-500" />
+      </div>
 
-               <div className="grid grid-cols-5 gap-2.5">
-                  {data.questions.map((q) => {
-                    const idx = q.globalIdx;
-                    const isCurrent = currentIndex === idx
-                    const isAnswered = answeredIndices.includes(idx)
-                    const isFlagged = flaggedIndices.includes(idx)
-                    const isVisited = visitedIndices.includes(idx)
-                    const isBoth = isAnswered && isFlagged
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2">
+           {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                  currentPage === i 
+                    ? "bg-[#0F172A] text-white border-[#0F172A] shadow-lg" 
+                    : "bg-white text-slate-400 border-slate-100 hover:border-primary/20"
+                )}
+              >
+                Page {i + 1}
+              </button>
+           ))}
+        </div>
+      )}
 
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => onSelect(idx)}
-                        className={cn(
-                          "h-8 w-8 md:h-9 md:w-9 rounded-full text-[10px] font-black transition-all border flex items-center justify-center shadow-sm shrink-0",
-                          isCurrent ? "ring-2 ring-primary ring-offset-2 scale-110 z-10 bg-white text-primary border-primary shadow-xl" : "",
-                          !isCurrent && isBoth && "bg-purple-600 text-white border-purple-600",
-                          !isCurrent && isAnswered && !isFlagged && "bg-emerald-600 text-white border-emerald-600",
-                          !isCurrent && isFlagged && !isAnswered && "bg-amber-500 text-white border-amber-500",
-                          !isCurrent && isVisited && !isAnswered && !isFlagged && "bg-rose-500 text-white border-rose-500",
-                          !isCurrent && !isVisited && "bg-slate-50 text-slate-300 border-transparent",
-                        )}
-                      >
-                        {idx + 1}
-                      </button>
-                    )
-                  })}
-               </div>
-            </div>
-         ))}
+      {/* High-Density Matrix (NO OVERLAP) */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 pt-2">
+         <div className="grid grid-cols-5 gap-3 p-1">
+            {currentQuestions.map((q) => {
+              const idx = q.globalIdx;
+              const isCurrent = currentIndex === idx
+              const isAnswered = answeredIndices.includes(idx)
+              const isFlagged = flaggedIndices.includes(idx)
+              const isVisited = visitedIndices.includes(idx)
+              const isBoth = isAnswered && isFlagged
+
+              return (
+                <div key={idx} className="flex items-center justify-center p-0.5 box-border">
+                  <button
+                    onClick={() => onSelect(idx)}
+                    className={cn(
+                      "h-10 w-10 md:h-11 md:w-11 rounded-full text-[11px] font-black transition-all flex items-center justify-center shrink-0 border-2 box-border relative",
+                      "hover:scale-105 active:scale-95",
+                      isCurrent ? "border-primary ring-2 ring-primary ring-offset-2 bg-white text-primary z-20 shadow-xl" : "border-transparent",
+                      !isCurrent && isBoth && "bg-purple-600 text-white border-purple-600",
+                      !isCurrent && isAnswered && !isFlagged && "bg-emerald-600 text-white border-emerald-600",
+                      !isCurrent && isFlagged && !isAnswered && "bg-amber-500 text-white border-amber-500",
+                      !isCurrent && isVisited && !isAnswered && !isFlagged && "bg-rose-500 text-white border-rose-500",
+                      !isCurrent && !isVisited && "bg-slate-50 text-slate-300",
+                    )}
+                  >
+                    {idx + 1}
+                  </button>
+                </div>
+              )
+            })}
+         </div>
+      </div>
+      
+      <div className="pt-4 border-t border-slate-100">
+         <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest text-center">
+            Nodes {currentPage * PAGE_SIZE + 1} - {Math.min((currentPage + 1) * PAGE_SIZE, totalQuestions)} of {totalQuestions}
+         </p>
       </div>
     </div>
   )
@@ -116,7 +142,7 @@ export default function QuestionPalette({
 
 function PaletteStat({ count, label, color, textColor = "text-white" }: any) {
   return (
-    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-100 bg-white shadow-sm">
+    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-slate-100 bg-white shadow-sm overflow-hidden">
        <div className={cn("h-4 w-4 rounded-md flex items-center justify-center text-[8px] font-black shrink-0", color, textColor)}>
           {count}
        </div>
