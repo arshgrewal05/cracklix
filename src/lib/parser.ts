@@ -1,7 +1,8 @@
 
 /**
- * @fileOverview Institutional Ultimate Hybrid Ingestion Engine.
- * Features: Automated Numbering Purge & Sequential ID Generation.
+ * @fileOverview Institutional Ultimate Hybrid Ingestion Engine v3.0.
+ * Features: Automatic Boundary Detection (Q1, Q291, etc.), Multilingual Mapping,
+ * and aggressive numbering artifacts purge.
  */
 
 import { Question, Difficulty, ContentStatus, QuestionType } from "@/types";
@@ -13,13 +14,12 @@ export interface ParsedResults {
 }
 
 /**
- * Aggressively cleans imported text.
- * Strips artifacts like "1.", "Q1.", "Question 1:", "**2.**"
+ * Aggressively cleans imported text and purges formatting debris.
  */
 function cleanText(text: string): string {
   if (!text) return "";
   return text
-    .replace(/^(\s*\**\s*(?:Q|Question)?\s*\d+[\.\):-]*\s*\*?\s*)/i, '') // Strips leading 1., Q1., Question 1:
+    .replace(/^(\s*\**\s*(?:Q|Question|QUESTION NO\.)?\s*\d+[\.\):-]*\s*\*?\s*)/i, '') // Strips leading 1., Q1., Question 1:
     .replace(/^[\s\d\.\*]+/, '') 
     .replace(/\*+$/, '')         
     .replace(/[\*\_]/g, '')      
@@ -28,21 +28,33 @@ function cleanText(text: string): string {
 }
 
 /**
- * Intelligent Subject Normalizer.
+ * Detects boundaries and splits text into individual question blocks.
+ * Supports patterns: Q1, Q291, 1., Question 1, QUESTION NO. 1
  */
-export function normalizeSubjectId(input: string, masterSubjects: any[]): string {
-  if (!input || !masterSubjects) return 'general-knowledge';
-  const cleanInput = input.trim().toLowerCase();
+function splitIntoBlocks(text: string): string[] {
+  // Pattern matches the start of a new question
+  const boundaryRegex = /(?:\n|^)\s*(?:Q|Question|QUESTION NO\.)?\s*(\d+)[\.\):\s-]/i;
   
-  const exact = masterSubjects.find(s => s.name.toLowerCase() === cleanInput || s.id.toLowerCase() === cleanInput);
-  if (exact) return exact.id;
-  
-  const aliasMatch = masterSubjects.find(s => 
-    s.aliases?.some((a: string) => a.toLowerCase() === cleanInput)
-  );
-  if (aliasMatch) return aliasMatch.id;
-  
-  return 'general-knowledge';
+  // We use a manual split to preserve content
+  const lines = text.split('\n');
+  const blocks: string[] = [];
+  let currentBlock: string[] = [];
+
+  lines.forEach(line => {
+    if (boundaryRegex.test(line) && currentBlock.length > 0) {
+      // If we see a new question marker and we have current content, save the block
+      blocks.push(currentBlock.join('\n').trim());
+      currentBlock = [line];
+    } else {
+      currentBlock.push(line);
+    }
+  });
+
+  if (currentBlock.length > 0) {
+    blocks.push(currentBlock.join('\n').trim());
+  }
+
+  return blocks.filter(b => b.length > 10);
 }
 
 export function parseBulkQuestions(
@@ -54,44 +66,30 @@ export function parseBulkQuestions(
     chapterId: string;
     difficulty: Difficulty;
     status: ContentStatus;
-  },
-  masterSubjects: any[] = []
+  }
 ): ParsedResults {
   const questions: Partial<Question>[] = [];
   const errors: string[] = [];
   
-  const text = "\n" + rawText.replace(/\r\n/g, '\n').trim();
-  const blocks = text.split(/(?:\n\s*[=-]{3,}\s*\n|(?=\n\s*\**Q?\d+[\.\)])|(?=\n\s*QUESTION_TYPE:))/i)
-    .map(b => b.trim())
-    .filter(b => b.length > 5);
+  const blocks = splitIntoBlocks(rawText);
 
   if (blocks.length === 0) {
-    return { questions: [], errors: ["No valid content blocks detected."], confidence: 0 };
+    return { questions: [], errors: ["No valid question patterns detected. Ensure you use Q1, 1., or Question 1 format."], confidence: 0 };
   }
 
   blocks.forEach((block, index) => {
     try {
-      const isTaggedFormat = block.toUpperCase().includes('QUESTION_TYPE:') || block.toUpperCase().includes('QUESTION_EN:');
-      let parsed: Partial<Question>;
+      const parsed = parseComplexBlock(block, metadata);
 
-      if (isTaggedFormat) {
-        parsed = parseTaggedBlock(block, metadata, masterSubjects);
-      } else {
-        parsed = parseSimpleBlock(block, metadata);
-      }
-
-      // Generate Sequential ID Placeholder
+      // Generate Institutional Sequential ID
       const prefix = metadata.examId.substring(0, 4).toUpperCase();
-      const timestamp = Date.now().toString().slice(-6);
-      const displayId = `${prefix}-${timestamp}-${index + 1}`;
+      const displayId = `${prefix}-${Date.now().toString().slice(-4)}-${index + 1}`;
 
       questions.push({
         ...parsed,
-        displayId, // Automated Sequential ID
+        displayId,
         isStandalone: true,
         status: metadata.status,
-        questionEn: cleanText(parsed.questionEn || ""),
-        questionPa: cleanText(parsed.questionPa || "")
       });
 
     } catch (err: any) {
@@ -103,80 +101,65 @@ export function parseBulkQuestions(
   return { questions, errors, confidence };
 }
 
-function parseTaggedBlock(block: string, metadata: any, masterSubjects: any[]): Partial<Question> {
-  const getTag = (tag: string) => {
-    const regex = new RegExp(`${tag}:?\\s*([\\s\\S]*?)(?=\\n[A-Z_\\d\\s]+:?|$)`, 'i');
-    const match = block.match(regex);
-    return match ? cleanText(match[1]) : null;
-  };
+function parseComplexBlock(block: string, metadata: any): Partial<Question> {
+  // Regex patterns for various components
+  const optionRegex = /(?:\n|^)\s*\**([A-D])[\.\)]\s*\*?\s*([\s\S]*?)(?=\n\s*\**[A-D][\.\)]|\n\s*\**Correct Answer|\n\s*\**Answer|\n\s*\**Explanation|\n\s*\**ਵਿਆਖਿਆ|$)/gi;
+  const answerRegex = /(?:Correct Answer|Answer|Correct Option|ਜਵਾਬ):?\s*\**([A-D])\b/i;
+  const explanationRegex = /(?:Explanation|ਵਿਆਖਿਆ):?\s*\**([\s\S]*)$/i;
 
-  const qType = (getTag("QUESTION_TYPE") || "MCQ").toUpperCase() as QuestionType;
-  const blockSubject = getTag("SUBJECT");
-  const finalSubjectId = blockSubject 
-    ? normalizeSubjectId(blockSubject, masterSubjects) 
-    : metadata.subjectId;
-
-  const ansRaw = getTag("ANSWER") || getTag("CORRECT_ANSWER");
-  const correctAnswer = (ansRaw?.match(/[A-D]/i)?.[0].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
-
-  return {
-    ...metadata,
-    subjectId: finalSubjectId,
-    questionType: qType,
-    questionEn: getTag("QUESTION_EN") || getTag("TITLE"),
-    questionPa: getTag("QUESTION_PA") || getTag("QUESTION_EN") || "",
-    optionAEn: getTag("OPTION_A_EN") || "Option A",
-    optionAPa: getTag("OPTION_A_PA") || "",
-    optionBEn: getTag("OPTION_B_EN") || "Option B",
-    optionBPa: getTag("OPTION_B_PA") || "",
-    optionCEn: getTag("OPTION_C_EN") || "Option C",
-    optionCPa: getTag("OPTION_C_PA") || "",
-    optionDEn: getTag("OPTION_D_EN") || "Option D",
-    optionDPa: getTag("OPTION_DPa") || "",
-    correctAnswer,
-    explanationEn: getTag("EXPLANATION_EN") || "Solution provided in bank.",
-    explanationPa: getTag("EXPLANATION_PA") || "",
-    imageUrl: getTag("IMAGE_URL"),
-    passageEn: getTag("PASSAGE_EN"),
-    passagePa: getTag("PASSAGE_PA")
-  };
-}
-
-function parseSimpleBlock(block: string, metadata: any): Partial<Question> {
-  const parts = block.split(/(?=\n\s*\**[A-D][\.\)]\s*\*?|(?:\n\s*\**Correct Answer:?\**)|(?:\n\s*\**Explanation:?\**))/i);
-  const qLines = parts[0]?.trim().split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  // Extract Question Text (everything before the first option)
+  const firstOptionMatch = optionRegex.exec(block);
+  optionRegex.lastIndex = 0; // Reset for later use
   
+  const questionPart = firstOptionMatch 
+    ? block.substring(0, firstOptionMatch.index).trim() 
+    : block.split('\n')[0];
+
+  // Multilingual split for question
+  const qLines = questionPart.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const questionEn = cleanText(qLines[0] || "");
-  const questionPa = qLines.length > 1 ? cleanText(qLines.slice(1).join('\n')) : questionEn;
+  const questionPa = qLines.length > 1 ? cleanText(qLines.slice(1).join('\n')) : "";
 
-  const extractOption = (prefix: string) => {
-    const raw = parts.find(p => p.trim().replace(/^\**|\**$/g, '').toLowerCase().startsWith(prefix.toLowerCase()));
-    if (!raw) return { en: `Option ${prefix}`, pa: "" };
-    const content = raw.trim().replace(new RegExp(`^\\**${prefix}[\\.\\)]?\\s*\\**`, 'i'), '').trim();
+  // Extract Options
+  const options: Record<string, { en: string; pa: string }> = {};
+  let match;
+  while ((match = optionRegex.exec(block)) !== null) {
+    const label = match[1].toUpperCase();
+    const content = match[2].trim();
+    
+    // Check for bilingual pipe separator
     if (content.includes('|')) {
-      const [en, pa] = content.split('|').map(s => s.trim());
-      return { en: cleanText(en), pa: cleanText(pa) };
+      const [en, pa] = content.split('|').map(s => cleanText(s.trim()));
+      options[label] = { en, pa };
+    } else {
+      // Try to detect script or just use as EN
+      options[label] = { en: cleanText(content), pa: "" };
     }
-    return { en: cleanText(content), pa: "" };
-  };
+  }
 
-  const optA = extractOption("A");
-  const optB = extractOption("B");
-  const optC = extractOption("C");
-  const optD = extractOption("D");
+  // Extract Answer
+  const ansMatch = block.match(answerRegex);
+  const correctAnswer = (ansMatch?.[1].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
 
-  const ansPart = parts.find(p => p.trim().replace(/^\**|\**$/g, '').toLowerCase().startsWith("correct answer")) || "A";
-  const correctAnswer = (ansPart.match(/[A-D]/i)?.[0].toUpperCase() || "A") as 'A' | 'B' | 'C' | 'D';
+  // Extract Explanation
+  const expMatch = block.match(explanationRegex);
+  const explanationEn = expMatch ? cleanText(expMatch[1]) : "Solution synced to bank.";
 
   return {
     ...metadata,
     questionType: 'MCQ',
     questionEn,
-    questionPa,
-    optionAEn: optA.en, optionAPa: optA.pa,
-    optionBEn: optB.en, optionBPa: optB.pa,
-    optionCEn: optC.en, optionCPa: optC.pa,
-    optionDEn: optD.en, optionDPa: optD.pa,
+    questionPa: questionPa || questionEn,
+    optionAEn: options['A']?.en || "Option A",
+    optionAPa: options['A']?.pa || "",
+    optionBEn: options['B']?.en || "Option B",
+    optionBPa: options['B']?.pa || "",
+    optionCEn: options['C']?.en || "Option C",
+    optionCPa: options['C']?.pa || "",
+    optionDEn: options['D']?.en || "Option D",
+    optionDPa: options['D']?.pa || "",
     correctAnswer,
+    explanationEn,
+    explanationPa: explanationPa ? explanationEn : "" // Simple mapping if single-lang
   };
 }

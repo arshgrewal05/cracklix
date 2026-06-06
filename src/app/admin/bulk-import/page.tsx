@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,17 +11,38 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Database, ChevronLeft, AlertCircle, Settings2, Loader2, Trash2, Zap, Copy, Save, FileCode, DatabaseBackup, CheckCircle2, Rocket, SearchCode } from "lucide-react"
-import { useFirestore, useCollection } from "@/firebase"
-import { collection, doc, writeBatch, serverTimestamp, getDocs, query, where } from "firebase/firestore"
+import { 
+  Database, 
+  ChevronLeft, 
+  AlertCircle, 
+  Settings2, 
+  Loader2, 
+  Trash2, 
+  Zap, 
+  Rocket, 
+  SearchCode, 
+  Image as ImageIcon, 
+  Upload, 
+  CheckCircle2, 
+  FileWarning 
+} from "lucide-react"
+import { useFirestore, useCollection, useStorage } from "@/firebase"
+import { collection, doc, writeBatch, serverTimestamp, getDocs, query, where, limit } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { useToast } from "@/hooks/use-toast"
 import { parseBulkQuestions } from "@/lib/parser"
 import { Difficulty, Question, ContentStatus } from "@/types"
 import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
+/**
+ * @fileOverview Institutional Bulk Ingestion Hub v3.5.
+ * Features: Automatic Question Splitting, Media Linkage, and Detection Preview.
+ */
+
 export default function BulkImportPage() {
   const router = useRouter()
   const db = useFirestore()
+  const storage = useStorage()
   const { toast } = useToast()
   
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
@@ -42,7 +63,9 @@ export default function BulkImportPage() {
   const [parseErrors, setParseErrors] = useState<string[]>([])
   const [confidence, setConfidence] = useState(0)
   const [isSyncing, setIsSyncing] = useState(false)
-  const [duplicateCount, setDuplicateCount] = useState(0)
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
+  
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleAnalyze = async () => {
     if (!rawText.trim()) return
@@ -51,28 +74,39 @@ export default function BulkImportPage() {
       return
     }
 
-    const { questions, errors, confidence: conf } = parseBulkQuestions(rawText, metadata, subjects || [])
+    const { questions, errors, confidence: conf } = parseBulkQuestions(rawText, metadata)
     
-    // Simple Collision Detection Hub
-    let dupes = 0;
-    if (db) {
-       const hashes = questions.map(q => q.questionEn?.substring(0, 50).toLowerCase());
-       const existingSnap = await getDocs(query(collection(db, "questions"), where("examId", "==", metadata.examId), limit(500)));
-       const existingTexts = existingSnap.docs.map(d => d.data().questionEn?.substring(0, 50).toLowerCase());
-       dupes = hashes.filter(h => existingTexts.includes(h)).length;
-    }
-
     setParsedQuestions(questions)
     setParseErrors(errors)
     setConfidence(conf)
-    setDuplicateCount(dupes)
 
     if (errors.length > 0) {
-      toast({ variant: "destructive", title: "Audit Warnings", description: `Parsed ${questions.length} blocks, but found ${errors.length} errors.` })
-    } else if (dupes > 0) {
-      toast({ variant: "destructive", title: "Collisions Detected", description: `${dupes} questions appear to already exist in this hub.` })
+      toast({ variant: "destructive", title: "Split Warnings", description: `Found ${errors.length} parsing issues.` })
     } else {
-      toast({ title: "Structure Validated", description: `${questions.length} nodes ready for bank sync.` })
+      toast({ title: "Analysis Complete", description: `Detected ${questions.length} individual questions.` })
+    }
+  }
+
+  const handleImageUpload = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !storage) return
+
+    setUploadingIdx(idx)
+    const storageRef = ref(storage, `question_assets/${Date.now()}_${file.name}`)
+
+    try {
+      const snapshot = await uploadBytes(storageRef, file)
+      const url = await getDownloadURL(snapshot.ref)
+      
+      const updated = [...parsedQuestions]
+      updated[idx].imageUrl = url
+      setParsedQuestions(updated)
+      
+      toast({ title: "Media Linked", description: "Image attached to question node." })
+    } catch (err) {
+      toast({ variant: "destructive", title: "Upload Failed" })
+    } finally {
+      setUploadingIdx(null)
     }
   }
 
@@ -89,15 +123,16 @@ export default function BulkImportPage() {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         isStandalone: true,
-        status: metadata.status
       };
+      
+      // Cleanup
       Object.keys(payload).forEach(key => (payload[key] === undefined || payload[key] === null) && delete payload[key]);
       batch.set(qRef, payload)
     })
 
     try {
       await batch.commit()
-      toast({ title: "Bank Sync Success", description: `${parsedQuestions.length} reusable nodes successfully committed.` })
+      toast({ title: "Bank Sync Success", description: `${parsedQuestions.length} nodes successfully committed.` })
       router.push("/admin/questions")
     } catch (e: any) {
       toast({ variant: "destructive", title: "Sync Failed", description: e.message })
@@ -112,16 +147,16 @@ export default function BulkImportPage() {
         <div className="flex items-center gap-6">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl border bg-white h-12 w-12 shadow-sm"><ChevronLeft className="h-6 w-6" /></Button>
           <div className="text-left">
-            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Institutional Ingestion</h1>
-            <p className="text-slate-500 font-medium">Auto-stripping numbering and generating sequential audit IDs.</p>
+            <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Bulk Ingestion Engine</h1>
+            <p className="text-slate-500 font-medium">Automatic boundary detection for massive scale datasets.</p>
           </div>
         </div>
         <div className="flex gap-4">
            <Button variant="outline" onClick={() => { setRawText(""); setParsedQuestions([]); }} className="h-16 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 shadow-sm bg-white">
-              <DatabaseBackup className="h-5 w-5" /> Reset Buffer
+              Reset Buffer
            </Button>
            <Button onClick={handleSaveToBank} disabled={isSyncing || parsedQuestions.length === 0} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl h-16 px-12 gap-3 shadow-3xl shadow-emerald-900/20">
-              {isSyncing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Rocket className="h-5 w-5" />} Commit to Question Bank
+              {isSyncing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Rocket className="h-5 w-5" />} Commit {parsedQuestions.length} Nodes
            </Button>
         </div>
       </div>
@@ -156,36 +191,39 @@ export default function BulkImportPage() {
                       <SelectContent>{subjects?.map((s:any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                    </Select>
                 </div>
-                <div className="space-y-1">
-                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Chapter / Topic</Label>
-                   <Input value={metadata.chapterId} onChange={e => setMetadata({...metadata, chapterId: e.target.value})} placeholder="e.g. Ratio" className="h-11 bg-slate-50 border-none rounded-xl font-bold" />
-                </div>
               </div>
             </CardContent>
           </Card>
           
-          {duplicateCount > 0 && (
-             <Card className="border-none bg-rose-50 p-8 rounded-[2.5rem] flex items-center gap-6 shadow-lg border border-rose-100">
-                <SearchCode className="h-10 w-10 text-rose-500 shrink-0" />
-                <div className="text-left">
-                   <p className="text-sm font-black text-rose-900 uppercase">Integrity Alert</p>
-                   <p className="text-xs font-bold text-rose-600 uppercase mt-1">{duplicateCount} Collisions Detected</p>
+          <div className="p-10 bg-[#0F172A] rounded-[3rem] text-white space-y-6">
+             <div className="flex items-center gap-4">
+                <div className="h-10 w-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary"><SearchCode className="h-6 w-6" /></div>
+                <h3 className="font-headline font-black uppercase">Detection Logic</h3>
+             </div>
+             <div className="space-y-4">
+                <div className="flex justify-between items-center text-sm">
+                   <span className="text-slate-400">Questions Detected</span>
+                   <span className="font-black text-primary">{parsedQuestions.length}</span>
                 </div>
-             </Card>
-          )}
+                <div className="flex justify-between items-center text-sm">
+                   <span className="text-slate-400">Parse Confidence</span>
+                   <span className="font-black text-emerald-400">{confidence}%</span>
+                </div>
+             </div>
+          </div>
         </div>
 
         <div className="lg:col-span-8 space-y-8">
            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Ingestion Buffer (Auto-Sanitized)</Label>
+              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Ingestion Buffer (Paste content with Q1, Q2...)</Label>
               <Textarea 
                 value={rawText}
                 onChange={e => setRawText(e.target.value)}
-                placeholder="Paste content with any numbering (1., Q1., Question 1)..."
+                placeholder="Q291. What is... A) Opt 1 B) Opt 2 ... Correct Answer: A"
                 className="min-h-[500px] rounded-[3.5rem] bg-white border-none p-12 text-sm font-mono shadow-4xl custom-scrollbar text-[#0F172A]"
               />
               <Button onClick={handleAnalyze} className="w-full h-20 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.3em] rounded-[2.5rem] shadow-4xl mt-6 gap-4">
-                 <Zap className="h-6 w-6 text-primary fill-current" /> Clean & Structure Batch
+                 <Zap className="h-6 w-6 text-primary fill-current" /> Analyze & Detect Boundaries
               </Button>
            </div>
 
@@ -193,19 +231,45 @@ export default function BulkImportPage() {
              <Card className="border-none shadow-4xl rounded-[4rem] bg-white overflow-hidden text-left">
                 <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/30 flex flex-row justify-between items-center">
                    <div className="space-y-2">
-                      <CardTitle className="font-headline font-black text-3xl uppercase">Extraction Matrix ({parsedQuestions.length})</CardTitle>
-                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Confidence: {confidence}% • Generated IDs: {parsedQuestions[0]?.displayId} onwards</p>
+                      <CardTitle className="font-headline font-black text-3xl uppercase">Detected Matrix ({parsedQuestions.length})</CardTitle>
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Verify answers and link media before bank sync.</p>
                    </div>
-                   <Badge className="bg-emerald-100 text-emerald-600 border-none font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest">VALIDATED NODES</Badge>
+                   <Badge className="bg-emerald-100 text-emerald-600 border-none font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest">VALIDATED</Badge>
                 </CardHeader>
                 <CardContent className="p-12 space-y-12 max-h-[800px] overflow-y-auto custom-scrollbar">
                    {parsedQuestions.map((q, idx) => (
-                      <div key={idx} className="p-10 bg-slate-50/50 rounded-[3rem] border border-slate-100 space-y-8">
+                      <div key={idx} className="p-10 bg-slate-50/50 rounded-[3rem] border border-slate-100 space-y-8 group/item">
                          <div className="flex items-center justify-between">
                             <Badge className="bg-primary text-white border-none text-[10px] font-black uppercase px-4 py-1 rounded-lg">Node {q.displayId}</Badge>
-                            <Button variant="ghost" size="icon" className="h-10 w-10 text-rose-500" onClick={() => setParsedQuestions(parsedQuestions.filter((_, i) => i !== idx))}><Trash2 className="h-4 w-4" /></Button>
+                            <div className="flex gap-2">
+                               <input 
+                                 type="file" 
+                                 className="hidden" 
+                                 accept="image/*" 
+                                 ref={fileInputRef} 
+                                 onChange={(e) => handleImageUpload(idx, e)} 
+                               />
+                               <Button 
+                                 variant="outline" 
+                                 size="sm" 
+                                 className="rounded-xl h-10 px-4 gap-2 bg-white font-bold uppercase text-[9px]"
+                                 onClick={() => {
+                                   // This is a simplification; ideally use a unique ref per row
+                                   const input = document.createElement('input');
+                                   input.type = 'file';
+                                   input.accept = 'image/*';
+                                   input.onchange = (e: any) => handleImageUpload(idx, e);
+                                   input.click();
+                                 }}
+                                 disabled={uploadingIdx === idx}
+                               >
+                                  {uploadingIdx === idx ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImageIcon className="h-3 w-3 text-primary" />}
+                                  {q.imageUrl ? "Update Image" : "Add Image"}
+                               </Button>
+                               <Button variant="ghost" size="icon" className="h-10 w-10 text-rose-500" onClick={() => setParsedQuestions(parsedQuestions.filter((_, i) => i !== idx))}><Trash2 className="h-4 w-4" /></Button>
+                            </div>
                          </div>
-                         <QuestionRenderer question={q} language="bilingual" />
+                         <QuestionRenderer question={q} language="bilingual" showSolution={true} />
                       </div>
                    ))}
                 </CardContent>
