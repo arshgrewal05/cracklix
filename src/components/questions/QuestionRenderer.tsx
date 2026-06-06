@@ -13,34 +13,33 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview High-Fidelity Question Renderer v10.0.
- * Optimized: Bilingual options are always rendered for professional review parity.
+ * @fileOverview High-Fidelity Question Renderer v11.0.
+ * Permanent Fix: Strict language isolation and automatic artifact sanitization.
  */
 
 export default function QuestionRenderer({ question, language, showSolution = false }: QuestionRendererProps) {
+  // Utility to clean text artifacts (A., 1., **, etc)
+  const cleanText = (text: string = "") => {
+    return text
+      .replace(/^[A-D][\.\):\s-]*/i, '') // Remove A., B) etc
+      .replace(/^\d+[\.\):\s-]*/, '')    // Remove leading numbers
+      .replace(/^\*\*|\*\*$/g, '')    // Remove bold markers
+      .trim();
+  };
+
   const showEn = language === 'en' || language === 'bilingual';
   const showPa = language === 'pa' || language === 'bilingual';
   
   const expEn = useMemo(() => question.explanationEn || (question as any).explanation || "", [question]);
   const expPa = useMemo(() => question.explanationPa || "", [question]);
 
-  // Utility to clean text artifacts
-  const cleanText = (text: string = "") => {
-    return text
-      .replace(/^\d+[\.\):\s-]*/, '') // Remove leading numbers
-      .replace(/^\*\*|\*\*$/g, '')    // Remove bold markers
-      .trim();
-  };
+  const renderContent = (en: string = "", pa: string = "") => {
+    const cEn = cleanText(en);
+    const cPa = cleanText(pa);
 
-  const renderOption = (key: string) => {
-    const rawEn = (question as any)[`option${key}En`] || "";
-    const rawPa = (question as any)[`option${key}Pa`] || "";
-    const cleanEn = rawEn.replace(/^[A-D][\.\):\s-]*/i, '').trim();
-    const cleanPa = rawPa.replace(/^[A-D][\.\):\s-]*/i, '').trim();
-
-    if (language === 'en') return cleanEn;
-    if (language === 'pa') return cleanPa || cleanEn;
-    return `${cleanEn}${cleanPa ? ` / ${cleanPa}` : ''}`;
+    if (language === 'en') return cEn;
+    if (language === 'pa') return cPa || cEn; // Fallback to EN if PA is missing
+    return `${cEn}${cPa ? ` / ${cPa}` : ''}`;
   };
 
   return (
@@ -51,32 +50,24 @@ export default function QuestionRenderer({ question, language, showSolution = fa
         </div>
       )}
 
-      {/* Question Statements */}
-      <div className="space-y-2 mb-6">
-        {showEn && question.questionEn && (
-           <div className="text-[17px] md:text-[19px] font-black leading-snug text-black whitespace-pre-wrap antialiased">
-              {cleanText(question.questionEn)}
-           </div>
-        )}
-        {showPa && question.questionPa && (
-           <div className={cn(
-              "text-[17px] md:text-[19px] font-black leading-snug text-black whitespace-pre-wrap antialiased",
-              showEn ? "pt-2 border-t border-slate-50 mt-2" : ""
-           )}>
-              {cleanText(question.questionPa)}
-           </div>
-        )}
+      {/* Question Statement */}
+      <div className="text-[17px] md:text-[19px] font-black leading-snug text-black whitespace-pre-wrap antialiased mb-6">
+        {renderContent(question.questionEn, question.questionPa)}
       </div>
 
-      {/* Options Hub - Always visible for professional review hubs */}
-      <div className="space-y-2 mb-6">
+      {/* Options Hub */}
+      <div className="space-y-3 mb-6">
         {['A', 'B', 'C', 'D'].map(key => {
-           const optionText = renderOption(key);
+           const en = (question as any)[`option${key}En` ] || "";
+           const pa = (question as any)[`option${key}Pa`] || "";
+           const optionText = renderContent(en, pa);
+           
            if (!optionText) return null;
+           
            return (
               <div key={key} className="flex items-start gap-3">
-                 <span className="font-black text-xs text-primary min-w-[20px]">{key})</span>
-                 <p className="text-sm font-bold text-slate-700 leading-tight">
+                 <span className="font-black text-sm text-primary min-w-[24px]">{key})</span>
+                 <p className="text-sm md:text-base font-bold text-slate-800 leading-tight">
                     {optionText}
                  </p>
               </div>
@@ -92,18 +83,12 @@ export default function QuestionRenderer({ question, language, showSolution = fa
            </div>
            
            <div className="space-y-4 pt-4 border-t border-emerald-200/30">
-              {showEn && expEn && (
-                <div className="space-y-1">
-                   <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Rationale (EN)</p>
-                   <div className="text-sm text-slate-800 leading-relaxed font-bold bg-white/60 p-4 rounded-xl whitespace-pre-wrap border border-emerald-100/50">{cleanText(expEn)}</div>
-                </div>
-              )}
-              {showPa && expPa && (
-                <div className="space-y-1">
-                   <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">ਵਿਆਖਿਆ (PA)</p>
-                   <div className="text-sm text-slate-800 leading-relaxed font-bold bg-white/60 p-4 rounded-xl whitespace-pre-wrap border border-emerald-100/50">{cleanText(expPa)}</div>
-                </div>
-              )}
+              <div className="space-y-1">
+                 <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Logic / ਵਿਆਖਿਆ</p>
+                 <div className="text-sm text-slate-800 leading-relaxed font-bold bg-white/60 p-4 rounded-xl whitespace-pre-wrap border border-emerald-100/50">
+                    {renderContent(expEn, expPa)}
+                 </div>
+              </div>
            </div>
         </div>
       )}

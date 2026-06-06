@@ -13,17 +13,12 @@ import { Badge } from "@/components/ui/badge"
 import { 
   Database, 
   ChevronLeft, 
-  AlertCircle, 
-  Settings2, 
   Loader2, 
   Trash2, 
   Zap, 
   Rocket, 
   SearchCode, 
   Image as ImageIcon, 
-  Upload, 
-  CheckCircle2, 
-  FileWarning,
   Edit3,
   Languages
 } from "lucide-react"
@@ -37,7 +32,7 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
 /**
  * @fileOverview Institutional High-Fidelity Bulk Ingestion Hub.
- * Optimized: Full Bilingual Option Editing & Unrestricted Preview Visibility.
+ * Permanent Fix: Full Bilingual Option Editing & Unrestricted Preview Visibility.
  */
 
 export default function BulkImportPage() {
@@ -70,7 +65,7 @@ export default function BulkImportPage() {
   const handleAnalyze = async () => {
     if (!rawText.trim()) return
     if (!metadata.boardId || !metadata.subjectId) {
-      toast({ variant: "destructive", title: "Config Required", description: "Select Board and Subject before analysis." })
+      toast({ variant: "destructive", title: "Config Required", description: "Select Board and Subject." })
       return
     }
 
@@ -81,9 +76,9 @@ export default function BulkImportPage() {
     setConfidence(conf)
 
     if (errors.length > 0) {
-      toast({ variant: "destructive", title: "Split Warnings", description: `Detected ${errors.length} parsing logic gaps.` })
+      toast({ variant: "destructive", title: "Split Warnings" })
     } else {
-      toast({ title: "Audit Complete", description: `Matrix ready with ${questions.length} high-fidelity nodes.` })
+      toast({ title: "Audit Complete", description: `Matrix ready with ${questions.length} nodes.` })
     }
   }
 
@@ -105,7 +100,7 @@ export default function BulkImportPage() {
       const url = await getDownloadURL(snapshot.ref)
       
       handleUpdateQuestion(idx, 'imageUrl', url)
-      toast({ title: "Asset Synced", description: "Media linked to question node." })
+      toast({ title: "Asset Synced" })
     } catch (err) {
       toast({ variant: "destructive", title: "Upload Rejected" })
     } finally {
@@ -134,10 +129,10 @@ export default function BulkImportPage() {
 
     try {
       await batch.commit()
-      toast({ title: "Global Bank Synced", description: `${parsedQuestions.length} nodes committed to registry.` })
+      toast({ title: "Global Bank Synced" })
       router.push("/admin/questions")
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Sync Failed", description: e.message })
+      toast({ variant: "destructive", title: "Sync Failed" })
     } finally {
       setIsSyncing(false)
     }
@@ -154,10 +149,7 @@ export default function BulkImportPage() {
           </div>
         </div>
         <div className="flex gap-4">
-           <Button variant="outline" onClick={() => { setRawText(""); setParsedQuestions([]); }} className="h-16 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 shadow-sm bg-white">
-              Purge Buffer
-           </Button>
-           <Button onClick={handleSaveToBank} disabled={isSyncing || parsedQuestions.length === 0} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl h-16 px-12 gap-3 shadow-3xl shadow-emerald-900/20 transition-all active:scale-95">
+           <Button onClick={handleSaveToBank} disabled={isSyncing || parsedQuestions.length === 0} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl h-16 px-12 gap-3 shadow-3xl shadow-emerald-900/20">
               {isSyncing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Rocket className="h-5 w-5" />} Commit {parsedQuestions.length} Nodes
            </Button>
         </div>
@@ -168,7 +160,7 @@ export default function BulkImportPage() {
           <Card className="border-none bg-white shadow-3xl rounded-[3rem] overflow-hidden">
             <div className="h-2 w-full bg-primary" />
             <CardHeader className="p-10 pb-4">
-              <CardTitle className="font-headline font-black text-2xl uppercase flex items-center gap-4"><Settings2 className="h-6 w-6 text-primary" /> Target Metadata</CardTitle>
+              <CardTitle className="font-headline font-black text-2xl uppercase flex items-center gap-4">Registry Metadata</CardTitle>
             </CardHeader>
             <CardContent className="p-10 pt-4 space-y-6">
               <div className="space-y-5">
@@ -176,21 +168,14 @@ export default function BulkImportPage() {
                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Authority Board</Label>
                   <Select value={metadata.boardId} onValueChange={v => setMetadata({...metadata, boardId: v, examId: ""})}>
                     <SelectTrigger className="rounded-xl h-12 bg-slate-50 border-none font-bold text-[#0F172A] shadow-inner"><SelectValue placeholder="Select" /></SelectTrigger>
-                    <SelectContent>{boards?.map((b: any) => <SelectItem key={b.id || "b-id"} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Exam Hub</Label>
-                  <Select value={metadata.examId} onValueChange={v => setMetadata({...metadata, examId: v})}>
-                    <SelectTrigger className="rounded-xl h-12 bg-slate-50 border-none font-bold text-[#0F172A] shadow-inner"><SelectValue placeholder="Select" /></SelectTrigger>
-                    <SelectContent>{exams?.filter(e => e.boardId === metadata.boardId).map((e: any) => <SelectItem key={e.id || "e-id"} value={e.id}>{e.name}</SelectItem>)}</SelectContent>
+                    <SelectContent>{boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-1.5">
                    <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Subject Registry</Label>
                    <Select value={metadata.subjectId} onValueChange={v => setMetadata({...metadata, subjectId: v})}>
                       <SelectTrigger className="rounded-xl h-12 bg-slate-50 border-none font-bold text-[#0F172A] shadow-inner"><SelectValue placeholder="Select" /></SelectTrigger>
-                      <SelectContent>{subjects?.map((s:any) => <SelectItem key={s.id || "s-id"} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+                      <SelectContent>{subjects?.map((s:any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                    </Select>
                 </div>
               </div>
@@ -198,9 +183,8 @@ export default function BulkImportPage() {
           </Card>
           
           <div className="p-10 bg-[#0F172A] rounded-[3rem] text-white space-y-8 shadow-4xl overflow-hidden relative">
-             <div className="absolute top-0 right-0 p-8 opacity-5 rotate-12"><SearchCode className="h-48 w-48" /></div>
              <div className="flex items-center gap-4 relative z-10">
-                <div className="h-10 w-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary"><SearchCode className="h-6 w-6" /></div>
+                <SearchCode className="h-6 w-6 text-primary" />
                 <h3 className="font-headline font-black uppercase">Fidelity Scan</h3>
              </div>
              <div className="space-y-6 relative z-10">
@@ -218,12 +202,11 @@ export default function BulkImportPage() {
 
         <div className="lg:col-span-8 space-y-8">
            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">High-Fidelity Buffer (Paste exact original content)</Label>
               <Textarea 
                 value={rawText}
                 onChange={e => setRawText(e.target.value)}
                 placeholder="Paste bilingual series text here..."
-                className="min-h-[550px] rounded-[3.5rem] bg-white border-none p-12 text-sm font-bold leading-relaxed shadow-4xl custom-scrollbar text-[#0F172A] whitespace-pre"
+                className="min-h-[400px] rounded-[3.5rem] bg-white border-none p-12 text-sm font-bold leading-relaxed shadow-4xl custom-scrollbar text-[#0F172A] whitespace-pre"
               />
               <Button onClick={handleAnalyze} className="w-full h-20 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.3em] rounded-[2.5rem] shadow-4xl mt-6 gap-4 transition-all active:scale-95">
                  <Zap className="h-6 w-6 text-primary fill-current" /> Initialize Audit & Matrix
@@ -232,12 +215,8 @@ export default function BulkImportPage() {
 
            {parsedQuestions.length > 0 && (
              <Card className="border-none shadow-4xl rounded-[4rem] bg-white overflow-hidden text-left">
-                <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/30 flex flex-row justify-between items-center">
-                   <div className="space-y-2">
-                      <CardTitle className="font-headline font-black text-3xl uppercase">Validated Matrix ({parsedQuestions.length})</CardTitle>
-                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Formatting preserved. Full Bilingual Editing enabled.</p>
-                   </div>
-                   <Badge className="bg-emerald-100 text-emerald-600 border-none font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest">FIDELITY SECURE</Badge>
+                <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/30">
+                   <CardTitle className="font-headline font-black text-3xl uppercase">Validated Matrix ({parsedQuestions.length})</CardTitle>
                 </CardHeader>
                 <CardContent className="p-12 space-y-12">
                    {parsedQuestions.map((q, idx) => (
@@ -248,7 +227,7 @@ export default function BulkImportPage() {
                                <Button 
                                  variant={editingIdx === idx ? "default" : "outline"} 
                                  size="sm" 
-                                 className="rounded-xl h-11 px-6 gap-3 bg-white font-black uppercase text-[10px] tracking-widest shadow-sm hover:border-primary/30"
+                                 className="rounded-xl h-11 px-6 gap-3 bg-white font-black uppercase text-[10px] tracking-widest shadow-sm"
                                  onClick={() => setEditingIdx(editingIdx === idx ? null : idx)}
                                >
                                   <Edit3 className="h-4 w-4" /> {editingIdx === idx ? "View Node" : "Edit Node"}

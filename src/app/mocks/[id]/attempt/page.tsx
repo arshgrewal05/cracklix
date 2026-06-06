@@ -19,8 +19,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 type LangMode = 'en' | 'pa' | 'bilingual'
 
 /**
- * @fileOverview Institutional High-Fidelity CBT Engine v12.0.
- * Optimized: High-density viewport logic to reduce scrolling.
+ * @fileOverview Institutional High-Fidelity CBT Engine v13.0.
+ * Optimized: Unified bilingual selection logic and sanitized artifacts.
  */
 
 export default function MockAttemptPage() {
@@ -31,7 +31,7 @@ export default function MockAttemptPage() {
   const { toast } = useToast()
   const mockId = params.id as string
   
-  const { data: mock, loading: mockLoading } = useDoc<any>(useMemo(() => (db ? doc(db, "mocks", mockId) : null), [db, mockId]))
+  const { data: mock, loading: mockLoading } = useDoc<any>(useMemo(() => (db && mockId ? doc(db, "mocks", mockId) : null), [db, mockId]))
   const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects") : null), [db]))
   const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
   
@@ -57,7 +57,7 @@ export default function MockAttemptPage() {
         setQuestions(qData)
         setRemainingTime((mock.duration || 120) * 60)
       } catch (err) {
-        toast({ variant: "destructive", title: "Audit Sync Error", description: "Could not fetch nodes." })
+        toast({ variant: "destructive", title: "Audit Sync Error" })
       } finally {
         setLoadingQs(false)
       }
@@ -75,6 +75,10 @@ export default function MockAttemptPage() {
       section: subjectName.toUpperCase()
     };
   }, [currentIdx, questions, subjects, exams, mock])
+
+  const cleanText = (text: string = "") => {
+    return text.replace(/^[A-D][\.\):\s-]*/i, '').trim();
+  };
 
   const submitMock = useCallback(async () => {
     if (isSubmitting || questions.length === 0 || !user || !db) return
@@ -124,7 +128,6 @@ export default function MockAttemptPage() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white text-black font-body">
-      {/* PROFESSIONAL CBT HEADER */}
       <header className="h-12 border-b flex items-center justify-between px-4 bg-[#0B1528] text-white shrink-0 z-[100]">
         <div className="flex items-center gap-4">
            <ShieldCheck className="h-5 w-5 text-primary" />
@@ -144,10 +147,10 @@ export default function MockAttemptPage() {
            </div>
            <div className="h-8 w-px bg-white/10 mx-2" />
            <Timer onTimeUp={submitMock} initialSeconds={remainingTime} onTick={setRemainingTime} isPaused={isPaused} />
-           <Button variant="ghost" size="icon" onClick={() => setIsPaused(!isPaused)} className="h-9 w-9 rounded-xl bg-white/5 text-white">
+           <Button variant="ghost" size="icon" onClick={() => setIsPaused(!isPaused)} className="h-9 w-9 rounded-xl bg-white/5 text-white ml-2">
               {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
            </Button>
-           <Button onClick={submitMock} disabled={isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest h-9 px-4 rounded-xl shadow-lg">
+           <Button onClick={submitMock} disabled={isSubmitting} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest h-9 px-4 rounded-xl shadow-lg ml-2">
              FINISH
           </Button>
         </div>
@@ -212,17 +215,15 @@ export default function MockAttemptPage() {
                    >
                      {['A', 'B', 'C', 'D'].map((k, i) => {
                        const isSelected = answers[currentIdx] === i;
-                       
-                       // Strict cleaning of option text
                        const rawEn = q?.[`option${k}En`] || "";
                        const rawPa = q?.[`option${k}Pa`] || "";
-                       const cleanEn = rawEn.replace(/^[A-D][\.\):\s-]*/i, '').trim();
-                       const cleanPa = rawPa.replace(/^[A-D][\.\):\s-]*/i, '').trim();
+                       const cEn = cleanText(rawEn);
+                       const cPa = cleanText(rawPa);
 
                        let displayVal = "";
-                       if (language === 'en') displayVal = cleanEn;
-                       else if (language === 'pa') displayVal = cleanPa || cleanEn;
-                       else displayVal = `${cleanEn}${cleanPa ? ` / ${cleanPa}` : ''}`;
+                       if (language === 'en') displayVal = cEn;
+                       else if (language === 'pa') displayVal = cPa || cEn;
+                       else displayVal = `${cEn}${cPa ? ` / ${cPa}` : ''}`;
 
                        return (
                          <div key={i} className={cn(
@@ -230,7 +231,7 @@ export default function MockAttemptPage() {
                            isSelected ? 'border-primary bg-primary/5' : 'border-slate-100 bg-white hover:border-slate-200'
                          )} onClick={() => setAnswers(prev => ({ ...prev, [currentIdx]: i }))}>
                             <div className={cn(
-                               "h-6 w-6 md:h-8 md:w-8 rounded-full border-2 flex items-center justify-center font-black text-[10px] md:text-xs shrink-0 transition-all",
+                               "h-6 w-6 md:h-8 md:w-8 rounded-full border-2 flex items-center justify-center font-black text-[10px] md:text-xs shrink-0",
                                isSelected ? "bg-primary border-primary text-white" : "border-slate-200 text-slate-300"
                             )}>
                                {k}
