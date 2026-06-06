@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useRef } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,7 +22,8 @@ import {
   Image as ImageIcon, 
   Upload, 
   CheckCircle2, 
-  FileWarning 
+  FileWarning,
+  Edit3
 } from "lucide-react"
 import { useFirestore, useCollection, useStorage } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
@@ -34,7 +35,7 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
 /**
  * @fileOverview Institutional High-Fidelity Bulk Ingestion Hub.
- * Features: Absolute Formatting Preservation, Media Uploads, and Matrix Preview.
+ * Features: Inline Editing, Media Uploads, and Absolute Formatting Preservation.
  */
 
 export default function BulkImportPage() {
@@ -62,6 +63,7 @@ export default function BulkImportPage() {
   const [confidence, setConfidence] = useState(0)
   const [isSyncing, setIsSyncing] = useState(false)
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
+  const [editingIdx, setEditingIdx] = useState<number | null>(null)
 
   const handleAnalyze = async () => {
     if (!rawText.trim()) return
@@ -83,6 +85,12 @@ export default function BulkImportPage() {
     }
   }
 
+  const handleUpdateQuestion = (idx: number, field: string, val: string) => {
+    const updated = [...parsedQuestions]
+    updated[idx] = { ...updated[idx], [field]: val }
+    setParsedQuestions(updated)
+  }
+
   const handleImageUpload = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !storage) return
@@ -94,10 +102,7 @@ export default function BulkImportPage() {
       const snapshot = await uploadBytes(storageRef, file)
       const url = await getDownloadURL(snapshot.ref)
       
-      const updated = [...parsedQuestions]
-      updated[idx].imageUrl = url
-      setParsedQuestions(updated)
-      
+      handleUpdateQuestion(idx, 'imageUrl', url)
       toast({ title: "Asset Synced", description: "Media linked to question node." })
     } catch (err) {
       toast({ variant: "destructive", title: "Upload Rejected" })
@@ -121,7 +126,6 @@ export default function BulkImportPage() {
         isStandalone: true,
       };
       
-      // Strict cleanup of undefined/null fields
       Object.keys(payload).forEach(key => (payload[key] === undefined || payload[key] === null) && delete payload[key]);
       batch.set(qRef, payload)
     })
@@ -229,7 +233,7 @@ export default function BulkImportPage() {
                 <CardHeader className="p-12 border-b border-slate-50 bg-slate-50/30 flex flex-row justify-between items-center">
                    <div className="space-y-2">
                       <CardTitle className="font-headline font-black text-3xl uppercase">Validated Matrix ({parsedQuestions.length})</CardTitle>
-                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Formatting and paragraphs preserved in registry.</p>
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Formatting preserved. Inline editing enabled.</p>
                    </div>
                    <Badge className="bg-emerald-100 text-emerald-600 border-none font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest">FIDELITY SECURE</Badge>
                 </CardHeader>
@@ -240,9 +244,17 @@ export default function BulkImportPage() {
                             <Badge className="bg-primary text-white border-none text-[11px] font-black uppercase px-5 py-1 rounded-xl shadow-lg">Node {q.displayId}</Badge>
                             <div className="flex gap-3">
                                <Button 
-                                 variant="outline" 
+                                 variant={editingIdx === idx ? "default" : "outline"} 
                                  size="sm" 
                                  className="rounded-xl h-11 px-6 gap-3 bg-white font-black uppercase text-[10px] tracking-widest shadow-sm hover:border-primary/30"
+                                 onClick={() => setEditingIdx(editingIdx === idx ? null : idx)}
+                               >
+                                  <Edit3 className="h-4 w-4" /> {editingIdx === idx ? "View Node" : "Edit Node"}
+                               </Button>
+                               <Button 
+                                 variant="outline" 
+                                 size="sm" 
+                                 className="rounded-xl h-11 px-6 gap-3 bg-white font-black uppercase text-[10px] tracking-widest shadow-sm"
                                  onClick={() => {
                                    const input = document.createElement('input');
                                    input.type = 'file';
@@ -258,8 +270,32 @@ export default function BulkImportPage() {
                                <Button variant="ghost" size="icon" className="h-11 w-11 text-rose-500 bg-rose-50 rounded-xl" onClick={() => setParsedQuestions(parsedQuestions.filter((_, i) => i !== idx))}><Trash2 className="h-5 w-5" /></Button>
                             </div>
                          </div>
+                         
                          <div className="border-t border-slate-100 pt-8">
-                            <QuestionRenderer question={q} language="bilingual" showSolution={true} />
+                            {editingIdx === idx ? (
+                               <div className="space-y-6 animate-in fade-in duration-300">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                     <div className="space-y-2">
+                                        <Label className="text-[9px] font-black uppercase text-slate-400">Statement (EN)</Label>
+                                        <Textarea value={q.questionEn} onChange={e => handleUpdateQuestion(idx, 'questionEn', e.target.value)} className="rounded-xl h-24 text-sm font-bold" />
+                                     </div>
+                                     <div className="space-y-2">
+                                        <Label className="text-[9px] font-black uppercase text-slate-400">ਸਵਾਲ (PA)</Label>
+                                        <Textarea value={q.questionPa} onChange={e => handleUpdateQuestion(idx, 'questionPa', e.target.value)} className="rounded-xl h-24 text-sm font-bold" />
+                                     </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                     {['A', 'B', 'C', 'D'].map(opt => (
+                                        <div key={opt} className="space-y-2">
+                                           <Label className="text-[9px] font-black uppercase text-slate-400">Option {opt}</Label>
+                                           <Input value={(q as any)[`option${opt}En`]} onChange={e => handleUpdateQuestion(idx, `option${opt}En`, e.target.value)} className="rounded-xl h-10 text-xs font-bold" />
+                                        </div>
+                                     ))}
+                                  </div>
+                               </div>
+                            ) : (
+                               <QuestionRenderer question={q} language="bilingual" showSolution={true} />
+                            )}
                          </div>
                       </div>
                    ))}
