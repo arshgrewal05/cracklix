@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -27,8 +26,8 @@ import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
 /**
- * @fileOverview Production Hardened CBT Attempt Engine v35.1.
- * Simplified Language: Replaced 'Synchronizing Nodes' with 'Loading Questions'.
+ * @fileOverview Production Hardened CBT Attempt Engine v35.2.
+ * UPDATED: Strict single-language isolation for English, Punjabi, and Hindi subjects.
  */
 
 export default function MockAttemptPage() {
@@ -66,10 +65,12 @@ export default function MockAttemptPage() {
   const effectiveLanguage = useMemo(() => {
     if (!q) return language;
     const sectionName = (q.sectionId || "").toUpperCase();
+    const subjectId = (q.subjectId || "").toUpperCase();
     
-    if (sectionName.includes("PUNJABI")) return "PUNJABI";
-    if (sectionName.includes("ENGLISH")) return "ENGLISH";
-    if (sectionName.includes("HINDI")) return "HINDI";
+    // Language subjects are never bilingual
+    if (sectionName.includes("PUNJABI") || subjectId.includes("PUNJABI")) return "PUNJABI";
+    if (sectionName.includes("ENGLISH") || subjectId.includes("ENGLISH")) return "ENGLISH";
+    if (sectionName.includes("HINDI") || subjectId.includes("HINDI")) return "HINDI";
     
     return language;
   }, [q, language]);

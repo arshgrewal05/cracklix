@@ -19,8 +19,8 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview High-Fidelity Question Engine v33.0.
- * UPDATED: Bilingual Explanation Rendering Node.
+ * @fileOverview High-Fidelity Question Engine v34.0.
+ * UPDATED: Strict single-language isolation for Language Subjects (English/Punjabi/Hindi).
  */
 export default function QuestionRenderer({ 
   question, 
@@ -35,9 +35,27 @@ export default function QuestionRenderer({
   
   if (!question) return null;
 
-  const normalizedLang = (language || 'ENGLISH_PUNJABI').toUpperCase();
   const q = question as any;
+  const normalizedLang = (language || 'ENGLISH_PUNJABI').toUpperCase();
   
+  // 0. LANGUAGE SUBJECT DETECTION (English, Punjabi, Hindi are never bilingual)
+  const sectionName = (q.sectionId || "").toUpperCase();
+  const subjectId = (q.subjectId || "").toUpperCase();
+  
+  let renderLang = normalizedLang;
+  
+  if (sectionName.includes("ENGLISH") || subjectId.includes("ENGLISH")) {
+    renderLang = "ENGLISH";
+  } else if (sectionName.includes("PUNJABI") || subjectId.includes("PUNJABI")) {
+    renderLang = "PUNJABI";
+  } else if (sectionName.includes("HINDI") || subjectId.includes("HINDI")) {
+    renderLang = "HINDI";
+  }
+  
+  const showEn = renderLang.includes('ENGLISH');
+  const showPa = renderLang.includes('PUNJABI');
+  const showHi = renderLang.includes('HINDI');
+
   const formatTime = (seconds: number) => {
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
@@ -48,10 +66,6 @@ export default function QuestionRenderer({
   const punjabiQ = q.punjabiQuestion || q.questionPa || "";
   const hindiQ = q.hindiQuestion || q.questionHi || "";
   
-  const showEn = normalizedLang.includes('ENGLISH');
-  const showPa = normalizedLang.includes('PUNJABI');
-  const showHi = normalizedLang.includes('HINDI');
-
   const OPT_LABELS = ['A', 'B', 'C', 'D'];
 
   return (
