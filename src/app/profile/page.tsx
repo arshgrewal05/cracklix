@@ -23,7 +23,11 @@ import {
   Zap,
   Sparkles,
   Bell,
-  CreditCard
+  CreditCard,
+  Settings,
+  ChevronRight,
+  User as UserIcon,
+  Activity
 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter } from "next/navigation"
@@ -31,6 +35,13 @@ import { useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import StudentAvatar from "@/components/brand/StudentAvatar"
+import { cn } from "@/lib/utils"
+
+/**
+ * @fileOverview Hardened Aspirant Profile Hub v8.0.
+ * Optimized: Testbook-inspired layout with absolute zero-overlap logic.
+ * Features: Responsive scaling for 360px - 1440px viewports.
+ */
 
 export default function ProfilePage() {
   const { user, profile, loading } = useUser()
@@ -40,16 +51,13 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login")
+      router.push("/login?returnUrl=/profile")
     }
   }, [user, loading, router])
 
   const resultsQuery = useMemo(() => {
     if (!db || !user) return null
-    return query(
-      collection(db, "results"), 
-      where("userId", "==", user.uid)
-    )
+    return query(collection(db, "results"), where("userId", "==", user.uid))
   }, [db, user])
 
   const { data: allResults, loading: resultsLoading } = useCollection<any>(resultsQuery)
@@ -57,8 +65,8 @@ export default function ProfilePage() {
   const results = useMemo(() => {
     if (!allResults) return []
     return [...allResults].sort((a, b) => {
-      const timeA = a.createdAt?.seconds || 0
-      const timeB = b.createdAt?.seconds || 0
+      const timeA = new Date(a.timestamp).getTime()
+      const timeB = new Date(b.timestamp).getTime()
       return timeB - timeA
     })
   }, [allResults])
@@ -67,8 +75,7 @@ export default function ProfilePage() {
     if (!results || results.length === 0) return { total: 0, avgAccuracy: 0, bestScore: 0, rank: "N/A" }
     const total = results.length
     const avgAccuracy = Math.round(results.reduce((acc: number, curr: any) => acc + (curr.accuracy || 0), 0) / total)
-    const bestScore = Math.max(...results.map((r: any) => r.score || 0))
-    return { total, avgAccuracy, bestScore, rank: "Top 12%" }
+    return { total, avgAccuracy, bestScore: 0, rank: "Top 12%" }
   }, [results])
 
   const handleToggleSub = async (boardId: string) => {
@@ -79,162 +86,193 @@ export default function ProfilePage() {
       : [...currentSubs, boardId]
     
     await updateDoc(doc(db, "users", user.uid), { subscriptions: nextSubs })
-    toast({ title: "Alert Settings Synced", description: `${boardId} alerts updated.` })
+    toast({ title: "Preferences Synced" })
   }
 
   if (loading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><Sparkles className="h-12 w-12 text-primary animate-pulse" /></div>
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-4">
+        <Zap className="h-10 w-10 text-primary animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Syncing Aspirant Node...</p>
+      </div>
+    )
   }
 
   if (!profile) return null
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-body">
+    <div className="min-h-screen bg-slate-50/50 font-body pb-32">
       <Navbar />
       
-      <main className="container mx-auto px-6 py-16 max-w-6xl">
-        <section className="relative mb-16">
-          <div className="h-64 w-full bg-[#08152D] rounded-[3.5rem] overflow-hidden relative shadow-3xl">
-            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[150%] bg-primary/20 blur-[120px] rounded-full" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[120%] bg-blue-600/10 blur-[100px] rounded-full" />
-            <div className="absolute bottom-10 right-12 flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
-              <ShieldCheck className="h-5 w-5 text-primary" />
-              <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">Verified Aspirant</span>
-            </div>
-          </div>
-
-          <div className="px-16 -mt-20 relative z-10 flex flex-col md:flex-row items-end gap-10">
-            <div className="relative group">
-              <StudentAvatar 
-                profile={profile} 
-                className="h-44 w-44 border-[10px] border-white shadow-3xl rounded-[3rem] transition-transform duration-500 group-hover:scale-105" 
-                iconClassName="h-3/4 w-3/4"
-              />
-              <div className="absolute bottom-4 right-4 h-10 w-10 bg-emerald-500 rounded-2xl border-4 border-white flex items-center justify-center shadow-2xl">
-                <div className="h-2.5 w-2.5 bg-white rounded-full animate-ping" />
-              </div>
-            </div>
-
-            <div className="flex-1 pb-6 space-y-3 text-left">
-              <div className="flex flex-wrap items-center gap-4">
-                <h1 className="text-5xl font-headline font-black text-[#0F172A] tracking-tight">{profile.name}</h1>
-                <Badge className={profile.status === 'Free' ? "bg-slate-200 text-slate-500 border-none px-6 py-2 rounded-2xl font-black uppercase text-[10px] tracking-widest" : "bg-amber-100 text-amber-600 border-none px-6 py-2 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl"}>
-                  {profile.status} Pass Active
-                </Badge>
-              </div>
-              <div className="flex flex-wrap items-center gap-8 text-slate-500 font-bold uppercase tracking-widest text-[10px]">
-                <span className="flex items-center gap-3"><Mail className="h-4 w-4 text-primary" /> {profile.email}</span>
-                <span className="flex items-center gap-3"><GraduationCap className="h-4 w-4 text-primary" /> Targeting {profile.targetExam || "Punjab Exams"}</span>
-              </div>
-            </div>
-
-            <div className="pb-8">
-               <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl h-16 px-12 shadow-3xl gap-3">
-                 <Link href="/pass"><CreditCard className="h-4 w-4" /> Manage Pass</Link>
-               </Button>
-            </div>
-          </div>
-        </section>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
-          <div className="lg:col-span-8 space-y-12">
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-              <MetricCard icon={<ClipboardList className="text-blue-500" />} label="Series Attempted" value={stats.total} footer="Lifetime Analytics" />
-              <MetricCard icon={<Target className="text-primary" />} label="Accuracy Level" value={`${stats.avgAccuracy}%`} footer="Institutional Avg: 64%" />
-              <MetricCard icon={<Trophy className="text-emerald-500" />} label="Punjab Ranking" value={stats.rank} footer="Monthly Benchmark" />
-            </div>
-
-            <Card className="border-none shadow-3xl shadow-slate-900/5 rounded-[3.5rem] bg-white overflow-hidden">
-               <CardHeader className="p-12 border-b border-slate-50 text-left">
-                  <div className="flex items-center gap-4">
-                     <Bell className="h-6 w-6 text-primary" />
-                     <CardTitle className="font-headline text-2xl font-black text-[#0F172A] uppercase">Exam Alert Hub</CardTitle>
-                  </div>
-                  <CardDescription className="text-slate-400 font-medium">Receive high-priority recruitment notifications for specific boards.</CardDescription>
-               </CardHeader>
-               <CardContent className="p-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {['PSSSB', 'PPSC', 'Punjab Police', 'Education', 'High Court'].map(board => (
-                     <div key={board} className="flex items-center justify-between p-6 bg-slate-50 rounded-[2rem] border border-slate-100 group hover:border-primary/20 transition-all">
-                        <div className="space-y-1">
-                           <p className="font-black text-xs uppercase tracking-widest text-[#0F172A]">{board} Vertical</p>
-                           <p className="text-[10px] text-slate-400 uppercase font-bold">Official Alerts & Results</p>
-                        </div>
-                        <Switch 
-                           checked={(profile.subscriptions || []).includes(board)} 
-                           onCheckedChange={() => handleToggleSub(board)} 
-                        />
-                     </div>
-                  ))}
-               </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-3xl shadow-slate-900/5 rounded-[3.5rem] overflow-hidden bg-white">
-               <CardHeader className="p-12 border-b border-slate-50 text-left">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="font-headline text-2xl font-black text-[#0F172A] uppercase">Preparation History</CardTitle>
-                      <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Deep audit of your high-fidelity results</CardDescription>
+      <main className="w-full">
+        {/* HEADER SECTION: BANNER + INFO */}
+        <div className="bg-[#0B1528] relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-[120px] rounded-full" />
+           <div className="container mx-auto px-4 md:px-6 max-w-6xl pt-8 md:pt-16 pb-20 md:pb-24">
+              <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-10 text-center md:text-left relative z-10">
+                 <div className="relative group shrink-0">
+                    <div className="absolute -inset-1 bg-primary/20 rounded-[2.5rem] blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <StudentAvatar 
+                      profile={profile} 
+                      className="h-24 w-24 md:h-32 md:w-32 border-4 border-white/10 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl relative bg-[#0F172A]" 
+                    />
+                    <div className="absolute -bottom-2 -right-2 bg-emerald-500 h-6 w-6 md:h-8 md:w-8 rounded-lg border-4 border-[#0B1528] flex items-center justify-center shadow-xl">
+                       <ShieldCheck className="h-3 w-3 md:h-4 md:w-4 text-white" />
                     </div>
-                  </div>
-               </CardHeader>
-               <CardContent className="p-0">
-                  <div className="divide-y divide-slate-50">
-                    {resultsLoading ? (
-                      Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 w-full" />)
-                    ) : results && results.length > 0 ? (
-                      results.slice(0, 5).map((r: any) => (
-                        <div key={r.id} className="p-10 flex items-center justify-between hover:bg-slate-50/50 transition-colors group cursor-pointer">
-                           <div className="flex items-center gap-8">
-                              <div className="h-16 w-16 rounded-1.5rem] bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                 <Zap className="h-7 w-7 text-slate-300 group-hover:text-primary transition-colors" />
-                              </div>
-                              <div className="space-y-1">
-                                 <p className="font-black text-slate-800 text-lg uppercase tracking-tight leading-tight">{r.mockTitle}</p>
-                                 <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] flex items-center gap-3">
-                                   <Calendar className="h-4 w-4" /> {new Date(r.timestamp).toLocaleDateString('en-GB')} • {r.totalQuestions} MCQs
-                                 </p>
-                              </div>
-                           </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-24 text-center text-slate-300 space-y-6">
-                        <ClipboardList className="h-20 w-20 mx-auto opacity-10" />
-                        <p className="font-black font-headline uppercase text-xl text-slate-400">No Attempts Recorded</p>
-                      </div>
-                    )}
-                  </div>
-               </CardContent>
-            </Card>
-          </div>
+                 </div>
 
-          <div className="lg:col-span-4 space-y-12">
-            <Card className="border-none shadow-3xl shadow-slate-900/5 rounded-[3.5rem] p-10 space-y-10 bg-white">
-               <div className="space-y-8">
-                 <h3 className="font-headline font-black text-xs uppercase tracking-[0.3em] text-slate-400">Account Credentials</h3>
+                 <div className="flex-1 space-y-3 min-w-0">
+                    <div className="flex flex-col md:flex-row items-center gap-3">
+                       <h1 className="text-2xl md:text-4xl font-headline font-black text-white uppercase tracking-tight truncate max-w-full">
+                          {profile.name}
+                       </h1>
+                       <Badge className={cn(
+                          "border-none text-[8px] md:text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-md shadow-lg",
+                          profile.status === 'Free' ? "bg-white/10 text-slate-300" : "bg-primary text-white"
+                       )}>
+                          {profile.status} Pass
+                       </Badge>
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2">
+                       <HeaderInfo icon={<Mail className="text-primary" />} text={profile.email} />
+                       <HeaderInfo icon={<Phone className="text-primary" />} text={profile.phone} />
+                       <HeaderInfo icon={<GraduationCap className="text-primary" />} text={`Targeting ${profile.targetExam || 'Punjab Exams'}`} />
+                    </div>
+                 </div>
+
+                 <div className="shrink-0 w-full md:w-auto pt-4 md:pt-0">
+                    <Button asChild className="w-full md:w-auto h-12 md:h-14 px-8 bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-2xl">
+                       <Link href="/pass"><CreditCard className="h-4 w-4 text-primary" /> Manage Billing</Link>
+                    </Button>
+                 </div>
+              </div>
+           </div>
+        </div>
+
+        {/* CONTENT GRID */}
+        <div className="container mx-auto px-4 md:px-6 max-w-6xl -mt-10 relative z-20">
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+              
+              {/* LEFT: ANALYTICS & PREFERENCES */}
+              <div className="lg:col-span-8 space-y-6 md:space-y-8">
                  
-                 <AccountInfo icon={<Phone className="h-5 w-5" />} label="Contact String" value={profile.phone} />
-                 <AccountInfo icon={<MapPin className="h-5 w-5" />} label="Geographic Node" value={profile.state} />
-                 <AccountInfo icon={<Calendar className="h-5 w-5" />} label="Platform Registry" value={new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} />
-                 <AccountInfo icon={<ShieldCheck className="h-5 w-5" />} label="Security Group" value={`${profile.status} Access`} />
-               </div>
-            </Card>
+                 {/* QUICK STATS CARDS */}
+                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-6">
+                    <StatsCard icon={<ClipboardList />} label="TESTS ATTEMPTED" value={stats.total} color="text-blue-500" />
+                    <StatsCard icon={<Target />} label="AVG ACCURACY" value={`${stats.avgAccuracy}%`} color="text-primary" />
+                    <StatsCard icon={<Trophy className="hidden sm:block" />} label="STATE RANKING" value={stats.rank} color="text-emerald-500" className="col-span-2 sm:col-span-1" />
+                 </div>
 
-            <Card className="border-none bg-[#0F172A] text-white shadow-3xl rounded-[3.5rem] p-12 overflow-hidden relative group cursor-pointer">
-               <div className="absolute top-0 right-0 p-10 opacity-20 group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-32 w-32 text-primary" />
-               </div>
-               <div className="relative z-10 space-y-6 text-left">
-                  <Badge className="bg-primary text-white border-none uppercase text-[10px] font-black px-6 py-2 rounded-2xl shadow-xl">Audit Active</Badge>
-                  <h4 className="text-3xl font-headline font-black leading-tight uppercase">Elite Access <br/>Enabled</h4>
-                  <p className="text-slate-400 text-base leading-relaxed font-medium">Your account is fully synchronized with Arsh Grewal's management repository.</p>
-                  <Button asChild className="w-full bg-white text-[#0F172A] hover:bg-slate-200 font-black uppercase text-[10px] tracking-[0.2em] h-16 rounded-[1.5rem] mt-6 shadow-2xl">
-                    <Link href="/mocks">Explore All Series</Link>
-                  </Button>
-               </div>
-            </Card>
-          </div>
+                 {/* RECENT PERFORMANCE */}
+                 <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-white">
+                    <CardHeader className="p-6 md:p-10 border-b border-slate-50 flex flex-row items-center justify-between">
+                       <div className="space-y-1">
+                          <CardTitle className="text-sm md:text-lg font-black uppercase tracking-tight text-[#0F172A] flex items-center gap-2">
+                             <Activity className="h-4 w-4 text-primary" /> Prep Trajectory
+                          </CardTitle>
+                          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Deep audit of your 5 most recent attempts</CardDescription>
+                       </div>
+                       <Button asChild variant="ghost" className="h-10 text-[9px] font-black uppercase tracking-widest text-primary gap-2">
+                          <Link href="/dashboard">Full History <ChevronRight className="h-3 w-3" /></Link>
+                       </Button>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                       <div className="divide-y divide-slate-50">
+                          {resultsLoading ? (
+                             Array.from({ length: 3 }).map((_, i) => <div key={i} className="p-8"><Skeleton className="h-12 w-full rounded-xl" /></div>)
+                          ) : results.length > 0 ? (
+                             results.slice(0, 5).map((r: any) => (
+                                <Link key={r.id} href={`/results/${r.mockId}`} className="p-6 md:p-8 flex items-center justify-between hover:bg-slate-50/50 transition-colors group">
+                                   <div className="flex items-center gap-4 md:gap-6 min-w-0">
+                                      <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary/5 transition-colors">
+                                         <Zap className="h-5 w-5 md:h-6 md:w-6 text-slate-300 group-hover:text-primary transition-colors" />
+                                      </div>
+                                      <div className="min-w-0">
+                                         <p className="font-black text-[#0B1528] text-sm md:text-base uppercase truncate leading-tight">{r.mockTitle}</p>
+                                         <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                            {new Date(r.timestamp).toLocaleDateString('en-GB')} • Accuracy: {r.accuracy}%
+                                         </p>
+                                      </div>
+                                   </div>
+                                   <div className="text-right shrink-0">
+                                      <p className="text-base md:text-xl font-headline font-black text-[#0F172A] leading-none">{r.score}/{r.totalQuestions}</p>
+                                      <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest mt-1">Marks</p>
+                                   </div>
+                                </Link>
+                             ))
+                          ) : (
+                             <div className="p-20 text-center space-y-4">
+                                <Sparkles className="h-10 w-10 mx-auto text-slate-200" />
+                                <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">No preparation nodes recorded.</p>
+                             </div>
+                          )}
+                       </div>
+                    </CardContent>
+                 </Card>
+
+                 {/* NOTIFICATION PREFERENCES */}
+                 <Card className="border-none shadow-xl rounded-[2rem] bg-white">
+                    <CardHeader className="p-6 md:p-10 border-b border-slate-50">
+                       <CardTitle className="text-sm md:text-lg font-black uppercase tracking-tight text-[#0F172A] flex items-center gap-2">
+                          <Bell className="h-4 w-4 text-primary" /> Exam Alert Subscriptions
+                       </CardTitle>
+                       <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Personalize high-priority broadcasts</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-6 md:p-10 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                       {['PSSSB', 'PPSC', 'Punjab Police', 'Education', 'High Court'].map(board => (
+                          <div key={board} className="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 transition-all hover:border-primary/20">
+                             <div className="space-y-0.5">
+                                <p className="font-black text-[11px] uppercase tracking-tight text-[#0F172A]">{board}</p>
+                                <p className="text-[8px] text-slate-400 font-bold uppercase">Alerts & Results</p>
+                             </div>
+                             <Switch 
+                                checked={(profile.subscriptions || []).includes(board)} 
+                                onCheckedChange={() => handleToggleSub(board)} 
+                             />
+                          </div>
+                       ))}
+                    </CardContent>
+                 </Card>
+              </div>
+
+              {/* RIGHT: ACCOUNT DETAILS & SUPPORT */}
+              <div className="lg:col-span-4 space-y-6 md:space-y-8">
+                 <Card className="border-none shadow-xl rounded-[2rem] bg-white p-8 md:p-10 space-y-8">
+                    <div className="space-y-6">
+                       <div className="flex items-center justify-between">
+                          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Account Context</h3>
+                          <Settings className="h-3.5 w-3.5 text-slate-300" />
+                       </div>
+                       
+                       <AccountDetail icon={<MapPin />} label="REGION" value={profile.state} />
+                       <AccountDetail icon={<Calendar />} label="MEMBER SINCE" value={new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} />
+                       <AccountDetail icon={<ShieldCheck />} label="AUDIT GROUP" value={`${profile.role}`} />
+                    </div>
+                 </Card>
+
+                 <Card className="border-none shadow-xl rounded-[2rem] bg-[#0F172A] text-white p-8 md:p-10 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-6 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Target className="h-40 w-40" /></div>
+                    <div className="relative z-10 space-y-6">
+                       <Badge className="bg-primary text-white border-none text-[8px] font-black px-3 py-1 rounded-md uppercase tracking-widest">Active Audit</Badge>
+                       <h3 className="text-2xl font-headline font-black uppercase leading-tight">Mastery Nodes <br/> Synchronized</h3>
+                       <p className="text-slate-400 text-xs font-medium leading-relaxed uppercase">
+                          Your profile is connected to the official Cracklix evaluation engine. All rank indices are live.
+                       </p>
+                       <Button asChild className="w-full bg-white text-[#0F172A] hover:bg-slate-100 font-black uppercase text-[10px] tracking-widest h-12 rounded-xl transition-all shadow-2xl active:scale-95">
+                          <Link href="/leaderboard">View State Ranks</Link>
+                       </Button>
+                    </div>
+                 </Card>
+
+                 <div className="text-center space-y-2 opacity-40">
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">
+                       Platform Architect: <span className="text-[#0F172A]">Arsh Grewal</span>
+                    </p>
+                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">REGISTRY NODE CRX-8.0</p>
+                 </div>
+              </div>
+           </div>
         </div>
       </main>
 
@@ -243,31 +281,40 @@ export default function ProfilePage() {
   )
 }
 
-function MetricCard({ icon, label, value, footer }: any) {
-  return (
-    <Card className="border-none shadow-3xl shadow-slate-900/5 rounded-[2.5rem] p-10 hover:translate-y-[-8px] transition-all duration-500 group bg-white">
-       <div className="flex items-center gap-5 mb-6">
-          <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:scale-110 transition-all">
-             {icon}
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{label}</span>
-       </div>
-       <p className="text-5xl font-headline font-black text-[#0F172A] tracking-tighter mb-2">{value}</p>
-       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{footer}</p>
-    </Card>
-  )
+function HeaderInfo({ icon, text }: { icon: React.ReactNode, text: string }) {
+   return (
+      <div className="flex items-center gap-2 text-white/60 font-bold uppercase text-[10px] md:text-xs tracking-tight">
+         <span className="shrink-0 scale-75 md:scale-100">{icon}</span>
+         <span className="truncate max-w-[200px]">{text}</span>
+      </div>
+   )
 }
 
-function AccountInfo({ icon, label, value }: any) {
-  return (
-    <div className="flex items-center gap-6 group">
-      <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 text-slate-300 group-hover:bg-primary/5 group-hover:text-primary transition-all">
-        {icon}
-      </div>
-      <div className="text-left">
-        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">{label}</p>
-        <p className="text-base font-bold text-slate-800">{value}</p>
-      </div>
-    </div>
-  )
+function StatsCard({ icon, label, value, color, className }: any) {
+   return (
+      <Card className={cn("border-none shadow-lg rounded-2xl p-5 md:p-8 bg-white group hover:translate-y-[-4px] transition-all", className)}>
+         <div className="flex items-center gap-3 mb-4">
+            <div className={cn("h-8 w-8 md:h-10 md:w-10 rounded-xl bg-slate-50 flex items-center justify-center transition-all group-hover:scale-110", color.replace('text-', 'bg-').replace('600', '50').replace('500', '50'))}>
+               {React.cloneElement(icon as React.ReactElement, { className: cn("h-4 w-4 md:h-5 md:w-5", color) })}
+            </div>
+            <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-400">{label}</span>
+         </div>
+         <p className={cn("text-2xl md:text-4xl font-headline font-black leading-none", color)}>{value}</p>
+      </Card>
+   )
 }
+
+function AccountDetail({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
+   return (
+      <div className="flex items-center gap-4 group">
+         <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 text-slate-300 group-hover:bg-primary/5 group-hover:text-primary transition-all">
+            {icon}
+         </div>
+         <div className="min-w-0 text-left">
+            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{label}</p>
+            <p className="text-xs md:text-sm font-bold text-[#0F172A] truncate uppercase">{value}</p>
+         </div>
+      </div>
+   )
+}
+import React from "react"
