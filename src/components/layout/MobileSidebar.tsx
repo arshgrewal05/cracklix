@@ -24,9 +24,9 @@ import StudentAvatar from "@/components/brand/StudentAvatar";
 import React from "react";
 
 /**
- * @fileOverview Institutional Dark Sidebar v10.0 (Recovered).
- * Reverts style to the premium Dark Navy theme with 'Node' terminology.
- * Optimized: 290px width, 14px font size, 46px menu height.
+ * @fileOverview Institutional Dark Sidebar v11.0 (Visibility Hardened).
+ * Fixed: Profile section clipping resolved with pt-24 safe-zone.
+ * Specifications: 290px width, 14px font-size, 46px menu height.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -55,8 +55,8 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col h-full bg-[#0F172A] text-white overflow-y-auto no-scrollbar font-body w-full select-none">
       
-      {/* 1. PROFILE NODE (Institutional Dark) */}
-      <div className="bg-[#0B1528] px-6 pt-12 pb-10 flex flex-col gap-6 relative overflow-hidden border-b border-white/5">
+      {/* 1. PROFILE NODE (Institutional Dark - Increased pt for visibility) */}
+      <div className="bg-[#0B1528] px-6 pt-24 pb-10 flex flex-col gap-8 relative overflow-hidden border-b border-white/5 shrink-0">
         <div className="absolute top-0 right-0 p-8 opacity-5"><ShieldCheck className="h-40 w-40" /></div>
         
         <div className="flex items-center gap-5 relative z-10">
@@ -85,7 +85,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
         <Link 
           href="/profile" 
           onClick={onClose}
-          className="flex items-center justify-between w-full p-4 bg-white/5 border border-white/10 rounded-xl group hover:bg-white/10 transition-all"
+          className="flex items-center justify-between w-full p-4 bg-white/5 border border-white/10 rounded-xl group hover:bg-white/10 transition-all relative z-10"
         >
           <div className="flex items-center gap-3">
              <User className="h-4 w-4 text-primary" />
@@ -143,7 +143,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* 3. FOUNDER FOOTER */}
-      <div className="mt-auto px-6 py-12 flex flex-col items-center gap-2 bg-black/20 border-t border-white/5">
+      <div className="mt-auto px-6 py-12 flex flex-col items-center gap-2 bg-black/20 border-t border-white/5 shrink-0">
          <div className="flex items-center gap-2 mb-2">
             <ShieldCheck className="h-3.5 w-3.5 text-slate-500" />
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">Institutional Hub</p>
