@@ -10,8 +10,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Final Geographic Registry Hub v6.5.
- * Optimized for full-width landing page display.
+ * @fileOverview Final Regional Hub Section v7.0.
+ * Fixed: Maps now render directly with object-contain to prevent cropping.
+ * Language: Replaced technical jargon with simple words.
  */
 
 export default function AppPreview() {
@@ -39,17 +40,17 @@ export default function AppPreview() {
                <Smartphone className="h-6 w-6 md:h-7 md:w-7 text-primary" />
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-headline font-black text-[#0F172A] leading-tight md:leading-[0.95] tracking-tight uppercase">
-              CRACKLIX IN <br className="hidden sm:block" />
-              <span className="text-primary">YOUR POCKET</span>
+              STUDY ON THE <br className="hidden sm:block" />
+              <span className="text-primary">MOBILE APP</span>
             </h2>
             <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed max-w-lg">
-              Download the official mobile app to access high-fidelity mocks and exam solutions anywhere in Punjab.
+              Download the official mobile app to access practice tests and exam solutions anywhere in Punjab.
             </p>
 
             <ul className="space-y-3 md:space-y-5 pt-2">
-               <FeatureItem text="Bilingual CBT Interface (PA/EN)" />
-               <FeatureItem text="Exam Pattern Rationalizations" />
-               <FeatureItem text="All Punjab State Ranking Index" />
+               <FeatureItem text="Bilingual Tests (English & Punjabi)" />
+               <FeatureItem text="Detailed Step-by-Step Solutions" />
+               <FeatureItem text="State Merit Rankings" />
             </ul>
 
             <div className="flex flex-wrap gap-4 pt-4 md:pt-8">
@@ -83,14 +84,13 @@ export default function AppPreview() {
                   viewport={{ once: true }}
                   className="group flex flex-col items-center gap-4 md:gap-6"
                 >
-                   <div className="w-full h-64 md:h-80 relative rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 shadow-lg">
+                   <div className="w-full h-auto min-h-[250px] md:min-h-[350px] relative rounded-3xl group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
                       <img 
                         src={punjabMap} 
-                        className="w-full h-full object-cover transition-all duration-[2000ms] group-hover:scale-110" 
+                        className="w-full h-full object-contain" 
                         referrerPolicy="no-referrer"
                         alt="Punjab Hub"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                    </div>
                    
                    <div className="flex items-center gap-4 px-6 md:px-8 py-3 bg-white border border-slate-100 rounded-2xl shadow-xl transition-all hover:border-primary/20 w-full sm:w-auto">
@@ -99,7 +99,7 @@ export default function AppPreview() {
                       </div>
                       <div className="text-left">
                          <p className="text-[10px] font-black uppercase text-[#0F172A] tracking-[0.2em] leading-none">Punjab Hub</p>
-                         <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">State Registry Active</p>
+                         <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">State Exams Covered</p>
                       </div>
                    </div>
                 </motion.div>
@@ -111,14 +111,13 @@ export default function AppPreview() {
                   transition={{ delay: 0.2 }}
                   className="group flex flex-col items-center gap-4 md:gap-6 sm:mt-12"
                 >
-                   <div className="w-full h-64 md:h-80 relative rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 shadow-lg">
+                   <div className="w-full h-auto min-h-[250px] md:min-h-[350px] relative rounded-3xl group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
                       <img 
                         src={indiaMap} 
-                        className="w-full h-full object-cover transition-all duration-[2000ms] group-hover:scale-110" 
+                        className="w-full h-full object-contain" 
                         referrerPolicy="no-referrer"
                         alt="National Hub"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                    </div>
                    
                    <div className="flex items-center gap-4 px-6 md:px-8 py-3 bg-white border border-slate-100 rounded-2xl shadow-xl transition-all hover:border-blue-200 w-full sm:w-auto">
@@ -127,7 +126,7 @@ export default function AppPreview() {
                       </div>
                       <div className="text-left">
                          <p className="text-[10px] font-black uppercase text-[#0F172A] tracking-[0.2em] leading-none">National Hub</p>
-                         <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">Central Registry Active</p>
+                         <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">Central Exams Covered</p>
                       </div>
                    </div>
                 </motion.div>
@@ -145,7 +144,7 @@ export default function AppPreview() {
                 <div className="text-left">
                    <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 md:mb-1.5">Platform Founder</p>
                    <p className="text-sm md:text-base font-bold text-[#0F172A]">
-                      Developed by <span className="text-primary font-black uppercase tracking-tighter ml-1 group-hover:text-primary transition-colors">Arsh Grewal</span>
+                      Developed by <span className="text-primary font-black uppercase tracking-tighter ml-1 transition-colors">Arsh Grewal</span>
                    </p>
                 </div>
              </motion.div>
