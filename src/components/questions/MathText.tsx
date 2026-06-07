@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -12,9 +11,9 @@ interface MathTextProps {
 }
 
 /**
- * @fileOverview Precision High-Contrast Renderer v17.0.
+ * @fileOverview Precision High-Contrast Renderer v18.0.
  * Supports Markdown Tables and KaTeX.
- * Optimized: Scaled down font sizes to reduce vertical sprawl and scrolling.
+ * Optimized: Maximum mobile responsive table support.
  */
 export default function MathText({ text, className }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,7 +57,7 @@ export default function MathText({ text, className }: MathTextProps) {
               ? processed.slice(1, -1) 
               : processed;
 
-            return `<div class="py-1 overflow-x-auto no-scrollbar font-sans text-base md:text-lg text-inherit">${katex.renderToString(mathContent, {
+            return `<div class="py-1 overflow-x-auto no-scrollbar font-sans text-sm md:text-lg text-inherit">${katex.renderToString(mathContent, {
               throwOnError: false,
               displayMode: false,
               trust: true
@@ -71,13 +70,13 @@ export default function MathText({ text, className }: MathTextProps) {
         if (trimmed.includes('=') && !/[a-z]{12,}/i.test(trimmed)) {
           const parts = trimmed.split('=');
           return `<div class="py-1 flex flex-wrap items-baseline gap-2 text-inherit">
-            <span class="font-bold text-inherit uppercase tracking-wide text-xs md:text-sm">${parts[0].trim()}</span>
+            <span class="font-bold text-inherit uppercase tracking-wide text-[11px] md:text-sm">${parts[0].trim()}</span>
             <span class="text-inherit font-black text-primary">=</span>
-            <span class="font-bold text-inherit text-xs md:text-sm">${parts[1].trim()}</span>
+            <span class="font-bold text-inherit text-[11px] md:text-sm">${parts[1].trim()}</span>
           </div>`;
         }
 
-        return `<div class="py-0.5 text-inherit font-[700] leading-[1.5] antialiased">${trimmed}</div>`;
+        return `<div class="py-0.5 text-inherit font-[700] leading-[1.4] md:leading-[1.5] antialiased text-[13px] md:text-base">${trimmed}</div>`;
       }).join('');
 
       containerRef.current.innerHTML = renderedHtml;
@@ -89,7 +88,7 @@ export default function MathText({ text, className }: MathTextProps) {
   return (
     <div 
       ref={containerRef} 
-      className={cn("whitespace-pre-wrap leading-relaxed h-auto overflow-visible text-inherit", className)} 
+      className={cn("whitespace-pre-wrap leading-relaxed h-auto overflow-hidden text-inherit w-full", className)} 
     />
   );
 }
@@ -104,17 +103,17 @@ function renderMarkdownTable(rawText: string): string {
   const dataRows = tableRows.slice(2).map(r => r.split('|').filter(c => c.trim().length >= 0).slice(1, -1));
 
   const html = `
-    <div class="my-4 overflow-x-auto rounded-xl border border-white/10 bg-white/5 shadow-2xl">
-      <table class="w-full text-left border-collapse min-w-[400px]">
+    <div class="my-3 overflow-x-auto rounded-lg border border-white/10 bg-white/5 shadow-xl w-full">
+      <table class="w-full text-left border-collapse min-w-[280px]">
         <thead>
           <tr class="bg-[#F97316]/10 border-b border-white/10">
-            ${header.map(col => `<th class="p-3 font-black uppercase text-[10px] md:text-xs tracking-[0.1em] text-[#F97316]">${col.trim()}</th>`).join('')}
+            ${header.map(col => `<th class="p-2 font-black uppercase text-[8px] md:text-xs tracking-tight text-[#F97316]">${col.trim()}</th>`).join('')}
           </tr>
         </thead>
         <tbody>
           ${dataRows.map(row => `
             <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-              ${row.map(cell => `<td class="p-3 font-bold text-[12px] md:text-sm text-inherit">${cell.trim()}</td>`).join('')}
+              ${row.map(cell => `<td class="p-2 font-bold text-[10px] md:text-sm text-inherit">${cell.trim()}</td>`).join('')}
             </tr>
           `).join('')}
         </tbody>
@@ -123,5 +122,5 @@ function renderMarkdownTable(rawText: string): string {
   `;
 
   const remainingText = lines.filter(l => !l.startsWith('|')).join('\n');
-  return html + (remainingText ? `<div class="mt-2 font-[700] text-inherit leading-relaxed text-sm md:text-base">${remainingText}</div>` : "");
+  return html + (remainingText ? `<div class="mt-2 font-[700] text-inherit leading-relaxed text-[12px] md:text-base">${remainingText}</div>` : "");
 }

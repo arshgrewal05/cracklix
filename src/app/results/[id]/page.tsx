@@ -36,8 +36,8 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import BackButton from "@/components/navigation/BackButton"
 
 /**
- * @fileOverview Institutional Result Engine v5.1.
- * Optimized: High-density solution hub and instant re-attempt logic.
+ * @fileOverview Institutional Result Engine v6.0.
+ * Optimized: Full Mobile Responsive Audit. Removed all fixed widths.
  */
 export default function ResultPage() {
   const params = useParams()
@@ -115,7 +115,6 @@ export default function ResultPage() {
     const confirmMsg = "CRITICAL AUDIT: Restart evaluation node? Current scores will be archived.";
     if (!window.confirm(confirmMsg)) return;
 
-    // Instant non-blocking reset
     deleteDoc(doc(db, "attempts", `${user.uid}_${mockId}`)).catch(() => {});
     deleteDoc(doc(db, "results", `${user.uid}_${mockId}`)).catch(() => {});
     
@@ -154,57 +153,57 @@ export default function ResultPage() {
   )
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50/50">
+    <div className="flex flex-col min-h-screen bg-slate-50/50 w-full overflow-x-hidden">
       <Navbar />
-      <main className="container mx-auto px-4 py-4 md:py-8 max-w-7xl">
-        <div className="flex items-center gap-4 mb-6">
+      <main className="container mx-auto px-2 md:px-6 py-4 md:py-8 max-w-4xl w-full">
+        <div className="flex items-center gap-2 md:gap-4 mb-6">
            <BackButton label="Dashboard" fallback="/dashboard" />
            <div className="h-6 w-px bg-slate-200" />
            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Audit Summary</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          <div className="lg:col-span-8 space-y-6 md:space-y-8 text-left">
-            <Card className="border-none shadow-3xl rounded-xl md:rounded-[2.5rem] overflow-hidden bg-white group">
+        <div className="flex flex-col gap-6 md:gap-8 w-full">
+          <div className="space-y-6 md:space-y-8 text-left w-full">
+            <Card className="border-none shadow-3xl rounded-xl md:rounded-[2.5rem] overflow-hidden bg-white group w-full">
                <div className="h-1.5 w-full bg-primary" />
-               <CardHeader className="p-5 md:p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
-                  <div className="space-y-2 text-center md:text-left">
+               <CardHeader className="p-4 md:p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div className="space-y-2 text-center md:text-left w-full">
                     <div className="flex items-center justify-center md:justify-start gap-3">
                        <ShieldCheck className="h-4 w-4 text-primary" />
                        <Badge className="bg-emerald-50 text-emerald-600 border-none px-2 py-0.5 rounded-lg font-black uppercase text-[7px] tracking-widest">AUDIT COMPLETE</Badge>
                     </div>
-                    <CardTitle className="font-headline text-xl md:text-3xl font-black text-[#0F172A] uppercase leading-tight tracking-tight">{sessionData.mockTitle}</CardTitle>
+                    <CardTitle className="font-headline text-lg md:text-3xl font-black text-[#0F172A] uppercase leading-tight tracking-tight break-words">{sessionData.mockTitle}</CardTitle>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                     <Button onClick={handleReattempt} className="bg-primary hover:bg-orange-600 text-white rounded-lg h-10 px-6 font-black uppercase text-[8px] tracking-widest shadow-lg transition-all active:scale-95 gap-2">
+                     <Button onClick={handleReattempt} className="flex-1 sm:flex-none bg-primary hover:bg-orange-600 text-white rounded-lg h-10 px-6 font-black uppercase text-[8px] tracking-widest shadow-lg transition-all active:scale-95 gap-2">
                         <RefreshCw className="h-3.5 w-3.5" /> Re-attempt
                      </Button>
-                     <Button asChild className="bg-[#0F172A] hover:bg-black text-white rounded-lg h-10 px-6 font-black uppercase text-[8px] tracking-widest shadow-lg transition-all active:scale-95">
+                     <Button asChild className="flex-1 sm:flex-none bg-[#0F172A] hover:bg-black text-white rounded-lg h-10 px-6 font-black uppercase text-[8px] tracking-widest shadow-lg transition-all active:scale-95">
                         <Link href="/dashboard"><LayoutDashboard className="h-3.5 w-3.5 mr-2 text-primary" /> Dashboard</Link>
                      </Button>
                   </div>
                </CardHeader>
-               <CardContent className="p-5 md:p-8">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-8">
-                    <ResultNode icon={<CheckCircle2 className="text-emerald-500 h-6 w-6" />} label="Correct" value={sessionData.score} color="text-emerald-600" />
-                    <ResultNode icon={<XCircle className="text-rose-500 h-6 w-6" />} label="Incorrect" value={Object.keys(sessionData.answers).length - sessionData.score} color="text-rose-600" />
-                    <ResultNode icon={<HelpCircle className="text-slate-300 h-6 w-6" />} label="Skipped" value={sessionData.totalQuestions - Object.keys(sessionData.answers).length} color="text-slate-400" />
-                    <ResultNode icon={<Target className="text-primary h-6 w-6" />} label="Accuracy" value={`${sessionData.accuracy}%`} color="text-primary" />
+               <CardContent className="p-4 md:p-8">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-center mb-8">
+                    <ResultNode icon={<CheckCircle2 className="text-emerald-500 h-5 w-5 md:h-6 md:w-6" />} label="Correct" value={sessionData.score} color="text-emerald-600" />
+                    <ResultNode icon={<XCircle className="text-rose-500 h-5 w-5 md:h-6 md:w-6" />} label="Incorrect" value={Object.keys(sessionData.answers).length - sessionData.score} color="text-rose-600" />
+                    <ResultNode icon={<HelpCircle className="text-slate-300 h-5 w-5 md:h-6 md:w-6" />} label="Skipped" value={sessionData.totalQuestions - Object.keys(sessionData.answers).length} color="text-slate-400" />
+                    <ResultNode icon={<Target className="text-primary h-5 w-5 md:h-6 md:w-6" />} label="Accuracy" value={`${sessionData.accuracy}%`} color="text-primary" />
                   </div>
 
                   <div className="space-y-4">
                      <h4 className="font-headline font-black text-sm md:text-xl uppercase tracking-tight border-b border-slate-100 pb-2 flex items-center gap-2">
                         <TrendingUp className="h-5 w-5 text-primary" /> Mastery Index
                      </h4>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                         {chartData.length > 0 ? chartData.map((subj, i) => (
-                           <div key={i} className="p-3 md:p-4 bg-slate-50/50 rounded-xl border border-slate-100 space-y-3 shadow-inner">
+                           <div key={i} className="p-3 rounded-xl bg-slate-50/50 border border-slate-100 space-y-2 shadow-inner">
                               <div className="flex justify-between items-start">
                                  <div className="min-w-0 flex-1">
                                     <span className="text-[7px] font-black uppercase text-slate-400 tracking-widest block">SUBJECT NODE</span>
-                                    <h5 className="text-[10px] md:text-xs font-black text-[#0B1528] uppercase truncate">{subj.name}</h5>
+                                    <h5 className="text-[9px] md:text-xs font-black text-[#0B1528] uppercase truncate">{subj.name}</h5>
                                  </div>
-                                 <span className={cn("text-sm md:text-base font-headline font-black ml-2", subj.accuracy > 70 ? "text-emerald-600" : "text-rose-500")}>{subj.accuracy}%</span>
+                                 <span className={cn("text-xs md:text-base font-headline font-black ml-2", subj.accuracy > 70 ? "text-emerald-600" : "text-rose-500")}>{subj.accuracy}%</span>
                               </div>
                               <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
                                  <div className={cn("h-full transition-all duration-1000", subj.accuracy > 70 ? "bg-emerald-500" : "bg-rose-500")} style={{ width: `${subj.accuracy}%` }} />
@@ -216,14 +215,14 @@ export default function ResultPage() {
                </CardContent>
             </Card>
 
-            <div className="space-y-4 md:space-y-6">
+            <div className="space-y-4 md:space-y-6 w-full">
                <div className="flex items-center justify-between px-1">
-                  <h3 className="font-headline font-black text-xl md:text-2xl uppercase flex items-center gap-3">
-                     <BrainCircuit className="h-6 w-6 text-primary" /> Solutions Hub
+                  <h3 className="font-headline font-black text-lg md:text-2xl uppercase flex items-center gap-3">
+                     <BrainCircuit className="h-5 w-5 md:h-6 md:w-6 text-primary" /> Solutions Hub
                   </h3>
                </div>
                
-               <div className="space-y-4">
+               <div className="space-y-4 w-full">
                   {questions.map((q, idx) => {
                      const studentAnsIdx = sessionData.answers?.[idx] !== undefined 
                        ? sessionData.answers[idx] 
@@ -235,13 +234,13 @@ export default function ResultPage() {
                      const isExpanded = expandedQs[idx];
 
                      return (
-                        <Card key={idx} className="border-none shadow-lg rounded-xl md:rounded-[2rem] overflow-hidden bg-white">
+                        <Card key={idx} className="border-none shadow-lg rounded-xl md:rounded-[2rem] overflow-hidden bg-white w-full">
                            <div className={cn("h-1 w-full", isCorrect ? "bg-emerald-500" : isSkipped ? "bg-slate-200" : "bg-rose-500")} />
-                           <CardContent className="p-4 md:p-6 space-y-4">
+                           <CardContent className="p-3 md:p-6 space-y-4">
                               <div className="flex items-center justify-between">
-                                 <div className="flex items-center gap-3">
+                                 <div className="flex items-center gap-2 md:gap-3">
                                     <div className={cn(
-                                       "h-8 w-8 md:h-9 md:w-9 rounded-lg flex items-center justify-center shadow-md font-black text-xs md:text-sm transition-all",
+                                       "h-7 w-7 md:h-9 md:w-9 rounded-lg flex items-center justify-center shadow-md font-black text-[10px] md:text-sm transition-all",
                                        isCorrect ? "bg-emerald-500 text-white" : isSkipped ? "bg-slate-100 text-slate-300" : "bg-rose-500 text-white"
                                     )}>
                                        {idx + 1}
@@ -252,10 +251,10 @@ export default function ResultPage() {
                                        </Badge>
                                     </div>
                                  </div>
-                                 <p className="text-[7px] font-black uppercase text-slate-400">Section: {q.sectionId || q.subjectId || 'Audit'}</p>
+                                 <p className="text-[7px] md:text-[9px] font-black uppercase text-slate-400 truncate max-w-[120px]">{q.sectionId || q.subjectId || 'Audit'}</p>
                               </div>
 
-                              <div className="text-left">
+                              <div className="text-left w-full overflow-hidden">
                                  <QuestionRenderer 
                                    question={q} 
                                    language="bilingual" 
@@ -268,7 +267,7 @@ export default function ResultPage() {
                                  <Button 
                                     onClick={() => setExpandedQs(p => ({ ...p, [idx]: !p[idx] }))}
                                     className={cn(
-                                       "rounded-xl h-10 px-8 md:px-12 font-black uppercase text-[8px] md:text-[9px] tracking-[0.2em] gap-2 shadow-sm transition-all",
+                                       "rounded-xl h-10 px-6 md:px-12 font-black uppercase text-[8px] md:text-[9px] tracking-[0.2em] gap-2 shadow-sm transition-all w-full md:w-auto",
                                        isExpanded ? "bg-slate-900 text-white" : "bg-primary text-white hover:bg-orange-600 shadow-orange-500/20"
                                     )}
                                  >
@@ -283,31 +282,6 @@ export default function ResultPage() {
                </div>
             </div>
           </div>
-
-          <div className="lg:col-span-4 space-y-6">
-             <Card className="border-none bg-[#0F172A] text-white shadow-xl rounded-xl md:rounded-[2rem] p-6 md:p-10 text-center space-y-6 overflow-hidden relative">
-                <div className="relative z-10 space-y-4">
-                   <Target className="h-8 w-8 text-primary mx-auto shadow-2xl" />
-                   <div className="space-y-1">
-                      <p className="text-[8px] font-black uppercase tracking-[0.3em] text-primary">Probability Index</p>
-                      <h3 className="text-4xl md:text-5xl font-headline font-black text-white tracking-tighter leading-none">{Math.min(98, sessionData.accuracy + 10)}%</h3>
-                   </div>
-                   <p className="text-slate-400 font-medium text-[10px] md:text-xs italic leading-relaxed px-2">
-                      Ready for the official merit registry.
-                   </p>
-                   <Button asChild className="w-full h-10 bg-white text-black hover:bg-slate-100 font-black uppercase tracking-widest text-[8px] rounded-lg shadow-xl"><Link href="/dashboard">View Rankings</Link></Button>
-                </div>
-             </Card>
-
-             <Card className="border-none shadow-lg rounded-xl bg-white p-6 space-y-4 text-left">
-                <h4 className="font-headline font-black text-sm uppercase tracking-tight flex items-center gap-2"><Zap className="h-4 w-4 text-primary" /> Audit Meta</h4>
-                <div className="space-y-3 pt-2 border-t border-slate-50">
-                   <SummaryRow label="Time" value={`${Math.floor(sessionData.timeTaken / 60)}m ${sessionData.timeTaken % 60}s`} />
-                   <SummaryRow label="Date" value={new Date(sessionData.timestamp).toLocaleDateString('en-GB')} />
-                   <SummaryRow label="Evaluation" value={sessionData.accuracy > 45 ? "QUALIFIED" : "FAIL"} color={sessionData.accuracy > 45 ? "text-emerald-600" : "text-rose-600"} />
-                </div>
-             </Card>
-          </div>
         </div>
       </main>
       <Footer />
@@ -319,17 +293,8 @@ function ResultNode({ icon, label, value, color }: any) {
   return (
     <div className="space-y-1">
       <div className="flex justify-center">{icon}</div>
-      <p className={cn("text-xl md:text-2xl font-headline font-black tracking-tighter leading-none", color)}>{value}</p>
+      <p className={cn("text-lg md:text-2xl font-headline font-black tracking-tighter leading-none", color)}>{value}</p>
       <p className="text-[6px] md:text-[8px] font-black uppercase text-slate-400 tracking-widest">{label}</p>
     </div>
   )
-}
-
-function SummaryRow({ label, value, color }: any) {
-   return (
-      <div className="flex justify-between items-center text-[8px] md:text-[10px] uppercase font-black">
-         <span className="text-slate-400">{label}</span>
-         <span className={cn(color || "text-[#0F172A]")}>{value}</span>
-      </div>
-   )
 }
