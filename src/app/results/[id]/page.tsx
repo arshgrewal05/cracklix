@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
@@ -29,8 +30,9 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import BackButton from "@/components/navigation/BackButton"
 
 /**
- * @fileOverview Standardized Results Hub with Firestore instance validation.
- * Fixed: Robust Firebase guards (removed HALLUCINATED .type checks).
+ * @fileOverview Institutional Results Hub v20.0.
+ * Updated: Desktop Wide-Format support (removed mobile-app-shell limitation).
+ * Optimized: Centered content with max-width container for high-fidelity review.
  */
 
 export default function ResultPage() {
@@ -128,62 +130,90 @@ export default function ResultPage() {
   };
 
   if (resultsLoading || loadingContent) return (
-    <div className="h-full flex flex-col items-center justify-center bg-white space-y-4">
-       <Loader2 className="h-8 w-8 text-primary animate-spin" />
-       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Auditing Node...</p>
+    <div className="h-screen flex flex-col items-center justify-center bg-white space-y-6">
+       <Loader2 className="h-10 w-10 text-primary animate-spin" />
+       <p className="text-[12px] font-black uppercase tracking-[0.4em] text-primary">Auditing Preparation Node...</p>
     </div>
   )
 
   if (!sessionData) return (
-    <div className="h-full flex flex-col items-center justify-center bg-slate-50 p-6 space-y-8">
-       <Trophy className="h-16 w-16 text-slate-200" />
-       <p className="text-sm font-bold text-slate-400 uppercase tracking-widest text-center">No Audit Node Detected</p>
-       <Button asChild className="rounded-xl h-14 px-10 bg-[#0B1528] text-white font-black uppercase text-[10px]">
+    <div className="h-screen flex flex-col items-center justify-center bg-slate-50 p-6 space-y-8">
+       <Trophy className="h-20 w-20 text-slate-200" />
+       <p className="text-lg font-bold text-slate-400 uppercase tracking-widest text-center">No Audit Node Detected</p>
+       <Button asChild className="rounded-2xl h-16 px-12 bg-[#0B1528] text-white font-black uppercase text-[11px] tracking-widest shadow-xl">
           <Link href="/mocks">Explore All Hubs</Link>
        </Button>
     </div>
   )
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <div className="flex flex-col min-h-screen bg-slate-50/50 font-body pb-32">
       <Navbar />
-      <main className="mobile-app-shell py-4 px-2 space-y-6">
-        <div className="flex items-center gap-2 mb-2">
-           <BackButton label="Dashboard" fallback="/dashboard" className="h-10" />
-           <div className="h-4 w-px bg-slate-200" />
-           <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Audit Registry</p>
+      
+      <main className="container mx-auto px-4 md:px-6 py-8 md:py-16 max-w-6xl space-y-10 text-left animate-in fade-in duration-700">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center gap-4 mb-2">
+           <BackButton label="Dashboard" fallback="/dashboard" className="h-12 border bg-white shadow-sm" />
+           <div className="h-6 w-px bg-slate-200 hidden md:block" />
+           <div className="hidden md:flex items-center gap-3">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional Audit Registry</p>
+           </div>
         </div>
 
-        <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-white">
-           <div className="h-1 w-full bg-primary" />
-           <CardHeader className="p-5 border-b border-slate-50 space-y-3">
-              <div className="flex items-center gap-3">
-                 <ShieldCheck className="h-4 w-4 text-primary" />
-                 <Badge className="bg-emerald-50 text-emerald-600 border-none px-2 py-0.5 rounded-lg font-black uppercase text-[7px] tracking-widest">VERIFIED</Badge>
-              </div>
-              <CardTitle className="text-lg font-black text-[#0F172A] uppercase leading-tight">{sessionData.mockTitle}</CardTitle>
-              
-              <div className="flex gap-2 pt-2">
-                 <Button onClick={handleReattempt} type="button" className="flex-1 h-10 bg-primary text-white rounded-lg font-black uppercase text-[8px] tracking-widest relative z-10">Re-Attempt</Button>
-                 <Button asChild className="flex-1 h-10 bg-[#0F172A] text-white rounded-lg font-black uppercase text-[8px] tracking-widest"><Link href="/dashboard">Dashboard</Link></Button>
+        {/* Master Scoreboard Node */}
+        <Card className="border-none shadow-3xl rounded-[3rem] overflow-hidden bg-white">
+           <div className="h-2 w-full bg-primary" />
+           <CardHeader className="p-10 md:p-16 border-b border-slate-50 space-y-6 text-center md:text-left">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                 <div className="space-y-4">
+                    <div className="flex items-center justify-center md:justify-start gap-4">
+                       <ShieldCheck className="h-8 w-8 text-primary" />
+                       <Badge className="bg-emerald-50 text-emerald-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg">VERIFIED ASSESSMENT</Badge>
+                    </div>
+                    <CardTitle className="text-3xl md:text-6xl font-headline font-black text-[#0F172A] uppercase leading-tight tracking-tight">
+                       {sessionData.mockTitle}
+                    </CardTitle>
+                 </div>
+                 
+                 <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+                    <Button 
+                      onClick={handleReattempt} 
+                      type="button" 
+                      className="h-16 px-10 bg-primary hover:bg-orange-600 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-2xl shadow-primary/20 transition-all active:scale-95"
+                    >
+                      Initialize Re-Attempt
+                    </Button>
+                    <Button asChild variant="outline" className="h-16 px-10 border-slate-200 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-sm">
+                      <Link href="/dashboard">Return Dashboard</Link>
+                    </Button>
+                 </div>
               </div>
            </CardHeader>
-           <CardContent className="p-5">
-              <div className="grid grid-cols-4 gap-2 text-center">
-                <MiniStat icon={<CheckCircle2 className="text-emerald-500 h-4 w-4" />} val={sessionData.score} label="CORRECT" />
-                <MiniStat icon={<XCircle className="text-rose-500 h-4 w-4" />} val={Object.keys(sessionData.answers).length - sessionData.score} label="WRONG" />
-                <MiniStat icon={<HelpCircle className="text-slate-300 h-4 w-4" />} val={sessionData.totalQuestions - Object.keys(sessionData.answers).length} label="SKIP" />
-                <MiniStat icon={<Target className="text-primary h-4 w-4" />} val={`${sessionData.accuracy}%`} label="ACCURACY" />
+
+           <CardContent className="p-10 md:p-16 bg-slate-50/30">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
+                <MetricNode icon={<CheckCircle2 className="text-emerald-500 h-6 w-6" />} val={sessionData.score} label="CORRECT AUDIT" sub="Success Points" />
+                <MetricNode icon={<XCircle className="text-rose-500 h-6 w-6" />} val={Object.keys(sessionData.answers).length - sessionData.score} label="WRONG NODES" sub="Logic Failures" />
+                <MetricNode icon={<HelpCircle className="text-slate-400 h-6 w-6" />} val={sessionData.totalQuestions - Object.keys(sessionData.answers).length} label="SKIPPED ASSETS" sub="Untouched" />
+                <MetricNode icon={<Target className="text-primary h-6 w-6" />} val={`${sessionData.accuracy}%`} label="PRECISION INDEX" sub="Registry Mastery" />
               </div>
            </CardContent>
         </Card>
 
-        <div className="space-y-4 pb-32">
-           <h3 className="font-headline font-black text-sm uppercase px-1 flex items-center gap-2">
-              <BrainCircuit className="h-4 w-4 text-primary" /> Performance Review
-           </h3>
+        {/* Detailed Performance Node */}
+        <div className="space-y-8">
+           <div className="flex items-center justify-between border-b border-slate-200 pb-6">
+              <h3 className="font-headline font-black text-2xl md:text-3xl uppercase text-[#0F172A] flex items-center gap-4">
+                 <BrainCircuit className="h-8 w-8 text-primary" /> Performance Review
+              </h3>
+              <Badge variant="outline" className="border-slate-200 text-slate-400 font-black uppercase text-[10px] px-4 py-2 rounded-xl">
+                 {questions.length} Items Locked
+              </Badge>
+           </div>
            
-           <div className="space-y-3">
+           <div className="grid grid-cols-1 gap-6 md:gap-8">
               {questions.map((q, idx) => {
                  const studentAnsIdx = sessionData.answers?.[idx];
                  const correctAnsIdx = ['A','B','C','D'].indexOf(q.correctAnswer);
@@ -192,35 +222,41 @@ export default function ResultPage() {
                  const isExpanded = expandedQs[idx];
 
                  return (
-                    <Card key={idx} className="border-none shadow-sm rounded-xl overflow-hidden bg-white">
-                       <div className={cn("h-1 w-full", isCorrect ? "bg-emerald-500" : isSkipped ? "bg-slate-200" : "bg-rose-500")} />
-                       <CardContent className="p-3 space-y-4">
+                    <Card key={idx} className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-white group hover:shadow-2xl transition-all duration-300">
+                       <div className={cn("h-2 w-full transition-colors", isCorrect ? "bg-emerald-500" : isSkipped ? "bg-slate-200" : "bg-rose-500")} />
+                       <CardContent className="p-8 md:p-12 space-y-8">
                           <div className="flex items-center justify-between">
-                             <div className="h-6 w-6 rounded-lg bg-slate-50 flex items-center justify-center font-black text-[10px] text-slate-400">
-                                {idx + 1}
+                             <div className="flex items-center gap-6">
+                                <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center font-black text-lg text-slate-400 group-hover:text-primary transition-colors">
+                                   {idx + 1}
+                                </div>
+                                <Badge className={cn(
+                                  "border-none px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-sm",
+                                  isCorrect ? "bg-emerald-50 text-emerald-600" : isSkipped ? "bg-slate-50 text-slate-400" : "bg-rose-50 text-rose-600"
+                                )}>
+                                   {isCorrect ? 'AUDIT SUCCESS' : isSkipped ? 'SKIPPED NODE' : 'REGISTRY FAILURE'}
+                                </Badge>
                              </div>
-                             <Badge className={cn("border-none px-2 py-0.5 rounded text-[6px] font-black uppercase tracking-widest", isCorrect ? "bg-emerald-50 text-emerald-600" : isSkipped ? "bg-slate-50 text-slate-400" : "bg-rose-50 text-rose-600")}>
-                                {isCorrect ? 'SUCCESS' : isSkipped ? 'SKIPPED' : 'FAILURE'}
-                             </Badge>
-                          </div>
-
-                          <QuestionRenderer 
-                            question={q} 
-                            language={mockLanguageMode} 
-                            showSolution={isExpanded} 
-                            selectedAnswer={studentAnsIdx}
-                            hideOptions={false}
-                          />
-
-                          <div className="flex justify-center">
+                             
                              <Button 
                                 variant="ghost"
                                 onClick={() => setExpandedQs(p => ({ ...p, [idx]: !p[idx] }))}
-                                className="h-10 px-6 font-black uppercase text-[9px] tracking-widest gap-2 text-primary"
+                                className="h-12 px-8 font-black uppercase text-[10px] tracking-widest gap-3 text-primary bg-primary/5 hover:bg-primary/10 rounded-xl"
                              >
-                                {isExpanded ? "Hide Logic" : "View Solution"}
-                                {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                {isExpanded ? "Hide Logic" : "Audit Solution"}
+                                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                              </Button>
+                          </div>
+
+                          <div className="px-1 md:px-4">
+                            <QuestionRenderer 
+                                question={q} 
+                                language={mockLanguageMode} 
+                                showSolution={isExpanded} 
+                                selectedAnswer={studentAnsIdx}
+                                hideOptions={false}
+                                className="border-none shadow-none p-0 bg-transparent"
+                            />
                           </div>
                        </CardContent>
                     </Card>
@@ -234,12 +270,17 @@ export default function ResultPage() {
   )
 }
 
-function MiniStat({ icon, val, label }: any) {
+function MetricNode({ icon, val, label, sub }: any) {
   return (
-    <div className="space-y-1">
-      <div className="flex justify-center">{icon}</div>
-      <p className="text-sm font-headline font-black text-[#0F172A]">{val}</p>
-      <p className="text-[6px] font-black uppercase text-slate-400">{label}</p>
+    <div className="space-y-4 p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm text-center group hover:translate-y-[-6px] transition-all">
+      <div className="h-14 w-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto shadow-inner group-hover:scale-110 transition-transform">
+         {icon}
+      </div>
+      <div className="space-y-1">
+         <p className="text-4xl font-headline font-black text-[#0F172A] tracking-tighter">{val}</p>
+         <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">{label}</p>
+         <p className="text-[8px] font-bold text-slate-300 uppercase tracking-tighter">{sub}</p>
+      </div>
     </div>
   )
 }
