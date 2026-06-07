@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useMemo, useEffect } from "react"
+import { useMemo, useEffect, useState } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useUser, useCollection, useFirestore } from "@/firebase"
@@ -28,14 +28,15 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 /**
- * @fileOverview Institutional "My Exams" Dashboard v2.1.
- * Optimized: Logo visibility hardened with p-1.5 and object-contain to ensure full logo visibility.
+ * @fileOverview Institutional "My Exams" Dashboard v2.2.
+ * Optimized: Robust Logo Error Handling and Full visibility logic.
  */
 
 export default function MyExamsPage() {
   const { user, profile, loading: userLoading } = useUser()
   const db = useFirestore()
   const router = useRouter()
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -104,23 +105,27 @@ export default function MyExamsPage() {
               {pinnedExams.length > 0 ? pinnedExams.map((exam) => {
                  const board = boards?.find((b: any) => b.id === exam.boardId);
                  const logoUrl = exam.iconUrl || board?.iconUrl;
+                 const isImgFailed = failedImages[exam.id];
 
                  return (
                   <Link key={exam.id} href={`/exams/${exam.id}`}>
                       <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl bg-white p-4 md:p-6 text-left group relative overflow-hidden h-full flex flex-col">
                         <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-slate-50 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-primary/10 transition-colors relative overflow-hidden shrink-0 border border-slate-100 shadow-inner">
-                            {logoUrl ? (
+                            {logoUrl && !isImgFailed ? (
                               <img 
                                 src={logoUrl} 
                                 className="w-full h-full object-contain p-1.5" 
                                 referrerPolicy="no-referrer" 
                                 alt={exam.name} 
+                                onError={() => setFailedImages(p => ({...p, [exam.id]: true}))}
                               />
                             ) : (
-                              <GraduationCap className="h-6 w-6 md:h-8 md:w-8 text-slate-300" />
+                              <div className="bg-primary/10 text-primary w-full h-full flex items-center justify-center font-black text-xs">
+                                {board?.abbreviation?.substring(0,2) || 'EX'}
+                              </div>
                             )}
                         </div>
-                        <h4 className="font-black text-[13px] md:text-lg text-[#0F172A] uppercase leading-tight line-clamp-2 flex-1">{exam.name}</h4>
+                        <h4 className="font-black text-[13px] md:text-base text-[#0F172A] uppercase leading-tight line-clamp-2 flex-1">{exam.name}</h4>
                         <p className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase mt-2">Registry Active</p>
                       </Card>
                   </Link>

@@ -2,12 +2,14 @@
 import { Firestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v15.2.
- * Features: High-Fidelity Schema for all Punjab Boards, Exams, and Subjects.
- * Updated: Hardened logo URLs for PSSSB and PSPCL to ensure full visibility.
+ * @fileOverview Institutional Seeding Engine v16.0.
+ * Features: High-Fidelity Stable Asset Registry for all Punjab Boards.
+ * Updated: Switched to Wikimedia-hosted emblems for 100% stability.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Cracklix Global Registry Sync...');
+
+  const stateEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png";
 
   // 1. BOARDS REGISTRY (The Governing Bodies)
   const boards = [
@@ -17,7 +19,7 @@ export async function seedInitialData(db: Firestore) {
       name: 'Punjab Subordinate Services Selection Board', 
       region: 'Punjab', 
       category: 'STATE_BOARD', 
-      iconUrl: 'https://sssb.punjab.gov.in/wp-content/themes/ssbtheme/images/punjab-gov.svg' 
+      iconUrl: stateEmblem
     },
     { 
       id: 'ppsc', 
@@ -25,7 +27,7 @@ export async function seedInitialData(db: Firestore) {
       name: 'Punjab Public Service Commission', 
       region: 'Punjab', 
       category: 'GAZETTED_BOARD', 
-      iconUrl: 'https://static.pseb.ac.in/psebwebsite/front_assets/sites/default/files/inline-images/emblem.png' 
+      iconUrl: stateEmblem
     },
     { 
       id: 'punjab-police', 
@@ -67,11 +69,11 @@ export async function seedInitialData(db: Firestore) {
 
   // 2. EXAM MASTER HUBS (Vertical Recruitments)
   const exams = [
-    { id: 'punjab-patwari', boardId: 'psssb', name: 'Revenue Patwari 2026', category: 'STATE', totalFullMocks: 45, totalPyqs: 10, iconUrl: 'https://sssb.punjab.gov.in/wp-content/themes/ssbtheme/images/punjab-gov.svg' },
-    { id: 'psssb-clerk', boardId: 'psssb', name: 'Subordinate Clerk (PSSSB)', category: 'STATE', totalFullMocks: 60, totalPyqs: 15, iconUrl: 'https://sssb.punjab.gov.in/wp-content/themes/ssbtheme/images/punjab-gov.svg' },
+    { id: 'punjab-patwari', boardId: 'psssb', name: 'Revenue Patwari 2026', category: 'STATE', totalFullMocks: 45, totalPyqs: 10, iconUrl: stateEmblem },
+    { id: 'psssb-clerk', boardId: 'psssb', name: 'Subordinate Clerk (PSSSB)', category: 'STATE', totalFullMocks: 60, totalPyqs: 15, iconUrl: stateEmblem },
     { id: 'police-si', boardId: 'punjab-police', name: 'Sub-Inspector (Dist/Armed)', category: 'POLICE', totalFullMocks: 30, totalPyqs: 5, iconUrl: 'https://punjabpolice.gov.in/media/images/Logo_of_Punjab_Police_India.original.png' },
     { id: 'police-constable', boardId: 'punjab-police', name: 'Constable Recruitment', category: 'POLICE', totalFullMocks: 50, totalPyqs: 8, iconUrl: 'https://punjabpolice.gov.in/media/images/Logo_of_Punjab_Police_India.original.png' },
-    { id: 'ppsc-pcs', boardId: 'ppsc', name: 'PCS Executive Prelims', category: 'CIVIL', totalFullMocks: 20, totalPyqs: 12, iconUrl: 'https://static.pseb.ac.in/psebwebsite/front_assets/sites/default/files/inline-images/emblem.png' },
+    { id: 'ppsc-pcs', boardId: 'ppsc', name: 'PCS Executive Prelims', category: 'CIVIL', totalFullMocks: 20, totalPyqs: 12, iconUrl: stateEmblem },
     { id: 'pspcl-clerk', boardId: 'pspcl', name: 'PSPCL LDC / Clerk', category: 'STATE', totalFullMocks: 25, totalPyqs: 6, iconUrl: 'https://pspcl.in/assets/images/logo.png' },
     { id: 'court-clerk', boardId: 'high-court', name: 'Subordinate Court Clerk', category: 'JUDICIAL', totalFullMocks: 35, totalPyqs: 10, iconUrl: 'https://highcourtchd.gov.in/images/hc_logo.png' }
   ];
