@@ -2,13 +2,11 @@
 
 import { useExamStore } from '@/store/useExamStore';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
 import { useFirestore } from '@/firebase';
-import { cn } from '@/lib/utils';
 
 /**
  * @file Overview High-Fidelity Tactical Action Bar.
- * Reordered and styled to match the specific mobile screenshot layout.
+ * REFINED: Reordered buttons and set Save & Next to Orange per user request.
  */
 export default function TacticalFooter({ onSubmit }: { onSubmit: () => void }) {
   const currentIdx = useExamStore(s => s.currentIdx);
@@ -25,7 +23,7 @@ export default function TacticalFooter({ onSubmit }: { onSubmit: () => void }) {
       <Button 
         variant="outline" 
         onClick={() => markForReview(currentIdx, db)}
-        className="h-14 rounded-xl font-black uppercase text-[10px] tracking-tight border-slate-300 text-[#0F172A] bg-white active:scale-95"
+        className="h-14 rounded-xl font-black uppercase text-[10px] tracking-tight border-slate-300 text-[#0F172A] bg-white active:scale-95 shadow-sm"
       >
         Mark & Next
       </Button>
@@ -33,14 +31,14 @@ export default function TacticalFooter({ onSubmit }: { onSubmit: () => void }) {
       <Button 
         variant="outline" 
         onClick={() => clearAnswer(currentIdx, db)}
-        className="h-14 rounded-xl font-black uppercase text-[10px] tracking-tight border-slate-300 text-[#0F172A] bg-white active:scale-95"
+        className="h-14 rounded-xl font-black uppercase text-[10px] tracking-tight border-slate-300 text-[#0F172A] bg-white active:scale-95 shadow-sm"
       >
         Clear
       </Button>
 
       <Button 
         onClick={isLast ? onSubmit : () => saveAndNext(db)}
-        className="h-14 bg-[#2563EB] hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-tight shadow-xl shadow-blue-500/20 active:scale-95"
+        className="h-14 bg-[#F97316] hover:bg-orange-600 text-white rounded-xl font-black uppercase text-[10px] tracking-tight shadow-xl shadow-orange-500/20 active:scale-95 border-none"
       >
         {isLast ? 'Finish Test' : 'Save & Next'}
       </Button>
