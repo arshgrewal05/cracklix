@@ -38,7 +38,8 @@ import {
   LayoutGrid,
   FileBox,
   Target,
-  AlertTriangle
+  AlertTriangle,
+  ChevronDown
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
 import { collection, doc, setDoc, serverTimestamp, query, where, limit, getDocs, documentId } from "firebase/firestore"
@@ -83,9 +84,7 @@ function MockBuilderContent() {
   const [hideUsed, setHideUsed] = useState(true)
   const [bankFilter, setBankFilter] = useState({ 
     boardId: "all",
-    examId: "all",
-    subjectId: "all", 
-    search: "" 
+    subjectId: "all"
   })
 
   const [isPublishing, setIsPublishing] = useState(false)
@@ -171,14 +170,11 @@ function MockBuilderContent() {
     const allSelectedIds = sections.flatMap(s => s.questions.map(q => q.id));
     return questionBank.filter((q: any) => {
       const matchesBoard = bankFilter.boardId === "all" || q.boardId === bankFilter.boardId
-      const matchesExam = bankFilter.examId === "all" || q.examId === bankFilter.examId
-      const matchesSub = bankFilter.subjectId === "all" || q.subjectId === bankFilter.subjectId
-      const qText = (q.englishQuestion || q.questionEn || "").toLowerCase()
-      const matchesSearch = !bankFilter.search || qText.includes(bankFilter.search.toLowerCase())
+      const matchesSubject = bankFilter.subjectId === "all" || q.subjectId === bankFilter.subjectId
       const notAlreadySelected = !allSelectedIds.includes(q.id)
       const passesUsageCheck = !hideUsed || !usedQuestionIds.has(q.id);
 
-      return matchesBoard && matchesExam && matchesSub && matchesSearch && notAlreadySelected && passesUsageCheck
+      return matchesBoard && matchesSubject && notAlreadySelected && passesUsageCheck
     })
   }, [questionBank, bankFilter, sections, hideUsed, usedQuestionIds])
 
@@ -337,13 +333,20 @@ function MockBuilderContent() {
 
                  <TabsContent value="bank" className="p-8 md:p-10 flex-1 flex flex-col m-0 text-left">
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
-                       <div className="md:col-span-5 relative">
-                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                          <Input placeholder="Search bank nodes..." value={bankFilter.search} onChange={e => setBankFilter({...bankFilter, search: e.target.value})} className="h-12 pl-12 rounded-xl bg-slate-50 border-none font-bold text-[#0F172A]" />
+                       <div className="md:col-span-5">
+                          <Select value={bankFilter.subjectId} onValueChange={v => setBankFilter({...bankFilter, subjectId: v})}>
+                             <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs">
+                                <SelectValue placeholder="All Subjects" />
+                             </SelectTrigger>
+                             <SelectContent>
+                                <SelectItem value="all">All Subjects</SelectItem>
+                                {subjects?.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                             </SelectContent>
+                          </Select>
                        </div>
                        <div className="md:col-span-4">
                           <Select value={bankFilter.boardId} onValueChange={v => setBankFilter({...bankFilter, boardId: v})}>
-                             <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs"><SelectValue placeholder="Board Filter" /></SelectTrigger>
+                             <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-none font-bold text-xs"><SelectValue placeholder="All Boards" /></SelectTrigger>
                              <SelectContent>
                                 <SelectItem value="all">All Boards</SelectItem>
                                 {boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}
