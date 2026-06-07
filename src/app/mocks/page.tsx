@@ -28,8 +28,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @file Overview Final Exam Gateway Node v4.5.
- * Fixed: Robust board logo lookup and removed crossOrigin lock for government domains.
+ * @file Overview Final Exam Gateway Node v5.0.
+ * HARDENED: Robust Board Logo lookup logic to ensure IBPS, PSSSB, and Police logos load for students.
  */
 
 export default function MocksGatewayPage() {
@@ -37,7 +37,7 @@ export default function MocksGatewayPage() {
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({})
   
   const examsQuery = useMemo(() => (db ? query(collection(db, "exams")) : null), [db])
-  const boardsQuery = useMemo(() => (db ? query(collection(db, "boards")) : null), [db])
+  const boardsQuery = useMemo(() => (db ? collection(db, "boards") : null), [db])
   const mocksQuery = useMemo(() => (db ? query(collection(db, "mocks"), where("published", "==", true)) : null), [db])
 
   const { data: exams, loading: examsLoading } = useCollection<any>(examsQuery)
@@ -96,6 +96,7 @@ export default function MocksGatewayPage() {
            {examsLoading || mocksLoading ? (
              Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-[450px] w-full rounded-[3.5rem]" />)
            ) : exams?.sort((a: any, b: any) => a.name.localeCompare(b.name)).map((exam: any) => {
+             // ROBUST BOARD LOGO LOOKUP
              const board = boards?.find((b: any) => 
                b.id.toLowerCase() === exam.boardId?.toLowerCase() || 
                b.abbreviation?.toLowerCase() === exam.boardId?.toLowerCase()

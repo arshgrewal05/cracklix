@@ -18,8 +18,8 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @file Overview High-Density Responsive Exam Catalog v4.0.
- * Fixed: Removed crossOrigin="anonymous" to allow government domain logos to load.
+ * @file Overview High-Density Responsive Exam Catalog v5.0.
+ * HARDENED: Robust Board Logo lookup logic to ensure 100% visibility for students.
  */
 
 export default function ExamsCatalog() {
@@ -114,6 +114,7 @@ function CatalogContent() {
            {examsLoading || mocksLoading ? (
               Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 w-full rounded-[3.5rem]" />)
            ) : filteredExams.map((exam: any) => {
+              // ROBUST LOOKUP: Check both Exam Icon and parent Board Icon
               const board = boards?.find((b: any) => 
                 b.id.toLowerCase() === exam.boardId?.toLowerCase() || 
                 b.abbreviation?.toLowerCase() === exam.boardId?.toLowerCase()

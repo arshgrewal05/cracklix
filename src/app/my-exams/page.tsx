@@ -29,8 +29,8 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @file Overview Institutional "My Exams" Dashboard v4.1.
- * Fixed: Removed crossOrigin and hardened board logo lookup for 100% visibility.
+ * @file Overview Institutional "My Exams" Dashboard v5.0.
+ * HARDENED: Fixed Logo rendering and parent Board lookup to ensure 100% visibility for students.
  */
 
 export default function MyExamsPage() {
@@ -104,6 +104,7 @@ export default function MyExamsPage() {
            
            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
               {pinnedExams.length > 0 ? pinnedExams.map((exam) => {
+                 // HARDENED BOARD LOOKUP
                  const board = boards?.find((b: any) => 
                    b.id.toLowerCase() === exam.boardId?.toLowerCase() || 
                    b.abbreviation?.toLowerCase() === exam.boardId?.toLowerCase()

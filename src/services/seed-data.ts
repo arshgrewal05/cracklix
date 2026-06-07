@@ -2,9 +2,9 @@
 import { Firestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v27.0.
- * Features: Hardened Unique Hub Registry with PSSSB Expansion.
- * Updated: Official Punjab Police logo and PSSSB SVG integration.
+ * @fileOverview Institutional Seeding Engine v28.0.
+ * Features: Hardened Unique Hub Registry with IBPS & PSSSB Expansion.
+ * Updated: Official Punjab Police, PSSSB SVG, and IBPS PO/Clerk assets.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Cracklix Global Registry Sync...');
@@ -18,6 +18,7 @@ export async function seedInitialData(db: Firestore) {
   const pspclLogo = "https://pspcl.in/assets/images/logo.png";
   const anganwadiLogo = "https://sswcd.punjab.gov.in/sites/default/files/download.png";
   const punjabEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png";
+  const ibpsLogo = "https://careeravenues.info/wp-content/uploads/2023/05/Introduction.jpg";
 
   // 1. BOARDS REGISTRY (The Governing Bodies)
   const boards = [
@@ -28,7 +29,7 @@ export async function seedInitialData(db: Firestore) {
     { id: 'pspcl', abbreviation: 'PSPCL', name: 'Punjab State Power Corporation Ltd', region: 'Punjab', category: 'TECHNICAL_BOARD', iconUrl: pspclLogo },
     { id: 'high-court', abbreviation: 'COURT', name: 'Punjab & Haryana High Court (SSSC)', region: 'Punjab/Haryana', category: 'JUDICIAL_BOARD', iconUrl: courtEmblem },
     { id: 'army', abbreviation: 'ARMY', name: 'Indian Army Recruitment', region: 'National', category: 'CENTRAL_BOARD', iconUrl: armyEmblem },
-    { id: 'INDIAN-ARMY', abbreviation: 'ARMY', name: 'Indian Army Defense Node', region: 'National', category: 'DEFENCE_BOARD', iconUrl: armyEmblem },
+    { id: 'ibps', abbreviation: 'IBPS', name: 'Institute of Banking Personnel Selection', region: 'National', category: 'BANKING_BOARD', iconUrl: ibpsLogo },
     { id: 'education', abbreviation: 'EDUCATION', name: 'Education Recruitment Board Punjab', region: 'Punjab', category: 'TEACHING_BOARD', iconUrl: punjabEmblem }
   ];
 
@@ -46,6 +47,7 @@ export async function seedInitialData(db: Firestore) {
     { id: 'psssb-senior-assistant', boardId: 'psssb', name: 'Senior Assistant', category: 'STATE', description: 'High-fidelity mocks for Senior Assistant recruitment.', totalFullMocks: 15, iconUrl: psssbSvg },
     
     // Other Verticals
+    { id: 'ibps-po-clerk', boardId: 'ibps', name: 'IBPS PO / Clerk', category: 'BANKING', description: 'Complete mock series for Bank Probationary Officers and Clerical posts.', totalFullMocks: 40, iconUrl: ibpsLogo },
     { id: 'punjab-anganwadi', boardId: 'sswcd', name: 'Punjab Anganwadi / NTT', category: 'STATE', description: 'Official syllabus and preparation matrix for Supervisor and NTT posts.', totalFullMocks: 15, iconUrl: anganwadiLogo },
     { id: 'police-si', boardId: 'punjab-police', name: 'Sub-Inspector (Dist/Armed)', category: 'POLICE', description: 'District and Armed Cadre recruitment for Punjab Police.', totalFullMocks: 30, iconUrl: policeEmblem },
     { id: 'police-constable', boardId: 'punjab-police', name: 'Constable Recruitment', category: 'POLICE', description: 'Direct recruitment for Constable posts in Punjab Police.', totalFullMocks: 50, iconUrl: policeEmblem },
@@ -56,7 +58,7 @@ export async function seedInitialData(db: Firestore) {
     { id: 'master-cadre', boardId: 'education', name: 'Master Cadre', category: 'TEACHING', description: 'Subject-wise teacher recruitment for Punjab Government Schools.', totalFullMocks: 40, iconUrl: punjabEmblem },
     { id: 'lecturer-cadre', boardId: 'education', name: 'Lecturer Cadre', category: 'TEACHING', description: 'Group B lecturer recruitment for Senior Secondary Schools.', totalFullMocks: 35, iconUrl: punjabEmblem },
     { id: 'court-clerk', boardId: 'high-court', name: 'High Court Clerk', category: 'JUDICIAL', description: 'Subordinate Court clerical recruitment (SSSC).', totalFullMocks: 35, iconUrl: courtEmblem },
-    { id: 'indian-army', boardId: 'INDIAN-ARMY', name: 'Agniveer GD / Tech', category: 'CENTRAL', description: 'High-fidelity preparation series for Indian Army Agniveer.', totalFullMocks: 10, iconUrl: armyEmblem }
+    { id: 'indian-army', boardId: 'army', name: 'Agniveer GD / Tech', category: 'CENTRAL', description: 'High-fidelity preparation series for Indian Army Agniveer.', totalFullMocks: 10, iconUrl: armyEmblem }
   ];
 
   for (const e of exams) {
