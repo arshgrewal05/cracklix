@@ -1,4 +1,3 @@
-
 'use client';
 
 import { create } from 'zustand';
@@ -9,8 +8,8 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
- * @fileOverview Elite CBT Global Store v29.0 (Production Hardened).
- * FEATURES: Precision scoring, Pause-aware clock synchronization, and background sync hardening.
+ * @fileOverview Elite CBT Global Store v30.0 (Production Hardened).
+ * FIXED: Improved setPaused parameter handling and timer tick stability.
  */
 
 interface ExamStore extends AttemptState {
@@ -27,7 +26,7 @@ interface ExamStore extends AttemptState {
   // Actions
   initExam: (mockId: string, mockTitle: string, userId: string, questions: Question[], duration: number, savedState?: any, languageMode?: LanguageDisplayMode) => void;
   setLanguage: (lang: ExamLanguage | LanguageDisplayMode) => void;
-  setPaused: (paused: boolean) => void;
+  setPaused: (val: boolean) => void;
   setCurrentIdx: (idx: number) => void;
   setAnswer: (idx: number, optionIdx: number | null, db: any) => void;
   clearAnswer: (idx: number, db: any) => void;
@@ -61,8 +60,11 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
   initExam: (mockId, mockTitle, userId, questions, duration, savedState, languageMode) => {
     const now = Date.now();
-    const { language: currentLang } = get();
+    const state = get();
     
+    // Prevent double init if already active for same mock
+    if (state.mockId === mockId && state.questions.length > 0 && !savedState) return;
+
     const isCompleted = savedState?.status === 'COMPLETED';
     const isTimedOut = savedState?.endTime && now >= savedState.endTime;
     const isStale = isCompleted || isTimedOut;
@@ -78,7 +80,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       questions,
       timeLeft,
       baseLanguageMode: finalBaseMode,
-      language: (currentLang && currentLang !== '') ? currentLang : finalBaseMode, 
+      language: (state.language && state.language !== '') ? state.language : finalBaseMode, 
       startTime: isStale ? now : (savedState?.startTime || now),
       endTime: finalEndTime,
       answers: isStale ? {} : (savedState?.answers || {}),
@@ -106,14 +108,14 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
   setLanguage: (lang) => set({ language: lang }),
   
-  setPaused: (isPaused) => {
+  setPaused: (val) => {
     const { timeLeft, userId, mockId } = get();
     const now = Date.now();
     
-    if (!isPaused) {
+    if (!val) {
        // Resuming: Recalculate end time based on preserved time left
        const newEndTime = now + (timeLeft * 1000);
-       set({ isPaused, endTime: newEndTime });
+       set({ isPaused: false, endTime: newEndTime });
        
        if (userId && mockId) {
           const { firestore: db } = initializeFirebase();
@@ -123,7 +125,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
           }).catch(() => {});
        }
     } else {
-       set({ isPaused });
+       set({ isPaused: true });
     }
   },
 
