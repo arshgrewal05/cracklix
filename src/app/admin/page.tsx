@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -14,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 /**
  * @fileOverview Institutional Command Center.
- * Hardened: Verified Firestore instance checks to prevent runtime collection() errors.
+ * Hardened: Standard SDK-safe guards for Firestore instances.
  */
 
 export default function AdminDashboard() {
@@ -22,13 +21,13 @@ export default function AdminDashboard() {
   const { toast } = useToast()
   const [isSyncing, setIsSyncing] = useState(false)
 
-  const usersQuery = useMemo(() => (db && db.type === 'firestore' ? collection(db, "users") : null), [db])
-  const questionsQuery = useMemo(() => (db && db.type === 'firestore' ? collection(db, "questions") : null), [db])
-  const mocksQuery = useMemo(() => (db && db.type === 'firestore' ? collection(db, "mocks") : null), [db])
-  const subjectsQuery = useMemo(() => (db && db.type === 'firestore' ? collection(db, "subjects") : null), [db])
-  const examsQuery = useMemo(() => (db && db.type === 'firestore' ? collection(db, "exams") : null), [db])
-  const notesQuery = useMemo(() => (db && db.type === 'firestore' ? collection(db, "notes") : null), [db])
-  const pyqsQuery = useMemo(() => (db && db.type === 'firestore' ? collection(db, "pyqs") : null), [db])
+  const usersQuery = useMemo(() => (db ? collection(db, "users") : null), [db])
+  const questionsQuery = useMemo(() => (db ? collection(db, "questions") : null), [db])
+  const mocksQuery = useMemo(() => (db ? collection(db, "mocks") : null), [db])
+  const subjectsQuery = useMemo(() => (db ? collection(db, "subjects") : null), [db])
+  const examsQuery = useMemo(() => (db ? collection(db, "exams") : null), [db])
+  const notesQuery = useMemo(() => (db ? collection(db, "notes") : null), [db])
+  const pyqsQuery = useMemo(() => (db ? collection(db, "pyqs") : null), [db])
 
   const { data: users } = useCollection<any>(usersQuery)
   const { data: questions, loading: qLoading } = useCollection<any>(questionsQuery)
@@ -45,7 +44,7 @@ export default function AdminDashboard() {
     if (!questions) return [];
     const uniqueSubjectIds = Array.from(new Set(questions.map((q: any) => q.subjectId))).filter(Boolean);
     return uniqueSubjectIds.map(id => {
-       const subjectName = subjects?.find((s: any) => s.id === id)?.name || id.replace('-', ' ').toUpperCase();
+       const subjectName = subjects?.find((s: any) => s.id === id)?.name || id.replace(/-/g, ' ').toUpperCase();
        return { id, name: subjectName, count: questions.filter((q: any) => q.subjectId === id).length }
     }).sort((a, b) => b.count - a.count);
   }, [questions, subjects]);

@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Hardened Institutional Asset Ledger (Global Bank).
- * Fixed: Robust Firebase instance validation (removed HALLUCINATED .type checks).
+ * Fixed: Robust Firestore instance validation to prevent runtime errors.
  */
 
 export default function QuestionBank() {
