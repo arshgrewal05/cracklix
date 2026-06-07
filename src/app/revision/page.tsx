@@ -31,7 +31,7 @@ import Link from "next/link"
 
 /**
  * @fileOverview Institutional Revision & Preparation Hub.
- * Optimized: Removed Firestore orderBy to bypass composite index requirement.
+ * Simplified Language: Replaced 'Missed Nodes' with 'Wrong Answers'.
  */
 
 export default function RevisionHub() {
@@ -42,13 +42,11 @@ export default function RevisionHub() {
   const bookmarkQuery = useMemo(() => (db && user ? query(collection(db, "bookmarks"), where("userId", "==", user.uid)) : null), [db, user])
   const { data: bookmarks, loading: bLoading } = useCollection<any>(bookmarkQuery)
 
-  // Simplified query to bypass composite index requirement
   const resultsQuery = useMemo(() => (db && user ? query(collection(db, "results"), where("userId", "==", user.uid)) : null), [db, user])
   const { data: rawResults, loading: rLoading } = useCollection<any>(resultsQuery)
 
   const results = useMemo(() => {
     if (!rawResults) return []
-    // Client-side chronological sort
     return [...rawResults].sort((a: any, b: any) => {
       const tA = new Date(a.timestamp || 0).getTime()
       const tB = new Date(b.timestamp || 0).getTime()
@@ -56,7 +54,6 @@ export default function RevisionHub() {
     }).slice(0, 20)
   }, [rawResults])
 
-  // Smart logic to extract "Audit Failures" from recent results for revision
   const wrongAttempts = useMemo(() => {
     if (!results) return []
     const wrongs: any[] = []
@@ -64,7 +61,7 @@ export default function RevisionHub() {
       if (res.accuracy < 100) wrongs.push({
         id: res.id,
         mockId: res.mockId,
-        title: `Audit Miss in ${res.mockTitle}`,
+        title: `Missed in ${res.mockTitle}`,
         count: res.totalQuestions - res.score,
         date: new Date(res.timestamp).toLocaleDateString()
       })
@@ -87,20 +84,20 @@ export default function RevisionHub() {
             <div className="space-y-4 text-left">
               <div className="flex items-center gap-3">
                  <History className="h-5 w-5 text-primary" />
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Preparation Mastery Hub</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Preparation Center</span>
               </div>
               <h1 className="text-5xl md:text-7xl font-headline font-black text-[#0F172A] tracking-tight uppercase leading-[0.9]">
                 Revision <br/> <span className="text-primary">Mastery</span>
               </h1>
               <p className="text-slate-500 font-medium text-lg max-w-xl">
-                Registry for your saved items and missed concepts. Optimize your preparation trajectory for the 2026 cycle.
+                Review your saved items and fix your mistakes. Improve your performance for upcoming exams.
               </p>
             </div>
             <div className="relative w-full md:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input 
                 className="pl-12 h-14 rounded-2xl bg-white border-none shadow-xl shadow-slate-200/50 font-bold" 
-                placeholder="Search revision bank..." 
+                placeholder="Search saved items..." 
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
@@ -113,10 +110,10 @@ export default function RevisionHub() {
                    <Bookmark className="h-4 w-4" /> Bookmarks
                 </TabsTrigger>
                 <TabsTrigger value="wrong" className="rounded-xl px-8 font-black uppercase text-[10px] gap-2 h-full data-[state=active]:bg-[#0F172A] data-[state=active]:text-white">
-                   <AlertCircle className="h-4 w-4" /> Missed Nodes
+                   <AlertCircle className="h-4 w-4" /> Wrong Answers
                 </TabsTrigger>
                 <TabsTrigger value="starred" className="rounded-xl px-8 font-black uppercase text-[10px] gap-2 h-full data-[state=active]:bg-[#0F172A] data-[state=active]:text-white">
-                   <Star className="h-4 w-4" /> Critical
+                   <Star className="h-4 w-4" /> Important
                 </TabsTrigger>
              </TabsList>
 
@@ -132,7 +129,7 @@ export default function RevisionHub() {
                               <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase tracking-widest px-3">
                                  {b.subjectId || 'General Punjab Hub'}
                               </Badge>
-                              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Added {new Date(b.timestamp).toLocaleDateString()}</span>
+                              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Saved {new Date(b.timestamp).toLocaleDateString()}</span>
                            </div>
                            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-rose-500 hover:bg-rose-50 opacity-20 group-hover:opacity-100 transition-opacity">
                               <Trash2 className="h-5 w-5" />
@@ -149,7 +146,7 @@ export default function RevisionHub() {
                                  <Languages className="h-4 w-4" /> Bilingual
                               </Button>
                               <Button variant="ghost" className="text-primary font-black uppercase text-[10px] gap-2">
-                                 <BrainCircuit className="h-4 w-4" /> AI Rationale
+                                 <BrainCircuit className="h-4 w-4" /> View Solution
                               </Button>
                            </div>
                            <Button variant="ghost" className="h-12 w-12 rounded-2xl bg-slate-50 hover:bg-primary hover:text-white transition-all shadow-sm">
@@ -160,7 +157,7 @@ export default function RevisionHub() {
                     </Card>
                   ))
                 ) : (
-                  <EmptyRevision icon={<Bookmark />} title="No Bookmarks Detected" desc="Save high-fidelity questions during mocks to revise them later." />
+                  <EmptyRevision icon={<Bookmark />} title="No Bookmarks Found" desc="Save questions during your tests to revise them later." />
                 )}
              </TabsContent>
 
@@ -177,22 +174,22 @@ export default function RevisionHub() {
                              </div>
                              <div>
                                 <h3 className="text-xl font-headline font-black text-[#0F172A] uppercase leading-tight">{w.title}</h3>
-                                <p className="text-[11px] font-black text-slate-400 mt-1 uppercase tracking-widest">{w.count} Incorrect Audit Choices • {w.date}</p>
+                                <p className="text-[11px] font-black text-slate-400 mt-1 uppercase tracking-widest">{w.count} Incorrect Answers • {w.date}</p>
                              </div>
                           </div>
                           <Button asChild className="bg-[#0F172A] hover:bg-black text-white h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-3 shadow-xl shadow-slate-200">
-                             <Link href={`/results/${w.mockId}`}>Audit Failures <ChevronRight className="h-4 w-4" /></Link>
+                             <Link href={`/results/${w.mockId}`}>View Mistakes <ChevronRight className="h-4 w-4" /></Link>
                           </Button>
                        </CardContent>
                     </Card>
                   ))
                 ) : (
-                  <EmptyRevision icon={<GraduationCap className="text-emerald-500" />} title="Perfect Audit Registry" desc="No missed nodes detected in your recent history. Excellence verified." />
+                  <EmptyRevision icon={<GraduationCap className="text-emerald-500" />} title="Perfect Performance" desc="You haven't missed any questions recently. Great job!" />
                 )}
              </TabsContent>
 
              <TabsContent value="starred">
-                <EmptyRevision icon={<Star />} title="Priority Matrix Empty" desc="Tag critical items as high-priority to build your custom revision strategy." />
+                <EmptyRevision icon={<Star />} title="Nothing Highlighted" desc="Mark important items as critical to build your custom study list." />
              </TabsContent>
           </Tabs>
         </div>

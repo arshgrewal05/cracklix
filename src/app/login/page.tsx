@@ -26,8 +26,8 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 
 /**
- * @fileOverview Login & Sign Up Hub v1.7.
- * UPDATED: Profile setup is now optional; users redirect to dashboard immediately.
+ * @fileOverview Login & Sign Up Hub.
+ * Simplified Language: Replaced technical terms like 'Node Transmitted' with 'Email Sent'.
  */
 
 export default function LoginPage() {
@@ -128,13 +128,13 @@ function LoginContent() {
     try {
       await sendPasswordResetEmail(auth, resetEmail);
       toast({ 
-        title: "Reset Node Transmitted", 
-        description: "Please check your inbox (and spam) for password reset instructions." 
+        title: "Reset Link Sent", 
+        description: "Please check your inbox for password reset instructions." 
       });
       setIsResetDialogOpen(false);
       setResetEmail("");
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Sync Failed", description: error.message });
+      toast({ variant: "destructive", title: "Failed to Send", description: error.message });
     } finally {
       setResetLoading(false);
     }
@@ -225,7 +225,7 @@ function LoginContent() {
             </div>
             <DialogTitle className="text-2xl font-headline font-black uppercase tracking-tight">Recover Account</DialogTitle>
             <DialogDescription className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">
-              ENTER YOUR EMAIL TO RECEIVE A RESET LINK IN YOUR REGISTRY.
+              ENTER YOUR EMAIL TO RECEIVE A RESET LINK IN YOUR INBOX.
             </DialogDescription>
           </DialogHeader>
           <div className="py-8 space-y-6">
@@ -246,7 +246,7 @@ function LoginContent() {
                disabled={resetLoading}
                className="w-full h-14 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-widest text-[11px] rounded-xl shadow-2xl transition-all"
              >
-               {resetLoading ? "Processing..." : "Transmit Reset Link"}
+               {resetLoading ? "Sending..." : "Send Reset Link"}
              </Button>
           </DialogFooter>
         </DialogContent>

@@ -12,8 +12,8 @@ import { PlaceHolderImages } from "@/lib/placeholder-images"
 import { Badge } from "@/components/ui/badge"
 
 /**
- * @fileOverview Institutional About Hub v3.0.
- * Features: Dedicated Founder & Developer profile for Arsh Grewal.
+ * @fileOverview Institutional About Hub v3.1.
+ * Simplified Language: Replaced 'Accuracy Node' with 'Accuracy Rate'.
  */
 
 export default function AboutPage() {
@@ -34,7 +34,7 @@ export default function AboutPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-primary font-black uppercase tracking-[0.2em] text-[10px]"
                  >
-                    Institutional Origin
+                    Our Origin
                  </motion.span>
                  <motion.h1 
                     initial={{ opacity: 0, y: 20 }}
@@ -51,7 +51,7 @@ export default function AboutPage() {
                     transition={{ delay: 0.2 }}
                     className="text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto font-medium"
                  >
-                    Cracklix is Punjab's most trusted and high-fidelity government exam preparation platform, built with technical precision and institutional integrity.
+                    Cracklix is Punjab's most trusted government exam preparation platform, built for quality and student success.
                  </motion.p>
               </div>
            </div>
@@ -70,7 +70,7 @@ export default function AboutPage() {
                     />
                     <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="absolute bottom-10 left-10 z-10 flex flex-col gap-2">
-                       <Badge className="bg-primary text-white border-none px-4 py-1 rounded-lg font-black uppercase text-[10px] tracking-widest w-fit shadow-xl">Lead Architect</Badge>
+                       <Badge className="bg-primary text-white border-none px-4 py-1 rounded-lg font-black uppercase text-[10px] tracking-widest w-fit shadow-xl">Lead Developer</Badge>
                        <p className="text-white font-headline font-black text-4xl uppercase tracking-tight">Arsh Grewal</p>
                     </div>
                  </div>
@@ -80,12 +80,12 @@ export default function AboutPage() {
                           <Shield className="text-primary h-8 w-8" />
                        </div>
                        <div className="space-y-1">
-                          <p className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">Registry Authority</p>
+                          <p className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">Preparation Authority</p>
                           <h3 className="text-2xl font-headline font-black text-white uppercase">The Founder's Mission</h3>
                        </div>
                     </div>
                     <blockquote className="text-2xl md:text-3xl text-slate-300 font-headline font-medium leading-tight italic antialiased border-l-4 border-primary pl-8">
-                       "I developed Cracklix because I saw aspirants struggling with outdated patterns and low-fidelity materials. My mission is to provide the fastest, cleanest, and most accurate evaluation experience for my fellow Punjab students."
+                       "I developed Cracklix because I saw aspirants struggling with outdated patterns and low-quality materials. My mission is to provide the cleanest and most accurate preparation experience for my fellow students."
                     </blockquote>
                     <div className="pt-8 border-t border-white/5 flex items-center gap-10">
                        <div className="text-left">
@@ -113,17 +113,17 @@ export default function AboutPage() {
                  <VisionCard 
                     icon={<Target className="text-primary h-8 w-8" />} 
                     title="Precision" 
-                    desc="Every mock test is designed by our team to mirror the exact patterns of PSSSB, PPSC, and Punjab Police boards." 
+                    desc="Every mock test is designed to mirror the exact patterns of PSSSB, PPSC, and Punjab Police boards." 
                  />
                  <VisionCard 
                     icon={<Code className="text-blue-500 h-8 w-8" />} 
-                    title="Engineering" 
-                    desc="Our platform is engineered for zero-lag performance, ensuring your preparation is never interrupted by technical failures." 
+                    title="Technology" 
+                    desc="Our platform is engineered for zero-lag performance, ensuring your preparation is never interrupted." 
                  />
                  <VisionCard 
                     icon={<ShieldCheck className="text-emerald-500 h-8 w-8" />} 
-                    title="Authenticity" 
-                    desc="We utilize only verified official answer keys and expert rationalizations to ensure zero misinformation across our registry." 
+                    title="Trust" 
+                    desc="We utilize only verified official answer keys and expert solutions to ensure high quality." 
                  />
               </div>
            </div>
@@ -133,10 +133,10 @@ export default function AboutPage() {
         <section className="py-32 bg-[#0F172A] text-white">
            <div className="container mx-auto px-6 max-w-7xl">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-16 text-center">
-                 <StatNode icon={<UserCheck className="text-primary" />} val="15,000+" label="Active Aspirants" />
-                 <StatNode icon={<Flame className="text-orange-500" />} val="1M+" label="MCQs Attempted" />
+                 <StatNode icon={<UserCheck className="text-primary" />} val="15,000+" label="Active Students" />
+                 <StatNode icon={<Flame className="text-orange-500" />} val="1M+" label="MCQs Solved" />
                  <StatNode icon={<Globe className="text-blue-400" />} val="22" label="Districts Covered" />
-                 <StatNode icon={<Target className="text-emerald-500" />} val="94%" label="Accuracy Node" />
+                 <StatNode icon={<Target className="text-emerald-500" />} val="94%" label="Accuracy Rate" />
               </div>
            </div>
         </section>
@@ -148,7 +148,7 @@ export default function AboutPage() {
            </div>
            <div className="container mx-auto px-6 text-center space-y-10 relative z-10">
               <h2 className="text-5xl md:text-8xl font-headline font-black uppercase leading-[0.85] tracking-tighter">Ready to start <br/> your journey?</h2>
-              <p className="text-white/80 max-w-xl mx-auto text-xl font-medium">Join the thousands of aspirants already preparing with Cracklix's institutional grade mock series.</p>
+              <p className="text-white/80 max-w-xl mx-auto text-xl font-medium">Join thousands of aspirants already preparing with Cracklix's verified mock series.</p>
               <div className="flex justify-center gap-4">
                  <Button asChild className="bg-white text-primary hover:bg-slate-100 font-black px-12 h-20 rounded-3xl uppercase tracking-widest text-xs shadow-4xl">
                     <Link href="/mocks">Start Free Mock <ArrowRight className="ml-2 h-5 w-5" /></Link>

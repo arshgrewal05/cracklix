@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState, useEffect } from "react"
@@ -38,7 +39,7 @@ import ShareButton from "@/components/navigation/ShareButton"
 
 /**
  * @fileOverview Student Dashboard.
- * Simplified Language: Replaced technical jargon with clear words.
+ * Simplified Language: Replaced 'Node' with 'Item' and 'Audit' with 'Check'.
  */
 
 export default function StudentDashboard() {
@@ -128,14 +129,14 @@ export default function StudentDashboard() {
 
               {/* METRICS */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-                 <MetricNode label="PREPARATION SCORE" val={`${stats.readiness}%`} icon={<TrendingUp className="text-primary h-4 w-4" />} />
-                 <MetricNode label="AVG ACCURACY" val={`${stats.avgAccuracy}%`} icon={<Target className="text-emerald-500 h-4 w-4" />} />
-                 <MetricNode label="TESTS DONE" val={stats.total} icon={<ClipboardList className="text-blue-500 h-4 w-4" />} />
-                 <MetricNode label="TIME SPENT" val={stats.hours} icon={<Clock className="text-amber-500 h-4 w-4" />} />
+                 <MetricItem label="PREPARATION SCORE" val={`${stats.readiness}%`} icon={<TrendingUp className="text-primary h-4 w-4" />} />
+                 <MetricItem label="AVG ACCURACY" val={`${stats.avgAccuracy}%`} icon={<Target className="text-emerald-500 h-4 w-4" />} />
+                 <MetricItem label="TESTS DONE" val={stats.total} icon={<ClipboardList className="text-blue-500 h-4 w-4" />} />
+                 <MetricItem label="TIME SPENT" val={stats.hours} icon={<Clock className="text-amber-500 h-4 w-4" />} />
               </div>
 
               {/* RECENT TESTS */}
-              <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden text-left border border-slate-50">
+              <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden text-left border border-slate-100">
                  <CardHeader className="p-8 md:p-12 border-b border-slate-50 bg-slate-50/50 flex flex-row items-center justify-between">
                     <div className="space-y-1">
                        <h3 className="font-headline text-xl md:text-2xl font-black text-[#0F172A] uppercase">Recent Tests</h3>
@@ -234,7 +235,7 @@ export default function StudentDashboard() {
   )
 }
 
-function MetricNode({ label, val, icon }: any) {
+function MetricItem({ label, val, icon }: any) {
   return (
     <Card className="border-none shadow-xl bg-white p-6 md:p-8 rounded-[2.5rem] text-left group hover:translate-y-[-4px] transition-all border border-slate-50">
       <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 group-hover:bg-primary/5 transition-all shadow-inner border border-slate-100">

@@ -15,8 +15,8 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Elite Global Search Hub v5.0.
- * UPDATED: Removed Strategic Analysis matching logic.
+ * @fileOverview Elite Global Search Hub.
+ * Simplified Language: Replaced 'Node Not Found' with 'No Hub Found'.
  */
 
 export default function SearchPage() {
@@ -37,7 +37,6 @@ function SearchContent() {
     if (q) setQuery(q)
   }, [searchParams])
 
-  // Aggregate Registry Nodes
   const { data: mocks, loading: mLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]))
   const { data: exams, loading: eLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
   const { data: notes, loading: nLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "notes") : null), [db]))
@@ -51,17 +50,17 @@ function SearchContent() {
     const examMatches = (exams || []).filter(e => 
       e.name?.toLowerCase().includes(term) || 
       e.boardId?.toLowerCase().includes(term)
-    ).map(e => ({ title: e.name, type: "Recruitment Hub", href: `/exams/${e.id}`, icon: <ShieldCheck className="text-primary" /> }))
+    ).map(e => ({ title: e.name, type: "Exam Hub", href: `/exams/${e.id}`, icon: <ShieldCheck className="text-primary" /> }))
 
     const mockMatches = (mocks || []).filter(m => 
       m.title?.toLowerCase().includes(term) || 
       m.boardId?.toLowerCase().includes(term)
-    ).map(m => ({ title: m.title, type: "Mock Series", href: `/mocks/${m.id}`, icon: <Zap className="text-orange-500" /> }))
+    ).map(m => ({ title: m.title, type: "Practice Test", href: `/mocks/${m.id}`, icon: <Zap className="text-orange-500" /> }))
 
     const notesMatches = (notes || []).filter(n => 
        n.title?.toLowerCase().includes(term) || 
        n.subjectId?.toLowerCase().includes(term)
-    ).map(n => ({ title: n.title, type: "PDF Blueprint", href: `/notes`, icon: <FileText className="text-blue-500" /> }))
+    ).map(n => ({ title: n.title, type: "Study PDF", href: `/notes`, icon: <FileText className="text-blue-500" /> }))
 
     return [...examMatches, ...mockMatches, ...notesMatches]
   }, [query, exams, mocks, notes])
@@ -74,8 +73,8 @@ function SearchContent() {
            
            <div className="text-center space-y-8">
               <div className="space-y-3">
-                 <h1 className="text-4xl md:text-7xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">Global <span className="text-primary">Registry</span></h1>
-                 <p className="text-slate-400 font-bold uppercase text-[10px] md:text-xs tracking-[0.4em]">Optimized Institutional Search Node</p>
+                 <h1 className="text-4xl md:text-7xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">Global <span className="text-primary">Search</span></h1>
+                 <p className="text-slate-400 font-bold uppercase text-[10px] md:text-xs tracking-[0.4em]">Find your preparation hub instantly</p>
               </div>
               
               <div className="relative max-w-3xl mx-auto group">
@@ -87,7 +86,7 @@ function SearchContent() {
                       onChange={e => setQuery(e.target.value)}
                       autoFocus
                       className="h-16 md:h-24 pl-16 pr-8 text-lg md:text-3xl rounded-[2rem] border-none shadow-3xl bg-white focus-visible:ring-primary text-[#0F172A] font-bold" 
-                      placeholder="Search recruitment hubs..." 
+                      placeholder="Search exams, tests, or notes..." 
                     />
                     {isLoading && <Loader2 className="absolute right-8 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-100 animate-spin" />}
                  </div>
@@ -98,7 +97,7 @@ function SearchContent() {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">RESULTS: {results.length}</h3>
-                    <Badge className="bg-primary/5 text-primary border-none text-[10px] font-black px-4 py-1 rounded-lg uppercase">Real-Time Registry Index</Badge>
+                    <Badge className="bg-primary/5 text-primary border-none text-[10px] font-black px-4 py-1 rounded-lg uppercase">Live Index</Badge>
                  </div>
                  <div className="grid grid-cols-1 gap-4">
                     {results.length > 0 ? results.map((res, i) => (
@@ -107,8 +106,8 @@ function SearchContent() {
                       <div className="text-center py-32 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 shadow-inner">
                         <div className="space-y-4 opacity-20 flex flex-col items-center">
                            <SearchIcon className="h-12 w-12" />
-                           <p className="font-headline font-black uppercase text-xl">Node Not Found</p>
-                           <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Try "Patwari", "Police" or "English"</p>
+                           <p className="font-headline font-black uppercase text-xl">No Results Found</p>
+                           <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Try searching "Patwari", "Police" or "English"</p>
                         </div>
                       </div>
                     )}
@@ -119,24 +118,23 @@ function SearchContent() {
                  <Card className="border-none shadow-4xl rounded-[3rem] p-10 bg-[#0B1528] text-white overflow-hidden relative group">
                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><LayoutGrid className="h-40 w-40" /></div>
                     <div className="relative z-10 space-y-8">
-                       <h4 className="font-headline font-black text-xs text-primary uppercase tracking-[0.3em]">Trending Matrix</h4>
+                       <h4 className="font-headline font-black text-xs text-primary uppercase tracking-[0.3em]">Quick Search</h4>
                        <ul className="space-y-5">
-                          <TrendingItem text="PSSSB Patwari 2026 Registry" onSelect={setQuery} />
-                          <TrendingItem text="Punjab Police SI Syllabus" onSelect={setQuery} />
-                          <TrendingItem text="Bilingual Mental Ability Mocks" onSelect={setQuery} />
-                          <TrendingItem text="Official PYQ Repository" onSelect={setQuery} />
+                          <TrendingItem text="PSSSB Patwari Hub" onSelect={setQuery} />
+                          <TrendingItem text="Punjab Police SI Prep" onSelect={setQuery} />
+                          <TrendingItem text="Mental Ability Tests" onSelect={setQuery} />
+                          <TrendingItem text="Official Previous Papers" onSelect={setQuery} />
                        </ul>
                     </div>
                  </Card>
                  <Card className="border-none shadow-4xl rounded-[3rem] p-10 bg-white group overflow-hidden border border-slate-100">
                     <div className="relative z-10 space-y-8">
-                       <h4 className="font-headline font-black text-xs text-slate-400 uppercase tracking-[0.3em]">Active Registry Modules</h4>
+                       <h4 className="font-headline font-black text-xs text-slate-400 uppercase tracking-[0.3em]">Preparation Hubs</h4>
                        <div className="flex flex-wrap gap-3">
-                          <SearchBadge label="Agniveer Hub" />
-                          <SearchBadge label="Master Cadre" />
-                          <SearchBadge label="Pass Registry" />
-                          <SearchBadge label="State Ranks" />
-                          <SearchBadge label="Audit Queue" />
+                          <SearchBadge label="Army Hub" />
+                          <SearchBadge label="Teaching" />
+                          <SearchBadge label="Elite Pass" />
+                          <SearchBadge label="Leaderboard" />
                        </div>
                     </div>
                  </Card>
@@ -162,7 +160,7 @@ function SearchResultItem({ icon, title, category, href }: any) {
                   <div className="flex items-center gap-3">
                      <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{category}</span>
                      <div className="h-1 w-1 rounded-full bg-slate-200" />
-                     <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Live Hub</span>
+                     <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Live</span>
                   </div>
                </div>
             </div>

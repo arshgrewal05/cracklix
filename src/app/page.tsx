@@ -13,6 +13,11 @@ import { useCollection, useFirestore } from "@/firebase";
 import { collection } from "firebase/firestore";
 import { BookOpen, Zap, Users, Target } from "lucide-react";
 
+/**
+ * @fileOverview Institutional Landing Hub.
+ * Simplified Language: Replaced 'TrustNode' with 'TrustCard'.
+ */
+
 export default function HomePage() {
   const db = useFirestore();
 
@@ -37,10 +42,10 @@ export default function HomePage() {
       <section className="bg-white py-4 md:py-12 border-b border-slate-50">
          <div className="container mx-auto px-4 max-w-7xl">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-10">
-               <TrustNode icon={<BookOpen className="text-primary h-4 w-4 md:h-6 md:w-6" />} label="MCQ Bank" val={formattedQCount} />
-               <TrustNode icon={<Zap className="text-blue-500 h-4 w-4 md:h-6 md:w-6" />} label="Mocks Live" val={mocks?.length || "0"} />
-               <TrustNode icon={<Users className="text-emerald-500 h-4 w-4 md:h-6 md:w-6" />} label="Aspirants" val={users?.length ? users.length.toLocaleString() : "0"} />
-               <TrustNode icon={<Target className="text-amber-500 h-4 w-4 md:h-6 md:w-6" />} label="Avg Accuracy" val="94%" />
+               <TrustCard icon={<BookOpen className="text-primary h-4 w-4 md:h-6 md:w-6" />} label="MCQ Bank" val={formattedQCount} />
+               <TrustCard icon={<Zap className="text-blue-500 h-4 w-4 md:h-6 md:w-6" />} label="Mocks Live" val={mocks?.length || "0"} />
+               <TrustCard icon={<Users className="text-emerald-500 h-4 w-4 md:h-6 md:w-6" />} label="Aspirants" val={users?.length ? users.length.toLocaleString() : "0"} />
+               <TrustCard icon={<Target className="text-amber-500 h-4 w-4 md:h-6 md:w-6" />} label="Avg Accuracy" val="94%" />
             </div>
          </div>
       </section>
@@ -57,7 +62,7 @@ export default function HomePage() {
   );
 }
 
-function TrustNode({ icon, label, val }: any) {
+function TrustCard({ icon, label, val }: any) {
    return (
       <div className="flex items-center gap-3 p-3 md:p-6 rounded-2xl bg-slate-50/50 border border-slate-50 transition-all hover:bg-white hover:shadow-xl">
          <div className="h-8 w-8 md:h-14 md:w-14 rounded-xl bg-white flex items-center justify-center shrink-0 border border-slate-100 shadow-sm">{icon}</div>

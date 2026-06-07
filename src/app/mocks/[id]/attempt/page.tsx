@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -26,8 +27,8 @@ import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
 /**
- * @fileOverview Production Hardened CBT Attempt Engine v35.0.
- * FIXED: Palette width increased to 85vw for mobile to prevent text clipping.
+ * @fileOverview Production Hardened CBT Attempt Engine v35.1.
+ * Simplified Language: Replaced 'Synchronizing Nodes' with 'Loading Questions'.
  */
 
 export default function MockAttemptPage() {
@@ -78,7 +79,7 @@ export default function MockAttemptPage() {
       if (!db || !user || !mockId) return;
       try {
         const mockSnap = await getDoc(doc(db, "mocks", mockId));
-        if (!mockSnap.exists()) throw new Error("Mock series not found in registry.");
+        if (!mockSnap.exists()) throw new Error("Test series not found.");
         const mData = mockSnap.data();
         setMockData(mData);
 
@@ -112,7 +113,7 @@ export default function MockAttemptPage() {
            });
         }
 
-        if (sortedQs.length === 0) throw new Error("Question bank nodes empty.");
+        if (sortedQs.length === 0) throw new Error("Question bank is currently empty.");
 
         const attemptRef = doc(db, "attempts", `${user.uid}_${mockId}`);
         const attemptSnap = await getDoc(attemptRef);
@@ -120,7 +121,7 @@ export default function MockAttemptPage() {
 
         initExam(mockId, mData.title || "Elite Series", user.uid, sortedQs, mData.duration || 120, savedState, mData.languageMode);
       } catch (err: any) {
-        toast({ variant: "destructive", title: "Assessment Blocked", description: err.message });
+        toast({ variant: "destructive", title: "Test Blocked", description: err.message });
         router.push(`/mocks/${mockId}`);
       } finally {
         setIsInitializing(false);
@@ -182,7 +183,7 @@ export default function MockAttemptPage() {
     try {
       await setDoc(resultRef, resultPayload);
       await updateDoc(attemptRef, { status: 'COMPLETED', updatedAt: serverTimestamp() });
-      toast({ title: "Assessment Synchronized", description: "Your results have been securely recorded." });
+      toast({ title: "Results Saved", description: "Your test results have been recorded." });
       router.push(`/results/${mockId}`);
     } catch (err: any) {
       errorEmitter.emit('permission-error', new FirestorePermissionError({ path: resultRef.path, operation: 'create' }));
@@ -193,7 +194,7 @@ export default function MockAttemptPage() {
   if (isInitializing) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0B1528] space-y-8">
        <Zap className="h-16 w-16 text-primary animate-pulse" />
-       <p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Synchronizing Nodes...</p>
+       <p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Loading Questions...</p>
     </div>
   );
 
@@ -217,10 +218,10 @@ export default function MockAttemptPage() {
                     <Play className="h-10 w-10 fill-current" />
                  </div>
                  <div className="space-y-2">
-                    <h2 className="text-2xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Attempt Paused</h2>
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Time Node Locked</p>
+                    <h2 className="text-2xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Test Paused</h2>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Timer Stopped</p>
                  </div>
-                 <Button onClick={() => setPaused(false)} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-3xl">Resume Assessment</Button>
+                 <Button onClick={() => setPaused(false)} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-3xl">Resume Test</Button>
               </div>
             </motion.div>
           )}
@@ -248,7 +249,7 @@ export default function MockAttemptPage() {
                  ) : (
                    <div className="p-20 text-center opacity-20">
                       <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4" />
-                      <p className="text-[10px] font-black uppercase">Loading node...</p>
+                      <p className="text-[10px] font-black uppercase">Loading...</p>
                    </div>
                  )}
                  <TacticalFooter onSubmit={() => setShowSubmitModal(true)} />
@@ -263,7 +264,7 @@ export default function MockAttemptPage() {
           className="p-0 border-none overflow-hidden shadow-5xl w-[85vw] md:w-[400px] h-full"
         >
           <SheetHeader className="sr-only">
-             <SheetTitle>Registry Palette</SheetTitle>
+             <SheetTitle>Question Map</SheetTitle>
           </SheetHeader>
           <QuestionPalette onSelect={(idx) => { useExamStore.getState().setCurrentIdx(idx); setIsPaletteOpen(false); }} onSubmit={() => setShowSubmitModal(true)} />
         </SheetContent>
@@ -276,8 +277,8 @@ export default function MockAttemptPage() {
                   <LogOut className="h-8 w-8" />
                </div>
                <div className="space-y-3">
-                  <DialogTitle className="text-3xl font-headline font-black uppercase text-[#0F172A] tracking-tight">Pause Assessment?</DialogTitle>
-                  <p className="text-sm font-bold text-slate-400 leading-relaxed uppercase tracking-tight">Your current state will be safely cached. You can resume later.</p>
+                  <DialogTitle className="text-3xl font-headline font-black uppercase text-[#0F172A] tracking-tight">Pause Test?</DialogTitle>
+                  <p className="text-sm font-bold text-slate-400 leading-relaxed uppercase tracking-tight">Your progress will be saved. You can resume later from the dashboard.</p>
                </div>
                <div className="flex gap-4 pt-4">
                   <Button variant="ghost" onClick={() => setShowExitModal(false)} className="flex-1 h-16 rounded-xl font-black uppercase text-[11px] text-[#0F172A] tracking-widest hover:bg-slate-50">Cancel</Button>
@@ -288,7 +289,7 @@ export default function MockAttemptPage() {
                     }}
                     className="flex-1 h-16 bg-[#F97316] hover:bg-orange-600 text-white rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-orange-500/20 transition-all border-none"
                   >
-                     Yes, Pause
+                     Yes, Save & Exit
                   </Button>
                </div>
             </div>
@@ -302,11 +303,11 @@ export default function MockAttemptPage() {
                   <ShieldCheck className="h-12 w-12" />
                </div>
                <div className="space-y-3">
-                  <DialogTitle className="text-3xl font-headline font-black uppercase text-white tracking-tight">Submit Test</DialogTitle>
-                  <p className="text-slate-400 font-medium leading-relaxed">Are you sure you want to commit your answers? This node will be locked for evaluation.</p>
+                  <DialogTitle className="text-3xl font-headline font-black uppercase text-white tracking-tight">Finish Test</DialogTitle>
+                  <p className="text-slate-400 font-medium leading-relaxed">Are you sure you want to submit? Your answers will be locked for grading.</p>
                </div>
                <div className="flex gap-4 pt-4">
-                  <Button variant="ghost" onClick={() => setShowSubmitModal(false)} disabled={isSubmittingFinal} className="flex-1 h-16 rounded-2xl text-slate-500 hover:text-white font-black uppercase text-[10px] tracking-widest">Cancel</Button>
+                  <Button variant="ghost" onClick={() => setShowSubmitModal(false)} disabled={isSubmittingFinal} className="flex-1 h-16 rounded-2xl text-slate-500 hover:text-white font-black uppercase text-[10px] tracking-widest">Go Back</Button>
                   <Button 
                      onClick={handleSubmitFinal}
                      disabled={isSubmittingFinal}

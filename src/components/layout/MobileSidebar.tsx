@@ -33,8 +33,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Institutional Dark Sidebar v15.0.
- * UPDATED: Consolidated Study Materials and PYQs into "Free Hub".
+ * @fileOverview Institutional Sidebar.
+ * Simplified Language: Replaced 'Aspirant Node' with 'My Account'.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -51,7 +51,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
     router.push('/');
   };
 
-  const shareText = "Prepare for Punjab Government Exams (PSSSB, PPSC, Police) with Cracklix. Join 15,000+ aspirants today!";
+  const shareText = "Prepare for Punjab Government Exams with Cracklix. Join 15,000+ students today!";
   const shareUrl = typeof window !== 'undefined' ? window.location.origin : 'https://cracklix.com';
 
   const shareOptions = [
@@ -76,20 +76,20 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   ];
 
   const menuItems = [
-    { label: "My Exams Hub", href: "/my-exams", icon: Target },
-    { label: "Home Registry", href: "/", icon: Home },
+    { label: "My Exam Dashboard", href: "/my-exams", icon: Target },
+    { label: "Home Page", href: "/", icon: Home },
     { label: "Elite Pass Hub", href: "/pass", icon: Gem, badge: "ACTIVATE" },
-    { label: "Test Series", href: "/mocks", icon: Zap },
-    { label: "Free Hub", href: "/current-affairs", icon: Sparkles },
-    { label: "Share CRACKLIX", icon: Share2, onClick: () => setIsShareOpen(true) },
-    { label: "Ask Arsh Grewal", href: "/contact", icon: MessageCircleQuestion },
+    { label: "Practice Tests", href: "/mocks", icon: Zap },
+    { label: "The Free Hub", href: "/current-affairs", icon: Sparkles },
+    { label: "Share Cracklix", icon: Share2, onClick: () => setIsShareOpen(true) },
+    { label: "Help & Support", href: "/contact", icon: MessageCircleQuestion },
   ];
 
   return (
     <>
       <div className="flex flex-col h-full bg-[#0F172A] text-white overflow-y-auto no-scrollbar font-body w-full select-none">
         
-        {/* 1. PROFILE NODE (Institutional Dark) */}
+        {/* 1. PROFILE SECTION */}
         <div className="bg-[#0B1528] px-6 pt-24 pb-10 flex flex-col gap-6 relative overflow-hidden border-b border-white/5 shrink-0">
           <div className="absolute top-0 right-0 p-8 opacity-5"><ShieldCheck className="h-40 w-40" /></div>
           
@@ -106,7 +106,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
              
              <div className="flex-1 min-w-0 text-left">
                 <h2 className="text-lg font-black text-white leading-tight mb-1 uppercase tracking-tight break-words max-w-full">
-                   {profile?.name || "Aspirant Node"}
+                   {profile?.name || "Student"}
                 </h2>
                 <div className="flex items-center gap-2">
                    <span className="bg-primary text-white border-none px-2 py-0.5 rounded-md font-black uppercase text-[7px] tracking-widest shadow-lg">
@@ -123,13 +123,13 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
           >
             <div className="flex items-center gap-3">
                <User className="h-4 w-4 text-primary" />
-               <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300">View Profile</span>
+               <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-300">View My Profile</span>
             </div>
             <ChevronRight className="h-4 w-4 text-slate-500 group-hover:text-primary transition-all" />
           </Link>
         </div>
 
-        {/* 2. MENU REGISTRY */}
+        {/* 2. MENU ITEMS */}
         <div className="flex flex-col py-6">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
@@ -191,15 +191,15 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
             className="flex items-center gap-5 px-6 h-[46px] text-rose-500 hover:bg-rose-500/5 transition-all w-full text-left group"
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            <span className="text-[14px] font-black uppercase tracking-tight">Logout Node</span>
+            <span className="text-[14px] font-black uppercase tracking-tight">Logout</span>
           </button>
         </div>
 
-        {/* 3. FOUNDER FOOTER */}
+        {/* 3. FOOTER */}
         <div className="mt-auto px-6 py-12 flex flex-col items-center gap-2 bg-black/20 border-t border-white/5 shrink-0">
            <div className="flex items-center gap-2 mb-2">
               <ShieldCheck className="h-3.5 w-3.5 text-slate-500" />
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">Institutional Hub</p>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">Punjab Hub</p>
            </div>
            <p className="text-[10px] font-black text-primary uppercase tracking-widest text-center">
               Developed by Arsh Grewal
@@ -213,7 +213,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
          <DialogContent className="bg-[#0F172A] text-white border-white/10 rounded-[2.5rem] max-w-[340px] p-0 overflow-hidden shadow-5xl">
             <div className="h-1.5 w-full bg-primary" />
             <DialogHeader className="p-8 pb-4 text-center relative">
-               <DialogTitle className="text-xl font-headline font-black uppercase tracking-tight">Share Registry</DialogTitle>
+               <DialogTitle className="text-xl font-headline font-black uppercase tracking-tight">Share Cracklix</DialogTitle>
                <button onClick={() => setIsShareOpen(false)} className="absolute top-8 right-8 text-slate-500 hover:text-white"><X className="h-5 w-5" /></button>
             </DialogHeader>
             <div className="p-8 pt-0 grid grid-cols-3 gap-4">
@@ -245,7 +245,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
                  className="w-full border-white/5 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white rounded-xl h-12 font-black uppercase text-[10px] tracking-[0.2em]"
                  onClick={async () => {
                     await navigator.clipboard.writeText(shareUrl);
-                    toast({ title: "Link Copied", description: "Registry URL saved to clipboard." });
+                    toast({ title: "Link Copied", description: "Website link saved to clipboard." });
                     setIsShareOpen(false);
                     onClose();
                  }}

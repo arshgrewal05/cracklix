@@ -42,8 +42,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import Logo from "@/components/brand/Logo"
 
 /**
- * @fileOverview Test Results Hub v7.1 (Hardened Report).
- * FIXED: Filter bar overlap on mobile. Compact horizontal scroll implemented.
+ * @fileOverview Test Results Hub v7.2.
+ * Simplified Language: Replaced technical labels with easy terms.
  */
 
 export default function ResultPage() {
@@ -171,14 +171,14 @@ export default function ResultPage() {
   if (resultsLoading || loadingContent) return (
     <div className="h-screen flex flex-col items-center justify-center bg-white space-y-6">
        <Loader2 className="h-12 w-12 text-primary animate-spin" />
-       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Auditing performance...</p>
+       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Checking your result...</p>
     </div>
   )
 
   if (!sessionData) return (
      <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4">
         <AlertCircle className="h-12 w-12 opacity-10" />
-        <p className="font-black uppercase tracking-widest text-xs">Result node not found.</p>
+        <p className="font-black uppercase tracking-widest text-xs">Result entry not found.</p>
         <Button asChild variant="outline" className="rounded-xl border-slate-200">
            <Link href="/dashboard">Return to Dashboard</Link>
         </Button>
@@ -197,20 +197,20 @@ export default function ResultPage() {
            <div className="text-center space-y-2">
               <h2 className="text-3xl font-black uppercase tracking-widest">OFFICIAL RESULT CERTIFICATE</h2>
               <div className="flex items-center justify-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
-                 <span>Batch: 2026 Registry</span>
+                 <span>Batch: 2026</span>
                  <span>•</span>
-                 <span>Authorized Audit Node</span>
+                 <span>Verified Result</span>
                  <span>•</span>
                  <span>Punjab Exam Hub</span>
               </div>
            </div>
            <div className="grid grid-cols-2 gap-20 w-full pt-6">
               <div className="text-left space-y-1">
-                 <p className="text-[8px] font-black text-slate-400 uppercase">ASPIRANT NAME</p>
+                 <p className="text-[8px] font-black text-slate-400 uppercase">STUDENT NAME</p>
                  <p className="text-xl font-bold uppercase">{profile?.name}</p>
               </div>
               <div className="text-right space-y-1">
-                 <p className="text-[8px] font-black text-slate-400 uppercase">SESSION TIMESTAMP</p>
+                 <p className="text-[8px] font-black text-slate-400 uppercase">TIME STAMP</p>
                  <p className="text-sm font-bold">{new Date(sessionData.timestamp).toLocaleString()}</p>
               </div>
            </div>
@@ -225,7 +225,7 @@ export default function ResultPage() {
                     <div className="space-y-4 max-w-full lg:max-w-[65%]">
                        <div className="flex items-center gap-4 print:hidden">
                           <ShieldCheck className="h-5 w-5 text-primary" />
-                          <Badge className="bg-primary/20 text-primary border-none px-4 py-1.5 rounded-full font-black uppercase text-[9px] tracking-[0.2em] shadow-xl">Audit Finalized</Badge>
+                          <Badge className="bg-primary/20 text-primary border-none px-4 py-1.5 rounded-full font-black uppercase text-[9px] tracking-[0.2em] shadow-xl">Test Completed</Badge>
                        </div>
                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-headline font-black uppercase leading-[0.95] tracking-tight break-words print:text-4xl">
                           {sessionData.mockTitle}
@@ -242,16 +242,16 @@ export default function ResultPage() {
                        <div className="flex-1 text-center space-y-1.5">
                           <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">PERCENTILE</p>
                           <p className="text-3xl md:text-5xl font-headline font-black text-emerald-400 leading-none tabular-nums print:text-4xl">{merit.percentile}</p>
-                          <p className="text-[9px] font-black text-slate-500 uppercase">EFFICIENCY</p>
+                          <p className="text-[9px] font-black text-slate-500 uppercase">SCORE %</p>
                        </div>
                     </div>
                  </div>
 
                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 pt-8 border-t border-white/5 print:border-slate-100 print:grid-cols-4">
                     <MetricCard label="SCORE" val={`${(sessionData.score || 0).toFixed(1)}`} sub={`/${sessionData.totalQuestions} MARKS`} color="text-primary" />
-                    <MetricCard label="ACCURACY" val={`${sessionData.accuracy || 0}%`} sub="PRECISION INDEX" color="text-emerald-400" />
-                    <MetricCard label="CORRECT" val={Math.floor(sessionData.score || 0)} sub="SUCCESS NODES" color="text-emerald-400" />
-                    <MetricCard label="TIME" val={`${Math.floor((sessionData.timeTaken || 0) / 60)}m`} sub="DURATION" color="text-blue-400" />
+                    <MetricCard label="ACCURACY" val={`${sessionData.accuracy || 0}%`} sub="PRECISION" color="text-emerald-400" />
+                    <MetricCard label="CORRECT" val={Math.floor(sessionData.score || 0)} sub="CORRECT ANSWERS" color="text-emerald-400" />
+                    <MetricCard label="TIME" val={`${Math.floor((sessionData.timeTaken || 0) / 60)}m`} sub="TIME SPENT" color="text-blue-400" />
                  </div>
               </CardContent>
            </Card>
@@ -260,14 +260,14 @@ export default function ResultPage() {
               <Card className="border-none shadow-3xl rounded-[2.5rem] bg-white p-6 md:p-8 space-y-6 border border-slate-100">
                  <div className="flex items-center gap-3">
                     <Zap className="h-5 w-5 text-primary" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Tactical Actions</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Quick Actions</h3>
                  </div>
                  <div className="space-y-4">
                     <Button onClick={() => window.print()} className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-emerald-900/10 gap-3 border-none">
-                       <Printer className="h-4 w-4" /> Download Report
+                       <Printer className="h-4 w-4" /> Download Certificate
                     </Button>
                     <Button variant="outline" asChild className="w-full h-14 border-2 border-slate-100 hover:border-primary hover:text-primary rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] text-slate-600">
-                       <Link href={`/mocks/${mockId}/attempt`}><TrendingUp className="h-4 w-4 mr-2" /> Re-Attempt Hub</Link>
+                       <Link href={`/mocks/${mockId}/attempt`}><TrendingUp className="h-4 w-4 mr-2" /> Re-Attempt Test</Link>
                     </Button>
                  </div>
               </Card>
@@ -276,8 +276,8 @@ export default function ResultPage() {
                 <div className="bg-primary rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-4xl cursor-pointer">
                    <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-125 transition-transform duration-[2s]"><Award className="h-48 w-48" /></div>
                    <div className="relative z-10 space-y-3 text-left">
-                      <h4 className="text-xl font-headline font-black uppercase leading-[1.1]">Elite Cohort</h4>
-                      <p className="text-white/70 text-[9px] font-bold uppercase tracking-widest leading-relaxed">Unlock complete solutions and state rank analytics.</p>
+                      <h4 className="text-xl font-headline font-black uppercase leading-[1.1]">Join Elite</h4>
+                      <p className="text-white/70 text-[9px] font-bold uppercase tracking-widest leading-relaxed">Unlock complete solutions and rank analysis.</p>
                       <Button asChild className="w-full h-12 mt-2 bg-white text-primary hover:bg-slate-50 font-black rounded-xl text-[10px] uppercase tracking-widest shadow-xl border-none">
                         <Link href="/pass"><Gem className="h-4 w-4 mr-2" /> Activate Pass</Link>
                       </Button>
@@ -292,10 +292,10 @@ export default function ResultPage() {
            <div className="bg-white border border-slate-100 rounded-3xl p-1.5 shadow-xl inline-flex w-full md:w-auto overflow-x-auto no-scrollbar justify-start print:hidden">
              <TabsList className="bg-transparent border-none p-0 flex h-14 md:h-16 gap-1 md:gap-2 px-1">
                 <TabsTrigger value="SECTIONAL" className="rounded-2xl px-4 md:px-8 font-black uppercase text-[8px] md:text-[10px] tracking-widest gap-2 h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white data-[state=active]:shadow-2xl transition-all whitespace-nowrap">
-                   <BarChart3 className="h-4 w-4" /> Sectional Audit
+                   <BarChart3 className="h-4 w-4" /> Section Performance
                 </TabsTrigger>
                 <TabsTrigger value="TOPPER" className="rounded-2xl px-4 md:px-8 font-black uppercase text-[8px] md:text-[10px] tracking-widest gap-2 h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white data-[state=active]:shadow-2xl transition-all whitespace-nowrap">
-                   <Trophy className="h-4 w-4" /> State Comparison
+                   <Trophy className="h-4 w-4" /> Compare with Topper
                 </TabsTrigger>
                 <TabsTrigger value="SOLUTIONS" className="rounded-2xl px-4 md:px-8 font-black uppercase text-[8px] md:text-[10px] tracking-widest gap-2 h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white data-[state=active]:shadow-2xl transition-all whitespace-nowrap">
                    <BrainCircuit className="h-4 w-4" /> Answer Review
@@ -310,7 +310,7 @@ export default function ResultPage() {
                        <CardHeader className="p-0 mb-8 flex flex-row items-center justify-between">
                           <div className="space-y-0.5 text-left min-w-0 flex-1 pr-4">
                              <h4 className="font-headline font-black text-xl md:text-2xl uppercase text-[#0B1528] leading-none truncate print:text-lg">{s.name}</h4>
-                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sectional Registry</p>
+                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Section Results</p>
                           </div>
                           <Badge className={cn(
                              "border-none text-[10px] font-black uppercase px-3 py-1.5 rounded-xl shadow-lg print:shadow-none print:bg-slate-50 print:text-black", 
@@ -333,7 +333,7 @@ export default function ResultPage() {
                           <div className="space-y-3">
                              <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">
                                 <span>EFFICIENCY</span>
-                                <span className="text-[#0B1528]">{s.correct}/{s.total} NODES</span>
+                                <span className="text-[#0B1528]">{s.correct}/{s.total} CORRECT</span>
                              </div>
                              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
                                 <div className={cn("h-full transition-all duration-[2000ms] ease-out", s.accuracy >= 70 ? 'bg-emerald-500' : s.accuracy >= 40 ? 'bg-amber-500' : 'bg-rose-500')} style={{ width: `${s.accuracy}%` }} />
@@ -354,14 +354,14 @@ export default function ResultPage() {
                              <Trophy className="h-8 w-8 md:h-10 md:w-10 print:h-6 print:w-6" />
                           </div>
                           <div className="space-y-1 text-left">
-                             <h3 className="font-headline font-black text-2xl md:text-4xl uppercase text-[#0B1528] tracking-tight print:text-2xl">Merit Benchmark</h3>
-                             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Performance vs State Leader</p>
+                             <h3 className="font-headline font-black text-2xl md:text-4xl uppercase text-[#0B1528] tracking-tight print:text-2xl">Topper Comparison</h3>
+                             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Your results vs State Leader</p>
                           </div>
                        </div>
                        
                        <div className="space-y-12 print:space-y-8">
                           <CompareMetric label="SCORE PERFORMANCE" user={sessionData.score || 0} topper={merit.topper?.score || 0} max={sessionData.totalQuestions} />
-                          <CompareMetric label="ACCURACY TRAIL" user={sessionData.accuracy || 0} topper={merit.topper?.accuracy || 0} unit="%" />
+                          <CompareMetric label="ACCURACY RATE" user={sessionData.accuracy || 0} topper={merit.topper?.accuracy || 0} unit="%" />
                           <CompareMetric label="TIME EFFICIENCY" user={Math.floor((sessionData.timeTaken || 0) / 60)} topper={Math.floor((merit.topper?.timeTaken || 0) / 60)} isTime />
                        </div>
                     </div>
@@ -373,7 +373,7 @@ export default function ResultPage() {
                           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-amber-400 text-white px-8 py-2.5 rounded-full font-black text-[10px] uppercase shadow-2xl tracking-[0.2em] border-4 border-white animate-bounce print:hidden">STATE TOPPER</div>
                        </div>
                        <div className="space-y-2 relative z-10">
-                          <p className="text-primary font-black uppercase tracking-[0.5em] text-[10px]">REGISTRY LEADER</p>
+                          <p className="text-primary font-black uppercase tracking-[0.5em] text-[10px]">CURRENT LEADER</p>
                           <h4 className="text-3xl md:text-5xl font-headline font-black uppercase text-[#0B1528] tracking-tight leading-none print:text-2xl">{merit.topper?.name || 'Academic Topper'}</h4>
                        </div>
                     </div>
@@ -383,7 +383,7 @@ export default function ResultPage() {
 
            <TabsContent value="SOLUTIONS" className="m-0 space-y-8 animate-in fade-in duration-500">
               <div className="bg-white border border-slate-100 rounded-[2.5rem] p-4 md:p-6 shadow-2xl flex flex-nowrap items-center gap-3 md:gap-6 sticky top-[72px] z-[40] backdrop-blur-3xl bg-opacity-95 overflow-x-auto no-scrollbar print:hidden">
-                 <FilterPill active={activeReviewFilter === 'ALL'} label="ALL NODES" count={questions.length} onClick={() => setActiveReviewFilter('ALL')} color="bg-slate-100 text-slate-500" />
+                 <FilterPill active={activeReviewFilter === 'ALL'} label="ALL QUESTIONS" count={questions.length} onClick={() => setActiveReviewFilter('ALL')} color="bg-slate-100 text-slate-500" />
                  <FilterPill active={activeReviewFilter === 'CORRECT'} label="CORRECT" count={Math.floor(sessionData.score || 0)} onClick={() => setActiveReviewFilter('CORRECT')} color="bg-emerald-50 text-emerald-600" />
                  <FilterPill active={activeReviewFilter === 'WRONG'} label="WRONG" count={Object.keys(sessionData.answers || {}).length - Math.floor(sessionData.score || 0)} onClick={() => setActiveReviewFilter('WRONG')} color="bg-rose-50 text-rose-600" />
                  <FilterPill active={activeReviewFilter === 'SKIPPED'} label="SKIPPED" count={sessionData.totalQuestions - Object.keys(sessionData.answers || {}).length} onClick={() => setActiveReviewFilter('SKIPPED')} color="bg-slate-100 text-slate-300" />
@@ -414,11 +414,11 @@ export default function ResultPage() {
                                             "border-none text-[9px] md:text-[11px] font-black uppercase px-3 py-1 rounded-lg shadow-sm print:text-[8px] print:px-2 print:py-0.5", 
                                             isCorrect ? 'bg-emerald-50 text-emerald-600' : isSkipped ? 'bg-slate-100 text-slate-400' : 'bg-rose-50 text-rose-600'
                                          )}>
-                                            {isCorrect ? 'CORRECT' : isSkipped ? 'SKIPPED' : 'INCORRECT'}
+                                            {isCorrect ? 'CORRECT' : isSkipped ? 'SKIPPED' : 'WRONG'}
                                          </Badge>
                                          {!isCorrect && !isSkipped && <Badge className="bg-[#0B1528] text-white border-none text-[9px] font-black uppercase px-3 py-1 rounded-lg print:text-[8px] print:bg-slate-100 print:text-black">KEY: {q.correctAnswer}</Badge>}
                                       </div>
-                                      <p className="text-[10px] md:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1 print:text-[8px]">{q.sectionId || 'GENERAL PREPARATION HUB'}</p>
+                                      <p className="text-[10px] md:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1 print:text-[8px]">{q.sectionId || 'GENERAL PREP HUB'}</p>
                                    </div>
                                 </div>
                                 <Button 
@@ -457,10 +457,10 @@ export default function ResultPage() {
               </div>
               <div className="text-right space-y-1">
                  <p className="text-slate-400">CERTIFICATE NO</p>
-                 <p className="text-sm">CRX-NODE-{sessionData.id?.slice(-8).toUpperCase()}</p>
+                 <p className="text-sm">CRX-SESSION-{sessionData.id?.slice(-8).toUpperCase()}</p>
               </div>
            </div>
-           <p className="text-[9px] text-slate-400 font-medium">This is an electronically generated result card. All marks are audited as per official 2026 patterns.</p>
+           <p className="text-[9px] text-slate-400 font-medium">This is an electronically generated result certificate. All marks are verified as per official 2026 patterns.</p>
         </div>
       </main>
 
@@ -486,7 +486,7 @@ function MetricCard({ label, val, sub, color }: any) {
          <div className="flex items-center gap-3 pt-3 border-t border-white/5 mt-4 print:hidden">
             <div className={cn("h-1.5 w-1.5 rounded-full animate-pulse shrink-0", valStr.includes('NaN') ? 'bg-rose-50 shadow-[0_0_8px_rgba(244,63,94,0.6)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]')} />
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">
-               {valStr.includes('NaN') ? 'SYNCING ERROR' : 'NODE ACTIVE'}
+               {valStr.includes('NaN') ? 'ERROR' : 'RESULTS SYNCED'}
             </p>
          </div>
       </div>

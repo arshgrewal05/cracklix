@@ -31,8 +31,8 @@ import { cn } from "@/lib/utils"
 import BackButton from "@/components/navigation/BackButton"
 
 /**
- * @fileOverview Institutional Deep Performance Analysis Node.
- * FIXED: Optimized header flex layout for small screens to prevent truncation.
+ * @fileOverview Institutional Performance Report.
+ * Simplified Language: Replaced 'Node' and 'Audit' with 'Item' and 'Check'.
  */
 
 export default function DeepAnalytics() {
@@ -66,7 +66,7 @@ export default function DeepAnalytics() {
     const attempted = results.reduce((acc: number, r: any) => acc + (Object.keys(r.answers || {}).length), 0)
     
     const chartData = [...results].reverse().map((r, i) => ({
-      name: `Attempt ${i + 1}`,
+      name: `Test ${i + 1}`,
       accuracy: r.accuracy || 0,
       score: r.score || 0
     }))
@@ -101,22 +101,22 @@ export default function DeepAnalytics() {
                <BackButton label="Dashboard" fallback="/dashboard" className="p-0" />
                <div className="h-8 w-px bg-slate-200 hidden md:block" />
                <div className="min-w-0 flex-1">
-                  <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-tight truncate">Deep-Audit</h1>
-                  <p className="text-slate-500 font-medium text-[9px] md:text-sm hidden sm:block">Registry analysis for your preparation trajectory.</p>
+                  <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-tight truncate">Progress Report</h1>
+                  <p className="text-slate-500 font-medium text-[9px] md:text-sm hidden sm:block">Detailed analysis of your preparation progress.</p>
                </div>
             </div>
             <div className="flex gap-4 shrink-0">
                <Badge className="bg-emerald-50 text-emerald-600 border-none px-2 md:px-4 py-1.5 rounded-xl font-black uppercase text-[8px] md:text-[10px] tracking-widest flex items-center gap-2 shadow-sm">
-                  <Activity className="h-3 w-3" /> <span className="hidden xs:inline">Sync Node</span>
+                  <Activity className="h-3 w-3" /> <span className="hidden xs:inline">Sync Stats</span>
                </Badge>
             </div>
          </div>
 
          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <AnalyticMetric label="Total MCQs" value={analytics.totalQ} icon={<LayoutGrid className="text-blue-500" />} color="text-blue-600" />
-            <AnalyticMetric label="Accuracy" value={`${analytics.avgAcc}%`} icon={<Target className="text-primary" />} color="text-primary" />
-            <AnalyticMetric label="Correct" value={analytics.correct} icon={<CheckCircle2 className="text-emerald-500" />} color="text-emerald-600" />
-            <AnalyticMetric label="Failures" value={analytics.wrong} icon={<XCircle className="text-rose-500" />} color="text-rose-600" />
+            <AnalyticMetric label="Accuracy Rate" value={`${analytics.avgAcc}%`} icon={<Target className="text-primary" />} color="text-primary" />
+            <AnalyticMetric label="Total Correct" value={analytics.correct} icon={<CheckCircle2 className="text-emerald-500" />} color="text-emerald-600" />
+            <AnalyticMetric label="Wrong Answers" value={analytics.wrong} icon={<XCircle className="text-rose-500" />} color="text-rose-600" />
          </div>
 
          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -126,7 +126,7 @@ export default function DeepAnalytics() {
                      <TrendingUp className="h-6 w-6 text-primary" />
                      <CardTitle className="font-headline text-2xl font-black uppercase text-[#0F172A]">Accuracy Trend</CardTitle>
                   </div>
-                  <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Progression nodes across recently attempted mocks</CardDescription>
+                  <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Your improvement across recently attempted mocks</CardDescription>
                </CardHeader>
                <CardContent className="p-8 md:p-10">
                   <div className="h-[300px] md:h-[400px] w-full">
@@ -177,7 +177,7 @@ export default function DeepAnalytics() {
                   <div className="space-y-2">
                      <h4 className="text-2xl font-headline font-black uppercase text-emerald-900 leading-none">Qualified</h4>
                      <p className="text-sm font-medium text-emerald-700 leading-relaxed italic">
-                        "Your current mastery index indicates an <strong>84% probability</strong> of qualifying for evaluation."
+                        "Your current mastery level indicates an <strong>84% probability</strong> of qualifying for final selection."
                      </p>
                   </div>
                </div>
