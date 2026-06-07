@@ -1,8 +1,7 @@
-
 'use client';
 
 import Link from "next/link";
-import { Menu, Search, Zap, CreditCard, LogOut, ShieldCheck, Megaphone, Target, LayoutGrid, Award, Gem } from "lucide-react";
+import { Menu, Search, Zap, CreditCard, LogOut, ShieldCheck, Megaphone, Target, LayoutGrid, Award, Gem, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/brand/Logo";
 import { useState, useMemo } from "react";
@@ -25,8 +24,9 @@ import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Elite Global Navigation Node v5.0.
- * Updated: 'Unlock Pass' changed to bold 'PASS' and Profile replaced with Pass in priority nodes.
+ * @fileOverview Elite Global Navigation Hub v5.1.
+ * FIXED: Added missing User icon import.
+ * UI: prioritized Pass node with high-fidelity Gem branding.
  */
 
 export default function Navbar() {
