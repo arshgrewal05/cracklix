@@ -303,7 +303,7 @@ export default function ExamRegistryPage() {
       <Dialog open={!!editingExam} onOpenChange={open => !open && setEditingExam(null)}>
          <DialogContent className="sm:max-w-xl rounded-[2.5rem] bg-white border-none shadow-4xl p-0 overflow-hidden text-left">
             <div className="h-2 w-full bg-[#0F172A]" />
-            <DialogHeader className="p-10 pb-0">
+            <DialogHeader className="p-10 pb-0 text-left">
                <DialogTitle className="text-2xl font-black font-headline uppercase">Hub Node Registry</DialogTitle>
             </DialogHeader>
             <div className="p-10 space-y-8">
