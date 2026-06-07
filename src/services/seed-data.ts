@@ -2,7 +2,7 @@
 import { Firestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v37.0 (Agniveer Hub Optimized).
+ * @fileOverview Institutional Seeding Engine v38.0 (Teacher & Child Dev Hub Restored).
  * Features: Hardened Unique Hub Registry with High-Fidelity Official Assets.
  * ReferrerPolicy Hardening is applied at the rendering layer.
  */
@@ -19,6 +19,7 @@ export async function seedInitialData(db: Firestore) {
   const armyEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Indian_Army_Insignia_circular.png/1280px-Indian_Army_Insignia_circular.png";
   const ibpsLogo = "https://careeravenues.info/wp-content/uploads/2023/05/Introduction.jpg";
   const punjabEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Emblem_of_Punjab.svg/512px-Emblem_of_Punjab.svg.png";
+  const cbseLogo = "https://upload.wikimedia.org/wikipedia/en/thumb/3/30/CBSE_Official_Logo.svg/512px-CBSE_Official_Logo.svg.png";
 
   // 1. BOARDS REGISTRY
   const boards = [
@@ -30,7 +31,8 @@ export async function seedInitialData(db: Firestore) {
     { id: 'pspcl', abbreviation: 'PSPCL', name: 'Punjab State Power Corporation Ltd', region: 'Punjab', category: 'TECHNICAL_BOARD', iconUrl: pspclLogo },
     { id: 'ibps', abbreviation: 'IBPS', name: 'Institute of Banking Personnel Selection', region: 'National', category: 'BANKING_BOARD', iconUrl: ibpsLogo },
     { id: 'army', abbreviation: 'ARMY', name: 'Indian Army Recruitment', region: 'National', category: 'CENTRAL_BOARD', iconUrl: armyEmblem },
-    { id: 'education', abbreviation: 'EDUCATION', name: 'Education Recruitment Board Punjab', region: 'Punjab', category: 'TEACHING_BOARD', iconUrl: punjabEmblem }
+    { id: 'education', abbreviation: 'EDUCATION', name: 'Education Recruitment Board Punjab', region: 'Punjab', category: 'TEACHING_BOARD', iconUrl: punjabEmblem },
+    { id: 'cbse', abbreviation: 'CBSE', name: 'Central Board of Secondary Education', region: 'National', category: 'CENTRAL_BOARD', iconUrl: cbseLogo }
   ];
 
   for (const b of boards) {
@@ -49,7 +51,8 @@ export async function seedInitialData(db: Firestore) {
     { id: 'ppsc-pcs', boardId: 'ppsc', name: 'PCS Executive Prelims', category: 'CIVIL', description: 'Higher Class A & B services including DSP and Tehsildar posts.', totalFullMocks: 20, iconUrl: ppscJpg },
     { id: 'naib-tehsildar', boardId: 'ppsc', name: 'Naib Tehsildar', category: 'CIVIL', description: 'PPSC recruitment series for revenue executive posts.', totalFullMocks: 15, iconUrl: ppscJpg },
     { id: 'punjab-anganwadi', boardId: 'sswcd', name: 'Punjab Anganwadi / NTT', category: 'STATE', description: 'Official syllabus and preparation matrix for Supervisor and NTT posts.', totalFullMocks: 15, iconUrl: anganwadiLogo },
-    { id: 'ibps-po-clerk', boardId: 'ibps', name: 'IBPS PO / Clerk', category: 'BANKING', description: 'Complete mock series for Bank Probationary Officers and Clerical posts.', totalFullMocks: 40, iconUrl: ibpsLogo },
+    { id: 'ctet-paper-1', boardId: 'cbse', name: 'CTET Paper 1 (Primary)', category: 'TEACHING', description: 'Central Teacher Eligibility Test for classes I to V.', totalFullMocks: 25, iconUrl: cbseLogo },
+    { id: 'ctet-paper-2', boardId: 'cbse', name: 'CTET Paper 2 (Upper Primary)', category: 'TEACHING', description: 'Central Teacher Eligibility Test for classes VI to VIII.', totalFullMocks: 25, iconUrl: cbseLogo },
     { id: 'pspcl-je', boardId: 'pspcl', name: 'PSPCL Junior Engineer', category: 'TECHNICAL', description: 'Electrical, Civil and IT JE recruitment for Punjab Power Board.', totalFullMocks: 25, iconUrl: pspclLogo },
     { id: 'master-cadre', boardId: 'education', name: 'Master Cadre', category: 'TEACHING', description: 'Subject-wise teacher recruitment for Punjab Government Schools.', totalFullMocks: 40, iconUrl: punjabEmblem },
     { id: 'indian-army', boardId: 'army', name: 'Agniveer GD / Tech', category: 'CENTRAL', description: 'High-fidelity preparation series for Indian Army Agniveer.', totalFullMocks: 10, iconUrl: armyEmblem }
