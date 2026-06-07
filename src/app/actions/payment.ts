@@ -1,13 +1,10 @@
 
 'use server';
 
-import Razorpay from 'razorpay';
-import crypto from 'crypto';
 import { initializeFirebase } from '@/firebase';
 import { 
   collection, 
   doc, 
-  setDoc, 
   addDoc, 
   serverTimestamp,
   updateDoc,
@@ -17,14 +14,8 @@ import {
 /**
  * @fileOverview Secure Pass Management & Payment Actions.
  * Handles Manual UPI approval and role-based pass grants.
+ * Removed: Razorpay SDK integration.
  */
-
-function getRazorpayInstance() {
-  return new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || '',
-    key_secret: process.env.RAZORPAY_KEY_SECRET || '',
-  });
-}
 
 export async function submitManualPayment(data: {
   userId: string;

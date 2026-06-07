@@ -9,18 +9,17 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ShieldCheck, Lock, CreditCard, ChevronRight, Zap, ArrowLeft, Loader2, Sparkles, AlertCircle, QrCode, Phone, CheckCircle2, Trophy, Star, Gem, Landmark } from "lucide-react"
+import { ShieldCheck, Lock, ArrowLeft, Loader2, QrCode, CheckCircle2, Gem } from "lucide-react"
 import { useUser, useDoc, useFirestore } from "@/firebase"
 import { useEffect, useState, Suspense, useMemo } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { submitManualPayment } from "@/app/actions/payment"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { doc } from "firebase/firestore"
-import Script from "next/script"
 
 /**
- * @fileOverview Institutional Checkout Hub v41.0.
- * FIXED: Explicit forced UI blocks for UPI ID entry and Card payments.
+ * @fileOverview Institutional Checkout Hub v42.0.
+ * UPDATED: Completely removed Razorpay online payment method.
+ * Fixed: Simplified UI to only show Manual QR Audit.
  */
 
 export default function CheckoutPage() {
@@ -48,127 +47,6 @@ function CheckoutContent() {
   useEffect(() => {
     if (!loading && !user) router.push("/login")
   }, [user, loading, router])
-
-  const handleRazorpayPayment = async () => {
-    if (!user || !planData || !db) return;
-    
-    if (!(window as any).Razorpay) {
-      toast({ variant: "destructive", title: "Gateway Script Missing", description: "Payment script failed to load. Please refresh." });
-      return;
-    }
-
-    setProcessing(true);
-
-    try {
-      const orderRes = await fetch('/api/razorpay/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: planData.price }),
-      });
-
-      const orderData = await orderRes.json();
-      if (orderData.error) throw new Error(orderData.error);
-
-      // 1. AGGRESSIVE NAME SANITIZATION (Only A-Z and spaces)
-      const rawName = profile?.name || user?.displayName || 'Aspirant';
-      const sanitizedName = rawName.replace(/[^a-zA-Z\s]/g, '').trim().slice(0, 40) || "Aspirant";
-      
-      // 2. STRICT 10-DIGIT MOBILE REGISTRY
-      const phoneDigits = (profile?.phone || '').replace(/\D/g, '').slice(-10);
-
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_Syo3XlvkICdGYd',
-        amount: orderData.amount,
-        currency: "INR",
-        name: "CRACKLIX Hub",
-        description: `${planData.name} Registry Activation`,
-        image: "https://i.ibb.co/5hkxTtKS/Whats-App-Image-2026-05-28-at-10-31-36-AM.jpg",
-        order_id: orderData.order_id,
-        handler: async function (response: any) {
-          setProcessing(true);
-          try {
-            const verifyRes = await fetch('/api/razorpay/verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                userId: user.uid,
-                planId: planId
-              }),
-            });
-
-            const verifyData = await verifyRes.json();
-            if (verifyData.success) {
-              toast({ title: "Pass Activated", description: "Preparation hub successfully unlocked." });
-              router.push(`/payment/success?plan=${planData.name}`);
-            } else {
-              throw new Error(verifyData.error || "Security audit failed.");
-            }
-          } catch (e: any) {
-            toast({ variant: "destructive", title: "Security Rejection", description: e.message });
-            setProcessing(false);
-          }
-        },
-        prefill: {
-          name: sanitizedName,
-          email: user.email,
-          contact: phoneDigits.length === 10 ? `+91${phoneDigits}` : ''
-        },
-        theme: { color: "#F97316" },
-        // CRITICAL: FORCE UPI ID (VPA) INPUT AND CARDS
-        config: {
-          display: {
-            blocks: {
-              upi: {
-                name: "Pay using UPI ID",
-                instruments: [
-                  {
-                    method: "upi",
-                    protocols: ["vpa"] // Forces the "Enter UPI ID" text field
-                  }
-                ]
-              },
-              card: {
-                name: "Debit / Credit Card",
-                instruments: [
-                  {
-                    method: "card"
-                  }
-                ]
-              }
-            },
-            sequence: ["block.upi", "block.card"],
-            preferences: {
-              show_default_blocks: false 
-            }
-          }
-        },
-        modal: {
-          ondismiss: function() { 
-            setProcessing(false); 
-          }
-        }
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      
-      rzp.on('payment.failed', function (response: any) {
-        toast({ 
-          variant: "destructive", 
-          title: "Payment Declined", 
-          description: response.error.description || "The transaction was rejected." 
-        });
-        setProcessing(false);
-      });
-
-      rzp.open();
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Gateway Error", description: e.message });
-      setProcessing(false);
-    }
-  };
 
   const handleManualPayment = async () => {
     if (!user || !profile || !planData) return
@@ -201,10 +79,6 @@ function CheckoutContent() {
   return (
     <div className="min-h-screen bg-slate-50/50 font-body">
       <Navbar />
-      <Script 
-        src="https://checkout.razorpay.com/v1/checkout.js" 
-        strategy="afterInteractive" 
-      />
       
       <main className="container mx-auto px-4 md:px-6 py-12 md:py-24 max-w-5xl">
         <div className="flex items-center gap-6 mb-12">
@@ -219,85 +93,49 @@ function CheckoutContent() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 text-left">
            <div className="lg:col-span-7 space-y-10">
-              <Tabs defaultValue="online" className="w-full">
-                 <TabsList className="grid grid-cols-2 h-16 bg-white border border-slate-100 rounded-2xl p-1 shadow-sm mb-10">
-                    <TabsTrigger value="online" className="rounded-xl font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-[#0B1528] data-[state=active]:text-white">Pay Online (Fast)</TabsTrigger>
-                    <TabsTrigger value="manual" className="rounded-xl font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-[#0B1528] data-[state=active]:text-white">Manual Audit (QR)</TabsTrigger>
-                 </TabsList>
-
-                 <TabsContent value="online" className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden">
-                       <CardHeader className="p-10 bg-slate-50/50 border-b border-slate-100">
-                          <CardTitle className="font-headline font-black text-xl uppercase text-[#0F172A]">Direct Activation</CardTitle>
-                          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Secure transaction via Razorpay domestic gateway</CardDescription>
-                       </CardHeader>
-                       <CardContent className="p-10 space-y-10">
-                          <div className="flex items-center gap-6 p-6 bg-emerald-50/50 rounded-3xl border border-emerald-100">
-                             <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg">
-                                <ShieldCheck className="h-6 w-6" />
-                             </div>
-                             <p className="text-sm font-medium text-emerald-800 leading-relaxed uppercase">
-                                Your transaction is verified against the master Punjab Exam Hub registry instantly.
-                             </p>
+              <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden">
+                 <CardHeader className="p-10 bg-slate-50/50 border-b border-slate-100">
+                    <CardTitle className="font-headline font-black text-xl uppercase text-[#0F172A]">Manual Hub Audit</CardTitle>
+                    <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Scan QR and submit transaction UTR code</CardDescription>
+                 </CardHeader>
+                 <CardContent className="p-10 space-y-10">
+                    <div className="flex flex-col md:flex-row items-center gap-10">
+                       <div className="h-48 w-48 bg-white rounded-3xl border-2 border-dashed border-slate-200 flex items-center justify-center p-4 shadow-inner relative group">
+                          <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${settings?.upiId || 'arshdeepgrewal1122@okaxis'}%26pn=Cracklix%26am=${planData.price}%26cu=INR`} alt="Audit QR" className="w-full h-full object-contain" />
+                       </div>
+                       <div className="flex-1 space-y-4 text-left">
+                          <div className="p-5 bg-[#0F172A] rounded-2xl border border-white/5 space-y-1 shadow-2xl">
+                             <p className="text-[9px] font-black text-primary uppercase tracking-widest">Institutional UPI Node</p>
+                             <p className="text-lg font-black text-white break-all leading-none">{settings?.upiId || "arshdeepgrewal1122@okaxis"}</p>
                           </div>
-                          <Button 
-                             onClick={handleRazorpayPayment}
-                             disabled={processing}
-                             className="w-full h-20 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl shadow-xl shadow-primary/20 gap-4 transition-all active:scale-95 border-none"
-                          >
-                             {processing ? <Loader2 className="h-6 w-6 animate-spin" /> : <CreditCard className="h-6 w-6" />}
-                             Pay Securely & Activate Now
-                          </Button>
-                       </CardContent>
-                    </Card>
-                 </TabsContent>
+                          <ul className="space-y-2">
+                             <li className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase"><CheckCircle2 className="h-3 w-3 text-emerald-500" /> Pay exactly ₹{planData.price}</li>
+                             <li className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase"><CheckCircle2 className="h-3 w-3 text-emerald-500" /> Copy 12-digit UTR from your app</li>
+                          </ul>
+                       </div>
+                    </div>
 
-                 <TabsContent value="manual" className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden">
-                       <CardHeader className="p-10 bg-slate-50/50 border-b border-slate-100">
-                          <CardTitle className="font-headline font-black text-xl uppercase text-[#0F172A]">Manual Hub Audit</CardTitle>
-                          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Scan QR and submit transaction UTR code</CardDescription>
-                       </CardHeader>
-                       <CardContent className="p-10 space-y-10">
-                          <div className="flex flex-col md:flex-row items-center gap-10">
-                             <div className="h-48 w-48 bg-white rounded-3xl border-2 border-dashed border-slate-200 flex items-center justify-center p-4 shadow-inner relative group">
-                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${settings?.upiId || 'arshdeepgrewal1122@okaxis'}%26pn=Cracklix%26am=${planData.price}%26cu=INR`} alt="Audit QR" className="w-full h-full object-contain" />
-                             </div>
-                             <div className="flex-1 space-y-4 text-left">
-                                <div className="p-5 bg-[#0F172A] rounded-2xl border border-white/5 space-y-1 shadow-2xl">
-                                   <p className="text-[9px] font-black text-primary uppercase tracking-widest">Institutional UPI Node</p>
-                                   <p className="text-lg font-black text-white break-all leading-none">{settings?.upiId || "arshdeepgrewal1122@okaxis"}</p>
-                                </div>
-                                <ul className="space-y-2">
-                                   <li className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase"><CheckCircle2 className="h-3 w-3 text-emerald-500" /> Pay exactly ₹{planData.price}</li>
-                                   <li className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase"><CheckCircle2 className="h-3 w-3 text-emerald-500" /> Copy 12-digit UTR from your app</li>
-                                </ul>
-                             </div>
-                          </div>
-
-                          <div className="space-y-4 pt-6 border-t border-slate-50">
-                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">UTR / Transaction ID</Label>
-                                <Input 
-                                  value={utr}
-                                  onChange={e => setUtr(e.target.value)}
-                                  placeholder="Enter 12-digit UTR" 
-                                  className="h-14 rounded-xl border-slate-100 bg-slate-50 font-black text-lg tracking-widest text-[#0F172A]" 
-                                />
-                             </div>
-                             <Button 
-                                onClick={handleManualPayment}
-                                disabled={processing}
-                                className="w-full h-16 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl transition-all active:scale-95 border-none"
-                             >
-                                {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : <ShieldCheck className="h-5 w-5" />}
-                                Submit Registry for Audit
-                             </Button>
-                          </div>
-                       </CardContent>
-                    </Card>
-                 </TabsContent>
-              </Tabs>
+                    <div className="space-y-4 pt-6 border-t border-slate-50">
+                       <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">UTR / Transaction ID</Label>
+                          <Input 
+                            value={utr}
+                            onChange={e => setUtr(e.target.value)}
+                            placeholder="Enter 12-digit UTR" 
+                            className="h-14 rounded-xl border-slate-100 bg-slate-50 font-black text-lg tracking-widest text-[#0F172A]" 
+                          />
+                       </div>
+                       <Button 
+                          onClick={handleManualPayment}
+                          disabled={processing}
+                          className="w-full h-16 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl transition-all active:scale-95 border-none"
+                       >
+                          {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : <ShieldCheck className="h-5 w-5" />}
+                          Submit Registry for Audit
+                       </Button>
+                    </div>
+                 </CardContent>
+              </Card>
            </div>
 
            <div className="lg:col-span-5 space-y-8">
