@@ -2,14 +2,14 @@
 import { Firestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v34.0.
+ * @fileOverview Institutional Seeding Engine v35.0 (Optimized Assets).
  * Features: Hardened Unique Hub Registry with High-Fidelity Official Assets.
- * Updated: Official Agniveer Army Circular Insignia and Board Mappings.
+ * ReferrerPolicy Hardening is applied at the rendering layer.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Cracklix Global Registry Sync...');
 
-  // Official Institutional Assets
+  // High-Fidelity Official Assets
   const psssbSvg = "https://sssb.punjab.gov.in/wp-content/themes/ssbtheme/images/punjab-gov.svg";
   const ppscJpg = "https://upload.wikimedia.org/wikipedia/en/a/a1/Punjab_Public_Service_Commission.jpg";
   const policeEmblem = "https://www.punjabpolice.gov.in/media/images/Logo_of_Punjab_Police_India.original.png";

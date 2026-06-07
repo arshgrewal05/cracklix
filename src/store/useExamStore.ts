@@ -7,7 +7,7 @@ import { doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 
 /**
- * @fileOverview Elite CBT Global Store v26.0 (Hardened).
+ * @fileOverview Elite CBT Global Store v27.0 (Performance Hardened).
  * ZERO-LAG ARCHITECTURE: Optimistic UI updates with non-blocking background sync.
  * RECOVERY ENGINE: Instant state restoration from local cache + cloud sync.
  */
@@ -62,7 +62,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     const now = Date.now();
     const { language: currentLang } = get();
     
-    // Check for existing attempt validity
     const isCompleted = savedState?.status === 'COMPLETED';
     const isTimedOut = savedState?.endTime && now >= savedState.endTime;
     const isStale = isCompleted || isTimedOut;
@@ -92,7 +91,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       isSubmitting: false
     });
 
-    // Background: Initialize cloud node if it doesn't exist
     if (userId && mockId && !savedState) {
       const { firestore: db } = initializeFirebase();
       const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
@@ -112,14 +110,14 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     
     const newVisited = Array.from(new Set([...visited, idx]));
     
-    // 1. Instant UI Reflection
+    // 1. Instant UI Feedback
     set({ 
       currentIdx: idx, 
       visited: newVisited,
       currentSectionId: questions[idx]?.sectionId || ''
     });
     
-    // 2. Background Sync
+    // 2. Non-blocking Background Sync
     if (userId && mockId) {
       const { firestore: db } = initializeFirebase();
       updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), {
@@ -145,9 +143,10 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       newStatus[idx] = 'answered';
     }
 
+    // 1. Optimistic Update (Instant response < 100ms)
     set({ answers: newAnswers, status: newStatus });
 
-    // Non-blocking Cloud Sync
+    // 2. Silent Sync
     updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), {
       [`answers.${idx}`]: optionIdx,
       [`status.${idx}`]: newStatus[idx],

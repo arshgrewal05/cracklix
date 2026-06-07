@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useMemo, useEffect, Suspense, useCallback } from "react"
+import { useState, useMemo, useEffect, Suspense } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { Input } from "@/components/ui/input"
@@ -15,9 +15,9 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Elite Global Search Hub v3.0.
- * PERFORMANCE OPTIMIZED: Sub-50ms registry filtering with fuzzy matching.
- * Target: Beats Adda247 search responsiveness.
+ * @fileOverview Elite Global Search Hub v4.0 (Performance Optimized).
+ * TARGET: Sub-50ms registry filtering with fuzzy matching.
+ * AUDIT: Unified results for Mocks, PYQs, Exams, and Analysis nodes.
  */
 
 export default function SearchPage() {
@@ -38,6 +38,7 @@ function SearchContent() {
     if (q) setQuery(q)
   }, [searchParams])
 
+  // Aggregate Registry Nodes
   const { data: mocks, loading: mLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]))
   const { data: exams, loading: eLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
   const { data: ca, loading: cLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "current_affairs") : null), [db]))
@@ -73,7 +74,7 @@ function SearchContent() {
   }, [query, exams, mocks, ca, notes])
 
   return (
-    <div className="min-h-screen bg-white font-body">
+    <div className="min-h-screen bg-slate-50/30 font-body">
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-12 md:py-20 max-w-5xl text-left">
         <div className="space-y-12">
@@ -81,7 +82,7 @@ function SearchContent() {
            <div className="text-center space-y-8">
               <div className="space-y-3">
                  <h1 className="text-4xl md:text-7xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">Global <span className="text-primary">Registry</span></h1>
-                 <p className="text-slate-400 font-bold uppercase text-[10px] md:text-xs tracking-[0.4em]">Sub-50ms Institutional Search</p>
+                 <p className="text-slate-400 font-bold uppercase text-[10px] md:text-xs tracking-[0.4em]">Optimized Institutional Search Node</p>
               </div>
               
               <div className="relative max-w-3xl mx-auto group">
@@ -103,18 +104,18 @@ function SearchContent() {
            {query.length >= 2 ? (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">REGISTRY NODES FOUND: {results.length}</h3>
-                    <Badge className="bg-primary/5 text-primary border-none text-[10px] font-black px-4 py-1 rounded-lg uppercase">Real-Time Index</Badge>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">RESULTS: {results.length}</h3>
+                    <Badge className="bg-primary/5 text-primary border-none text-[10px] font-black px-4 py-1 rounded-lg uppercase">Real-Time Registry Index</Badge>
                  </div>
                  <div className="grid grid-cols-1 gap-4">
                     {results.length > 0 ? results.map((res, i) => (
                       <SearchResultItem key={i} icon={res.icon} title={res.title} category={res.type} href={res.href} />
                     )) : !isLoading && (
-                      <div className="text-center py-32 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-100">
+                      <div className="text-center py-32 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 shadow-inner">
                         <div className="space-y-4 opacity-20 flex flex-col items-center">
                            <SearchIcon className="h-12 w-12" />
                            <p className="font-headline font-black uppercase text-xl">Node Not Found</p>
-                           <p className="text-xs font-bold uppercase tracking-widest">Try searching "Patwari", "Constable" or "GK"</p>
+                           <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Try "Patwari", "Police" or "English"</p>
                         </div>
                       </div>
                     )}
@@ -134,7 +135,7 @@ function SearchContent() {
                        </ul>
                     </div>
                  </Card>
-                 <Card className="border-none shadow-4xl rounded-[3rem] p-10 bg-white group overflow-hidden border border-slate-50">
+                 <Card className="border-none shadow-4xl rounded-[3rem] p-10 bg-white group overflow-hidden border border-slate-100">
                     <div className="relative z-10 space-y-8">
                        <h4 className="font-headline font-black text-xs text-slate-400 uppercase tracking-[0.3em]">Active Registry Modules</h4>
                        <div className="flex flex-wrap gap-3">
@@ -158,8 +159,8 @@ function SearchContent() {
 
 function SearchResultItem({ icon, title, category, href }: any) {
    return (
-      <Link href={href} className="block">
-         <div className="bg-white p-5 md:p-8 rounded-[2.5rem] shadow-sm hover:shadow-4xl flex items-center justify-between group border border-slate-100 transition-all duration-300 active:scale-[0.98]">
+      <Link href={href} className="block active:scale-[0.98] transition-all">
+         <div className="bg-white p-5 md:p-8 rounded-[2.5rem] shadow-sm hover:shadow-4xl flex items-center justify-between group border border-slate-100 transition-all duration-300">
             <div className="flex items-center gap-6 min-w-0 flex-1">
                <div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/5 transition-all shrink-0 shadow-inner">
                   {icon}
@@ -169,7 +170,7 @@ function SearchResultItem({ icon, title, category, href }: any) {
                   <div className="flex items-center gap-3">
                      <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{category}</span>
                      <div className="h-1 w-1 rounded-full bg-slate-200" />
-                     <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Live Node</span>
+                     <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Live Hub</span>
                   </div>
                </div>
             </div>
@@ -193,7 +194,7 @@ function TrendingItem({ text, onSelect }: { text: string, onSelect: (v: string) 
 
 function SearchBadge({ label }: { label: string }) {
    return (
-      <Badge variant="outline" className="rounded-xl px-5 py-2.5 border-slate-100 bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all cursor-pointer active:scale-95">
+      <Badge variant="outline" className="rounded-xl px-5 py-2.5 border-slate-200 bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all cursor-pointer active:scale-95 shadow-sm">
          {label}
       </Badge>
    )
