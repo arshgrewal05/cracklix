@@ -37,7 +37,8 @@ import {
   Gem,
   Lock,
   Unlock,
-  History
+  History,
+  LayoutGrid
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
 import { collection, doc, setDoc, serverTimestamp, query, where, limit, getDocs, documentId } from "firebase/firestore"
@@ -82,7 +83,7 @@ function MockBuilderContent() {
   const { data: boards } = useCollection<any>(useMemo(() => (db ? query(collection(db, "boards")) : null), [db]))
   const { data: exams } = useCollection<any>(useMemo(() => (db ? query(collection(db, "exams")) : null), [db]))
   const { data: subjects } = useCollection<any>(useMemo(() => (db ? query(collection(db, "subjects")) : null), [db]))
-  const { data: allMocks } = useCollection<any>(useMemo(() => (db ? query(collection(db, "mocks")) : null), [db]))
+  const { data: allMocks, loading: allMocksLoading } = useCollection<any>(useMemo(() => (db ? query(collection(db, "mocks")) : null), [db]))
   
   const [bankLoading, setBankLoading] = useState(false)
   const [questionBank, setQuestionBank] = useState<any[]>([])
@@ -141,9 +142,7 @@ function MockBuilderContent() {
   }, [db])
 
   useEffect(() => {
-    async function hydrateExistingMock() {
-      if (!existingMock || questionBank.length === 0 || !db) return;
-
+    if (existingMock && questionBank.length > 0) {
       setMockData(prev => ({ 
         ...prev, 
         ...existingMock,
@@ -175,8 +174,7 @@ function MockBuilderContent() {
         }]);
       }
     }
-    hydrateExistingMock();
-  }, [existingMock, questionBank, db])
+  }, [existingMock, questionBank])
 
   const filteredBank = useMemo(() => {
     const allSelectedIds = sections.flatMap(s => s.questions.map(q => q.id));
@@ -229,6 +227,7 @@ function MockBuilderContent() {
       sections: sectionMetadata,
       updatedAt: serverTimestamp(),
       createdAt: isEditing ? (existingMock?.createdAt || serverTimestamp()) : serverTimestamp(),
+      totalMarks: totalQuestions * (mockData.positiveMarks || 1),
     };
 
     try {
@@ -272,7 +271,7 @@ function MockBuilderContent() {
                  </Label>
                  <Select value={mockId || 'new'} onValueChange={handleSwitchMock}>
                     <SelectTrigger className="h-14 rounded-xl bg-slate-900 text-white border-none font-bold">
-                       <SelectValue placeholder="Select a mock to edit" />
+                       <SelectValue placeholder={allMocksLoading ? "Loading Series..." : "Select a mock to edit"} />
                     </SelectTrigger>
                     <SelectContent>
                        <SelectItem value="new" className="font-black text-primary uppercase text-[10px]">Create New Series +</SelectItem>
@@ -417,6 +416,36 @@ function MockBuilderContent() {
                        </div>
                     </div>
 
+                    {/* SUBJECT GRID MATRIX */}
+                    <div className="mb-8 space-y-4">
+                       <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2">
+                          <LayoutGrid className="h-3 w-3" /> Select Subject Node
+                       </Label>
+                       <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                          <button 
+                             onClick={() => setBankFilter({...bankFilter, subjectId: 'all'})}
+                             className={cn(
+                                "px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all",
+                                bankFilter.subjectId === 'all' ? "bg-[#0F172A] border-[#0F172A] text-white shadow-lg" : "bg-white border-slate-100 text-slate-400 hover:border-primary/20"
+                             )}
+                          >
+                             All Subjects
+                          </button>
+                          {subjects?.sort((a:any, b:any) => a.name.localeCompare(b.name)).map((s: any) => (
+                             <button 
+                               key={s.id}
+                               onClick={() => setBankFilter({...bankFilter, subjectId: s.id})}
+                               className={cn(
+                                  "px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all truncate",
+                                  bankFilter.subjectId === s.id ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-slate-100 text-slate-400 hover:border-primary/20"
+                               )}
+                             >
+                                {s.name}
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+
                     <div className="bg-[#0F172A] p-6 rounded-[2rem] mb-8 flex flex-col md:flex-row md:items-center justify-between gap-8 text-white shadow-2xl overflow-hidden">
                        <div className="flex-1 min-w-0 text-left">
                              <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1.5">Target Section</p>
@@ -452,7 +481,7 @@ function MockBuilderContent() {
                                   <div className="min-w-0 flex-1">
                                      <div className="flex items-center gap-3 mb-1">
                                         {isUsed && <Badge className="bg-amber-50 text-amber-600 border-none text-[7px] font-black uppercase">Previously Used</Badge>}
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{q.subjectId}</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{subjects?.find((s:any) => s.id === q.subjectId)?.name || q.subjectId}</p>
                                      </div>
                                      <p className="font-bold text-sm text-[#0F172A] truncate">{q.englishQuestion || q.questionEn}</p>
                                   </div>
