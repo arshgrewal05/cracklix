@@ -20,7 +20,8 @@ import {
   ChevronDown,
   Info,
   LayoutGrid,
-  Share2
+  Share2,
+  Target
 } from "lucide-react";
 import Link from "next/link";
 import { useUser, useAuth } from "@/firebase";
@@ -39,7 +40,7 @@ import ShareButton from "@/components/navigation/ShareButton";
 
 /**
  * @fileOverview Responsive Mobile Navigation Hub.
- * Updated: Website Share Registry integrated.
+ * Updated: "Free Hub" rebranded to "My Exams" to match global navigation.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -59,7 +60,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
 
   const primaryMenu = [
     { label: "Home", href: "/", icon: Home },
-    { label: "Free Hub", href: "/current-affairs", icon: LayoutGrid },
+    { label: "My Exams", href: "/my-exams", icon: Target },
     { label: "Practice Series", href: "/mocks", icon: Zap },
     { label: "Exam Calendar", href: "/exam-calendar", icon: CalendarDays },
     { label: "Study Notes", href: "/notes", icon: FileText },
