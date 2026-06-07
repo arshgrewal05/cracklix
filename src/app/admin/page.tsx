@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Institutional Command Center.
- * Enhanced Feedback Hub: Provides visible status for Registry Sync protocol.
+ * Enhanced Feedback: Provides visible status for Data Sync.
  */
 
 export default function AdminDashboard() {
@@ -41,9 +41,11 @@ export default function AdminDashboard() {
   const { data: notes } = useCollection<any>(notesQuery)
   const { data: pyqs } = useCollection<any>(pyqsQuery)
 
-  const proUsers = useMemo(() => users?.filter((u: any) => u.status && u.status !== 'Free') || [], [users]);
+  const formattedQCount = useMemo(() => {
+    const count = questions?.length || 0;
+    return count > 999 ? `${(count / 1000).toFixed(1)}k+` : count.toString();
+  }, [questions]);
 
-  // Subject Breakdown Audit
   const subjectBreakdown = useMemo(() => {
     if (!questions) return [];
     const uniqueSubjectIds = Array.from(new Set(questions.map((q: any) => q.subjectId))).filter(Boolean);
@@ -53,7 +55,6 @@ export default function AdminDashboard() {
     }).sort((a, b) => b.count - a.count);
   }, [questions, subjects]);
 
-  // Exam Breakdown Audit
   const examBreakdown = useMemo(() => {
      if (!questions || !exams) return [];
      return exams.map((e: any) => {
@@ -67,7 +68,7 @@ export default function AdminDashboard() {
     setLastSyncStatus('idle')
     try {
       await seedInitialData(db)
-      toast({ title: "Registry Synced", description: "Official Punjab Exam hierarchy pushed to live database." })
+      toast({ title: "Database Updated", description: "Official Punjab Exam data synced." })
       setLastSyncStatus('success')
       setTimeout(() => setLastSyncStatus('idle'), 5000)
     } catch (e: any) {
@@ -83,10 +84,10 @@ export default function AdminDashboard() {
         <div>
            <div className="flex items-center gap-3 mb-2">
               <ShieldCheck className="h-5 w-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Live Database Overview</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Database Overview</span>
            </div>
           <h1 className="text-3xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Admin Center</h1>
-          <p className="text-slate-500 mt-2 text-sm md:text-lg font-medium">Database Volume: {questions?.length || 0} Questions Locked.</p>
+          <p className="text-slate-500 mt-2 text-sm md:text-lg font-medium">Platform Stats: {questions?.length || 0} Questions Saved.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
            <Button 
@@ -107,19 +108,19 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-6 px-2 md:px-0">
-         <StatCard label="Atomic Bank" value={questions?.length ?? "..."} icon={<Database className="text-blue-500" />} />
-         <StatCard label="Live Tests" value={mocks?.filter((m: any) => m.published).length ?? "..."} icon={<Zap className="text-primary" />} />
-         <StatCard label="Active Students" value={users?.length || "0"} icon={<Users className="text-emerald-500" />} />
+         <StatCard label="Questions" value={questions?.length ?? "..."} icon={<Database className="text-blue-500" />} />
+         <StatCard label="Tests" value={mocks?.filter((m: any) => m.published).length ?? "..."} icon={<Zap className="text-primary" />} />
+         <StatCard label="Students" value={users?.length || "0"} icon={<Users className="text-emerald-500" />} />
          <StatCard label="PYQ Papers" value={pyqs?.length ?? "..."} icon={<Landmark className="text-orange-500" />} />
          <StatCard label="Study Notes" value={notes?.length ?? "..."} icon={<BookOpen className="text-rose-500" />} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 px-2 md:px-0">
-         <Card className="lg:col-span-8 border-none shadow-3xl bg-white rounded-2xl md:rounded-[3.5rem] overflow-hidden text-left">
+         <Card className="lg:col-span-8 border-none shadow-3xl bg-white rounded-2xl md:rounded-[3rem] overflow-hidden text-left">
             <Tabs defaultValue="subjects">
                <CardHeader className="p-6 md:p-12 border-b border-slate-50 bg-slate-50/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="text-xl md:text-2xl font-headline font-black uppercase text-[#0F172A]">Mastery Centers</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl font-headline font-black uppercase text-[#0F172A]">Content Center</CardTitle>
                     <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Subject and Board Database Audit.</CardDescription>
                   </div>
                   <TabsList className="bg-white border p-1 rounded-xl h-10 md:h-12 shadow-sm shrink-0">
@@ -169,7 +170,7 @@ export default function AdminDashboard() {
                               </div>
                               <div className="text-right shrink-0">
                                  <p className="text-xl md:text-2xl font-headline font-black text-amber-600 leading-none">{e.count}</p>
-                                 <p className="text-[7px] md:text-[8px] font-black text-slate-300 uppercase tracking-widest mt-1">Linked MCQs</p>
+                                 <p className="text-[7px] md:text-[8px] font-black text-slate-300 uppercase tracking-widest mt-1">Questions</p>
                               </div>
                            </div>
                         ))}

@@ -27,7 +27,8 @@ import {
   User,
   TrendingUp,
   BarChart3,
-  Calendar
+  Calendar,
+  Loader2
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -36,9 +37,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import ShareButton from "@/components/navigation/ShareButton"
 
 /**
- * @fileOverview FINAL ELITE STUDENT DASHBOARD v8.0.
- * Updated to a Testbook-style professional experience.
- * Replaced jargon with clear Student-friendly language.
+ * @fileOverview FINAL ELITE STUDENT DASHBOARD v8.1.
+ * Updated: Simplified Language, Fixed Loader2 import.
  */
 
 export default function StudentDashboard() {
@@ -126,7 +126,7 @@ export default function StudentDashboard() {
                 </div>
               </section>
 
-              {/* READINESS INDEX GRID */}
+              {/* READINESS GRID */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                  <MetricNode label="READINESS" val={`${stats.readiness}%`} icon={<TrendingUp className="text-primary h-4 w-4" />} />
                  <MetricNode label="ACCURACY" val={`${stats.avgAccuracy}%`} icon={<Target className="text-emerald-500 h-4 w-4" />} />
@@ -134,12 +134,12 @@ export default function StudentDashboard() {
                  <MetricNode label="PREP HOURS" val={stats.hours} icon={<Clock className="text-amber-500 h-4 w-4" />} />
               </div>
 
-              {/* RECENT TESTS TABLE-STYLE CARDS */}
+              {/* RECENT TESTS */}
               <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden text-left border border-slate-50">
                  <CardHeader className="p-8 md:p-12 border-b border-slate-50 bg-slate-50/50 flex flex-row items-center justify-between">
                     <div className="space-y-1">
-                       <h3 className="font-headline text-xl md:text-2xl font-black text-[#0F172A] uppercase">Attempt History</h3>
-                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Analysis of recently completed series</p>
+                       <h3 className="font-headline text-xl md:text-2xl font-black text-[#0F172A] uppercase">Test History</h3>
+                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Your recent exam performance</p>
                     </div>
                     <Button asChild variant="ghost" className="h-10 text-[9px] font-black uppercase tracking-widest text-primary gap-2">
                        <Link href="/my-exams">View All <ChevronRight className="h-4 w-4" /></Link>
@@ -168,14 +168,14 @@ export default function StudentDashboard() {
                              </Link>
                           ))
                        ) : (
-                          <div className="p-24 text-center opacity-30 italic text-[11px] uppercase font-black tracking-widest text-slate-400">No official attempts detected in your registry.</div>
+                          <div className="p-24 text-center opacity-30 italic text-[11px] uppercase font-black tracking-widest text-slate-400">No test history found.</div>
                        )}
                     </div>
                  </CardContent>
               </Card>
            </div>
 
-           {/* RIGHT SIDEBAR: QUICK TACTICAL NODES */}
+           {/* RIGHT SIDEBAR */}
            <div className="lg:col-span-4 space-y-8 md:space-y-12">
               
               {/* STREAK CARD */}
@@ -187,7 +187,7 @@ export default function StudentDashboard() {
                        <p className="text-7xl md:text-9xl font-headline font-black leading-none">{stats.streak}</p>
                        <div className="space-y-1">
                           <p className="text-xl font-black uppercase">Days</p>
-                          <p className="text-[9px] font-bold uppercase text-white/60">Registry Node Active</p>
+                          <p className="text-[9px] font-bold uppercase text-white/60">Streak Active</p>
                        </div>
                     </div>
                     <div className="pt-4 flex gap-2">
@@ -198,12 +198,12 @@ export default function StudentDashboard() {
                  </div>
               </Card>
 
-              {/* QUICK LINKS GRID */}
+              {/* QUICK LINKS */}
               <div className="grid grid-cols-2 gap-4 md:gap-6">
-                 <DashboardTile icon={<Bookmark className="text-primary" />} label="SAVED MCQS" href="/revision" />
+                 <DashboardTile icon={<Bookmark className="text-primary" />} label="SAVED QUESTIONS" href="/revision" />
                  <DashboardTile icon={<Trophy className="text-amber-500" />} label="RANKINGS" href="/leaderboard" />
-                 <DashboardTile icon={<LayoutGrid className="text-blue-500" />} label="EXAM HUBS" href="/exams" />
-                 <DashboardTile icon={<Activity className="text-emerald-500" />} label="DEEP AUDIT" href="/analytics" />
+                 <DashboardTile icon={<LayoutGrid className="text-blue-500" />} label="ALL EXAMS" href="/exams" />
+                 <DashboardTile icon={<Activity className="text-emerald-500" />} label="MY ANALYSIS" href="/analytics" />
               </div>
 
               {/* SHARE BRANDING */}
@@ -214,7 +214,7 @@ export default function StudentDashboard() {
                     </div>
                     <div className="space-y-1">
                        <h4 className="text-lg font-black uppercase text-[#0B1528]">Spread Success</h4>
-                       <p className="text-[9px] font-bold uppercase text-slate-400">Help fellow aspirants grow</p>
+                       <p className="text-[9px] font-bold uppercase text-slate-400">Help others grow</p>
                     </div>
                  </div>
                  <ShareButton 
@@ -227,7 +227,7 @@ export default function StudentDashboard() {
                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
                     Developed by <span className="text-[#0F172A] font-black">Arsh Grewal</span>
                  </p>
-                 <Badge className="bg-slate-50 text-slate-300 border-none text-[8px] font-bold uppercase px-3 py-1">Cracklix v8.0 • Secure Node</Badge>
+                 <Badge className="bg-slate-50 text-slate-300 border-none text-[8px] font-bold uppercase px-3 py-1">Cracklix v8.1 • Secure Platform</Badge>
               </div>
            </div>
         </div>
