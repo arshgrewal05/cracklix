@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -26,7 +27,7 @@ import {
 
 /**
  * @fileOverview Final CBT Attempt Node v18.0.
- * Fixed: Relocated TacticalFooter from fixed-bottom to inline-flow to prevent mobile clipping.
+ * Fixed: Compact content area to remove vacant space and sit footer inline.
  */
 
 export default function MockAttemptPage() {
@@ -188,7 +189,7 @@ export default function MockAttemptPage() {
   const selectedAnswer = examStore.answers[examStore.currentIdx];
 
   return (
-    <div className="flex flex-col h-screen bg-black font-body select-none">
+    <div className="flex flex-col h-screen bg-black font-body select-none overflow-hidden">
       <AntiCheat />
       <ExamHeader 
         onPaletteToggle={() => setIsMobilePaletteOpen(true)} 
@@ -233,7 +234,7 @@ export default function MockAttemptPage() {
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-black flex flex-col items-center">
-           <div className="w-full max-w-[920px] p-3 md:p-6 lg:p-8 space-y-4">
+           <div className="w-full max-w-[920px] p-2 md:p-6 lg:p-8 space-y-2">
               {q && (
                 <>
                   <QuestionRenderer 

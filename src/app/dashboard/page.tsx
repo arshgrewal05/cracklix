@@ -41,7 +41,7 @@ import ShareButton from "@/components/navigation/ShareButton"
 
 /**
  * @fileOverview Final Production-Grade Student Success Hub.
- * Updated: Dynamic Website Share system integrated into Quick Access.
+ * Updated: Robust expiry logic to prevent render loops and integrated share system.
  */
 
 export default function StudentDashboard() {
@@ -53,19 +53,19 @@ export default function StudentDashboard() {
     if (!loading && !user) router.push("/login")
   }, [user, loading, router])
 
-  // Automated Expiry Audit
+  // Automated Expiry Audit - Optimized to prevent infinite loops
   useEffect(() => {
-    if (profile?.passExpiryDate && db && user) {
+    if (profile?.passExpiryDate && db && user && profile.status !== 'Free') {
        const expiry = new Date(profile.passExpiryDate);
        const now = new Date();
-       if (now > expiry && profile.status !== 'Free') {
+       if (now > expiry) {
           updateDoc(doc(db, "users", user.uid), {
              status: 'Free',
              updatedAt: serverTimestamp()
           });
        }
     }
-  }, [profile, db, user]);
+  }, [profile?.status, profile?.passExpiryDate, db, user]);
 
   const resultsQuery = useMemo(() => {
     if (!db || !user) return null
@@ -164,7 +164,7 @@ export default function StudentDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
           <div className="lg:col-span-8 space-y-6 md:space-y-10">
             {/* Readiness Card */}
-            <Card className="border-none shadow-3xl rounded-[2.5rem] md:rounded-[3rem] bg-white overflow-hidden text-left">
+            <Card className="border-none shadow-3xl rounded-[2.5rem] md:rounded-[3.5rem] bg-white overflow-hidden text-left">
                <CardHeader className="p-6 md:p-10 border-b border-slate-50 flex flex-row items-center justify-between">
                   <div className="space-y-1">
                     <CardTitle className="font-headline text-lg md:text-2xl font-black text-[#0F172A] uppercase">Exam Readiness Score</CardTitle>
@@ -200,7 +200,7 @@ export default function StudentDashboard() {
             </Card>
 
             {/* History Card */}
-            <Card className="border-none shadow-3xl rounded-[2.5rem] md:rounded-[3rem] bg-white overflow-hidden text-left">
+            <Card className="border-none shadow-3xl rounded-[2.5rem] md:rounded-[3.5rem] bg-white overflow-hidden text-left">
                <CardHeader className="p-6 md:p-10 border-b border-slate-50">
                   <CardTitle className="font-headline text-lg md:text-2xl font-black text-[#0F172A] uppercase">Test History</CardTitle>
                </CardHeader>
