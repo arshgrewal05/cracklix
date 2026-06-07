@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -23,7 +24,8 @@ import {
   CheckCircle2, 
   Loader2, 
   X, 
-  Zap 
+  Zap,
+  Eye
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -36,8 +38,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Mock Manager v15.5.
- * FIXED: Zap icon reference and bulk selection logic.
+ * @fileOverview Institutional Mock Manager v16.0.
+ * UPDATED: Added View option and Manual Edit routing for direct content typing.
  */
 
 export default function MockManagement() {
@@ -126,9 +128,14 @@ export default function MockManagement() {
           <h1 className="text-2xl md:text-5xl font-headline font-black text-primary uppercase tracking-tight">Mock Manager</h1>
           <p className="text-slate-500 mt-1 font-medium">Audit and manage all preparation series.</p>
         </div>
-        <Button asChild className="bg-primary hover:bg-orange-600 gap-2 font-black shadow-2xl rounded-xl h-12 md:h-16 px-8 md:px-12 uppercase tracking-widest text-[10px] w-full md:w-auto border-none">
-          <Link href="/admin/mocks/builder"><Plus className="h-5 w-5" /> Assemble New Series</Link>
-        </Button>
+        <div className="flex gap-4 w-full md:w-auto">
+           <Button asChild variant="outline" className="h-12 md:h-16 px-6 md:px-10 rounded-xl font-black uppercase tracking-widest text-[9px] border-slate-200 bg-white">
+              <Link href="/admin/mocks/builder"><Plus className="h-4 w-4" /> Architect</Link>
+           </Button>
+           <Button asChild className="bg-primary hover:bg-orange-600 gap-2 font-black shadow-2xl rounded-xl h-12 md:h-16 px-8 md:px-12 uppercase tracking-widest text-[10px] flex-1 md:flex-none">
+             <Link href="/admin/mocks/builder"><Zap className="h-5 w-5" /> Assemble New</Link>
+           </Button>
+        </div>
       </div>
 
       <Card className="border-none shadow-3xl bg-white rounded-2xl md:rounded-[3rem] overflow-hidden">
@@ -212,8 +219,15 @@ export default function MockManagement() {
                       </TableCell>
                       <TableCell className="text-right px-10">
                         <div className="flex justify-end gap-2 opacity-20 group-hover:opacity-100 transition-all">
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-white hover:text-primary shadow-sm" asChild><Link href={`/admin/mocks/builder?id=${mock.id}`}><Edit className="h-4 w-4" /></Link></Button>
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDeleteSingle(mock.id)}><Trash2 className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-white hover:text-primary shadow-sm" asChild>
+                             <Link href={`/mocks/${mock.id}`} target="_blank"><Eye className="h-4 w-4" /></Link>
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-white hover:text-blue-600 shadow-sm" asChild>
+                             <Link href={`/admin/mocks/manual-edit?id=${mock.id}`}><Edit className="h-4 w-4" /></Link>
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDeleteSingle(mock.id)}>
+                             <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
