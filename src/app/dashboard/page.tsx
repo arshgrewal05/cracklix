@@ -196,7 +196,7 @@ export default function StudentDashboard() {
            <div className="lg:col-span-4 space-y-8 md:space-y-12">
               
               <Card className="border-none shadow-4xl bg-gradient-to-br from-orange-500 to-primary text-white p-10 rounded-[3rem] relative overflow-hidden group">
-                 <div className="absolute bottom-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform duration-[2s]"><Flame className="h-64 w-64" /></div>
+                 <div className="absolute bottom-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform" style={{ transitionDuration: '2s' }}><Flame className="h-64 w-64" /></div>
                  <div className="relative z-10 space-y-6">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/70">Learning Streak</p>
                     <div className="flex items-baseline gap-4">

@@ -336,7 +336,7 @@ export default function ResultPage() {
                                 <span className="text-[#0B1528]">{s.correct}/{s.total} CORRECT</span>
                              </div>
                              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                                <div className={cn("h-full transition-all duration-[2000ms] ease-out", s.accuracy >= 70 ? 'bg-emerald-500' : s.accuracy >= 40 ? 'bg-amber-500' : 'bg-rose-500')} style={{ width: `${s.accuracy}%` }} />
+                                <div className={cn("h-full transition-all ease-out")} style={{ width: `${s.accuracy}%`, transitionDuration: '2000ms', backgroundColor: s.accuracy >= 70 ? '#10B981' : s.accuracy >= 40 ? '#F59E0B' : '#EF4444' }} />
                              </div>
                           </div>
                        </div>
@@ -520,9 +520,9 @@ function CompareMetric({ label, user, topper, max, unit = "", isTime = false }: 
             </div>
          </div>
          <div className="relative h-3 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/50 print:h-2">
-            <div className="absolute inset-0 bg-amber-400/10 transition-all duration-[1500ms] ease-out" style={{ width: `${topperPer}%` }} />
-            <div className="absolute inset-0 bg-amber-400 transition-all duration-[1800ms] ease-out border-r-[4px] border-amber-600 shadow-lg" style={{ width: `${topperPer}%` }} />
-            <div className="absolute inset-0 bg-primary/40 border-r-[4px] border-primary transition-all duration-[1200ms] ease-out shadow-lg" style={{ width: `${userPer}%` }} />
+            <div className="absolute inset-0 bg-amber-400/10 transition-all ease-out" style={{ width: `${topperPer}%`, transitionDuration: '1500ms' }} />
+            <div className="absolute inset-0 bg-amber-400 transition-all ease-out border-r-[4px] border-amber-600 shadow-lg" style={{ width: `${topperPer}%`, transitionDuration: '1800ms' }} />
+            <div className="absolute inset-0 bg-primary/40 border-r-[4px] border-primary transition-all ease-out shadow-lg" style={{ width: `${userPer}%`, transitionDuration: '1200ms' }} />
          </div>
       </div>
    )
