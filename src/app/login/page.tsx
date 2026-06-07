@@ -25,8 +25,8 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 
 /**
- * @fileOverview Login & Sign Up Hub v1.0.
- * Simplified Language: Replaced "Registry Access" with "Login".
+ * @fileOverview Login & Sign Up Hub v1.5.
+ * HARDENED: Fixed visibility of headings and descriptions for dark theme.
  */
 
 export default function LoginPage() {
@@ -131,35 +131,39 @@ function LoginContent() {
         <Card className="border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl rounded-[2.5rem] overflow-hidden">
           <div className="h-1.5 w-full bg-primary" />
           <CardHeader className="text-center pt-10">
-            <CardTitle className="text-2xl font-headline font-black uppercase tracking-tight">{mode === 'login' ? "Login" : "Create Account"}</CardTitle>
-            <CardDescription className="text-slate-500 font-bold uppercase text-[10px] tracking-widest mt-2">Manage your study progress.</CardDescription>
+            <CardTitle className="text-2xl font-headline font-black uppercase tracking-tight text-white">
+              {mode === 'login' ? "Login" : "Create Account"}
+            </CardTitle>
+            <CardDescription className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-2">
+              MANAGE YOUR STUDY PROGRESS.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pb-12">
             <form onSubmit={handleEmailAuth} className="space-y-4">
               {mode === 'register' && (
                 <div className="space-y-4">
-                   <Input value={name} onChange={e => setName(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10" placeholder="Your Full Name" />
-                   <Input value={phone} onChange={e => setPhone(e.target.value)} required maxLength={10} className="h-12 rounded-xl bg-white/5 border-white/10" placeholder="Mobile Number" />
+                   <Input value={name} onChange={e => setName(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-primary" placeholder="Your Full Name" />
+                   <Input value={phone} onChange={e => setPhone(e.target.value)} required maxLength={10} className="h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-primary" placeholder="Mobile Number" />
                 </div>
               )}
-              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10" placeholder="Email Address" />
-              <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10" placeholder="Password" />
-              {mode === 'register' && <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10" placeholder="Confirm Password" />}
+              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-primary" placeholder="Email Address" />
+              <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-primary" placeholder="Password" />
+              {mode === 'register' && <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-primary" placeholder="Confirm Password" />}
               
-              <Button type="submit" className="w-full h-14 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-xl shadow-xl" disabled={loading}>
+              <Button type="submit" className="w-full h-14 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-xl shadow-xl border-none transition-all active:scale-95" disabled={loading}>
                 {loading ? "Please Wait..." : (mode === 'login' ? "Login" : "Sign Up")}
               </Button>
             </form>
             
-            <Button variant="outline" className="w-full h-12 border-white/10 bg-white/5 text-white gap-3 rounded-xl font-bold text-xs" onClick={handleGoogleSignIn}>
+            <Button variant="outline" className="w-full h-12 border-white/10 bg-white/5 text-white gap-3 rounded-xl font-bold text-xs hover:bg-white/10" onClick={handleGoogleSignIn}>
               Continue with Google
             </Button>
 
             <div className="text-center text-[10px] font-black uppercase text-slate-500 tracking-widest">
                {mode === 'login' ? (
-                 <p>New Student? <button onClick={() => setMode('register')} className="text-primary hover:underline">Register Now</button></p>
+                 <p>NEW STUDENT? <button onClick={() => setMode('register')} className="text-primary hover:underline">Register Now</button></p>
                ) : (
-                 <p>Already a student? <button onClick={() => setMode('login')} className="text-primary hover:underline">Login</button></p>
+                 <p>ALREADY A STUDENT? <button onClick={() => setMode('login')} className="text-primary hover:underline">Login</button></p>
                )}
             </div>
           </CardContent>
