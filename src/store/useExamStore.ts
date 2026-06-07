@@ -1,11 +1,12 @@
+
 import { create } from 'zustand';
-import { AttemptState, ExamLanguage, QuestionStatus, Question } from '@/types';
+import { AttemptState, ExamLanguage, QuestionStatus, Question, LanguageDisplayMode } from '@/types';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 
 /**
- * @fileOverview Enterprise CBT Global Store v20.0.
- * Optimized: High-speed non-blocking updates and robust re-initialization.
+ * @fileOverview Enterprise CBT Global Store v21.0.
+ * Updated: Hydration support for Mock Language Display Mode.
  */
 
 interface ExamStore extends AttemptState {
@@ -13,14 +14,14 @@ interface ExamStore extends AttemptState {
   mockId: string;
   mockTitle: string;
   userId: string;
-  language: ExamLanguage;
+  language: ExamLanguage | LanguageDisplayMode;
   isPaused: boolean;
   isSubmitting: boolean;
   isPaletteVisible: boolean;
 
   // Actions
-  initExam: (mockId: string, mockTitle: string, userId: string, questions: Question[], duration: number, savedState?: any) => void;
-  setLanguage: (lang: ExamLanguage) => void;
+  initExam: (mockId: string, mockTitle: string, userId: string, questions: Question[], duration: number, savedState?: any, languageMode?: LanguageDisplayMode) => void;
+  setLanguage: (lang: ExamLanguage | LanguageDisplayMode) => void;
   setPaused: (paused: boolean) => void;
   setPaletteVisible: (visible: boolean) => void;
   togglePalette: () => void;
@@ -55,10 +56,9 @@ export const useExamStore = create<ExamStore>((set, get) => ({
   startTime: 0,
   endTime: 0,
 
-  initExam: (mockId, mockTitle, userId, questions, duration, savedState) => {
+  initExam: (mockId, mockTitle, userId, questions, duration, savedState, languageMode) => {
     const now = Date.now();
     
-    // Logic: If session is completed or expired, treat as a fresh start
     let isStale = false;
     if (savedState?.status === 'COMPLETED' || (savedState?.endTime && now >= savedState.endTime)) {
       isStale = true;
@@ -73,6 +73,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       userId,
       questions,
       timeLeft,
+      language: languageMode || 'bilingual',
       startTime: isStale ? now : (savedState?.startTime || now),
       endTime,
       answers: isStale ? {} : (savedState?.answers || {}),
@@ -103,7 +104,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       currentSectionId: questions[idx]?.sectionId || ''
     });
     
-    // Async registry sync
     if (userId && mockId) {
       const { firestore: db } = initializeFirebase();
       updateDoc(doc(db, 'attempts', `${userId}_${mockId}`), {
@@ -129,10 +129,8 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       newStatus[idx] = 'answered';
     }
 
-    // Instant UI update
     set({ answers: newAnswers, status: newStatus });
 
-    // Background cloud sync
     const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);
     updateDoc(attemptRef, {
       [`answers.${idx}`]: optionIdx,

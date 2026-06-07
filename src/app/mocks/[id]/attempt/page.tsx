@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -86,7 +87,7 @@ export default function MockAttemptPage() {
         const attemptSnap = await getDoc(attemptRef);
         const savedState = attemptSnap.exists() ? attemptSnap.data() : undefined;
 
-        examStore.initExam(mockId, mockData.title || "Evaluation Series", user.uid, questions, mockData.duration || 120, savedState);
+        examStore.initExam(mockId, mockData.title || "Evaluation Series", user.uid, questions, mockData.duration || 120, savedState, mockData.languageMode);
       } catch (err: any) {
         toast({ variant: "destructive", title: "Sync Failure", description: err.message });
         router.push(`/mocks/${mockId}`);
@@ -185,10 +186,6 @@ export default function MockAttemptPage() {
                     <Play className="h-7 w-7 fill-current" />
                  </div>
                  <h2 className="text-xl font-headline font-black text-[#0F172A] uppercase">Test Paused</h2>
-                 <div className="grid grid-cols-2 gap-3">
-                    <ResumeStat label="Ans." val={stats.answered} color="text-blue-600 bg-blue-50" />
-                    <ResumeStat label="Marked" val={stats.marked} color="text-violet-600 bg-violet-50" />
-                 </div>
                  <Button onClick={() => examStore.setPaused(false)} className="w-full h-14 bg-primary text-white rounded-xl font-black uppercase tracking-widest">Resume Attempt</Button>
               </div>
             </motion.div>
@@ -200,7 +197,7 @@ export default function MockAttemptPage() {
               {q && (
                 <>
                   <QuestionRenderer 
-                    language={examStore.language} 
+                    language={examStore.language as any} 
                     question={{...q, displayId: (examStore.currentIdx + 1).toString()}} 
                     selectedAnswer={selectedAnswer}
                     onSelect={(idx) => examStore.setAnswer(examStore.currentIdx, idx, db)}
@@ -230,7 +227,6 @@ export default function MockAttemptPage() {
             <DialogHeader className="space-y-4">
                <div className="h-16 w-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto text-rose-500"><AlertTriangle className="h-8 w-8" /></div>
                <DialogTitle className="text-xl font-headline font-black text-[#0F172A] uppercase">Terminate Session?</DialogTitle>
-               <p className="text-slate-500 text-sm font-medium">Timer continues in cloud. Re-entry allowed until expiration.</p>
             </DialogHeader>
             <DialogFooter className="flex flex-col gap-3 mt-6">
                <Button onClick={() => setShowExitModal(false)} className="w-full h-12 bg-slate-100 text-slate-600 rounded-xl font-bold uppercase">Stay in Test</Button>
@@ -240,13 +236,4 @@ export default function MockAttemptPage() {
       </Dialog>
     </div>
   );
-}
-
-function ResumeStat({ label, val, color }: any) {
-   return (
-      <div className={cn("p-3 rounded-xl flex flex-col items-center", color)}>
-         <span className="text-[8px] font-black uppercase tracking-widest opacity-60">{label}</span>
-         <span className="text-lg font-headline font-black">{val}</span>
-      </div>
-   )
 }

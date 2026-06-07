@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect, useCallback } from "react"
@@ -46,6 +47,7 @@ export default function ResultPage() {
   const [expandedQs, setExpandedQs] = useState<Record<number, boolean>>({})
   const [questions, setQuestions] = useState<any[]>([])
   const [loadingContent, setLoadingContent] = useState(true)
+  const [mockLanguageMode, setMockLanguageMode] = useState<any>('ENGLISH_PUNJABI')
 
   const isValidDb = !!(db && typeof db === 'object' && 'type' in db === false);
 
@@ -80,7 +82,9 @@ export default function ResultPage() {
       try {
         const mockSnap = await getDoc(doc(db, "mocks", mockId))
         if (mockSnap.exists()) {
-          const questionIds = mockSnap.data().questionIds || []
+          const mData = mockSnap.data();
+          setMockLanguageMode(mData.languageMode || 'ENGLISH_PUNJABI');
+          const questionIds = mData.questionIds || []
           const fetchedQuestions: any[] = []
           
           const chunks = []
@@ -198,7 +202,7 @@ export default function ResultPage() {
 
                           <QuestionRenderer 
                             question={q} 
-                            language="bilingual" 
+                            language={mockLanguageMode} 
                             showSolution={isExpanded} 
                             selectedAnswer={studentAnsIdx}
                             hideOptions={false}

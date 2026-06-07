@@ -8,6 +8,8 @@ export type AccessType = 'FREE' | 'PREMIUM';
 export type QuestionStatus = 'not-visited' | 'not-answered' | 'answered' | 'marked' | 'answered-marked';
 export type ExamLanguage = 'en' | 'pa' | 'hi' | 'bilingual';
 
+export type LanguageDisplayMode = 'ENGLISH' | 'PUNJABI' | 'HINDI' | 'ENGLISH_PUNJABI' | 'ENGLISH_HINDI';
+
 export interface Subject {
   id: string;
   name: string;
@@ -35,6 +37,7 @@ export interface MockTest {
   questionIds: string[];
   sections: ExamSection[];
   published: boolean;
+  languageMode: LanguageDisplayMode;
   createdAt: any;
   updatedAt: any;
 }
@@ -49,15 +52,20 @@ export interface Question {
   hindiQuestion?: string;
   optionAEnglish: string;
   optionAPunjabi: string;
+  optionAHindi?: string;
   optionBEnglish: string;
   optionBPunjabi: string;
+  optionBHindi?: string;
   optionCEnglish: string;
   optionCPunjabi: string;
+  optionCHindi?: string;
   optionDEnglish: string;
   optionDPunjabi: string;
+  optionDHindi?: string;
   correctAnswer: 'A' | 'B' | 'C' | 'D';
   englishExplanation: string;
   punjabiExplanation: string;
+  hindiExplanation?: string;
   difficulty: Difficulty;
   subjectId: string;
 }
