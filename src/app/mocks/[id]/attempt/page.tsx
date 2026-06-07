@@ -26,8 +26,8 @@ import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
 /**
- * @fileOverview Production Hardened CBT Attempt Engine v26.0.
- * FIXED: Duration calculation added to final payload to eliminate NaN errors in results.
+ * @fileOverview Production Hardened CBT Attempt Engine v27.0.
+ * UPDATED: Pause modal buttons set to institutional orange per high-fidelity screenshot.
  */
 
 export default function MockAttemptPage() {
@@ -257,23 +257,23 @@ export default function MockAttemptPage() {
       </Sheet>
 
       <Dialog open={showExitModal} onOpenChange={setShowExitModal}>
-         <DialogContent className="max-w-[400px] rounded-[2.5rem] p-12 bg-white border-none shadow-5xl text-center">
-            <div className="space-y-8">
-               <div className="h-16 w-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto text-slate-400">
+         <DialogContent className="max-w-[440px] rounded-[2.5rem] p-10 md:p-12 bg-white border-none shadow-5xl text-center">
+            <div className="space-y-10">
+               <div className="h-16 w-16 bg-blue-50/50 rounded-2xl flex items-center justify-center mx-auto text-blue-500 shadow-inner">
                   <LogOut className="h-8 w-8" />
                </div>
-               <div className="space-y-2">
-                  <DialogTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Pause Assessment?</DialogTitle>
-                  <p className="text-sm font-medium text-slate-500">Your current state will be safely cached. You can resume later.</p>
+               <div className="space-y-3">
+                  <DialogTitle className="text-3xl font-headline font-black uppercase text-[#0F172A] tracking-tight">Pause Assessment?</DialogTitle>
+                  <p className="text-sm font-bold text-slate-400 leading-relaxed uppercase tracking-tight">Your current state will be safely cached. You can resume later.</p>
                </div>
-               <div className="flex gap-4">
-                  <Button variant="ghost" onClick={() => setShowExitModal(false)} className="flex-1 h-14 rounded-xl font-black uppercase text-[10px]">Cancel</Button>
+               <div className="flex gap-4 pt-4">
+                  <Button variant="ghost" onClick={() => setShowExitModal(false)} className="flex-1 h-16 rounded-xl font-black uppercase text-[11px] text-[#0F172A] tracking-widest hover:bg-slate-50">Cancel</Button>
                   <Button 
                     onClick={() => {
                        setShowExitModal(false);
                        router.push('/dashboard');
                     }}
-                    className="flex-1 h-14 bg-[#0F172A] hover:bg-black text-white rounded-xl font-black uppercase text-[10px] shadow-xl"
+                    className="flex-1 h-16 bg-[#F97316] hover:bg-orange-600 text-white rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-orange-500/20 transition-all border-none"
                   >
                      Yes, Pause
                   </Button>
