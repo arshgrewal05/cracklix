@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
@@ -18,8 +19,8 @@ import { doc } from "firebase/firestore"
 import Script from "next/script"
 
 /**
- * @fileOverview Institutional Checkout Hub v32.0.
- * FIXED: Aggressively forced UPI VPA (ID) entry field and hardened Customer Metadata Sanitization.
+ * @fileOverview Institutional Checkout Hub v35.0.
+ * FIXED: Forced UPI ID (VPA) entry field and Aggressive Customer Name Sanitization.
  */
 
 export default function CheckoutPage() {
@@ -69,9 +70,9 @@ function CheckoutContent() {
       if (orderData.error) throw new Error(orderData.error);
 
       // 1. AGGRESSIVE NAME SANITIZATION (Only A-Z and spaces)
-      // Razorpay rejections often happen due to special characters in names
+      // Razorpay's domestic node rejects names with periods, dashes, or symbols.
       const rawName = profile?.name || user?.displayName || 'Aspirant';
-      const sanitizedName = rawName.replace(/[^a-zA-Z\s]/g, '').trim().slice(0, 40) || "Student";
+      const sanitizedName = rawName.replace(/[^a-zA-Z\s]/g, '').trim().slice(0, 40) || "Aspirant";
       
       // 2. STRICT 10-DIGIT MOBILE REGISTRY
       const phoneDigits = (profile?.phone || '').replace(/\D/g, '').slice(-10);
@@ -80,8 +81,8 @@ function CheckoutContent() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_SynIbBuKzUu1w2',
         amount: orderData.amount,
         currency: "INR",
-        name: "CRACKLIX",
-        description: `${planData.name} Activation`,
+        name: "CRACKLIX Hub",
+        description: `${planData.name} Registry Activation`,
         image: "https://i.ibb.co/5hkxTtKS/Whats-App-Image-2026-05-28-at-10-31-36-AM.jpg",
         order_id: orderData.order_id,
         handler: async function (response: any) {
@@ -117,7 +118,7 @@ function CheckoutContent() {
           contact: phoneDigits.length === 10 ? `+91${phoneDigits}` : ''
         },
         theme: { color: "#F97316" },
-        // CRITICAL: FORCE UPI VPA INPUT AND CARDS
+        // CRITICAL: FORCE UPI ID (VPA) INPUT AND CARDS
         config: {
           display: {
             blocks: {
@@ -126,7 +127,7 @@ function CheckoutContent() {
                 instruments: [
                   {
                     method: "upi",
-                    protocols: ["vpa"] // This forces the "Enter UPI ID" field
+                    protocols: ["vpa"] // Forces the "Enter UPI ID" text field
                   }
                 ]
               },

@@ -1,10 +1,11 @@
+
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { initializeFirebase } from '@/firebase';
 import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Razorpay Verification Hub v9.0.
+ * @fileOverview Institutional Razorpay Verification Hub v10.0.
  * Hardened: Domestic signature audit and automatic user registry update.
  */
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
 
     const secret = process.env.RAZORPAY_KEY_SECRET || 'Ikrj9m0oFrwlW1peOzgq0Nrb';
     
-    // 1. Signature Audit Hub
+    // 1. Signature Audit Hub (HMAC-SHA256)
     const hmac = crypto.createHmac('sha256', secret);
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generated_signature = hmac.digest('hex');
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Security audit failed. Transaction rejected.' }, { status: 400 });
     }
 
-    // 2. Access Synchronization
+    // 2. Access Synchronization Node
     const { firestore: db } = initializeFirebase();
     const userRef = doc(db, 'users', userId);
     const planRef = doc(db, 'passes', planId);
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + duration);
 
-    // Update User Status
+    // Update User Registry
     await updateDoc(userRef, {
       status: planId,
       passExpiryDate: expiryDate.toISOString(),
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
       createdAt: serverTimestamp()
     });
 
-    // Create Subscription Node
+    // Create Subscription Hub Entry
     await addDoc(collection(db, 'subscriptions'), {
       userId,
       planId,
