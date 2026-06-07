@@ -39,8 +39,8 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Admin Layout v9.0.
- * UPDATED: Integrated Current Affairs Hub into Content Sections.
+ * @fileOverview Admin Layout v10.0.
+ * UPDATED: Hardened for mobile responsiveness with overflow-x management.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -151,9 +151,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
            <SideNavContent />
         </Sidebar>
         
-        <SidebarInset className="flex flex-col bg-white">
+        <SidebarInset className="flex flex-col bg-white min-w-0 max-w-full">
           <header className="h-14 md:h-16 border-b border-slate-200 flex items-center px-4 md:px-6 justify-between bg-white sticky top-0 z-[100] shrink-0">
-            <div className="flex items-center gap-1 md:gap-3">
+            <div className="flex items-center gap-1 md:gap-3 overflow-hidden">
               <div className="lg:hidden">
                  <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                     <SheetTrigger asChild>
@@ -170,7 +170,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <SidebarTrigger className="hidden lg:flex text-[#0F172A]" />
               
               <div className="h-4 w-[1px] bg-slate-200 mx-2 hidden md:block" />
-              <BackButton label="Dashboard" fallback="/admin" />
+              <BackButton label="Dashboard" fallback="/admin" className="hidden xs:flex" />
 
               <div className="h-4 w-[1px] bg-slate-200 mx-1 hidden sm:block" />
               <div className="flex items-center gap-2 truncate">
@@ -183,8 +183,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                <LogOut className="h-5 w-5" />
             </Button>
           </header>
-          <main className="flex-1 p-4 md:p-8 bg-white overflow-y-auto overflow-x-hidden">
-            <div className="max-w-full overflow-hidden">
+          <main className="flex-1 p-4 md:p-8 bg-white overflow-y-auto overflow-x-hidden min-w-0">
+            <div className="max-w-full">
                {children}
             </div>
           </main>
