@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -57,12 +56,12 @@ export default function QuestionRenderer({
            </div>
          )}
          {showPa && punjabiQ && (
-           <div className="font-[700] text-[15px] leading-snug tracking-tight text-slate-500 antialiased">
+           <div className="font-[700] text-[15px] leading-snug tracking-tight text-[#0F172A] antialiased">
              <MathText text={punjabiQ} />
            </div>
          )}
          {showHi && hindiQ && (
-           <div className="font-[700] text-[15px] leading-snug tracking-tight text-slate-500 antialiased">
+           <div className="font-[700] text-[15px] leading-snug tracking-tight text-[#0F172A] antialiased">
              <MathText text={hindiQ} />
            </div>
          )}
@@ -103,10 +102,10 @@ export default function QuestionRenderer({
                     <div className="font-[700] text-[15px] leading-tight text-[#0F172A]"><MathText text={en} /></div>
                   )}
                   {showPa && pa && (
-                    <div className="font-[700] text-[14px] leading-tight text-slate-500 mt-1"><MathText text={pa} /></div>
+                    <div className="font-[700] text-[14px] leading-tight text-[#0F172A] mt-1"><MathText text={pa} /></div>
                   )}
                   {showHi && hi && (
-                    <div className="font-[700] text-[14px] leading-tight text-slate-500 mt-1"><MathText text={hi} /></div>
+                    <div className="font-[700] text-[14px] leading-tight text-[#0F172A] mt-1"><MathText text={hi} /></div>
                   )}
                 </div>
               </div>
