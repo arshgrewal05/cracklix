@@ -11,6 +11,10 @@ interface TimerProps {
   isPaused?: boolean
 }
 
+/**
+ * @fileOverview High-Contrast CBT Timer Pill.
+ * Optimized: Tabular numbers for clean digit swapping and high visibility.
+ */
 export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(initialSeconds)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -49,11 +53,13 @@ export default function Timer({ onTimeUp, initialSeconds, onTick, isPaused }: Ti
 
   return (
     <div className={cn(
-      "flex items-center gap-2 px-3 h-8 rounded-lg font-bold transition-all tabular-nums border",
-      isLowTime ? "bg-rose-600 border-rose-500 text-white animate-pulse" : "bg-[#0F172A] border-white/10 text-white"
+      "flex items-center gap-2 md:gap-3 px-4 md:px-6 h-9 md:h-12 rounded-full font-bold transition-all tabular-nums border shadow-inner",
+      isLowTime ? "bg-rose-600 border-rose-500 text-white animate-pulse" : "bg-[#050B19] border-white/10 text-white"
     )}>
-      <Clock className={cn("h-3.5 w-3.5", isLowTime ? "text-white" : "text-primary")} />
-      <span className="text-[14px] md:text-[18px] font-black tracking-widest leading-none">{formatTime(timeLeft)}</span>
+      <Clock className={cn("h-3.5 w-3.5 md:h-4 md:w-4", isLowTime ? "text-white" : "text-primary")} />
+      <span className="text-[15px] md:text-[22px] font-[900] tracking-widest leading-none">
+         {formatTime(timeLeft)}
+      </span>
     </div>
   )
 }
