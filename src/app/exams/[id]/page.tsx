@@ -35,8 +35,8 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 /**
- * @fileOverview Final Exam-Specific Mastery Hub v2.1.
- * Optimized: Removed title truncation and improved mobile tab navigation.
+ * @fileOverview Final Exam-Specific Mastery Hub v2.2.
+ * Optimized: Horizontal back button alignment to save vertical space.
  */
 
 export default function ExamHubPage() {
@@ -94,8 +94,11 @@ export default function ExamHubPage() {
       
       <section className="bg-white border-b border-slate-200 py-6 md:py-10">
          <div className="container mx-auto px-6 max-w-7xl text-left">
-            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-               <button onClick={() => router.back()} className="h-10 w-10 md:h-12 md:w-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-black transition-all active:scale-95 shrink-0">
+            <div className="flex items-start gap-4 md:gap-8">
+               <button 
+                 onClick={() => router.back()} 
+                 className="h-10 w-10 md:h-12 md:w-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-black transition-all active:scale-95 shrink-0 mt-1"
+               >
                   <ChevronLeft className="h-6 w-6 md:h-7 md:w-7" />
                </button>
                <div className="min-w-0 flex-1">

@@ -30,9 +30,8 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import BackButton from "@/components/navigation/BackButton"
 
 /**
- * @fileOverview Institutional Results Hub v20.0.
- * Updated: Desktop Wide-Format support (removed mobile-app-shell limitation).
- * Optimized: Centered content with max-width container for high-fidelity review.
+ * @fileOverview Institutional Results Hub v21.0.
+ * Updated: Side-aligned back button to minimize vertical space usage.
  */
 
 export default function ResultPage() {
@@ -150,15 +149,15 @@ export default function ResultPage() {
     <div className="flex flex-col min-h-screen bg-slate-50/50 font-body pb-32">
       <Navbar />
       
-      <main className="container mx-auto px-4 md:px-6 py-8 md:py-16 max-w-6xl space-y-10 text-left animate-in fade-in duration-700">
+      <main className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-6xl space-y-8 text-left animate-in fade-in duration-700">
         
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center gap-4 mb-2">
-           <BackButton label="Dashboard" fallback="/dashboard" className="h-12 border bg-white shadow-sm" />
-           <div className="h-6 w-px bg-slate-200 hidden md:block" />
-           <div className="hidden md:flex items-center gap-3">
-              <ShieldCheck className="h-4 w-4 text-emerald-500" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Institutional Audit Registry</p>
+        {/* Navigation Breadcrumb (Side Aligned) */}
+        <div className="flex items-center gap-3">
+           <BackButton label="Home" fallback="/dashboard" className="p-0 h-auto" />
+           <div className="h-4 w-px bg-slate-200" />
+           <div className="flex items-center gap-2">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Institutional Audit Registry</p>
            </div>
         </div>
 

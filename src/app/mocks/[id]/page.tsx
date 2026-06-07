@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Institutional Mock Node with Advanced Tiered Access Control.
- * Logic: Checks specific subscription allowed_exams and active expiry.
+ * Optimized: Horizontal back button layout.
  */
 
 export default function MockOverviewPage() {
@@ -123,34 +123,39 @@ export default function MockOverviewPage() {
       <main className="flex-1">
         <section className="bg-slate-50 border-b border-slate-100 py-10 md:py-16">
           <div className="container mx-auto px-6 max-w-6xl text-left">
-            <Button variant="ghost" onClick={() => router.back()} className="rounded-xl text-slate-400 hover:text-[#0F172A] gap-2 mb-6 p-0 h-auto">
-              <ChevronLeft className="h-4 w-4" /> Back to Hub
-            </Button>
-            
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-              <div className="space-y-4 max-w-2xl">
-                 <div className="flex flex-wrap items-center gap-3">
-                    <Badge className="bg-orange-50 text-primary border-none px-3 py-1 rounded-lg font-black uppercase text-[9px] tracking-widest">
-                       {mock.boardId?.toUpperCase() || "STATE"} OFFICIAL
-                    </Badge>
-                    {isLocked && (
-                      <Badge className="bg-amber-100 text-amber-600 border-none px-3 py-1 rounded-lg font-black uppercase text-[9px] tracking-widest flex items-center gap-1.5">
-                         <Lock className="h-3 w-3" /> PASS RESTRICTED
+              <div className="flex items-start gap-4 flex-1">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => router.back()} 
+                  className="rounded-full h-10 w-10 border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-black shrink-0 mt-1 p-0"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                      <Badge className="bg-orange-50 text-primary border-none px-3 py-1 rounded-lg font-black uppercase text-[9px] tracking-widest">
+                        {mock.boardId?.toUpperCase() || "STATE"} OFFICIAL
                       </Badge>
-                    )}
-                 </div>
+                      {isLocked && (
+                        <Badge className="bg-amber-100 text-amber-600 border-none px-3 py-1 rounded-lg font-black uppercase text-[9px] tracking-widest flex items-center gap-1.5">
+                            <Lock className="h-3 w-3" /> PASS RESTRICTED
+                        </Badge>
+                      )}
+                  </div>
 
-                 <h1 className="text-3xl md:text-5xl font-headline font-black text-[#000000] uppercase leading-tight tracking-tight">
-                   {mock.title}
-                 </h1>
+                  <h1 className="text-2xl md:text-5xl font-headline font-black text-[#000000] uppercase leading-tight tracking-tight">
+                    {mock.title}
+                  </h1>
 
-                 <div className="flex flex-wrap items-center gap-6 pt-2">
-                    <div className="flex items-center gap-2 text-slate-500"><Clock className="h-4 w-4 text-primary" /><span className="text-xs font-bold">{mock.duration || 120} Mins</span></div>
-                    <div className="flex items-center gap-2 text-slate-500"><BookOpen className="h-4 w-4 text-primary" /><span className="text-xs font-bold">{mock.totalQuestions || 150} Questions</span></div>
-                 </div>
+                  <div className="flex flex-wrap items-center gap-6 pt-2">
+                      <div className="flex items-center gap-2 text-slate-500"><Clock className="h-4 w-4 text-primary" /><span className="text-xs font-bold">{mock.duration || 120} Mins</span></div>
+                      <div className="flex items-center gap-2 text-slate-500"><BookOpen className="h-4 w-4 text-primary" /><span className="text-xs font-bold">{mock.totalQuestions || 150} Questions</span></div>
+                  </div>
+                </div>
               </div>
 
-              <div className="w-full md:w-auto">
+              <div className="w-full md:w-auto mt-4 md:mt-0">
                  {isLocked ? (
                     <Button asChild className="w-full h-16 md:h-20 md:px-12 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl shadow-2xl shadow-amber-900/20 gap-4">
                       <Link href="/pass">

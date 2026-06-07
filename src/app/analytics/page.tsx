@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo } from "react"
@@ -31,7 +32,7 @@ import BackButton from "@/components/navigation/BackButton"
 
 /**
  * @fileOverview Institutional Deep Performance Analysis Node.
- * Updated: Reusable Back Button added for consistent navigation flow.
+ * Updated: Realigned Back Button side-by-side with titles.
  */
 
 export default function DeepAnalytics() {
@@ -95,40 +96,40 @@ export default function DeepAnalytics() {
       <Navbar />
       
       <main className="container mx-auto px-4 py-8 max-w-6xl space-y-10 text-left">
-         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="flex items-center gap-4">
-               <BackButton label="Dashboard" fallback="/dashboard" />
+         <div className="flex flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2 md:gap-4">
+               <BackButton label="Dashboard" fallback="/dashboard" className="p-0" />
                <div className="h-8 w-px bg-slate-200 hidden md:block" />
                <div>
-                  <h1 className="text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Performance Deep-Audit</h1>
-                  <p className="text-slate-500 font-medium text-sm">Registry analysis for your preparation trajectory.</p>
+                  <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-tight">Deep-Audit</h1>
+                  <p className="text-slate-500 font-medium text-[10px] md:text-sm hidden sm:block">Registry analysis for your preparation trajectory.</p>
                </div>
             </div>
             <div className="flex gap-4">
-               <Badge className="bg-emerald-50 text-emerald-600 border-none px-4 py-1.5 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-                  <Activity className="h-3 w-3" /> Real-time Sync Node
+               <Badge className="bg-emerald-50 text-emerald-600 border-none px-3 md:px-4 py-1.5 rounded-xl font-black uppercase text-[8px] md:text-[10px] tracking-widest flex items-center gap-2">
+                  <Activity className="h-3 w-3" /> <span className="hidden xs:inline">Sync Node</span>
                </Badge>
             </div>
          </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <AnalyticMetric label="Total MCQs Audit" value={analytics.totalQ} icon={<LayoutGrid className="text-blue-500" />} color="text-blue-600" />
-            <AnalyticMetric label="Institutional Accuracy" value={`${analytics.avgAcc}%`} icon={<Target className="text-primary" />} color="text-primary" />
-            <AnalyticMetric label="Correct Logic" value={analytics.correct} icon={<CheckCircle2 className="text-emerald-500" />} color="text-emerald-600" />
-            <AnalyticMetric label="Audit Failures" value={analytics.wrong} icon={<XCircle className="text-rose-500" />} color="text-rose-600" />
+         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <AnalyticMetric label="Total MCQs" value={analytics.totalQ} icon={<LayoutGrid className="text-blue-500" />} color="text-blue-600" />
+            <AnalyticMetric label="Accuracy" value={`${analytics.avgAcc}%`} icon={<Target className="text-primary" />} color="text-primary" />
+            <AnalyticMetric label="Correct" value={analytics.correct} icon={<CheckCircle2 className="text-emerald-500" />} color="text-emerald-600" />
+            <AnalyticMetric label="Failures" value={analytics.wrong} icon={<XCircle className="text-rose-500" />} color="text-rose-600" />
          </div>
 
          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <Card className="border-none shadow-3xl rounded-[3.5rem] bg-white overflow-hidden">
-               <CardHeader className="p-10 border-b border-slate-50 bg-slate-50/30">
+               <CardHeader className="p-8 md:p-10 border-b border-slate-50 bg-slate-50/30">
                   <div className="flex items-center gap-4">
                      <TrendingUp className="h-6 w-6 text-primary" />
-                     <CardTitle className="font-headline text-2xl font-black uppercase text-[#0F172A]">Accuracy Trend (Audit %)</CardTitle>
+                     <CardTitle className="font-headline text-2xl font-black uppercase text-[#0F172A]">Accuracy Trend</CardTitle>
                   </div>
                   <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Progression nodes across recently attempted mocks</CardDescription>
                </CardHeader>
-               <CardContent className="p-10">
-                  <div className="h-[400px] w-full">
+               <CardContent className="p-8 md:p-10">
+                  <div className="h-[300px] md:h-[400px] w-full">
                      <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={analytics.chartData}>
                            <defs>
@@ -149,7 +150,7 @@ export default function DeepAnalytics() {
             </Card>
 
             <div className="lg:col-span-4 space-y-10">
-               <Card className="border-none shadow-3xl rounded-[3rem] bg-[#0F172A] text-white p-12 overflow-hidden relative group">
+               <Card className="border-none shadow-3xl rounded-[3rem] bg-[#0F172A] text-white p-10 md:p-12 overflow-hidden relative group">
                   <div className="absolute bottom-0 right-0 p-8 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Zap className="h-64 w-64" /></div>
                   <div className="relative z-10 space-y-10">
                      <h3 className="font-headline font-black text-2xl uppercase border-b border-white/5 pb-6 flex items-center gap-4">
@@ -176,7 +177,7 @@ export default function DeepAnalytics() {
                   <div className="space-y-2">
                      <h4 className="text-2xl font-headline font-black uppercase text-emerald-900 leading-none">Qualified</h4>
                      <p className="text-sm font-medium text-emerald-700 leading-relaxed italic">
-                        "Your current mastery index indicates an <strong>84% probability</strong> of qualifying for the PSSSB Clerk Tier-1 evaluation."
+                        "Your current mastery index indicates an <strong>84% probability</strong> of qualifying for evaluation."
                      </p>
                   </div>
                </div>
@@ -191,11 +192,11 @@ export default function DeepAnalytics() {
 
 function AnalyticMetric({ label, value, icon, color }: any) {
    return (
-      <Card className="border-none shadow-xl bg-white p-8 rounded-[2.5rem] relative overflow-hidden group hover:translate-y-[-4px] transition-all">
-         <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">{icon}</div>
-         <div className="space-y-4 relative z-10">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p>
-            <p className={cn("text-4xl font-headline font-black tracking-tighter leading-none", color)}>{value}</p>
+      <Card className="border-none shadow-xl bg-white p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] relative overflow-hidden group hover:translate-y-[-4px] transition-all">
+         <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5 group-hover:scale-110 transition-transform">{icon}</div>
+         <div className="space-y-3 md:space-y-4 relative z-10">
+            <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p>
+            <p className={cn("text-2xl md:text-4xl font-headline font-black tracking-tighter leading-none", color)}>{value}</p>
          </div>
       </Card>
    )
