@@ -30,7 +30,7 @@ import { FirestorePermissionError, type SecurityRuleContext } from "@/firebase/e
 
 /**
  * @fileOverview Institutional Integrity & Cleanup Dashboard.
- * Hardened: Verified Firestore instance checks for query/collection calls.
+ * Features: Deep Scan for Duplicate Registries and Empty Vertical Nodes.
  */
 
 export default function QADashboard() {
@@ -40,72 +40,78 @@ export default function QADashboard() {
 
   const { data: questions, loading: qLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "questions") : null), [db]))
   const { data: mocks, loading: mLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]))
+  const { data: exams, loading: eLoading } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
 
   // AI-Driven Integrity Analysis
   const audit = useMemo(() => {
-    if (!questions || !mocks) return { dummyMocks: [], brokenQuestions: [], orphanMocks: [], stats: { dummy: 0, critical: 0 } }
+    if (!questions || !mocks || !exams) return { dummyMocks: [], brokenQuestions: [], redundantExams: [], stats: { dummy: 0, critical: 0 } }
 
-    const dummyKeywords = ["TEST", "DUMMY", "DEMO", "SAMPLE", "MOCK 1", "MOCK 2", "MOCK 3", "PLACEHOLDER"];
+    const dummyKeywords = ["TEST", "DUMMY", "DEMO", "SAMPLE", "MOCK 1", "MOCK 2", "PLACEHOLDER"];
     
+    // 1. Detect Dummy Mocks
     const dummyMocks = mocks.filter((m: any) => 
       dummyKeywords.some(kw => m.title?.toUpperCase().includes(kw)) ||
-      m.isDummy === true ||
-      !m.boardId ||
-      !m.examId
+      m.isDummy === true
     )
 
-    const orphanMocks = mocks.filter((m: any) => 
-      !m.questionIds || 
-      m.questionIds.length === 0 ||
-      m.questionIds.length !== m.totalQuestions
-    )
+    // 2. Detect Redundant/Empty Exams
+    const redundantExams = exams.filter((e: any) => {
+       const hasQuestions = questions.some((q: any) => q.examId === e.id);
+       const hasMocks = mocks.some((m: any) => m.examId === e.id);
+       return !hasQuestions && !hasMocks; // Hubs that exist but have zero content
+    })
+
+    // 3. Detect Overlapping Names (Potential Duplicates)
+    const duplicates: any[] = [];
+    const nameMap: Record<string, string> = {};
+    exams.forEach((e: any) => {
+       const key = `${e.name?.toLowerCase()}_${e.boardId}`;
+       if (nameMap[key]) {
+          duplicates.push(e);
+       } else {
+          nameMap[key] = e.id;
+       }
+    });
 
     const brokenQuestions = questions.filter((q: any) => 
       !q.correctAnswer || 
-      (!q.questionEn && !q.englishQuestion) || 
-      (q.questionEn || q.englishQuestion || "").toUpperCase().includes("DUMMY")
+      (!q.englishQuestion && !q.questionEn)
     )
 
     return {
       dummyMocks,
       brokenQuestions,
-      orphanMocks,
+      redundantExams: [...new Set([...redundantExams, ...duplicates])],
       stats: {
         dummy: dummyMocks.length,
-        critical: brokenQuestions.length + orphanMocks.length
+        critical: redundantExams.length + duplicates.length + brokenQuestions.length
       }
     }
-  }, [questions, mocks])
+  }, [questions, mocks, exams])
 
   const handleBulkPurgeDummy = async () => {
     if (!db || audit.dummyMocks.length === 0) return
-    if (!confirm(`CRITICAL AUDIT: Permanently purge ${audit.dummyMocks.length} dummy/demo mocks?`)) return
+    if (!confirm(`CRITICAL AUDIT: Permanently purge ${audit.dummyMocks.length} dummy nodes?`)) return
     
     setIsSyncing(true)
     const batch = writeBatch(db)
-    audit.dummyMocks.forEach(m => {
-       batch.delete(doc(db, "mocks", m.id))
-    })
+    audit.dummyMocks.forEach(m => batch.delete(doc(db, "mocks", m.id)))
 
     try {
       await batch.commit()
-      toast({ title: "Registry Cleaned", description: "All flagged dummy nodes successfully purged." })
+      toast({ title: "Registry Cleaned" })
     } catch (e) {
-      toast({ variant: "destructive", title: "Audit Failed", description: "Cloud database rejected bulk purge." })
+      toast({ variant: "destructive", title: "Audit Failed" })
     } finally {
       setIsSyncing(false)
     }
   }
 
-  const handleMoveToReview = async (id: string, coll: string) => {
-    if (!db) return
-    const docRef = doc(db, coll, id)
-    try {
-      await updateDoc(docRef, { status: 'REVIEW', published: false })
-      toast({ title: "Node Isolated", description: "Moved to Admin Review Queue." })
-    } catch (e) {
-      toast({ variant: "destructive", title: "Isolation Failed" })
-    }
+  const handlePurgeExam = async (id: string) => {
+     if (!db) return;
+     if (!confirm("Permanently purge this empty/duplicate registry hub?")) return;
+     await deleteDoc(doc(db, "exams", id));
+     toast({ title: "Hub Purged" });
   }
 
   return (
@@ -117,7 +123,7 @@ export default function QADashboard() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Integrity & Audit Hub</span>
            </div>
           <h1 className="text-5xl font-black font-headline text-[#0F172A] uppercase tracking-tight">System Cleanup</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">Scan and isolate dummy, demo, or placeholder preparation nodes.</p>
+          <p className="text-slate-500 mt-2 text-lg font-medium">Scan and isolate redundant, empty, or placeholder registries.</p>
         </div>
         <div className="flex gap-4">
            <Button 
@@ -131,46 +137,43 @@ export default function QADashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-         <QAStatCard label="Dummy Detections" value={audit.stats.dummy} color="text-rose-600" desc="Flagged based on Demo/Test/Placeholder keywords" />
-         <QAStatCard label="Broken/Orphan Nodes" value={audit.stats.critical} color="text-orange-600" desc="Questions with missing data or mocks with 0 items" />
-         <QAStatCard label="Registry Integrity" value={`${questions && questions.length > 0 ? Math.round(((questions.length - audit.brokenQuestions.length) / questions.length) * 100) : 100}%`} color="text-emerald-600" desc="Validated high-fidelity MCQ nodes" />
+         <QAStatCard label="Dummy Detections" value={audit.stats.dummy} color="text-rose-600" desc="Mocks flagged with 'Test/Demo' keywords" />
+         <QAStatCard label="Redundant Hubs" value={audit.redundantExams.length} color="text-orange-600" desc="Exams with zero questions or duplicate names" />
+         <QAStatCard label="Registry Integrity" value={`${questions && questions.length > 0 ? Math.round(((questions.length - audit.brokenQuestions.length) / questions.length) * 100) : 100}%`} color="text-emerald-600" desc="Validated high-fidelity preparation nodes" />
       </div>
 
       <div className="space-y-12 px-4">
          <section className="space-y-6">
             <h3 className="text-2xl font-headline font-black uppercase flex items-center gap-4">
-               <Archive className="h-6 w-6 text-rose-600" /> Integrity Review Queue
+               <Archive className="h-6 w-6 text-orange-600" /> Redundant Registry Hubs
             </h3>
             <Card className="border-slate-100 shadow-3xl bg-white rounded-[2.5rem] overflow-hidden">
                <Table>
                   <TableHeader className="bg-slate-50/50">
                      <TableRow className="border-slate-50 h-16">
-                        <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Blueprint Identity</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase text-center text-slate-500">Anomaly Context</TableHead>
+                        <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Hub Identity</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-center text-slate-500">Audit Context</TableHead>
                         <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Audit Action</TableHead>
                      </TableRow>
                   </TableHeader>
                   <TableBody>
-                     {mLoading ? (
+                     {eLoading ? (
                         <TableRow><TableCell colSpan={3} className="p-10"><Skeleton className="h-12 w-full rounded-xl" /></TableCell></TableRow>
-                     ) : [...audit.dummyMocks, ...audit.orphanMocks].length > 0 ? (
-                        [...audit.dummyMocks, ...audit.orphanMocks].slice(0, 20).map((m: any, idx: number) => (
-                           <TableRow key={`${m.id}-${idx}`} className="border-slate-50 hover:bg-slate-50 transition-colors group">
+                     ) : audit.redundantExams.length > 0 ? (
+                        audit.redundantExams.map((e: any) => (
+                           <TableRow key={e.id} className="border-slate-50 hover:bg-slate-50 transition-colors group">
                               <TableCell className="px-10 py-6 text-left">
-                                 <p className="font-bold text-[#000000] uppercase">{m.title || "Untitled Blueprint"}</p>
-                                 <code className="text-[9px] text-slate-400 font-mono uppercase tracking-widest">ID: {m.id?.slice(-8)} • {m.boardId}</code>
+                                 <p className="font-bold text-[#000000] uppercase">{e.name}</p>
+                                 <code className="text-[9px] text-slate-400 font-mono uppercase tracking-widest">ID: {e.id} • Board: {e.boardId}</code>
                               </TableCell>
                               <TableCell className="text-center">
-                                 <Badge className="bg-rose-50 text-rose-600 border-none px-4 py-1 text-[9px] uppercase font-black">
-                                    {m.totalQuestions === 0 ? 'EMPTY_MOCK' : 'DUMMY_KEYWORD'}
+                                 <Badge className="bg-orange-50 text-orange-600 border-none px-4 py-1 text-[9px] uppercase font-black">
+                                    CONTENT_EMPTY
                                  </Badge>
                               </TableCell>
                               <TableCell className="text-right px-10">
                                  <div className="flex justify-end gap-3 opacity-20 group-hover:opacity-100 transition-all">
-                                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-600" asChild>
-                                       <Link href={`/admin/mocks/builder?id=${m.id}`}><Edit className="h-4 w-4" /></Link>
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-rose-50 text-rose-600" onClick={() => handleMoveToReview(m.id, 'mocks')}>
+                                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl bg-rose-50 text-rose-600" onClick={() => handlePurgeExam(e.id)}>
                                        <Trash2 className="h-4 w-4" />
                                     </Button>
                                  </div>
@@ -178,7 +181,7 @@ export default function QADashboard() {
                            </TableRow>
                         ))
                      ) : (
-                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic font-black uppercase text-[10px]">Registry audit complete. Zero anomalies detected.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={3} className="h-40 text-center opacity-30 italic font-black uppercase text-[10px]">Registry audit complete. Hub coverage is 100% efficient.</TableCell></TableRow>
                      )}
                   </TableBody>
                </Table>

@@ -131,7 +131,7 @@ export default function ExamManagement() {
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-white/5 h-20">
                 <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Identity</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Short Code</TableHead>
+                <TableHead className="text-[10px) font-black uppercase tracking-widest text-slate-400">Short Code</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Authority Name</TableHead>
                 <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Audit</TableHead>
               </TableRow>

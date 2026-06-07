@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -13,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 /**
  * @fileOverview Institutional Command Center.
- * Hardened: Standard SDK-safe guards for Firestore instances.
+ * Features: High-Fidelity Registry Volume Audits per Vertical.
  */
 
 export default function AdminDashboard() {

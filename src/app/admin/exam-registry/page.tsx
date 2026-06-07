@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Institutional Exam Master Registry.
- * Standardized: Standardized Firestore instance validation.
+ * Features: Normalization Engine for Duplicate Merging and Content Coverage Audit.
  */
 
 export default function ExamRegistryPage() {
@@ -53,6 +53,7 @@ export default function ExamRegistryPage() {
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
   const { data: questions } = useCollection<any>(useMemo(() => (db ? collection(db, "questions") : null), [db]))
 
+  // Atomic content volume per exam registry
   const stats = useMemo(() => {
     if (!exams || !questions) return {}
     const map: Record<string, number> = {}
@@ -105,25 +106,28 @@ export default function ExamRegistryPage() {
     const sourceExam = exams?.find(e => e.id === mergeSource)
     const targetExam = exams?.find(e => e.id === mergeTarget)
     
-    if (!confirm(`CRITICAL: Merge "${sourceExam.name}" into "${targetExam.name}"?`)) return
+    if (!confirm(`CRITICAL: Merge "${sourceExam.name}" into "${targetExam.name}"? This will reassign all MCQs and Mocks.`)) return
 
     setIsMerging(true)
     try {
+      // 1. Reassign Questions
       const qSnap = await getDocs(query(collection(db, "questions"), where("examId", "==", mergeSource)))
       const batch = writeBatch(db)
       qSnap.docs.forEach(d => {
          batch.update(doc(db, "questions", d.id), { examId: mergeTarget, updatedAt: serverTimestamp() })
       })
 
+      // 2. Reassign Mocks
       const mSnap = await getDocs(query(collection(db, "mocks"), where("examId", "==", mergeSource)))
       mSnap.docs.forEach(d => {
          batch.update(doc(db, "mocks", d.id), { examId: mergeTarget, updatedAt: serverTimestamp() })
       })
 
+      // 3. Delete Duplicate Registry
       batch.delete(doc(db, "exams", mergeSource))
 
       await batch.commit()
-      toast({ title: "Success", description: `Merged ${qSnap.size} MCQs.` })
+      toast({ title: "Normalization Complete", description: `Merged ${qSnap.size} MCQs into ${targetExam.name}.` })
       setMergeDialogOpen(false)
     } catch (e: any) {
       toast({ variant: "destructive", title: "Merge Failed" })
@@ -141,13 +145,13 @@ export default function ExamRegistryPage() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Exam Master Registry</span>
            </div>
           <h1 className="text-5xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Master Hubs</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">Coordinate recruitment hubs for all Punjab board verticals.</p>
+          <p className="text-slate-500 mt-2 text-lg font-medium">Coordinate and consolidate recruitment hubs for all Punjab verticals.</p>
         </div>
         <div className="flex gap-4">
-           <Button onClick={() => setMergeDialogOpen(true)} variant="outline" className="h-16 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 border-slate-200 bg-white">
+           <Button onClick={() => setMergeDialogOpen(true)} variant="outline" className="h-16 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 border-slate-200 bg-white shadow-sm hover:bg-slate-50">
               <GitMerge className="h-5 w-5 text-emerald-500" /> Normalization Engine
            </Button>
-           <Button onClick={() => setEditingExam({ name: "", boardId: "", description: "", category: "STATE" })} className="bg-primary hover:bg-orange-600 h-16 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 shadow-2xl">
+           <Button onClick={() => setEditingExam({ name: "", boardId: "", description: "", category: "STATE" })} className="bg-primary hover:bg-orange-600 h-16 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 shadow-2xl transition-all active:scale-95">
               <Plus className="h-5 w-5" /> Register New Hub
            </Button>
         </div>
@@ -170,7 +174,7 @@ export default function ExamRegistryPage() {
               <TableRow className="border-slate-50 h-20">
                 <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Hub Identity</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Recruitment Context</TableHead>
-                <TableHead className="text-center text-[10px] font-black uppercase tracking-widest text-slate-500">Audit Stats</TableHead>
+                <TableHead className="text-center text-[10px] font-black uppercase tracking-widest text-slate-500">Registry Audit</TableHead>
                 <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -188,7 +192,7 @@ export default function ExamRegistryPage() {
                        </div>
                        <div>
                           <p className="font-black text-[#0F172A] text-xl uppercase tracking-tight leading-none">{e.name}</p>
-                          <code className="text-[9px] font-mono text-slate-400 mt-2 block uppercase tracking-widest">REGISTRY: {e.id}</code>
+                          <code className="text-[9px] font-mono text-slate-400 mt-2 block uppercase tracking-widest">REGISTRY ID: {e.id}</code>
                        </div>
                     </div>
                   </TableCell>
@@ -202,17 +206,19 @@ export default function ExamRegistryPage() {
                   </TableCell>
                   <TableCell className="text-center">
                      <div className="inline-flex flex-col items-center">
-                        <span className="text-2xl font-headline font-black text-[#0F172A]">{stats[e.id] || 0}</span>
+                        <span className={cn("text-2xl font-headline font-black", stats[e.id] > 0 ? "text-[#0F172A]" : "text-rose-400")}>
+                           {stats[e.id] || 0}
+                        </span>
                         <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Atomic MCQs</span>
                      </div>
                   </TableCell>
                   <TableCell className="text-right px-10">
                     <div className="flex justify-end gap-2 opacity-20 group-hover:opacity-100 transition-all">
-                       <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-white shadow-sm" onClick={() => setEditingExam(e)}>
+                       <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-white shadow-sm" onClick={() => setEditingSubject(e)}>
                           <Edit className="h-5 w-5" />
                        </Button>
                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={async () => {
-                          if (confirm("CRITICAL: Purge registry node?")) {
+                          if (confirm("CRITICAL: Purge registry node? This cannot be undone.")) {
                              await deleteDoc(doc(db!, "exams", e.id))
                              toast({ title: "Registry Node Purged" })
                           }
@@ -228,6 +234,55 @@ export default function ExamRegistryPage() {
         </CardContent>
       </Card>
 
+      {/* Normalization Merge Dialog */}
+      <Dialog open={mergeDialogOpen} onOpenChange={setMergeDialogOpen}>
+         <DialogContent className="sm:max-w-xl rounded-[2.5rem] bg-white border-none shadow-4xl p-0 overflow-hidden text-left">
+            <div className="h-2 w-full bg-emerald-500" />
+            <DialogHeader className="p-10 pb-4">
+               <DialogTitle className="text-2xl font-black font-headline uppercase flex items-center gap-3">
+                  <GitMerge className="h-6 w-6 text-emerald-500" /> Normalization Engine
+               </DialogTitle>
+               <p className="text-slate-400 font-medium text-sm">Combine two duplicate exam registries into one unified hub.</p>
+            </DialogHeader>
+            <div className="p-10 space-y-8">
+               <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Duplicate Node (TO BE DELETED)</label>
+                  <select 
+                    value={mergeSource} 
+                    onChange={e => setMergeSource(e.target.value)}
+                    className="w-full h-14 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none"
+                  >
+                     <option value="">Select Source Registry</option>
+                     {exams?.map((e: any) => <option key={e.id} value={e.id}>{e.name} ({stats[e.id] || 0} Qs)</option>)}
+                  </select>
+               </div>
+               <div className="flex justify-center"><ChevronRight className="h-6 w-6 text-slate-200 rotate-90" /></div>
+               <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Canonical Hub (TO BE RETAINED)</label>
+                  <select 
+                    value={mergeTarget} 
+                    onChange={e => setMergeTarget(e.target.value)}
+                    className="w-full h-14 bg-[#0F172A] text-white border-none rounded-xl px-4 font-bold text-sm outline-none"
+                  >
+                     <option value="" className="text-white/30">Select Target Hub</option>
+                     {exams?.filter(e => e.id !== mergeSource).map((e: any) => <option key={e.id} value={e.id}>{e.name}</option>)}
+                  </select>
+               </div>
+            </div>
+            <DialogFooter className="p-10 pt-0">
+               <Button variant="ghost" onClick={() => setMergeDialogOpen(false)} className="rounded-xl h-14 font-black uppercase text-[10px] px-8">Abort</Button>
+               <Button 
+                  onClick={handleDeepMerge} 
+                  disabled={isMerging || !mergeSource || !mergeTarget} 
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white h-14 px-10 rounded-xl font-black uppercase text-[10px] tracking-widest flex-1 shadow-xl"
+               >
+                  {isMerging ? <Loader2 className="h-4 w-4 animate-spin" /> : "Authorize Deep Merge"}
+               </Button>
+            </DialogFooter>
+         </DialogContent>
+      </Dialog>
+
+      {/* Registry Form Dialog */}
       <Dialog open={!!editingExam} onOpenChange={open => !open && setEditingExam(null)}>
          <DialogContent className="sm:max-w-xl rounded-[2.5rem] bg-white border-none shadow-4xl p-0 overflow-hidden text-left">
             <div className="h-2 w-full bg-[#0F172A]" />
