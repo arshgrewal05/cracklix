@@ -23,7 +23,8 @@ import {
   Database,
   SearchCode,
   CheckCircle2,
-  Languages
+  Languages,
+  Info
 } from "lucide-react"
 import { useFirestore, useCollection } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
@@ -61,7 +62,7 @@ export default function BulkImportPage() {
   const handleImport = () => {
     if (!rawText.trim()) return
     if (!metadata.boardId || !metadata.subjectId) {
-      toast({ variant: "destructive", title: "Audit Blocked", description: "Select Board and Subject first." })
+      toast({ variant: "destructive", title: "Audit Blocked", description: "Select Board and Subject Hub." })
       return
     }
 
@@ -72,7 +73,7 @@ export default function BulkImportPage() {
     if (result.questions.length > 0) {
       toast({ title: "Extraction Success", description: `${result.questions.length} blocks mapped to explicit fields.` });
     } else {
-      toast({ variant: "destructive", title: "Audit Rejected", description: "Check field validation reports." });
+      toast({ variant: "destructive", title: "Audit Rejected", description: "Check multi-line pattern." });
     }
   }
 
@@ -136,7 +137,7 @@ export default function BulkImportPage() {
       toast({ title: "Master Registry Synced", description: `${parsedQuestions.length} assets committed.` })
       router.push("/admin/questions")
     } catch (e) {
-      toast({ variant: "destructive", title: "Cloud Rejection", description: "Check security permissions." })
+      toast({ variant: "destructive", title: "Cloud Rejection" })
     } finally {
       setIsSyncing(false)
     }
@@ -151,7 +152,7 @@ export default function BulkImportPage() {
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-xl border border-slate-200 h-12 w-12 bg-white shadow-sm"><ChevronLeft className="h-6 w-6" /></Button>
           <div>
             <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight leading-none">Bulk Ingestion</h1>
-            <p className="text-slate-500 font-medium">High-Fidelity Multi-Language Mapping Hub.</p>
+            <p className="text-slate-500 font-medium">Stacked Multi-Language Mapping Hub.</p>
           </div>
         </div>
         <Button onClick={handleSaveToRegistry} disabled={isSyncing || parsedQuestions.length === 0} className="bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[11px] tracking-widest rounded-xl h-14 px-12 gap-3 shadow-2xl">
@@ -164,19 +165,19 @@ export default function BulkImportPage() {
           <Card className="border-none bg-white shadow-3xl rounded-[2.5rem] overflow-hidden">
             <div className="h-1.5 w-full bg-[#0F172A]" />
             <CardHeader className="p-10 pb-4 text-left">
-              <CardTitle className="font-headline font-black text-xl uppercase flex items-center gap-3"><ClipboardList className="h-5 w-5 text-primary" /> Registry Config</CardTitle>
+              <CardTitle className="font-headline font-black text-xl uppercase flex items-center gap-3"><ClipboardList className="h-5 w-5 text-primary" /> Ingestion Config</CardTitle>
             </CardHeader>
             <CardContent className="p-10 pt-4 space-y-8">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Board Hub</Label>
+                  <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Target Board</Label>
                   <Select value={metadata.boardId} onValueChange={v => setMetadata({...metadata, boardId: v})}>
                     <SelectTrigger className="rounded-xl h-12 bg-slate-50/50 border-none font-bold text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>{boards?.map((b: any) => <SelectItem key={b.id} value={b.id}>{b.abbreviation}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Subject Hub</Label>
+                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Target Subject</Label>
                    <Select value={metadata.subjectId} onValueChange={v => setMetadata({...metadata, subjectId: v})}>
                       <SelectTrigger className="rounded-xl h-12 bg-slate-50/50 border-none font-bold text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent>{subjects?.map((s:any) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
@@ -185,7 +186,7 @@ export default function BulkImportPage() {
               </div>
 
               <div className="space-y-1.5 pt-2">
-                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2"><Languages className="h-3 w-3" /> Target Secondary Language</Label>
+                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2"><Languages className="h-3 w-3" /> Secondary Assessment Language</Label>
                  <Select value={metadata.secondaryLanguage} onValueChange={(v: any) => setMetadata({...metadata, secondaryLanguage: v})}>
                     <SelectTrigger className="rounded-xl h-14 bg-slate-900 text-white border-none font-black uppercase text-[10px] tracking-widest"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -201,11 +202,11 @@ export default function BulkImportPage() {
             <Textarea 
                 value={rawText}
                 onChange={e => setRawText(e.target.value)}
-                placeholder={`Paste Q1. English Statement...\n${isHindiMode ? 'Hindi Statement...' : 'Punjabi Statement...'}\n(A) EN / ${isHindiMode ? 'HI' : 'PA'}...\nCorrect Answer: A`}
+                placeholder={`Q15. English Statement...\n${isHindiMode ? 'Hindi Statement...' : 'Punjabi Statement...'}\n(A) Option EN\n${isHindiMode ? 'Hindi Text' : 'Punjabi Text'}\nAnswer: C\nExplanation: Text...`}
                 className="min-h-[550px] rounded-[2.5rem] bg-white border-none p-12 text-sm font-bold shadow-4xl leading-relaxed resize-none focus-visible:ring-primary text-[#0F172A]"
             />
             <Button onClick={handleImport} className="w-full h-20 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.3em] text-[11px] rounded-[2rem] shadow-4xl gap-4 group transition-all active:scale-95">
-               Initialize Extraction <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+               Initialize Ingestion <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
@@ -232,6 +233,7 @@ export default function BulkImportPage() {
                                 <DebugIndicator label={isHindiMode ? "HI" : "PA"} active={q.debug.SEC_Q === 'YES'} />
                                 <DebugIndicator label="OPTS" active={q.debug.OPT === 'YES'} />
                                 <DebugIndicator label="KEY" active={q.debug.KEY === 'YES'} />
+                                <DebugIndicator label="EXP" active={q.debug.SEC_EXP === 'YES'} />
                              </div>
                           </div>
                           <div className="flex gap-3">
@@ -239,7 +241,9 @@ export default function BulkImportPage() {
                              <Button variant="ghost" size="icon" className="h-14 w-14 rounded-2xl text-rose-500 bg-rose-50 shadow-sm hover:scale-110 transition-transform" onClick={() => handleDelete(idx)}><Trash2 className="h-6 w-6" /></Button>
                           </div>
                        </div>
-                       <QuestionRenderer question={q} language={isHindiMode ? "ENGLISH_HINDI" : "ENGLISH_PUNJABI"} showSolution={true} />
+                       <div className="space-y-8">
+                          <QuestionRenderer question={q} language={isHindiMode ? "ENGLISH_HINDI" : "ENGLISH_PUNJABI"} showSolution={true} />
+                       </div>
                     </Card>
                   </div>
                 ))}
@@ -247,7 +251,7 @@ export default function BulkImportPage() {
            ) : (
              <div className="h-full flex flex-col items-center justify-center text-slate-300 opacity-20 pt-40">
                 <FileText className="h-40 w-40 mb-10" />
-                <p className="font-headline font-black uppercase text-2xl tracking-[0.2em]">Awaiting Content Registry</p>
+                <p className="font-headline font-black uppercase text-2xl tracking-[0.2em]">Awaiting Content Hub</p>
              </div>
            )}
         </div>
@@ -282,20 +286,20 @@ export default function BulkImportPage() {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">English Rationalization</Label>
-                     <Textarea value={editForm?.englishExplanation || ""} onChange={e => setEditForm({...editForm, englishExplanation: e.target.value})} className="h-32 rounded-2xl bg-slate-50 border-none font-medium p-6 shadow-inner text-[#0F172A]" />
+                     <Textarea value={editForm?.englishExplanation || ""} onChange={e => setEditForm({...editForm, englishExplanation: e.target.value})} className="h-32 rounded-2xl bg-slate-900 text-emerald-400 font-medium p-6 shadow-2xl" />
                   </div>
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">{isHindiMode ? 'Hindi Rationalization' : 'Punjabi Rationalization'}</Label>
                      <Textarea 
                         value={isHindiMode ? (editForm?.hindiExplanation || "") : (editForm?.punjabiExplanation || "")} 
                         onChange={e => setEditForm({...editForm, [isHindiMode ? 'hindiExplanation' : 'punjabiExplanation']: e.target.value})} 
-                        className="h-32 rounded-2xl bg-slate-50 border-none font-medium p-6 shadow-inner text-[#0F172A]" 
+                        className="h-32 rounded-2xl bg-slate-900 text-blue-400 font-medium p-6 shadow-2xl" 
                      />
                   </div>
                </div>
             </div>
             <DialogFooter className="p-10 pt-6 bg-slate-50 flex gap-6 shrink-0">
-               <Button variant="ghost" onClick={() => setEditingIndex(null)} className="h-16 px-10 font-black uppercase text-[11px] text-slate-400 tracking-widest">Discard Audit</Button>
+               <Button variant="ghost" onClick={() => setEditingIndex(null)} className="h-16 px-10 font-black uppercase text-[11px] text-slate-400 tracking-widest">Discard Changes</Button>
                <Button onClick={handleSaveEdit} className="bg-[#0F172A] hover:bg-black text-white h-16 px-16 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] flex-1 shadow-2xl transition-all active:scale-95">
                   <CheckCircle2 className="h-5 w-5 mr-3" /> Apply Modifications
                </Button>

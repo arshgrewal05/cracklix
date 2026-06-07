@@ -36,8 +36,8 @@ import { cn } from "@/lib/utils"
 import { parseBulkQuestions } from "@/lib/parser"
 
 /**
- * @fileOverview Institutional Current Affairs Management Hub v8.0.
- * UPDATED: Full question preview (Question, Options, Answer, Both Explanations).
+ * @fileOverview Institutional Current Affairs Management Hub v9.0.
+ * UPDATED: Multi-language preview for full extraction audit (Question, Options, Key, Rationale).
  */
 
 export default function AdminCurrentAffairs() {
@@ -63,7 +63,12 @@ export default function AdminCurrentAffairs() {
 
   const handleProcessBulk = () => {
     if (!bulkText.trim()) return;
-    const metadata = { boardId: 'current-affairs', subjectId: 'gk-ca', status: 'PUBLISHED' };
+    const metadata = { 
+      boardId: 'current-affairs', 
+      subjectId: 'gk-ca', 
+      status: 'PUBLISHED',
+      secondaryLanguage: editingItem.language === 'English & Hindi' ? 'hindi' : 'punjabi'
+    };
     const result = parseBulkQuestions(bulkText, metadata);
     
     if (result.questions.length > 0) {
@@ -72,9 +77,9 @@ export default function AdminCurrentAffairs() {
         questions: [...(editingItem.questions || []), ...result.questions]
       });
       setBulkText("");
-      toast({ title: "Extraction Success", description: `${result.questions.length} questions staged with bilingual logic.` });
+      toast({ title: "Extraction Success", description: `${result.questions.length} questions staged for audit.` });
     } else {
-      toast({ variant: "destructive", title: "Parse Failed", description: "Format: Q1, Pa Statement, (A) Opt EN/PA" });
+      toast({ variant: "destructive", title: "Parse Failed", description: "Verify stacked bilingual format." });
     }
   };
 
@@ -172,9 +177,9 @@ export default function AdminCurrentAffairs() {
           <h1 className="text-3xl md:text-5xl font-black font-headline text-primary uppercase tracking-tight leading-tight">CA Manager</h1>
           <p className="text-slate-500 mt-1 md:mt-2 text-sm md:text-lg font-medium">Coordinate Daily, Weekly, and Monthly strategic coverage.</p>
         </div>
-        <Button onClick={() => setEditingItem({ title: "", type: "DAILY", month: "January", year: "2026", status: "PUBLISHED", questions: [], language: "Bilingual" })} className="w-full lg:w-auto bg-primary hover:bg-orange-600 h-14 md:h-16 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest gap-3 shadow-2xl transition-all active:scale-95 border-none">
+        <button onClick={() => setEditingItem({ title: "", type: "DAILY", month: "January", year: "2026", status: "PUBLISHED", questions: [], language: "English & Punjabi" })} className="w-full lg:w-auto bg-primary hover:bg-orange-600 text-white h-14 md:h-16 px-10 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 shadow-2xl transition-all active:scale-95 border-none">
           <Plus className="h-5 w-5" /> Initialize CA Hub
-        </Button>
+        </button>
       </div>
 
       <Card className="border-none shadow-3xl bg-white rounded-2xl md:rounded-[3rem] overflow-hidden mx-2 md:mx-4">
@@ -253,7 +258,6 @@ export default function AdminCurrentAffairs() {
           
           <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-6 space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-               {/* Metadata Column */}
                <div className="lg:col-span-3 space-y-4">
                   <Card className="border-none bg-slate-50/50 p-5 rounded-2xl space-y-4 shadow-inner">
                      <p className="text-[9px] font-black uppercase text-primary tracking-[0.3em] ml-1">Package Metadata</p>
@@ -270,6 +274,16 @@ export default function AdminCurrentAffairs() {
                               <option value="DAILY">DAILY HUB</option>
                               <option value="WEEKLY">WEEKLY HUB</option>
                               <option value="MONTHLY">MONTHLY HUB</option>
+                           </select>
+                        </div>
+                     </div>
+
+                     <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-1.5">
+                           <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Secondary Language</Label>
+                           <select value={editingItem?.language} onChange={e => setEditingItem({...editingItem, language: e.target.value})} className="w-full h-10 bg-[#0B1528] text-white border-none rounded-lg px-2 font-black uppercase text-[9px] outline-none shadow-sm">
+                              <option value="English & Punjabi">English & Punjabi</option>
+                              <option value="English & Hindi">English & Hindi</option>
                            </select>
                         </div>
                      </div>
@@ -294,18 +308,17 @@ export default function AdminCurrentAffairs() {
                   </Card>
                </div>
 
-               {/* Quiz Hub */}
                <div className="lg:col-span-9 h-full min-h-[400px]">
                   <Card className="border-none bg-white shadow-xl rounded-2xl p-6 space-y-6 border border-slate-100 h-full flex flex-col">
                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
                         <div className="flex items-center gap-4">
                            <Zap className="h-6 w-6 text-primary" />
                            <div className="text-left">
-                              <h4 className="font-headline font-black text-xl uppercase text-[#0F172A]">Bulk Ingestion</h4>
-                              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Institutional Ingestion Protocol</p>
+                              <h4 className="font-headline font-black text-xl uppercase text-[#0F172A]">Bulk Ingestion Hub</h4>
+                              <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Multi-language Ingestion Protocol</p>
                            </div>
                         </div>
-                        <Badge className="bg-[#0F172A] text-white border-none font-black px-4 py-1.5 rounded-lg text-[9px] w-fit shadow-lg">{editingItem?.questions?.length || 0} Questions Staged</Badge>
+                        <Badge className="bg-[#0F172A] text-white border-none font-black px-4 py-1.5 rounded-lg text-[9px] w-fit shadow-lg">{editingItem?.questions?.length || 0} Assets Staged</Badge>
                      </div>
 
                      <div className="space-y-4 flex flex-col flex-1 min-h-0">
@@ -313,11 +326,11 @@ export default function AdminCurrentAffairs() {
                            <Textarea 
                               value={bulkText}
                               onChange={e => setBulkText(e.target.value)}
-                              placeholder={`Q15. English Question\nਪੰਜਾਬੀ ਪ੍ਰਸ਼ਨ\nA. Option EN\nਪੰਜਾਬੀ ਆਪਸ਼ਨ\nAnswer: C\nExplanation (English): English rationale\nਵਿਆਖਿਆ (Punjabi): Punjabi rationale`}
-                              className="min-h-[300px] rounded-xl bg-slate-50 border-none p-6 text-sm font-bold shadow-inner resize-none focus-visible:ring-primary"
+                              placeholder={`Q15. English Question\nहिंदी/ਪੰਜਾਬੀ ਪ੍ਰਸ਼ਨ\n(A) Option EN\nहिंदी/ਪੰਜਾਬੀ ਆਪਸ਼ਨ\nAnswer: C. Text\nExplanation (English): Text...\nव्याख्या/ਵਿਆਖਿਆ: Text...`}
+                              className="min-h-[500px] rounded-xl bg-slate-50 border-none p-6 text-sm font-bold shadow-inner resize-none focus-visible:ring-primary"
                            />
                            <Button onClick={handleProcessBulk} disabled={!bulkText.trim()} className="w-full h-14 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.3em] text-[11px] rounded-xl shadow-2xl gap-3 border-none">
-                              Process Bulk Extraction <ChevronRight className="h-4 w-4" />
+                              Initialize Extraction <ChevronRight className="h-4 w-4" />
                            </Button>
                         </div>
 
@@ -331,32 +344,44 @@ export default function AdminCurrentAffairs() {
                                           
                                           <div className="flex items-center gap-4 mb-4">
                                              <div className="h-8 w-8 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-black text-xs shadow-lg">{idx + 1}</div>
-                                             <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black uppercase tracking-widest px-3 py-1">VERIFIED ASSET</Badge>
+                                             <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black uppercase tracking-widest px-3 py-1">EXTRACTED ASSET</Badge>
                                           </div>
 
                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                             <div className="space-y-4 text-left">
+                                             <div className="space-y-6 text-left">
                                                 <div className="space-y-1">
                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Question Statement</p>
                                                    <p className="font-bold text-sm text-[#0F172A] leading-snug">{q.englishQuestion}</p>
-                                                   <p className="font-bold text-sm text-slate-500 leading-snug mt-1">{q.punjabiQuestion}</p>
+                                                   <p className="font-bold text-sm text-slate-500 leading-snug mt-1">{q.punjabiQuestion || q.hindiQuestion}</p>
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                   <div className="bg-white/50 p-2 rounded-lg border border-slate-100/50">
-                                                      <p className="text-[7px] font-black text-slate-400 uppercase">Correct Key</p>
-                                                      <p className="font-black text-emerald-600 text-sm">Option {q.correctAnswer}</p>
+
+                                                <div className="space-y-2">
+                                                   <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Options Audit</p>
+                                                   <div className="grid grid-cols-1 gap-2">
+                                                      {['A','B','C','D'].map(key => (
+                                                         <div key={key} className="text-[10px] font-bold text-slate-600 border-l-2 border-slate-200 pl-3">
+                                                            <span className="text-[#0F172A]">{key}.</span> {q[`option${key}English`]} / {q[`option${key}${q.hindiQuestion ? 'Hindi' : 'Punjabi'}`]}
+                                                         </div>
+                                                      ))}
                                                    </div>
+                                                </div>
+
+                                                <div className="bg-emerald-50/50 p-3 rounded-lg border border-emerald-100/50">
+                                                   <p className="text-[7px] font-black text-emerald-600 uppercase">Correct Answer Key</p>
+                                                   <p className="font-black text-[#0F172A] text-sm">Option {q.correctAnswer}</p>
                                                 </div>
                                              </div>
 
                                              <div className="space-y-4 text-left border-l border-slate-100 pl-4 md:pl-8">
                                                 <div className="space-y-2">
                                                    <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2"><Info className="h-3 w-3" /> English Rationale</p>
-                                                   <p className="text-xs font-medium text-slate-600 leading-relaxed italic line-clamp-2">{q.englishExplanation || 'Not provided'}</p>
+                                                   <p className="text-xs font-medium text-slate-600 leading-relaxed italic">{q.englishExplanation || 'Awaiting audit...'}</p>
                                                 </div>
-                                                <div className="space-y-2">
-                                                   <p className="text-[8px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2"><Info className="h-3 w-3" /> ਪੰਜਾਬੀ ਵਿਆਖਿਆ</p>
-                                                   <p className="text-xs font-medium text-slate-600 leading-relaxed italic line-clamp-2">{q.punjabiExplanation || 'Not provided'}</p>
+                                                <div className="space-y-2 pt-2 border-t border-slate-50">
+                                                   <p className="text-[8px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                                                      <Info className="h-3 w-3" /> {q.hindiQuestion ? 'हिंदी व्याख्या' : 'ਪੰਜਾਬੀ ਵਿਆਖਿਆ'}
+                                                   </p>
+                                                   <p className="text-xs font-medium text-slate-600 leading-relaxed italic">{q.hindiExplanation || q.punjabiExplanation || 'Awaiting audit...'}</p>
                                                 </div>
                                              </div>
                                           </div>
@@ -373,9 +398,9 @@ export default function AdminCurrentAffairs() {
           </div>
 
           <DialogFooter className="px-6 py-4 bg-slate-50 flex flex-row items-center gap-4 shrink-0 border-t border-slate-100">
-            <button onClick={() => setEditingItem(null)} className="rounded-xl h-12 px-6 font-black uppercase text-[9px] text-slate-400 hover:text-[#0F172A]">Cancel Draft</button>
+            <button onClick={() => setEditingItem(null)} className="rounded-xl h-12 px-6 font-black uppercase text-[9px] text-slate-400 hover:text-[#0F172A]">Discard Draft</button>
             <Button onClick={handleSave} disabled={isSaving} className="bg-[#0F172A] hover:bg-black text-white h-12 px-10 rounded-xl font-black uppercase text-[9px] tracking-widest flex-1 shadow-xl gap-3 border-none">
-              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4 text-primary fill-current" />} Commit Hub to Registry
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4 text-primary fill-current" />} Commit Hub to Live Registry
             </Button>
           </DialogFooter>
         </DialogContent>
