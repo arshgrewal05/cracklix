@@ -88,6 +88,8 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
+  dob?: string;
+  address?: string;
   role: UserRole;
   state: "Punjab";
   targetExam: string;

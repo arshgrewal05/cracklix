@@ -8,16 +8,16 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { useAuth, useFirestore, useUser } from "@/firebase"
 import { doc, setDoc, serverTimestamp } from "firebase/firestore"
 import Logo from "@/components/brand/Logo"
 import { useToast } from "@/hooks/use-toast"
-import { Phone, User as UserIcon, GraduationCap, Users } from "lucide-react"
+import { Phone, User as UserIcon, GraduationCap, Calendar, MapPin } from "lucide-react"
 import { Gender } from "@/types"
 
 export default function ProfileSetup() {
   const router = useRouter()
-  const auth = useAuth()
   const db = useFirestore()
   const { user } = useUser()
   const { toast } = useToast()
@@ -26,8 +26,10 @@ export default function ProfileSetup() {
     name: "",
     phone: "",
     gender: "" as Gender | "",
+    dob: "",
+    address: "",
     targetExam: "",
-    state: "Punjab"
+    state: "Punjab" as const
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -39,11 +41,11 @@ export default function ProfileSetup() {
   }, [user])
 
   const handleSubmit = async () => {
-    if (!user || !formData.name || !formData.targetExam || !formData.phone || !formData.gender) {
+    if (!user || !formData.name || !formData.targetExam || !formData.phone || !formData.gender || !formData.dob) {
       toast({
         variant: "destructive",
         title: "Incomplete Profile",
-        description: "Please fill in all details, including identity, to proceed."
+        description: "Please fill in all mandatory details, including DOB, to proceed."
       })
       return
     }
@@ -55,17 +57,20 @@ export default function ProfileSetup() {
         id: user.uid,
         name: formData.name,
         email: user.email,
-        phone: `+91 ${formData.phone}`,
+        phone: formData.phone.startsWith('+91') ? formData.phone : `+91 ${formData.phone}`,
         gender: formData.gender,
+        dob: formData.dob,
+        address: formData.address,
         targetExam: formData.targetExam,
         state: "Punjab",
-        createdAt: serverTimestamp(),
+        createdAt: new Date().toISOString(),
         status: 'Free',
-        role: 'STUDENT'
+        role: 'STUDENT',
+        pinnedExams: []
       }, { merge: true })
 
       toast({
-        title: "Profile Updated",
+        title: "Profile Synchronized",
         description: "Your preparation journey starts now!"
       })
       router.push("/")
@@ -88,40 +93,39 @@ export default function ProfileSetup() {
         <Logo variant="dark" />
       </div>
 
-      <Card className="w-full max-w-lg border-none shadow-2xl rounded-[2.5rem] overflow-hidden z-10">
+      <Card className="w-full max-w-xl border-none shadow-2xl rounded-[2.5rem] overflow-hidden z-10">
         <div className="h-2 w-full bg-primary" />
         <CardHeader className="text-center pt-10 pb-6">
-          <CardTitle className="font-headline font-black text-3xl text-[#0F172A]">Almost There!</CardTitle>
+          <CardTitle className="font-headline font-black text-3xl text-[#0F172A]">Aspirant Onboarding</CardTitle>
           <CardDescription className="text-slate-500 font-medium px-4">
-            Personalise your experience to get the most accurate mock tests.
+            Personalize your identity node to access high-fidelity mocks.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 px-10 pb-12">
-          <div className="space-y-2">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Full Name (as per ID)</Label>
+          <div className="space-y-2 text-left">
+            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Legal Identity</Label>
             <div className="relative">
               <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input 
                 placeholder="Arsh Grewal" 
-                className="pl-12 h-12 rounded-xl border-slate-200 bg-slate-50/50"
+                className="pl-12 h-12 rounded-xl border-slate-200 bg-slate-50/50 font-bold"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
-                <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Mobile Number</Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div className="space-y-2 text-left">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Contact Node</Label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <Phone className="h-4 w-4 text-slate-400" />
-                    <span className="text-slate-500 text-sm font-bold border-r border-slate-200 pr-2">+91</span>
                   </div>
                   <Input 
                     type="tel"
                     placeholder="98XXX XXXXX" 
-                    className="pl-24 h-12 rounded-xl border-slate-200 bg-slate-50/50"
+                    className="pl-12 h-12 rounded-xl border-slate-200 bg-slate-50/50 font-bold"
                     value={formData.phone}
                     onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                     maxLength={10}
@@ -129,10 +133,25 @@ export default function ProfileSetup() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Identity</Label>
+              <div className="space-y-2 text-left">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Date of Birth</Label>
+                <div className="relative">
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input 
+                    type="date"
+                    className="pl-12 h-12 rounded-xl border-slate-200 bg-slate-50/50 font-bold"
+                    value={formData.dob}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
+                  />
+                </div>
+              </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2 text-left">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Identity</Label>
                 <Select onValueChange={(val: Gender) => setFormData(prev => ({ ...prev, gender: val }))}>
-                  <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50">
+                  <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50 font-bold">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -141,43 +160,47 @@ export default function ProfileSetup() {
                     <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+            </div>
+            <div className="space-y-2 text-left">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Primary Target Board</Label>
+              <Select onValueChange={(val) => setFormData(prev => ({ ...prev, targetExam: val }))}>
+                <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50 font-bold">
+                  <SelectValue placeholder="Select Hub" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PSSSB">PSSSB Boards</SelectItem>
+                  <SelectItem value="PPSC">PPSC Gazetted</SelectItem>
+                  <SelectItem value="Punjab Police">Punjab Police</SelectItem>
+                  <SelectItem value="Army">Indian Army</SelectItem>
+                  <SelectItem value="High Court">High Court Clerk</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-slate-400">State</Label>
-              <Input value="Punjab" disabled className="h-12 rounded-xl bg-slate-100/50 border-slate-100 font-bold" />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Board</Label>
-              <div className="relative">
-                <Select onValueChange={(val) => setFormData(prev => ({ ...prev, targetExam: val }))}>
-                  <SelectTrigger className="h-12 rounded-xl border-slate-200 bg-slate-50/50">
-                    <SelectValue placeholder="Target Board" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PSSSB">PSSSB</SelectItem>
-                    <SelectItem value="PPSC">PPSC</SelectItem>
-                    <SelectItem value="Punjab Police">Punjab Police</SelectItem>
-                    <SelectItem value="Education">Education</SelectItem>
-                    <SelectItem value="High Court">High Court</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          <div className="space-y-2 text-left">
+             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Correspondence Address</Label>
+             <div className="relative">
+                <MapPin className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+                <Textarea 
+                   placeholder="Enter your complete address..." 
+                   className="pl-12 min-h-[80px] rounded-xl border-slate-200 bg-slate-50/50 font-bold"
+                   value={formData.address}
+                   onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                />
+             </div>
           </div>
 
           <Button 
-            className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 rounded-xl mt-4"
+            className="w-full h-16 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-xl rounded-2xl mt-4 transition-all active:scale-95"
             onClick={handleSubmit}
-            disabled={isSubmitting || !formData.name || !formData.targetExam || !formData.phone || !formData.gender}
+            disabled={isSubmitting}
           >
-            {isSubmitting ? "Initialising Journey..." : "Start My Journey"}
+            {isSubmitting ? "Syncing Identity..." : "Initialize Registry Node"}
           </Button>
           
-          <p className="text-[10px] text-center text-slate-400 uppercase font-bold tracking-widest leading-relaxed">
-            By continuing, you agree to receive exam alerts and platform updates.
+          <p className="text-[9px] text-center text-slate-400 uppercase font-bold tracking-widest leading-relaxed">
+            By initializing, you authorize Arsh Grewal Management to send institutional alerts.
           </p>
         </CardContent>
       </Card>
