@@ -34,6 +34,7 @@ function QuestionEntryContent() {
   const { profile } = useUser()
   const { toast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
+  const [activeLangTab, setActiveLangTab] = useState<'punjabi' | 'hindi'>('punjabi')
 
   const questionId = searchParams.get("id")
   const isEditing = !!questionId
@@ -45,13 +46,13 @@ function QuestionEntryContent() {
   const [formData, setFormData] = useState<any>({
     boardId: "", examId: "", subjectId: "", difficulty: "Medium",
     status: "DRAFT",
-    englishQuestion: "", punjabiQuestion: "",
-    optionAEnglish: "", optionAPunjabi: "",
-    optionBEnglish: "", optionBPunjabi: "",
-    optionCEnglish: "", optionCPunjabi: "",
-    optionDEnglish: "", optionDPunjabi: "",
+    englishQuestion: "", punjabiQuestion: "", hindiQuestion: "",
+    optionAEnglish: "", optionAPunjabi: "", optionAHindi: "",
+    optionBEnglish: "", optionBPunjabi: "", optionBHindi: "",
+    optionCEnglish: "", optionCPunjabi: "", optionCHindi: "",
+    optionDEnglish: "", optionDPunjabi: "", optionDHindi: "",
     correctAnswer: "A", 
-    englishExplanation: "", punjabiExplanation: "",
+    englishExplanation: "", punjabiExplanation: "", hindiExplanation: "",
     imageUrl: "",
     chapterId: ""
   })
@@ -63,33 +64,32 @@ function QuestionEntryContent() {
         ...existingData,
         englishQuestion: existingData.englishQuestion || "",
         punjabiQuestion: existingData.punjabiQuestion || "",
+        hindiQuestion: existingData.hindiQuestion || "",
         optionAEnglish: existingData.optionAEnglish || "",
         optionAPunjabi: existingData.optionAPunjabi || "",
+        optionAHindi: existingData.optionAHindi || "",
         optionBEnglish: existingData.optionBEnglish || "",
         optionBPunjabi: existingData.optionBPunjabi || "",
+        optionBHindi: existingData.optionBHindi || "",
         optionCEnglish: existingData.optionCEnglish || "",
         optionCPunjabi: existingData.optionCPunjabi || "",
+        optionCHindi: existingData.optionCHindi || "",
         optionDEnglish: existingData.optionDEnglish || "",
         optionDPunjabi: existingData.optionDPunjabi || "",
+        optionDHindi: existingData.optionDHindi || "",
         englishExplanation: existingData.englishExplanation || "",
-        punjabiExplanation: existingData.punjabiExplanation || ""
+        punjabiExplanation: existingData.punjabiExplanation || "",
+        hindiExplanation: existingData.hindiExplanation || ""
       }))
+      if (existingData.hindiQuestion) setActiveLangTab('hindi');
     }
   }, [existingData])
 
   const handleSave = async () => {
     if (!db || isSaving) return
     
-    // Strict Validation: Audit all 12 nodes
-    const mandatory = [
-      'englishQuestion', 'punjabiQuestion', 
-      'optionAEnglish', 'optionAPunjabi',
-      'optionBEnglish', 'optionBPunjabi',
-      'optionCEnglish', 'optionCPunjabi',
-      'optionDEnglish', 'optionDPunjabi',
-      'englishExplanation', 'punjabiExplanation',
-      'subjectId'
-    ];
+    // Strict Validation: Audit primary nodes
+    const mandatory = ['englishQuestion', 'optionAEnglish', 'correctAnswer', 'subjectId'];
 
     const missing = mandatory.filter(key => !formData[key]?.trim());
     if (missing.length > 0) {
@@ -110,9 +110,12 @@ function QuestionEntryContent() {
       author: existingData?.author || profile?.name || "Team Node"
     };
 
+    // Purge undefined
+    Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key]);
+
     try {
       await setDoc(questionRef, payload, { merge: true })
-      toast({ title: "Registry Synced", description: "All 12 nodes securely locked." })
+      toast({ title: "Registry Synced", description: "Node securely locked." })
       router.push("/admin/questions")
     } catch (err: any) {
       errorEmitter.emit("permission-error", new FirestorePermissionError({
@@ -134,7 +137,7 @@ function QuestionEntryContent() {
           </button>
           <div className="text-left">
             <h1 className="text-3xl font-black font-headline text-[#0F172A] uppercase tracking-tight">{isEditing ? "Modify Entry" : "Manual Ingestion"}</h1>
-            <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mt-1">Strict 12-Node Field Control</p>
+            <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mt-1">Direct explicit Field Control</p>
           </div>
         </div>
         <Button className="bg-primary hover:bg-primary/90 gap-3 font-black px-10 h-14 shadow-xl rounded-2xl uppercase tracking-widest text-xs" onClick={handleSave} disabled={isSaving}>
@@ -145,32 +148,50 @@ function QuestionEntryContent() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         <div className="lg:col-span-7 space-y-8">
            <Card className="border-slate-100 bg-white shadow-2xl rounded-[3rem] p-10 space-y-10">
-              <div className="space-y-4">
-                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">1. Question Registry</p>
+              
+              <Tabs value={activeLangTab} onValueChange={(v: any) => setActiveLangTab(v)} className="w-full">
+                 <div className="flex items-center justify-between mb-8">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">1. Statement Matrix</p>
+                    <TabsList className="bg-slate-50 h-10 rounded-xl p-1">
+                       <TabsTrigger value="punjabi" className="rounded-lg px-6 font-black uppercase text-[8px] tracking-widest data-[state=active]:bg-[#0F172A] data-[state=active]:text-white">Punjabi Context</TabsTrigger>
+                       <TabsTrigger value="hindi" className="rounded-lg px-6 font-black uppercase text-[8px] tracking-widest data-[state=active]:bg-[#0F172A] data-[state=active]:text-white">Hindi Context</TabsTrigger>
+                    </TabsList>
+                 </div>
+
                  <div className="space-y-6">
                     <div className="space-y-2">
                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">English Statement</Label>
                        <Textarea value={formData.englishQuestion || ""} onChange={e => setFormData({...formData, englishQuestion: e.target.value})} className="h-24 rounded-xl bg-slate-50 font-bold" />
                     </div>
-                    <div className="space-y-2">
+                    
+                    <TabsContent value="punjabi" className="m-0 space-y-2 animate-in fade-in duration-300">
                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Punjabi Statement</Label>
                        <Textarea value={formData.punjabiQuestion || ""} onChange={e => setFormData({...formData, punjabiQuestion: e.target.value})} className="h-24 rounded-xl bg-slate-50 font-bold" />
-                    </div>
+                    </TabsContent>
+
+                    <TabsContent value="hindi" className="m-0 space-y-2 animate-in fade-in duration-300">
+                       <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Hindi Statement</Label>
+                       <Textarea value={formData.hindiQuestion || ""} onChange={e => setFormData({...formData, hindiQuestion: e.target.value})} className="h-24 rounded-xl bg-slate-50 font-bold" />
+                    </TabsContent>
                  </div>
-              </div>
+              </Tabs>
 
               <div className="space-y-6 pt-6 border-t border-slate-100">
                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">2. Option Matrix</p>
                  <div className="grid grid-cols-1 gap-6">
                     {['A','B','C','D'].map(opt => (
-                       <div key={opt} className="grid grid-cols-2 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                       <div key={opt} className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
                           <div className="space-y-2">
-                             <Label className="text-[9px] font-black uppercase text-slate-500">Option {opt} English</Label>
-                             <Input value={formData[`option${opt}English`] || ""} onChange={e => setFormData({...formData, [`option${opt}English`]: e.target.value})} className="bg-white font-bold" />
+                             <Label className="text-[9px] font-black uppercase text-slate-500">Opt {opt} EN</Label>
+                             <Input value={formData[`option${opt}English`] || ""} onChange={e => setFormData({...formData, [`option${opt}English`]: e.target.value})} className="bg-white font-bold h-11" />
                           </div>
                           <div className="space-y-2">
-                             <Label className="text-[9px] font-black uppercase text-slate-500">Option {opt} Punjabi</Label>
-                             <Input value={formData[`option${opt}Punjabi`] || ""} onChange={e => setFormData({...formData, [`option${opt}Punjabi`]: e.target.value})} className="bg-white font-bold" />
+                             <Label className="text-[9px] font-black uppercase text-slate-500">Opt {opt} PA</Label>
+                             <Input value={formData[`option${opt}Punjabi`] || ""} onChange={e => setFormData({...formData, [`option${opt}Punjabi`]: e.target.value})} className="bg-white font-bold h-11" />
+                          </div>
+                          <div className="space-y-2">
+                             <Label className="text-[9px] font-black uppercase text-slate-500">Opt {opt} HI</Label>
+                             <Input value={formData[`option${opt}Hindi`] || ""} onChange={e => setFormData({...formData, [`option${opt}Hindi`]: e.target.value})} className="bg-white font-bold h-11" />
                           </div>
                        </div>
                     ))}
@@ -201,12 +222,19 @@ function QuestionEntryContent() {
                  <div className="space-y-6">
                     <div className="space-y-2">
                        <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">English Rationale</Label>
-                       <Textarea value={formData.englishExplanation || ""} onChange={e => setFormData({...formData, englishExplanation: e.target.value})} className="h-40 rounded-xl bg-slate-900 text-emerald-400 font-medium" />
+                       <Textarea value={formData.englishExplanation || ""} onChange={e => setFormData({...formData, englishExplanation: e.target.value})} className="h-28 rounded-xl bg-slate-900 text-emerald-400 font-medium" />
                     </div>
-                    <div className="space-y-2">
-                       <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Punjabi Rationale</Label>
-                       <Textarea value={formData.punjabiExplanation || ""} onChange={e => setFormData({...formData, punjabiExplanation: e.target.value})} className="h-40 rounded-xl bg-slate-900 text-blue-400 font-medium" />
-                    </div>
+                    {activeLangTab === 'punjabi' ? (
+                       <div className="space-y-2 animate-in slide-in-from-left-4 duration-300">
+                          <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Punjabi Rationale</Label>
+                          <Textarea value={formData.punjabiExplanation || ""} onChange={e => setFormData({...formData, punjabiExplanation: e.target.value})} className="h-28 rounded-xl bg-slate-900 text-blue-400 font-medium" />
+                       </div>
+                    ) : (
+                       <div className="space-y-2 animate-in slide-in-from-right-4 duration-300">
+                          <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Hindi Rationale</Label>
+                          <Textarea value={formData.hindiExplanation || ""} onChange={e => setFormData({...formData, hindiExplanation: e.target.value})} className="h-28 rounded-xl bg-slate-900 text-orange-400 font-medium" />
+                       </div>
+                    )}
                  </div>
               </div>
            </Card>
@@ -217,26 +245,29 @@ function QuestionEntryContent() {
              <div className="bg-[#0B1528] px-10 py-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                    <Eye className="h-4 w-4 text-primary" />
-                   <span className="text-[10px] font-black uppercase tracking-widest text-white">CBT Preview Node</span>
+                   <span className="text-[10px] font-black uppercase tracking-widest text-white">CBT Preview Hub</span>
                 </div>
                 <div className="flex gap-2">
-                   {['EN', 'PA', 'BI'].map((l) => (
+                   {['EN', 'PA', 'HI', 'BI_PA', 'BI_HI'].map((l) => (
                       <button 
                         key={l}
-                        onClick={() => setFormData({...formData, previewLang: l.toLowerCase()})}
+                        onClick={() => setFormData({...formData, previewLang: l === 'BI_PA' ? 'ENGLISH_PUNJABI' : l === 'BI_HI' ? 'ENGLISH_HINDI' : l === 'EN' ? 'ENGLISH' : l === 'PA' ? 'PUNJABI' : 'HINDI'})}
                         className={cn(
                            "text-[8px] font-black px-2 py-1 rounded border border-white/10 transition-all",
-                           formData.previewLang === l.toLowerCase() ? "bg-primary text-white" : "bg-white/5 text-slate-400"
+                           (formData.previewLang === 'ENGLISH_PUNJABI' && l === 'BI_PA') || 
+                           (formData.previewLang === 'ENGLISH_HINDI' && l === 'BI_HI') || 
+                           (formData.previewLang === l.replace('EN','ENGLISH').replace('PA','PUNJABI').replace('HI','HINDI'))
+                           ? "bg-primary text-white" : "bg-white/5 text-slate-400"
                         )}
                       >
-                         {l}
+                         {l.replace('_', '+')}
                       </button>
                    ))}
                 </div>
              </div>
              <CardContent className="p-10 space-y-10 h-[70vh] overflow-y-auto custom-scrollbar text-left">
                 <QuestionRenderer 
-                   language={formData.previewLang || "bilingual"} 
+                   language={formData.previewLang || "ENGLISH_PUNJABI"} 
                    question={formData} 
                    showSolution={true}
                 />

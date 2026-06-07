@@ -23,7 +23,8 @@ import {
   AlertTriangle,
   Database,
   SearchCode,
-  CheckCircle2
+  CheckCircle2,
+  Languages
 } from "lucide-react"
 import { useFirestore, useCollection } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp } from "firebase/firestore"
@@ -45,6 +46,7 @@ export default function BulkImportPage() {
   const [metadata, setMetadata] = useState({
     boardId: "",
     subjectId: "",
+    secondaryLanguage: "punjabi" as 'punjabi' | 'hindi',
     difficulty: "Medium" as Difficulty,
     status: "PUBLISHED" as ContentStatus,
   })
@@ -69,7 +71,7 @@ export default function BulkImportPage() {
     setErrors(result.errors);
 
     if (result.questions.length > 0) {
-      toast({ title: "Extraction Success", description: `${result.questions.length} blocks mapped to 12 bilingual fields.` });
+      toast({ title: "Extraction Success", description: `${result.questions.length} blocks mapped to explicit fields.` });
     } else {
       toast({ variant: "destructive", title: "Audit Rejected", description: "Check field validation reports." });
     }
@@ -81,16 +83,22 @@ export default function BulkImportPage() {
       ...parsedQuestions[idx],
       englishQuestion: parsedQuestions[idx].englishQuestion || "",
       punjabiQuestion: parsedQuestions[idx].punjabiQuestion || "",
+      hindiQuestion: parsedQuestions[idx].hindiQuestion || "",
       optionAEnglish: parsedQuestions[idx].optionAEnglish || "",
       optionAPunjabi: parsedQuestions[idx].optionAPunjabi || "",
+      optionAHindi: parsedQuestions[idx].optionAHindi || "",
       optionBEnglish: parsedQuestions[idx].optionBEnglish || "",
       optionBPunjabi: parsedQuestions[idx].optionBPunjabi || "",
+      optionBHindi: parsedQuestions[idx].optionBHindi || "",
       optionCEnglish: parsedQuestions[idx].optionCEnglish || "",
       optionCPunjabi: parsedQuestions[idx].optionCPunjabi || "",
+      optionCHindi: parsedQuestions[idx].optionCHindi || "",
       optionDEnglish: parsedQuestions[idx].optionDEnglish || "",
       optionDPunjabi: parsedQuestions[idx].optionDPunjabi || "",
+      optionDHindi: parsedQuestions[idx].optionDHindi || "",
       englishExplanation: parsedQuestions[idx].englishExplanation || "",
-      punjabiExplanation: parsedQuestions[idx].punjabiExplanation || ""
+      punjabiExplanation: parsedQuestions[idx].punjabiExplanation || "",
+      hindiExplanation: parsedQuestions[idx].hindiExplanation || ""
     })
   }
 
@@ -135,6 +143,8 @@ export default function BulkImportPage() {
     }
   }
 
+  const isHindiMode = metadata.secondaryLanguage === 'hindi';
+
   return (
     <div className="space-y-10 pb-32 text-left max-w-7xl mx-auto pt-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 px-4">
@@ -142,7 +152,7 @@ export default function BulkImportPage() {
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-xl border border-slate-200 h-12 w-12 bg-white"><ChevronLeft className="h-6 w-6" /></Button>
           <div>
             <h1 className="text-4xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Content Ingestion</h1>
-            <p className="text-slate-500 font-medium">12-Node Explicit Field Management.</p>
+            <p className="text-slate-500 font-medium">High-Fidelity Multi-Language Mapping.</p>
           </div>
         </div>
         <Button onClick={handleSaveToRegistry} disabled={isSyncing || parsedQuestions.length === 0} className="bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[11px] tracking-widest rounded-xl h-14 px-12 gap-3 shadow-2xl">
@@ -157,7 +167,7 @@ export default function BulkImportPage() {
             <CardHeader className="p-10 pb-4 text-left">
               <CardTitle className="font-headline font-black text-xl uppercase flex items-center gap-3"><ClipboardList className="h-5 w-5 text-primary" /> Registry Config</CardTitle>
             </CardHeader>
-            <CardContent className="p-10 pt-4 space-y-6">
+            <CardContent className="p-10 pt-4 space-y-8">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Board Hub</Label>
@@ -174,6 +184,17 @@ export default function BulkImportPage() {
                    </Select>
                 </div>
               </div>
+
+              <div className="space-y-1.5 pt-2">
+                 <Label className="text-[10px] font-black uppercase text-slate-400 ml-1 flex items-center gap-2"><Languages className="h-3 w-3" /> Target Secondary Language</Label>
+                 <Select value={metadata.secondaryLanguage} onValueChange={(v: any) => setMetadata({...metadata, secondaryLanguage: v})}>
+                    <SelectTrigger className="rounded-xl h-14 bg-slate-900 text-white border-none font-black uppercase text-[10px] tracking-widest"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                       <SelectItem value="punjabi">English + Punjabi</SelectItem>
+                       <SelectItem value="hindi">English + Hindi</SelectItem>
+                    </SelectContent>
+                 </Select>
+              </div>
             </CardContent>
           </Card>
           
@@ -181,7 +202,7 @@ export default function BulkImportPage() {
             <Textarea 
                 value={rawText}
                 onChange={e => setRawText(e.target.value)}
-                placeholder="Paste Q1. English... Punjabi... (A) EN / PA... Correct Answer... English Explanation... Punjabi Explanation..."
+                placeholder={`Paste Q1. English...\n${isHindiMode ? 'Hindi...' : 'Punjabi...'}\n(A) EN / ${isHindiMode ? 'HI' : 'PA'}...\nCorrect Answer: A\nEnglish Explanation: ...\n${isHindiMode ? 'Hindi Explanation' : 'Punjabi Explanation'}: ...`}
                 className="min-h-[550px] rounded-[2.5rem] bg-white border-none p-12 text-sm font-bold shadow-4xl leading-relaxed resize-none focus-visible:ring-primary"
             />
             <Button onClick={handleImport} className="w-full h-20 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.3em] text-[11px] rounded-[2rem] shadow-4xl gap-4 group">
@@ -223,7 +244,7 @@ export default function BulkImportPage() {
                              <Badge className="bg-[#0F172A] text-white border-none text-[10px] font-black px-6 py-2 rounded-xl uppercase tracking-widest">Asset {idx + 1}</Badge>
                              <div className="flex flex-wrap gap-2 pt-2">
                                 <DebugIndicator label="EN" active={q.debug.EN_Q === 'YES'} />
-                                <DebugIndicator label="PA" active={q.debug.PA_Q === 'YES'} />
+                                <DebugIndicator label={isHindiMode ? "HI" : "PA"} active={q.debug.SEC_Q === 'YES'} />
                                 <DebugIndicator label="OPTS" active={q.debug.OPT === 'YES'} />
                                 <DebugIndicator label="KEY" active={q.debug.KEY === 'YES'} />
                                 <DebugIndicator label="LOGIC" active={q.debug.LOGIC === 'YES'} />
@@ -234,7 +255,7 @@ export default function BulkImportPage() {
                              <Button variant="ghost" size="icon" className="h-14 w-14 rounded-2xl text-rose-500 bg-rose-50 shadow-sm hover:scale-110 transition-transform" onClick={() => handleDelete(idx)}><Trash2 className="h-6 w-6" /></Button>
                           </div>
                        </div>
-                       <QuestionRenderer question={q} language="bilingual" showSolution={true} />
+                       <QuestionRenderer question={q} language={isHindiMode ? "ENGLISH_HINDI" : "ENGLISH_PUNJABI"} showSolution={true} />
                     </Card>
                   </div>
                 ))}
@@ -265,8 +286,12 @@ export default function BulkImportPage() {
                      <Textarea value={editForm?.englishQuestion || ""} onChange={e => setEditForm({...editForm, englishQuestion: e.target.value})} className="h-36 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner" />
                   </div>
                   <div className="space-y-3">
-                     <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Punjabi Statement</Label>
-                     <Textarea value={editForm?.punjabiQuestion || ""} onChange={e => setEditForm({...editForm, punjabiQuestion: e.target.value})} className="h-36 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner" />
+                     <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">{isHindiMode ? 'Hindi Statement' : 'Punjabi Statement'}</Label>
+                     <Textarea 
+                        value={isHindiMode ? (editForm?.hindiQuestion || "") : (editForm?.punjabiQuestion || "")} 
+                        onChange={e => setEditForm({...editForm, [isHindiMode ? 'hindiQuestion' : 'punjabiQuestion']: e.target.value})} 
+                        className="h-36 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner" 
+                     />
                   </div>
                </div>
 
@@ -278,8 +303,12 @@ export default function BulkImportPage() {
                           <Input value={editForm?.[`option${opt}English`] || ""} onChange={e => setEditForm({...editForm, [`option${opt}English`]: e.target.value})} className="bg-white font-bold" />
                        </div>
                        <div className="space-y-2">
-                          <Label className="text-[9px] font-black uppercase text-slate-400">Option {opt} Punjabi</Label>
-                          <Input value={editForm?.[`option${opt}Punjabi`] || ""} onChange={e => setEditForm({...editForm, [`option${opt}Punjabi`]: e.target.value})} className="bg-white font-bold" />
+                          <Label className="text-[9px] font-black uppercase text-slate-400">Option {opt} {isHindiMode ? 'Hindi' : 'Punjabi'}</Label>
+                          <Input 
+                            value={isHindiMode ? (editForm?.[`option${opt}Hindi`] || "") : (editForm?.[`option${opt}Punjabi`] || "")} 
+                            onChange={e => setEditForm({...editForm, [isHindiMode ? `option${opt}Hindi` : `option${opt}Punjabi`]: e.target.value})} 
+                            className="bg-white font-bold" 
+                          />
                        </div>
                     </div>
                   ))}
@@ -291,8 +320,12 @@ export default function BulkImportPage() {
                      <Textarea value={editForm?.englishExplanation || ""} onChange={e => setEditForm({...editForm, englishExplanation: e.target.value})} className="h-64 rounded-2xl bg-slate-50 border-none font-medium p-8 leading-relaxed shadow-inner" />
                   </div>
                   <div className="space-y-3">
-                     <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Punjabi Logic Hub</Label>
-                     <Textarea value={editForm?.punjabiExplanation || ""} onChange={e => setEditForm({...editForm, punjabiExplanation: e.target.value})} className="h-64 rounded-2xl bg-slate-50 border-none font-medium p-8 leading-relaxed shadow-inner" />
+                     <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">{isHindiMode ? 'Hindi Logic Hub' : 'Punjabi Logic Hub'}</Label>
+                     <Textarea 
+                        value={isHindiMode ? (editForm?.hindiExplanation || "") : (editForm?.punjabiExplanation || "")} 
+                        onChange={e => setEditForm({...editForm, [isHindiMode ? 'hindiExplanation' : 'punjabiExplanation']: e.target.value})} 
+                        className="h-64 rounded-2xl bg-slate-50 border-none font-medium p-8 leading-relaxed shadow-inner" 
+                     />
                   </div>
                </div>
             </div>
