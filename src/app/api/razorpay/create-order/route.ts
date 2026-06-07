@@ -4,26 +4,35 @@ import Razorpay from 'razorpay';
 
 /**
  * @fileOverview Backend Node for Razorpay Order Creation.
+ * FIXED: Added credential presence check and improved error logging.
  */
-
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || '',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || '',
-});
 
 export async function POST(request: Request) {
   try {
     const { amount, planId } = await request.json();
 
-    if (!amount || amount < 1) {
-      return NextResponse.json({ error: 'Invalid amount node' }, { status: 400 });
+    const key_id = process.env.RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!key_id || !key_secret) {
+      console.error('[RAZORPAY_CONFIG_ERR]: Missing API Keys in environment.');
+      return NextResponse.json({ error: 'Gateway configuration error' }, { status: 500 });
     }
 
-    // Razorpay expects amount in paise (e.g. 100 INR = 10000 paise)
+    const razorpay = new Razorpay({
+      key_id: key_id,
+      key_secret: key_secret,
+    });
+
+    if (amount === undefined || amount === null || amount < 1) {
+      return NextResponse.json({ error: 'Invalid amount (Min ₹1 required)' }, { status: 400 });
+    }
+
+    // Razorpay expects amount in paise (e.g. 1 INR = 100 paise)
     const options = {
-      amount: Math.round(amount * 100), 
+      amount: Math.round(Number(amount) * 100), 
       currency: 'INR',
-      receipt: `receipt_${planId}_${Date.now()}`,
+      receipt: `rcpt_${planId.slice(0, 15)}_${Date.now()}`.slice(0, 40),
     };
 
     const order = await razorpay.orders.create(options);
