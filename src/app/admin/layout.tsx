@@ -1,7 +1,8 @@
+
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { LayoutDashboard, Database, ClipboardList, LogOut, ShieldCheck, Zap, Newspaper, Megaphone, Globe, MousePointer2, Layers, CheckCircle2, Gem, BookOpen, FileStack, Upload, ListTree, Landmark, Menu, HeartPulse, Settings, Users, CreditCard, ShieldAlert, HelpCircle, History } from "lucide-react"
+import { LayoutDashboard, Database, ClipboardList, LogOut, ShieldCheck, Zap, Newspaper, Megaphone, Globe, MousePointer2, Layers, CheckCircle2, Gem, BookOpen, FileStack, Upload, ListTree, Landmark, Menu, HeartPulse, Settings, Users, CreditCard, ShieldAlert, HelpCircle, History, User } from "lucide-react"
 import Link from "next/link"
 import Logo from "@/components/brand/Logo"
 import { useUser, useAuth } from "@/firebase"
@@ -12,8 +13,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview FINAL MASTER Administrative Layout.
- * Restored: Every missing module (Settings, Passes, Users, Reports, Payments).
+ * @fileOverview MASTER Administrative Layout.
+ * Updated: Standardized "Developed by Arsh Grewal" branding in sidebar footer.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -71,42 +72,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </SidebarGroup>
 
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Modular Architect</SidebarGroupLabel>
-            <SidebarMenu>
-              <AdminNavItem icon={<Layers className="text-primary" />} label="Mock Blueprints" href="/admin/mocks" active={pathname === "/admin/mocks"} onClick={() => setIsMobileMenuOpen(false)} />
-              <AdminNavItem icon={<ClipboardList />} label="Mock Builder" href="/admin/mocks/builder" active={pathname === "/admin/mocks/builder"} onClick={() => setIsMobileMenuOpen(false)} />
-            </SidebarMenu>
-          </SidebarGroup>
-
-          <SidebarGroup className="mt-4">
             <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Monetization Registry</SidebarGroupLabel>
             <SidebarMenu>
               <AdminNavItem icon={<Gem className="text-amber-400" />} label="Pass Management" href="/admin/passes" active={pathname === "/admin/passes"} onClick={() => setIsMobileMenuOpen(false)} />
               <AdminNavItem icon={<Users className="text-blue-400" />} label="Student Registry" href="/admin/users" active={pathname === "/admin/users"} onClick={() => setIsMobileMenuOpen(false)} />
-              <AdminNavItem icon={<CreditCard className="text-emerald-400" />} label="Transaction Audit" href="/admin/payments" active={pathname === "/admin/payments"} onClick={() => setIsMobileMenuOpen(false)} />
-              <AdminNavItem icon={<Zap className="text-primary" />} label="Manual Verify" href="/admin/payments/verify" active={pathname === "/admin/payments/verify"} onClick={() => setIsMobileMenuOpen(false)} />
             </SidebarMenu>
           </SidebarGroup>
 
           <SidebarGroup className="mt-4">
             <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Platform Governance</SidebarGroupLabel>
             <SidebarMenu>
-              <AdminNavItem icon={<ShieldAlert className="text-rose-400" />} label="Audit Queue" href="/admin/reports" active={pathname === "/admin/reports"} onClick={() => setIsMobileMenuOpen(false)} />
-              <AdminNavItem icon={<HelpCircle className="text-blue-400" />} label="Support Hub" href="/admin/support" active={pathname === "/admin/support"} onClick={() => setIsMobileMenuOpen(false)} />
               <AdminNavItem icon={<History className="text-slate-400" />} label="Audit Trail" href="/admin/audit-logs" active={pathname === "/admin/audit-logs"} onClick={() => setIsMobileMenuOpen(false)} />
               <AdminNavItem icon={<Settings className="text-primary" />} label="System Portal" href="/admin/settings" active={pathname === "/admin/settings"} onClick={() => setIsMobileMenuOpen(false)} />
             </SidebarMenu>
           </SidebarGroup>
+       </div>
 
-          <SidebarGroup className="mt-auto pb-8">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                 <button onClick={handleLogout} className="w-full flex items-center px-6 text-destructive/70 hover:bg-destructive/10 hover:text-destructive h-12 gap-3">
-                  <LogOut className="size-4 shrink-0" /> <span className="font-bold text-sm uppercase tracking-tight">Logout Node</span>
-                </button>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
+       {/* ADMIN FOOTER BRANDING */}
+       <div className="p-6 border-t border-white/5 bg-black/20">
+          <div className="flex items-center gap-3">
+             <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <User className="h-4 w-4" />
+             </div>
+             <div className="text-left">
+                <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none mb-1">DEVELOPED BY</p>
+                <p className="text-[11px] font-black text-white uppercase tracking-tight">Arsh Grewal</p>
+             </div>
+          </div>
        </div>
     </div>
   );

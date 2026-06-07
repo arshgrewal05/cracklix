@@ -24,6 +24,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import Link from "next/link"
 import { motion } from "framer-motion"
 
+/**
+ * @fileOverview Professional Login & Registration Node.
+ * Updated: Subtle Developer branding for Arsh Grewal.
+ */
+
 export default function LoginPage() {
   return (
     <Suspense fallback={null}>
@@ -159,6 +164,12 @@ function LoginContent() {
             </div>
           </CardContent>
         </Card>
+        
+        {/* DEVELOPER CREDIT */}
+        <div className="mt-10 text-center opacity-30 flex flex-col items-center gap-1">
+           <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">Developed by Arsh Grewal</p>
+           <div className="h-px w-8 bg-slate-500/20" />
+        </div>
       </motion.div>
     </div>
   )

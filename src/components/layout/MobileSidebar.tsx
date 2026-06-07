@@ -21,7 +21,8 @@ import {
   Info,
   LayoutGrid,
   Share2,
-  Target
+  Target,
+  User as UserIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useUser, useAuth } from "@/firebase";
@@ -40,7 +41,7 @@ import ShareButton from "@/components/navigation/ShareButton";
 
 /**
  * @fileOverview Responsive Mobile Navigation Hub.
- * Updated: "Free Hub" rebranded to "My Exams" to match global navigation.
+ * Updated: Standardized "Developed by Arsh Grewal" footer branding.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -168,10 +169,16 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* 2. COMPACT FIXED FOOTER */}
-      <div className="px-3 py-2 lg:py-4 border-t border-slate-100 bg-slate-50 shrink-0 mb-[env(safe-area-inset-bottom,0px)]">
-        <p className="text-[7px] lg:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">
-          Cracklix v6.5
-        </p>
+      <div className="px-4 py-4 border-t border-slate-100 bg-slate-50 shrink-0 mb-[env(safe-area-inset-bottom,0px)] flex flex-col items-center gap-2">
+         <div className="flex items-center gap-2 opacity-40">
+            <UserIcon className="h-2.5 w-2.5" />
+            <p className="text-[7px] lg:text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">
+               Developed by Arsh Grewal
+            </p>
+         </div>
+         <p className="text-[6px] lg:text-[8px] font-bold text-slate-300 uppercase tracking-widest">
+            Cracklix v6.5 • Authority Node
+         </p>
       </div>
     </div>
   );

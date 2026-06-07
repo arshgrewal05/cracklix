@@ -23,7 +23,8 @@ import {
   ShieldCheck,
   AlertTriangle,
   Activity,
-  Award
+  Award,
+  User
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -32,8 +33,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import ShareButton from "@/components/navigation/ShareButton"
 
 /**
- * @fileOverview Institutional Dashboard v7.0 (Audit Enhanced).
- * Features: Readiness Index, Daily Preparation Streak, and Engagement Hub.
+ * @fileOverview Institutional Dashboard v7.5 (Audit Enhanced).
+ * Updated: Standardized "Powered by Arsh Grewal" branding badge.
  */
 
 export default function StudentDashboard() {
@@ -170,6 +171,17 @@ export default function StudentDashboard() {
                   </div>
                </div>
             </Card>
+
+            {/* POWERED BY BRANDING */}
+            <div className="py-8 flex flex-col items-center gap-3">
+               <div className="flex items-center gap-3 px-6 py-2.5 bg-slate-50 rounded-full border border-slate-100 shadow-sm group hover:border-primary/20 transition-all">
+                  <User className="h-3 w-3 text-primary group-hover:animate-pulse" />
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                     Powered by <span className="text-[#0F172A] font-black group-hover:text-primary transition-colors">Arsh Grewal</span>
+                  </p>
+               </div>
+               <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Cracklix v7.5 • Punjab Registry</p>
+            </div>
         </div>
       </main>
     </div>
