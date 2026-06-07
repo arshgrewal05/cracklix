@@ -1,3 +1,4 @@
+
 "use client"
 
 import Navbar from "@/components/layout/Navbar"
@@ -24,7 +25,8 @@ import {
   Map,
   Bell,
   GraduationCap,
-  ListTree
+  ListTree,
+  Download
 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -32,6 +34,11 @@ import { useMemo, useState } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+
+/**
+ * @fileOverview Institutional Exam Hub v7.0.
+ * Dynamic: All tabs (Mocks, Notes, Syllabus) are now live synced with Admin Firestore.
+ */
 
 export default function ExamHubPage() {
   const params = useParams()
@@ -43,9 +50,16 @@ export default function ExamHubPage() {
 
   const { data: exam, loading: examLoading } = useDoc<any>(useMemo(() => (db && examId ? doc(db, "exams", examId) : null), [db, examId]))
   
+  // 1. Fetch all mocks for this exam
   const mocksQuery = useMemo(() => {
     if (!db || !examId) return null;
     return query(collection(db, "mocks"), where("examId", "==", examId), where("published", "==", true));
+  }, [db, examId]);
+
+  // 2. Fetch all study notes/syllabus for this exam
+  const notesQuery = useMemo(() => {
+    if (!db || !examId) return null;
+    return query(collection(db, "notes"), where("examId", "==", examId));
   }, [db, examId]);
 
   const resultsQuery = useMemo(() => {
@@ -54,18 +68,24 @@ export default function ExamHubPage() {
   }, [db, user]);
 
   const { data: rawMocks, loading: mocksLoading } = useCollection<any>(mocksQuery)
+  const { data: rawNotes, loading: notesLoading } = useCollection<any>(notesQuery)
   const { data: userResults } = useCollection<any>(resultsQuery)
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
 
-  const groupedMocks = useMemo(() => {
-    if (!rawMocks) return { FULL: [], SUBJECT: [], CHAPTER: [], PYQ: [] };
+  // 3. Grouping Content Nodes
+  const groupedContent = useMemo(() => {
+    const mocks = rawMocks || [];
+    const notes = rawNotes || [];
+
     return {
-      FULL: rawMocks.filter(m => m.mockType === 'FULL'),
-      SUBJECT: rawMocks.filter(m => m.mockType === 'SUBJECT'),
-      CHAPTER: rawMocks.filter(m => m.mockType === 'CHAPTER'),
-      PYQ: rawMocks.filter(m => m.mockType === 'PYQ'),
+      FULL: mocks.filter(m => m.mockType === 'FULL'),
+      SUBJECT: mocks.filter(m => m.mockType === 'SUBJECT'),
+      CHAPTER: mocks.filter(m => m.mockType === 'CHAPTER'),
+      PYQ: mocks.filter(m => m.mockType === 'PYQ'),
+      NOTES: notes.filter(n => n.category === 'NOTES'),
+      SYLLABUS: notes.filter(n => n.category === 'SYLLABUS')
     }
-  }, [rawMocks])
+  }, [rawMocks, rawNotes])
 
   const hasPass = useMemo(() => profile?.status && profile?.status !== 'Free', [profile]);
 
@@ -95,7 +115,7 @@ export default function ExamHubPage() {
                   {logoUrl && !imgFailed ? (
                     <img 
                       src={logoUrl} 
-                      className={cn("w-full h-full object-contain p-1.5", isArmy ? "scale-150" : "")} 
+                      className={cn("w-full h-full object-contain p-1.5", isArmy ? "scale-125" : "")} 
                       alt="Board Logo" 
                       referrerPolicy="no-referrer" 
                       onError={() => setImgFailed(true)}
@@ -129,13 +149,13 @@ export default function ExamHubPage() {
             </div>
 
             <div className="animate-in fade-in duration-500">
-               <TabsContent value="FULL" className="m-0"><MockList data={groupedMocks.FULL} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
-               <TabsContent value="SUBJECT" className="m-0"><MockList data={groupedMocks.SUBJECT} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
-               <TabsContent value="CHAPTER" className="m-0"><MockList data={groupedMocks.CHAPTER} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
-               <TabsContent value="PYQ" className="m-0"><MockList data={groupedMocks.PYQ} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
+               <TabsContent value="FULL" className="m-0"><MockList data={groupedContent.FULL} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
+               <TabsContent value="SUBJECT" className="m-0"><MockList data={groupedContent.SUBJECT} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
+               <TabsContent value="CHAPTER" className="m-0"><MockList data={groupedContent.CHAPTER} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
+               <TabsContent value="PYQ" className="m-0"><MockList data={groupedContent.PYQ} results={userResults} hasPass={hasPass} user={user} /></TabsContent>
                
-               <TabsContent value="NOTES" className="m-0"><EmptyNode label="No Study Notes Recorded" /></TabsContent>
-               <TabsContent value="SYLLABUS" className="m-0"><EmptyNode label="Syllabus Audit Pending" /></TabsContent>
+               <TabsContent value="NOTES" className="m-0"><NotesList data={groupedContent.NOTES} hasPass={hasPass} user={user} /></TabsContent>
+               <TabsContent value="SYLLABUS" className="m-0"><NotesList data={groupedContent.SYLLABUS} hasPass={hasPass} user={user} /></TabsContent>
             </div>
          </Tabs>
       </main>
@@ -167,11 +187,10 @@ function DashboardTab({ value, label, icon }: any) {
 function MockList({ data, results, hasPass, user }: any) {
    const router = useRouter();
 
-   const handleInteraction = (e: React.MouseEvent, href: string) => {
+   const handleInteraction = (e: React.MouseEvent) => {
       if (!user) {
          e.preventDefault();
          router.push(`/login?returnUrl=${encodeURIComponent(window.location.pathname)}`);
-         return;
       }
    };
 
@@ -201,13 +220,56 @@ function MockList({ data, results, hasPass, user }: any) {
                      <div className="pt-2">
                         <Button 
                           asChild 
-                          onClick={(e) => handleInteraction(e, `/mocks/${mock.id}`)}
+                          onClick={handleInteraction}
                           className="w-full h-10 bg-slate-50 hover:bg-primary text-slate-600 hover:text-white border-none font-black uppercase text-[9px] rounded-xl"
                         >
                            <Link href={locked ? "/pass" : result ? `/results/${mock.id}` : `/mocks/${mock.id}`}>
                               {locked ? 'Unlock with Pass' : result ? 'View Results' : 'Attempt Now'}
                            </Link>
                         </Button>
+                     </div>
+                  </CardContent>
+               </Card>
+            )
+         })}
+      </div>
+   )
+}
+
+function NotesList({ data, hasPass, user }: any) {
+   const router = useRouter();
+
+   if (data.length === 0) return <EmptyNode label="No Materials Archive Found" />;
+
+   return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         {data.map((note: any) => {
+            const isFree = note.isFree;
+            const locked = !isFree && !hasPass;
+
+            return (
+               <Card key={note.id} className="border-none shadow-sm rounded-2xl bg-white hover:shadow-md transition-all text-left group">
+                  <CardContent className="p-5 md:p-8 space-y-4">
+                     <div className="flex items-center justify-between">
+                        <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded", isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
+                           {isFree ? 'FREE' : 'PREMIUM'}
+                        </Badge>
+                     </div>
+                     <h3 className="text-sm md:text-lg font-black text-[#0F172A] uppercase leading-tight group-hover:text-primary transition-colors">{note.title}</h3>
+                     <div className="flex items-center gap-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-50 pt-3">
+                        <span className="flex items-center gap-1.5"><FileText className="h-3 w-3" /> STUDY ASSET</span>
+                        <span className="flex items-center gap-1.5"><Download className="h-3 w-3" /> PDF</span>
+                     </div>
+                     <div className="pt-2">
+                        {locked ? (
+                          <Button asChild className="w-full h-10 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase text-[9px] rounded-xl border-none">
+                             <Link href="/pass"><Lock className="h-3 w-3 mr-2" /> Unlock for Download</Link>
+                          </Button>
+                        ) : (
+                          <Button asChild className="w-full h-10 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[9px] rounded-xl border-none">
+                             <a href={note.pdfUrl} target="_blank" rel="noopener noreferrer"><Download className="h-3 w-3 mr-2" /> Download Node</a>
+                          </Button>
+                        )}
                      </div>
                   </CardContent>
                </Card>
