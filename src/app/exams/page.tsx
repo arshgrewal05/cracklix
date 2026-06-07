@@ -4,19 +4,21 @@
 import { useMemo, Suspense, useState } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { useCollection, useFirestore } from "@/firebase"
-import { collection, query } from "firebase/firestore"
+import { useCollection, useFirestore, useUser } from "@/firebase"
+import { collection, query, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
 import { Input } from "@/components/ui/input"
-import { Search, GraduationCap, ChevronRight, Zap, ShieldCheck, BookOpen, Layers, FileText } from "lucide-react"
+import { Search, GraduationCap, ChevronRight, Zap, ShieldCheck, BookOpen, Layers, FileText, Star } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
 
 /**
- * @fileOverview High-Density Responsive Exam Catalog v3.0.
- * Optimized: Uses 100% real-time aggregation logic from the 'mocks' collection.
+ * @fileOverview High-Density Responsive Exam Catalog v3.5.
+ * Features: Pin to My Exams Engine and Authentication Protocol.
  */
 
 export default function ExamsCatalog() {
@@ -29,6 +31,9 @@ export default function ExamsCatalog() {
 
 function CatalogContent() {
   const db = useFirestore()
+  const { user, profile } = useUser()
+  const { toast } = useToast()
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
 
   const examsQuery = useMemo(() => (db ? query(collection(db, 'exams')) : null), [db])
@@ -39,30 +44,18 @@ function CatalogContent() {
   const { data: boards } = useCollection<any>(boardsQuery)
   const { data: mocks, loading: mocksLoading } = useCollection<any>(mocksQuery)
 
-  // Institutional Aggregation Hub
   const statsMap = useMemo(() => {
     if (!mocks) return {};
     const map: Record<string, any> = {};
-    
     mocks.forEach(m => {
       const eid = m.examId;
       if (!eid) return;
-      
-      if (!map[eid]) {
-        map[eid] = {
-          full: 0,
-          pyq: 0,
-          sectional: 0,
-          subjects: new Set<string>()
-        };
-      }
-      
+      if (!map[eid]) map[eid] = { full: 0, pyq: 0, sectional: 0, subjects: new Set<string>() };
       if (m.mockType === 'FULL') map[eid].full++;
       if (m.mockType === 'PYQ') map[eid].pyq++;
       if (m.mockType === 'SECTIONAL') map[eid].sectional++;
       if (m.subjectId) map[eid].subjects.add(m.subjectId);
     });
-    
     return map;
   }, [mocks]);
 
@@ -70,6 +63,26 @@ function CatalogContent() {
     if (!exams) return [];
     return exams.filter((e: any) => e.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [exams, searchTerm])
+
+  const togglePin = async (e: React.MouseEvent, examId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!user) {
+      router.push("/login?returnUrl=/exams");
+      return;
+    }
+
+    const isPinned = profile?.pinnedExams?.includes(examId);
+    try {
+      await updateDoc(doc(db!, "users", user.uid), {
+        pinnedExams: isPinned ? arrayRemove(examId) : arrayUnion(examId)
+      });
+      toast({ title: isPinned ? "Hub Unpinned" : "Pinned to My Exams", description: isPinned ? "Removed from dashboard." : "Available on your dashboard node." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Sync Failed" });
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50 pb-safe overflow-x-hidden">
@@ -82,7 +95,7 @@ function CatalogContent() {
                 <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Official Registry 2026</span>
              </div>
              <h1 className="text-2xl md:text-6xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-none">MASTER <span className="text-primary">CATALOG</span></h1>
-             <p className="text-[11px] md:text-lg text-slate-500 font-medium">Connect with 100% verified preparation hubs.</p>
+             <p className="text-[11px] md:text-lg text-slate-500 font-medium">Explore and pin your target recruitment hubs.</p>
           </div>
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
@@ -101,11 +114,19 @@ function CatalogContent() {
            ) : filteredExams.map((exam: any) => {
               const board = boards?.find((b: any) => b.id === exam.boardId);
               const stats = statsMap[exam.id] || { full: 0, pyq: 0, sectional: 0, subjects: new Set() };
+              const isPinned = profile?.pinnedExams?.includes(exam.id);
               
               return (
-                <Link key={exam.id} href={`/exams/${exam.id}`}>
-                  <Card className="border-none shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl md:rounded-[3.5rem] bg-white group overflow-hidden text-left h-full flex flex-col border border-slate-100 p-4 md:p-10">
-                       <div className="flex justify-between items-start mb-4 md:mb-10">
+                <Card key={exam.id} className="border-none shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl md:rounded-[3.5rem] bg-white group overflow-hidden text-left h-full flex flex-col border border-slate-100 p-4 md:p-10 relative">
+                   <button 
+                     onClick={(e) => togglePin(e, exam.id)}
+                     className={`absolute top-4 right-4 md:top-8 md:right-8 z-20 p-2 rounded-full transition-all ${isPinned ? 'bg-amber-100 text-amber-600' : 'bg-slate-50 text-slate-300 hover:text-primary'}`}
+                   >
+                      <Star className={`h-4 w-4 md:h-5 md:w-5 ${isPinned ? 'fill-current' : ''}`} />
+                   </button>
+
+                   <Link href={`/exams/${exam.id}`} className="flex-1 flex flex-col">
+                       <div className="flex justify-between items-start mb-4 md:mb-10 pr-10">
                           <div className="h-10 w-10 md:h-20 md:w-20 rounded-lg md:rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center relative overflow-hidden shrink-0">
                              {board?.iconUrl ? (
                                 <img src={board.iconUrl} className="w-full h-full object-contain p-1.5 md:p-3" alt="Logo" referrerPolicy="no-referrer" />
@@ -127,7 +148,6 @@ function CatalogContent() {
                           </p>
                        </div>
 
-                       {/* Reactive Inventory Matrix */}
                        <div className="grid grid-cols-2 gap-y-4 gap-x-2 mt-6 pt-6 border-t border-slate-50">
                           <CounterNode icon={<Zap className="h-3 w-3 text-primary" />} val={stats.full} label="Full Mocks" />
                           <CounterNode icon={<BookOpen className="h-3 w-3 text-blue-500" />} val={stats.subjects.size} label="Subject Hubs" />
@@ -140,8 +160,8 @@ function CatalogContent() {
                              Enter Hub <ChevronRight className="h-3 w-3 md:h-3.5 md:w-3.5" />
                           </Button>
                        </div>
-                  </Card>
-                </Link>
+                   </Link>
+                </Card>
               )
            })}
         </div>
@@ -158,7 +178,7 @@ function CounterNode({ icon, val, label }: { icon: React.ReactNode, val: number,
           {icon}
           <p className="text-[10px] md:text-[12px] font-black text-[#0F172A]">{val}</p>
        </div>
-       <p className="text-[6px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest pl-4.5">{label}</p>
+       <p className="text-[6px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
     </div>
   )
 }

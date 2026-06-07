@@ -97,6 +97,7 @@ export interface UserProfile {
   photoURL?: string;
   gender?: Gender;
   subscriptions?: string[];
+  pinnedExams?: string[];
 }
 
 export interface Advertisement {

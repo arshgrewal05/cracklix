@@ -1,14 +1,15 @@
+
 'use client';
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Zap, User, Home, Newspaper, BarChart3, LayoutGrid } from "lucide-react";
+import { Zap, User, Home, BarChart3, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * @fileOverview Institutional Sticky Bottom Navigation for Mobile.
- * Updated: High-priority z-index and touch area optimization.
+ * Updated: "Free Hub" rebranded to "My Exams" with high-contrast Target icon.
  */
 
 export default function MobileNav() {
@@ -16,7 +17,7 @@ export default function MobileNav() {
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
-    { label: "Free Hub", href: "/current-affairs", icon: LayoutGrid },
+    { label: "My Exams", href: "/my-exams", icon: Target },
     { label: "Mocks", href: "/mocks", icon: Zap },
     { label: "Results", href: "/dashboard", icon: BarChart3 },
     { label: "Profile", href: "/profile", icon: User },
@@ -53,7 +54,7 @@ export default function MobileNav() {
                 />
                 
                 <span className={cn(
-                  "text-[9px] font-black uppercase tracking-tight transition-colors duration-300",
+                  "text-[9px] font-[900] uppercase tracking-tighter transition-colors duration-300",
                   isActive ? "text-white" : "text-[#7A8B9E]"
                 )}>
                   {item.label}

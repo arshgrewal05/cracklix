@@ -2,7 +2,7 @@
 'use client';
 
 import Link from "next/link";
-import { Menu, Search, Zap, CreditCard, LogOut, ShieldCheck, Megaphone, Newspaper, LayoutGrid } from "lucide-react";
+import { Menu, Search, Zap, CreditCard, LogOut, ShieldCheck, Megaphone, Target, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/brand/Logo";
 import { useState, useMemo } from "react";
@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * @fileOverview Global Navigation Node.
- * Updated: Logo scaling refined for mobile-first native app feel.
+ * Updated: "Free Hub" rebranded to "My Exams" with Target icon.
  */
 
 export default function Navbar() {
@@ -59,7 +59,7 @@ export default function Navbar() {
         </div>
       )}
 
-      <nav className="w-full bg-[#0B1528] border-b border-white/5 py-1.5 md:py-3 shadow-xl backdrop-blur-md bg-opacity-95">
+      <nav className="w-full bg-[#0B1528] border-b border-white/5 py-1.5 md:py-2.5 shadow-xl backdrop-blur-md bg-opacity-95">
         <div className="container mx-auto max-w-[98%] lg:max-w-[90%] flex items-center justify-between px-2">
           <div className="flex items-center gap-2 md:gap-4">
             <div className="flex items-center gap-1 md:gap-4">
@@ -86,8 +86,8 @@ export default function Navbar() {
                <Logo variant="light" className="origin-left" />
             </div>
 
-            <div className="hidden lg:flex items-center gap-8 text-[12px] font-bold uppercase tracking-widest text-[#7A8B9E]">
-              <Link href="/current-affairs" className={pathname === '/current-affairs' ? 'text-white' : 'hover:text-primary transition-colors'}>Free Hub</Link>
+            <div className="hidden lg:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-[#7A8B9E]">
+              <Link href="/my-exams" className={pathname === '/my-exams' ? 'text-white' : 'hover:text-primary transition-colors flex items-center gap-2'}><Target className="h-3.5 w-3.5 text-primary" /> My Exams</Link>
               <Link href="/mocks" className={pathname === '/mocks' ? 'text-white' : 'hover:text-primary transition-colors'}>Mocks</Link>
               <Link href="/pass" className={pathname === '/pass' ? 'text-white' : 'hover:text-primary transition-colors'}>Pass</Link>
               <Link href="/notes" className={pathname === '/notes' ? 'text-white' : 'hover:text-primary transition-colors'}>Notes</Link>
@@ -111,15 +111,15 @@ export default function Navbar() {
                 <DropdownMenuContent className="w-64 bg-[#0F172A] border-white/10 text-white rounded-[2rem] p-3 shadow-4xl animate-in fade-in zoom-in-95 duration-200" align="end">
                   <DropdownMenuLabel className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Account Access</DropdownMenuLabel>
                   
-                  <DropdownNavItem href="/dashboard" icon={<Zap className="h-5 w-5" />} label="Dashboard" />
-                  <DropdownNavItem href="/pass" icon={<CreditCard className="h-5 w-5" />} label="My Pass" />
+                  <DropdownNavItem href="/my-exams" icon={<Target className="h-5 w-5 text-primary" />} label="My Exams" />
+                  <DropdownNavItem href="/dashboard" icon={<Zap className="h-5 w-5" />} label="Analytics" />
+                  <DropdownNavItem href="/pass" icon={<CreditCard className="h-5 w-5" />} label="Pass Access" />
                   
                   {isAdmin && (
                     <DropdownNavItem 
                       href="/admin" 
-                      icon={<ShieldCheck className="h-5 w-5" />} 
+                      icon={<ShieldCheck className="h-5 w-5 text-primary" />} 
                       label="Admin Portal" 
-                      className="text-primary focus:bg-primary/5 focus:text-primary" 
                     />
                   )}
                   
@@ -130,13 +130,13 @@ export default function Navbar() {
                     className="flex items-center gap-4 px-4 py-3.5 cursor-pointer rounded-2xl transition-all focus:bg-rose-50/10 focus:text-rose-500 text-rose-500/80"
                   >
                     <LogOut className="h-5 w-5 shrink-0" />
-                    <span className="font-bold text-sm tracking-tight">Logout</span>
+                    <span className="font-bold text-sm tracking-tight uppercase">Logout Node</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Button asChild className="bg-[#F97316] hover:bg-orange-600 text-white font-black px-4 md:px-5 py-1.5 rounded-xl h-8 md:h-10 uppercase text-[9px] md:text-[10px] tracking-widest shadow-lg transition-all active:scale-95">
-                <Link href="/login">Login</Link>
+                <Link href="/login">Login Node</Link>
               </Button>
             )}
           </div>
@@ -151,7 +151,7 @@ function DropdownNavItem({ href, icon, label, className }: any) {
     <DropdownMenuItem asChild className={cn("flex items-center gap-4 px-4 py-3.5 cursor-pointer rounded-2xl transition-all focus:bg-white/5", className)}>
       <Link href={href} className="w-full flex items-center gap-4">
         <span className="shrink-0">{icon}</span>
-        <span className="font-bold text-sm tracking-tight">{label}</span>
+        <span className="font-bold text-sm tracking-tight uppercase">{label}</span>
       </Link>
     </DropdownMenuItem>
   )
