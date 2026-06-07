@@ -1,8 +1,7 @@
-
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { LayoutDashboard, Database, ClipboardList, LogOut, ShieldCheck, Zap, Newspaper, Megaphone, Globe, MousePointer2, Layers, CheckCircle2, Gem, BookOpen, FileStack, Upload, ListTree, Landmark, Menu, HeartPulse } from "lucide-react"
+import { LayoutDashboard, Database, ClipboardList, LogOut, ShieldCheck, Zap, Newspaper, Megaphone, Globe, MousePointer2, Layers, CheckCircle2, Gem, BookOpen, FileStack, Upload, ListTree, Landmark, Menu, HeartPulse, Settings, Users, CreditCard, ShieldAlert, HelpCircle, History } from "lucide-react"
 import Link from "next/link"
 import Logo from "@/components/brand/Logo"
 import { useUser, useAuth } from "@/firebase"
@@ -13,8 +12,8 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Administrative Sidebar & Navigation Layout.
- * Updated: Logo scaling refined for mobile-first native app feel.
+ * @fileOverview FINAL MASTER Administrative Layout.
+ * Restored: Every missing module (Settings, Passes, Users, Reports, Payments).
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -74,8 +73,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <SidebarGroup className="mt-4">
             <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Modular Architect</SidebarGroupLabel>
             <SidebarMenu>
-              <AdminNavItem icon={<Layers className="text-primary" />} label="Test Assembly" href="/admin/mocks" active={pathname === "/admin/mocks"} onClick={() => setIsMobileMenuOpen(false)} />
-              <AdminNavItem icon={<ClipboardList />} label="Mock Blueprints" href="/admin/mocks/builder" active={pathname === "/admin/mocks/builder"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<Layers className="text-primary" />} label="Mock Blueprints" href="/admin/mocks" active={pathname === "/admin/mocks"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<ClipboardList />} label="Mock Builder" href="/admin/mocks/builder" active={pathname === "/admin/mocks/builder"} onClick={() => setIsMobileMenuOpen(false)} />
+            </SidebarMenu>
+          </SidebarGroup>
+
+          <SidebarGroup className="mt-4">
+            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Monetization Registry</SidebarGroupLabel>
+            <SidebarMenu>
+              <AdminNavItem icon={<Gem className="text-amber-400" />} label="Pass Management" href="/admin/passes" active={pathname === "/admin/passes"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<Users className="text-blue-400" />} label="Student Registry" href="/admin/users" active={pathname === "/admin/users"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<CreditCard className="text-emerald-400" />} label="Transaction Audit" href="/admin/payments" active={pathname === "/admin/payments"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<Zap className="text-primary" />} label="Manual Verify" href="/admin/payments/verify" active={pathname === "/admin/payments/verify"} onClick={() => setIsMobileMenuOpen(false)} />
+            </SidebarMenu>
+          </SidebarGroup>
+
+          <SidebarGroup className="mt-4">
+            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Platform Governance</SidebarGroupLabel>
+            <SidebarMenu>
+              <AdminNavItem icon={<ShieldAlert className="text-rose-400" />} label="Audit Queue" href="/admin/reports" active={pathname === "/admin/reports"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<HelpCircle className="text-blue-400" />} label="Support Hub" href="/admin/support" active={pathname === "/admin/support"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<History className="text-slate-400" />} label="Audit Trail" href="/admin/audit-logs" active={pathname === "/admin/audit-logs"} onClick={() => setIsMobileMenuOpen(false)} />
+              <AdminNavItem icon={<Settings className="text-primary" />} label="System Portal" href="/admin/settings" active={pathname === "/admin/settings"} onClick={() => setIsMobileMenuOpen(false)} />
             </SidebarMenu>
           </SidebarGroup>
 
@@ -83,7 +102,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <SidebarMenu>
               <SidebarMenuItem>
                  <button onClick={handleLogout} className="w-full flex items-center px-6 text-destructive/70 hover:bg-destructive/10 hover:text-destructive h-12 gap-3">
-                  <LogOut className="size-4 shrink-0" /> <span className="font-bold text-sm uppercase tracking-tight">Logout</span>
+                  <LogOut className="size-4 shrink-0" /> <span className="font-bold text-sm uppercase tracking-tight">Logout Node</span>
                 </button>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -111,7 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 border-none w-[280px] bg-[#0F172A]">
                        <SheetHeader className="sr-only">
-                          <SheetTitle>Admin Menu</SheetTitle>
+                          <SheetTitle>Admin Menu Hub</SheetTitle>
                        </SheetHeader>
                        <SideNavContent />
                     </SheetContent>
@@ -122,14 +141,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {showBack && (
                 <div className="flex items-center">
                   <div className="h-4 w-[1px] bg-slate-200 mx-2 hidden md:block" />
-                  <BackButton label="Dashboard" fallback="/admin" />
+                  <BackButton label="Hub Dashboard" fallback="/admin" />
                 </div>
               )}
 
               <div className="h-4 w-[1px] bg-slate-200 mx-1 hidden sm:block" />
               <div className="flex items-center gap-2 truncate">
                  <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
-                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#0F172A] truncate">CMS Governance</span>
+                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#0F172A] truncate">System Governance Active</span>
               </div>
             </div>
           </header>
@@ -157,7 +176,7 @@ function AdminNavItem({ icon, label, href, active, onClick }: { icon: React.Reac
           <div className="shrink-0 flex items-center justify-center size-5">
             {icon}
           </div>
-          <span className="font-bold tracking-tight truncate text-left text-[14px] uppercase">{label}</span>
+          <span className="font-bold tracking-tight truncate text-left text-[13px] uppercase">{label}</span>
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
