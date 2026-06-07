@@ -1,8 +1,7 @@
-
 import { Firestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v40.0.
+ * @fileOverview Institutional Seeding Engine v41.0.
  * Features: Expanded PSSSB Vertical Registry (Clerk, VDO, JE, Senior Assistant).
  * ReferrerPolicy Hardening is applied at the rendering layer.
  */

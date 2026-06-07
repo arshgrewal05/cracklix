@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -6,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Trash2, Edit, ClipboardList, Layers, ChevronRight, Clock, FileText, Calendar, BookOpen, ListTree, FileStack, Filter, CheckCircle2, Loader2, X } from "lucide-react"
+import { Plus, Search, Trash2, Edit, ClipboardList, Layers, ChevronRight, Clock, FileText, Calendar, BookOpen, ListTree, FileStack, Filter, CheckCircle2, Loader2, X, Zap } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useCollection, useFirestore } from "@/firebase"
@@ -18,8 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Mock Manager v15.0.
- * FEATURES: Bulk selection, mass deletion, and categorized audits.
+ * @fileOverview Institutional Mock Manager v15.5.
+ * FIXED: Zap icon reference and bulk selection logic.
  */
 
 export default function MockManagement() {

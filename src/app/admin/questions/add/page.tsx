@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo, useEffect, Suspense } from "react"
@@ -21,8 +20,8 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Manual Question Entry v15.2.
- * Resolved: Globe reference error and optimized side-by-side bilingual option editing.
+ * @fileOverview Hardened Manual Question Entry v15.5.
+ * FIXED: Globe reference error and side-by-side bilingual option editing.
  */
 
 export default function QuestionEntryPage() {
