@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from "react";
@@ -11,21 +10,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, Info, CheckCircle2, Clock, BookOpen, Zap, Globe, Languages, ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { useExamStore } from "@/store/useExamStore";
 import { cn } from "@/lib/utils";
 import { LanguageDisplayMode } from "@/types";
 
 /**
- * @fileOverview Testbook-Style Entrance Hub v3.0.
- * Updated: Aspirant language selection filtered by Admin's Mock Registry.
+ * @fileOverview Testbook-Style Entrance Hub v4.0.
+ * Fixed: Pre-test language selection persistence logic.
  */
 export default function InstructionsPage() {
   const params = useParams();
   const router = useRouter();
   const db = useFirestore();
   const mockId = params.id as string;
-  const { setLanguage } = useExamStore();
+  const setLanguage = useExamStore(s => s.setLanguage);
   const [prefLang, setPrefLang] = useState<LanguageDisplayMode>('ENGLISH_PUNJABI');
 
   const { data: mock, loading } = useDoc<any>(useMemo(() => (db ? doc(db, "mocks", mockId) : null), [db, mockId]));
@@ -46,6 +44,12 @@ export default function InstructionsPage() {
     if (mode === 'HINDI') return ['HINDI'];
     return [];
   }, [mock]);
+
+  const handleStart = () => {
+    // Commit preference to store before navigation
+    setLanguage(prefLang);
+    router.push(`/mocks/${mockId}/attempt`);
+  };
 
   if (loading) return <div className="h-screen flex items-center justify-center bg-white"><Zap className="h-10 w-10 text-[#F97316] animate-pulse" /></div>;
   if (!mock) return null;
@@ -115,13 +119,10 @@ export default function InstructionsPage() {
                  </div>
 
                  <Button 
-                    asChild 
+                    onClick={handleStart}
                     className="w-full h-20 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.3em] text-[11px] rounded-[1.5rem] shadow-4xl group transition-all"
-                    onClick={() => setLanguage(prefLang)}
                  >
-                    <Link href={`/mocks/${mockId}/attempt`}>
-                       Agree & Continue <ChevronRight className="ml-4 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-                    </Link>
+                    Agree & Continue <ChevronRight className="ml-4 h-6 w-6 group-hover:translate-x-2 transition-transform" />
                  </Button>
               </CardContent>
            </Card>

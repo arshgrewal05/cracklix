@@ -7,7 +7,7 @@ import MathText from './MathText';
 
 interface QuestionRendererProps {
   question: Partial<Question> & { displayId?: string };
-  language: LanguageDisplayMode | 'en' | 'pa' | 'hi' | 'bilingual';
+  language: LanguageDisplayMode | 'en' | 'pa' | 'hi' | 'bilingual' | string;
   showSolution?: boolean;
   hideOptions?: boolean;
   selectedAnswer?: number; 
@@ -16,9 +16,9 @@ interface QuestionRendererProps {
 }
 
 /**
- * @fileOverview Final Institutional Question Engine v22.0.
+ * @fileOverview Final Institutional Question Engine v23.0.
  * Layout: 1. Statements -> 2. Options -> 3. Solution (Strict Order).
- * Optimized: Supports runtime language overrides and LaTeX math rendering.
+ * Fixed: Robust language mode normalization to prevent "hidden" English text.
  */
 export default function QuestionRenderer({ 
   question, 
@@ -30,11 +30,13 @@ export default function QuestionRenderer({
   className
 }: QuestionRendererProps) {
   
-  // Normalized Mode Logic
-  const mode = language === 'en' ? 'ENGLISH' :
-               language === 'pa' ? 'PUNJABI' :
-               language === 'hi' ? 'HINDI' :
-               language === 'bilingual' ? 'ENGLISH_PUNJABI' : language as LanguageDisplayMode;
+  // Normalized Mode Logic (Case Insensitive & Comprehensive)
+  const normalizedLang = (language || 'ENGLISH_PUNJABI').toUpperCase();
+  
+  const mode = normalizedLang === 'EN' ? 'ENGLISH' :
+               normalizedLang === 'PA' ? 'PUNJABI' :
+               normalizedLang === 'HI' ? 'HINDI' :
+               normalizedLang === 'BILINGUAL' ? 'ENGLISH_PUNJABI' : normalizedLang as LanguageDisplayMode;
 
   const q = question as any;
   
@@ -74,7 +76,7 @@ export default function QuestionRenderer({
          )}
       </div>
 
-      {/* 2. OPTIONS MATRIX (A, B, C, D) */}
+      {/* 2. OPTIONS MATRIX */}
       {!hideOptions && (
         <div className="flex flex-col space-y-3">
           {['A', 'B', 'C', 'D'].map((key, idx) => {
@@ -121,7 +123,7 @@ export default function QuestionRenderer({
         </div>
       )}
 
-      {/* 3. SOLUTION HUB (Always rendered below options when active) */}
+      {/* 3. SOLUTION HUB */}
       {showSolution && (
         <div className="mt-8 pt-8 border-t border-slate-100 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
            <div className="flex items-center gap-4">

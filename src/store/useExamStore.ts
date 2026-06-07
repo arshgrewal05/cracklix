@@ -4,9 +4,9 @@ import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 
 /**
- * @fileOverview Enterprise CBT Global Store v23.0.
- * Updated: Hardened mutation handlers with explicit Firestore guards.
- * Fixed: Robust document reference handling for attempts.
+ * @fileOverview Enterprise CBT Global Store v24.0.
+ * Fixed: Robust language selection persistence during init.
+ * Optimized: Explicit state updates for runtime translation.
  */
 
 interface ExamStore extends AttemptState {
@@ -15,7 +15,7 @@ interface ExamStore extends AttemptState {
   mockTitle: string;
   userId: string;
   language: ExamLanguage | LanguageDisplayMode;
-  baseLanguageMode: LanguageDisplayMode; // Master config from Admin
+  baseLanguageMode: LanguageDisplayMode;
   isPaused: boolean;
   isSubmitting: boolean;
   isPaletteVisible: boolean;
@@ -41,7 +41,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
   mockId: '',
   mockTitle: '',
   userId: '',
-  language: 'ENGLISH_PUNJABI',
+  language: '',
   baseLanguageMode: 'ENGLISH_PUNJABI',
   isPaused: false,
   isSubmitting: false,
@@ -60,6 +60,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
   initExam: (mockId, mockTitle, userId, questions, duration, savedState, languageMode) => {
     const now = Date.now();
+    const { language: currentLang } = get();
     
     let isStale = false;
     if (savedState?.status === 'COMPLETED' || (savedState?.endTime && now >= savedState.endTime)) {
@@ -78,7 +79,8 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       questions,
       timeLeft,
       baseLanguageMode: finalBaseMode,
-      language: finalBaseMode, 
+      // CRITICAL: Prefer existing user selection if it exists, otherwise use mock default
+      language: (currentLang && currentLang !== '') ? currentLang : finalBaseMode, 
       startTime: isStale ? now : (savedState?.startTime || now),
       endTime,
       answers: isStale ? {} : (savedState?.answers || {}),
@@ -93,7 +95,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     });
   },
 
-  setLanguage: (language) => set({ language }),
+  setLanguage: (lang) => set({ language: lang }),
   setPaused: (isPaused) => set({ isPaused }),
   setPaletteVisible: (isPaletteVisible) => set({ isPaletteVisible }),
   togglePalette: () => set((state) => ({ isPaletteVisible: !state.isPaletteVisible })),

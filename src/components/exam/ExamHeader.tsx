@@ -14,9 +14,17 @@ import {
 import { LanguageDisplayMode } from '@/types';
 import { useMemo } from 'react';
 
+const ALL_LANG_MODES: { label: string, value: LanguageDisplayMode }[] = [
+  { label: "ENGLISH ONLY", value: "ENGLISH" },
+  { label: "PUNJABI ONLY", value: "PUNJABI" },
+  { label: "HINDI ONLY", value: "HINDI" },
+  { label: "BILINGUAL (EN+PA)", value: "ENGLISH_PUNJABI" },
+  { label: "BILINGUAL (EN+HI)", value: "ENGLISH_HINDI" },
+];
+
 /**
- * @fileOverview Institutional CBT Header v13.0.
- * Optimized: Perfectly matches the user's reference screenshot layout and tactical nodes.
+ * @fileOverview Institutional CBT Header v14.0.
+ * Fixed: Explicit language selection nodes with onSelect event handling.
  */
 export default function ExamHeader({ 
   onPaletteToggle, 
@@ -25,40 +33,30 @@ export default function ExamHeader({
   onPaletteToggle: () => void,
   onExitRequest: () => void
 }) {
-  const { 
-    isPaused, 
-    setPaused, 
-    timeLeft,
-    currentIdx,
-    questions,
-    language,
-    baseLanguageMode,
-    setLanguage
-  } = useExamStore();
-
-  const allLangModes: { label: string, value: LanguageDisplayMode }[] = [
-    { label: "ENGLISH ONLY", value: "ENGLISH" },
-    { label: "PUNJABI ONLY", value: "PUNJABI" },
-    { label: "HINDI ONLY", value: "HINDI" },
-    { label: "BILINGUAL (EN+PA)", value: "ENGLISH_PUNJABI" },
-    { label: "BILINGUAL (EN+HI)", value: "ENGLISH_HINDI" },
-  ];
+  const language = useExamStore(s => s.language);
+  const baseLanguageMode = useExamStore(s => s.baseLanguageMode);
+  const isPaused = useExamStore(s => s.isPaused);
+  const setPaused = useExamStore(s => s.setPaused);
+  const timeLeft = useExamStore(s => s.timeLeft);
+  const currentIdx = useExamStore(s => s.currentIdx);
+  const questionsCount = useExamStore(s => s.questions.length);
+  const setLanguage = useExamStore(s => s.setLanguage);
 
   const availableModes = useMemo(() => {
     if (baseLanguageMode === 'ENGLISH_PUNJABI') {
-      return allLangModes.filter(m => ['ENGLISH', 'PUNJABI', 'ENGLISH_PUNJABI'].includes(m.value));
+      return ALL_LANG_MODES.filter(m => ['ENGLISH', 'PUNJABI', 'ENGLISH_PUNJABI'].includes(m.value));
     }
     if (baseLanguageMode === 'ENGLISH_HINDI') {
-      return allLangModes.filter(m => ['ENGLISH', 'HINDI', 'ENGLISH_HINDI'].includes(m.value));
+      return ALL_LANG_MODES.filter(m => ['ENGLISH', 'HINDI', 'ENGLISH_HINDI'].includes(m.value));
     }
-    return allLangModes.filter(m => m.value === baseLanguageMode);
+    return ALL_LANG_MODES.filter(m => m.value === baseLanguageMode);
   }, [baseLanguageMode]);
 
   return (
     <header className="bg-[#0B1528] text-white flex flex-col shrink-0 z-[100] border-b border-white/5 shadow-lg">
       <div className="h-12 md:h-16 flex items-center justify-between px-3 md:px-6">
         
-        {/* LEFT: BACK & PROGRESS (As per screenshot) */}
+        {/* LEFT: BACK & PROGRESS */}
         <div className="flex items-center gap-2 md:gap-8 shrink-0">
            <button onClick={onExitRequest} className="p-1 text-slate-400 hover:text-white active:scale-90 transition-all">
               <ChevronLeft className="h-6 w-6" />
@@ -67,7 +65,7 @@ export default function ExamHeader({
            <div className="flex flex-col items-start leading-none gap-0.5">
               <p className="text-[7px] md:text-[9px] font-black uppercase text-primary tracking-[0.2em]">PROGRESS</p>
               <p className="text-[14px] md:text-[18px] font-black text-white">
-                 {currentIdx + 1}<span className="text-slate-500 text-[10px] md:text-[12px] font-bold">/{questions.length}</span>
+                 {currentIdx + 1}<span className="text-slate-500 text-[10px] md:text-[12px] font-bold">/{questionsCount}</span>
               </p>
            </div>
         </div>
@@ -94,7 +92,7 @@ export default function ExamHeader({
                    {availableModes.map((mode) => (
                       <DropdownMenuItem 
                         key={mode.value} 
-                        onClick={() => setLanguage(mode.value)}
+                        onSelect={() => setLanguage(mode.value)}
                         className={cn(
                           "text-[10px] font-black uppercase px-4 py-3.5 rounded-lg cursor-pointer tracking-wider",
                           language === mode.value ? "bg-primary text-white" : "hover:bg-white/5 text-slate-400"
