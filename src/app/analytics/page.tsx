@@ -32,7 +32,7 @@ import BackButton from "@/components/navigation/BackButton"
 
 /**
  * @fileOverview Institutional Deep Performance Analysis Node.
- * Updated: Realigned Back Button side-by-side with titles.
+ * FIXED: Optimized header flex layout for small screens to prevent truncation.
  */
 
 export default function DeepAnalytics() {
@@ -96,17 +96,17 @@ export default function DeepAnalytics() {
       <Navbar />
       
       <main className="container mx-auto px-4 py-8 max-w-6xl space-y-10 text-left">
-         <div className="flex flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2 md:gap-4">
+         <div className="flex flex-row justify-between items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-4 flex-1 min-w-0">
                <BackButton label="Dashboard" fallback="/dashboard" className="p-0" />
                <div className="h-8 w-px bg-slate-200 hidden md:block" />
-               <div>
-                  <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-tight">Deep-Audit</h1>
-                  <p className="text-slate-500 font-medium text-[10px] md:text-sm hidden sm:block">Registry analysis for your preparation trajectory.</p>
+               <div className="min-w-0 flex-1">
+                  <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-tight truncate">Deep-Audit</h1>
+                  <p className="text-slate-500 font-medium text-[9px] md:text-sm hidden sm:block">Registry analysis for your preparation trajectory.</p>
                </div>
             </div>
-            <div className="flex gap-4">
-               <Badge className="bg-emerald-50 text-emerald-600 border-none px-3 md:px-4 py-1.5 rounded-xl font-black uppercase text-[8px] md:text-[10px] tracking-widest flex items-center gap-2">
+            <div className="flex gap-4 shrink-0">
+               <Badge className="bg-emerald-50 text-emerald-600 border-none px-2 md:px-4 py-1.5 rounded-xl font-black uppercase text-[8px] md:text-[10px] tracking-widest flex items-center gap-2 shadow-sm">
                   <Activity className="h-3 w-3" /> <span className="hidden xs:inline">Sync Node</span>
                </Badge>
             </div>

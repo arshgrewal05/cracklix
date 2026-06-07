@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -13,7 +14,7 @@ interface BackButtonProps {
 
 /**
  * @fileOverview Universal Institutional Navigation Node.
- * Features: History detection with fallback routing and high-density touch target.
+ * FIXED: Reduced mobile padding to prevent header overflow.
  */
 export default function BackButton({ 
   label = 'Back', 
@@ -23,7 +24,6 @@ export default function BackButton({
   const router = useRouter();
 
   const handleBack = () => {
-    // Basic history length check
     if (typeof window !== 'undefined' && window.history.length > 1) {
       router.back();
     } else {
@@ -36,7 +36,7 @@ export default function BackButton({
       variant="ghost"
       onClick={handleBack}
       className={cn(
-        "group flex items-center gap-2 h-10 md:h-12 px-2 md:px-4 rounded-xl text-slate-500 hover:text-[#0F172A] hover:bg-slate-50 transition-all active:scale-95 shrink-0",
+        "group flex items-center gap-1.5 md:gap-2 h-10 md:h-12 px-1 md:px-4 rounded-xl text-slate-500 hover:text-[#0F172A] hover:bg-slate-50 transition-all active:scale-95 shrink-0",
         className
       )}
     >

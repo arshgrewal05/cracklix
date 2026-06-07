@@ -34,8 +34,8 @@ import ShareButton from "@/components/navigation/ShareButton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 /**
- * @fileOverview Institutional Mobile Sidebar v2.0.
- * DESIGN: Matches the provided screenshot with full-height scrolling and bold branding.
+ * @fileOverview Institutional Mobile Sidebar v2.1.
+ * FIXED: Resolved text truncation and Badge overflow in the profile header.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -67,28 +67,28 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col min-h-full">
           
           {/* 1. HIGH-FIDELITY PROFILE HEADER */}
-          <div className="px-8 pt-12 pb-10 bg-[#0B1528] relative overflow-hidden text-left">
+          <div className="px-6 md:px-8 pt-12 pb-10 bg-[#0B1528] relative overflow-hidden text-left">
             <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full" />
             
             <button 
               onClick={onClose}
-              className="absolute top-6 right-6 p-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all active:scale-90"
+              className="absolute top-6 right-6 p-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all active:scale-90 z-20"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <div className="flex flex-col gap-8 relative z-10">
+            <div className="flex flex-col gap-6 md:gap-8 relative z-10">
               <StudentAvatar 
                 profile={profile} 
-                className="h-20 w-20 border-4 border-white/10 rounded-[2rem] shadow-2xl bg-[#0F172A]" 
+                className="h-16 w-16 md:h-20 md:w-20 border-4 border-white/10 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl bg-[#0F172A]" 
               />
               
               <div className="space-y-4 text-left">
-                <div className="flex items-center justify-between gap-4">
-                  <h2 className="font-headline font-black text-2xl md:text-3xl text-white uppercase tracking-tight truncate flex-1">
+                <div className="flex flex-col gap-2">
+                  <h2 className="font-headline font-black text-2xl md:text-3xl text-white uppercase tracking-tight break-words">
                     {profile?.name || "Student Node"}
                   </h2>
-                  <Badge className="bg-primary text-white border-none text-[8px] font-black uppercase px-3 py-1 rounded shadow-xl shrink-0">
+                  <Badge className="bg-primary text-white border-none text-[8px] font-black uppercase px-3 py-1 rounded shadow-xl w-fit">
                     {(profile?.status || 'Free').toUpperCase()} PASS
                   </Badge>
                 </div>
