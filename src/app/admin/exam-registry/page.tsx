@@ -22,7 +22,8 @@ import {
   X,
   Landmark,
   ShieldCheck,
-  Trophy
+  Trophy,
+  GraduationCap
 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, doc, deleteDoc, writeBatch, updateDoc, setDoc, serverTimestamp, getDocs, where } from "firebase/firestore"
@@ -34,7 +35,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Institutional Exam Master Registry.
- * Features: Normalization Engine for Duplicate Merging and Content Coverage Audit.
+ * Updated: High-Fidelity Board Logo lookup for registry identity nodes.
  */
 
 export default function ExamRegistryPage() {
@@ -110,20 +111,17 @@ export default function ExamRegistryPage() {
 
     setIsMerging(true)
     try {
-      // 1. Reassign Questions
       const qSnap = await getDocs(query(collection(db, "questions"), where("examId", "==", mergeSource)))
       const batch = writeBatch(db)
       qSnap.docs.forEach(d => {
          batch.update(doc(db, "questions", d.id), { examId: mergeTarget, updatedAt: serverTimestamp() })
       })
 
-      // 2. Reassign Mocks
       const mSnap = await getDocs(query(collection(db, "mocks"), where("examId", "==", mergeSource)))
       mSnap.docs.forEach(d => {
          batch.update(doc(db, "mocks", d.id), { examId: mergeTarget, updatedAt: serverTimestamp() })
       })
 
-      // 3. Delete Duplicate Registry
       batch.delete(doc(db, "exams", mergeSource))
 
       await batch.commit()
@@ -183,52 +181,71 @@ export default function ExamRegistryPage() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}><TableCell colSpan={4} className="px-10 py-8"><Skeleton className="h-12 w-full rounded-2xl bg-slate-50" /></TableCell></TableRow>
                 ))
-              ) : filteredExams.map((e) => (
-                <TableRow key={e.id} className="hover:bg-slate-50 border-slate-50 transition-colors group">
-                  <TableCell className="px-10 py-8">
-                    <div className="flex items-center gap-6">
-                       <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 font-black text-xs shadow-inner">
-                          {e.name?.[0]?.toUpperCase() || 'E'}
-                       </div>
-                       <div>
-                          <p className="font-black text-[#0F172A] text-xl uppercase tracking-tight leading-none">{e.name}</p>
-                          <code className="text-[9px] font-mono text-slate-400 mt-2 block uppercase tracking-widest">REGISTRY ID: {e.id}</code>
-                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                     <div className="flex flex-col gap-2">
-                        <Badge variant="outline" className="bg-white border-slate-100 text-primary text-[8px] font-black uppercase px-2 py-0.5 w-fit">
-                           {e.boardId}
-                        </Badge>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{e.category || 'General'}</p>
-                     </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                     <div className="inline-flex flex-col items-center">
-                        <span className={cn("text-2xl font-headline font-black", stats[e.id] > 0 ? "text-[#0F172A]" : "text-rose-400")}>
-                           {stats[e.id] || 0}
-                        </span>
-                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Atomic MCQs</span>
-                     </div>
-                  </TableCell>
-                  <TableCell className="text-right px-10">
-                    <div className="flex justify-end gap-2 opacity-20 group-hover:opacity-100 transition-all">
-                       <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-white shadow-sm" onClick={() => setEditingSubject(e)}>
-                          <Edit className="h-5 w-5" />
-                       </Button>
-                       <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={async () => {
-                          if (confirm("CRITICAL: Purge registry node? This cannot be undone.")) {
-                             await deleteDoc(doc(db!, "exams", e.id))
-                             toast({ title: "Registry Node Purged" })
-                          }
-                       }}>
-                          <Trash2 className="h-5 w-5" />
-                       </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              ) : filteredExams.map((e) => {
+                const board = boards?.find((b: any) => 
+                  b.id.toLowerCase() === e.boardId?.toLowerCase() || 
+                  b.abbreviation?.toLowerCase() === e.boardId?.toLowerCase()
+                );
+                const logoUrl = board?.iconUrl;
+
+                return (
+                  <TableRow key={e.id} className="hover:bg-slate-50 border-slate-50 transition-colors group">
+                    <TableCell className="px-10 py-8">
+                      <div className="flex items-center gap-6">
+                        <div className="h-12 w-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                            {logoUrl ? (
+                              <img 
+                                src={logoUrl} 
+                                className="w-full h-full object-contain p-2" 
+                                alt="Logo" 
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <div className="h-full w-full bg-amber-50 flex items-center justify-center text-amber-600 font-black text-xs">
+                                {e.name?.[0]?.toUpperCase() || 'E'}
+                              </div>
+                            )}
+                        </div>
+                        <div>
+                            <p className="font-black text-[#0F172A] text-xl uppercase tracking-tight leading-none">{e.name}</p>
+                            <code className="text-[9px] font-mono text-slate-400 mt-2 block uppercase tracking-widest">REGISTRY ID: {e.id}</code>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-2">
+                          <Badge variant="outline" className="bg-white border-slate-100 text-primary text-[8px] font-black uppercase px-2 py-0.5 w-fit">
+                            {e.boardId}
+                          </Badge>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{e.category || 'General'}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="inline-flex flex-col items-center">
+                          <span className={cn("text-2xl font-headline font-black", stats[e.id] > 0 ? "text-[#0F172A]" : "text-rose-400")}>
+                            {stats[e.id] || 0}
+                          </span>
+                          <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Atomic MCQs</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right px-10">
+                      <div className="flex justify-end gap-2 opacity-20 group-hover:opacity-100 transition-all">
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-white shadow-sm" onClick={() => setEditingExam(e)}>
+                            <Edit className="h-5 w-5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={async () => {
+                            if (confirm("CRITICAL: Purge registry node? This cannot be undone.")) {
+                              await deleteDoc(doc(db!, "exams", e.id))
+                              toast({ title: "Registry Node Purged" })
+                            }
+                        }}>
+                            <Trash2 className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </CardContent>
@@ -316,6 +333,7 @@ export default function ExamRegistryPage() {
                         <option value="STATE">State Level</option>
                         <option value="TEACHING">Teaching Hub</option>
                         <option value="CENTRAL">Central Hub</option>
+                        <option value="DEFENSE">Defense Hub</option>
                      </select>
                   </div>
                </div>
