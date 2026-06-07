@@ -38,8 +38,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import ShareButton from "@/components/navigation/ShareButton"
 
 /**
- * @fileOverview Student Dashboard v11.0.
- * Updated: Developer credit corrected to Arsh Grewal.
+ * @fileOverview Student Dashboard v12.0.
+ * UPDATED: Hardened real-time stats calculation using actual result metrics.
  */
 
 export default function StudentDashboard() {
@@ -64,16 +64,31 @@ export default function StudentDashboard() {
   }, [rawResults])
 
   const stats = useMemo(() => {
-    if (!results || results.length === 0) return { total: 0, avgAccuracy: 0, streak: 0, readiness: 45, hours: "0h" }
+    if (!results || results.length === 0) return { total: 0, avgAccuracy: 0, streak: 0, readiness: 0, hours: "0h" }
+    
     const total = results.length
+    
+    // 1. Accuracy Audit
     const avgAcc = Math.round(results.reduce((acc: number, r: any) => acc + (r.accuracy || 0), 0) / total)
-    const readiness = Math.min(98, Math.max(30, avgAcc + Math.floor(total / 2)));
+    
+    // 2. Real Time Spent Node
+    const totalSeconds = results.reduce((acc: number, r: any) => acc + (r.timeTaken || 0), 0)
+    const hoursSpent = totalSeconds / 3600
+    const timeFormatted = hoursSpent >= 1 ? `${hoursSpent.toFixed(1)}h` : `${Math.round(totalSeconds / 60)}m`
+
+    // 3. Activity Streak Check (Unique Days)
+    const uniqueDays = new Set(results.map(r => new Date(r.timestamp).toDateString()))
+    const streak = uniqueDays.size
+
+    // 4. Preparation Readiness Index (Weighted Score)
+    const readiness = Math.min(100, Math.round((avgAcc * 0.7) + (Math.min(total, 30) * 1)))
+
     return { 
       total, 
       avgAccuracy: avgAcc, 
-      streak: total > 0 ? 3 : 0, 
+      streak, 
       readiness, 
-      hours: `${Math.round(total * 1.2)}h` 
+      hours: timeFormatted 
     }
   }, [results])
 
