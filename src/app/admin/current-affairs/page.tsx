@@ -16,43 +16,48 @@ import {
   Save, 
   Search, 
   Newspaper, 
-  FileText, 
-  FileStack, 
   Zap, 
   Loader2, 
   X, 
-  ChevronLeft, 
   Upload, 
-  CheckCircle2, 
   FileCode,
   Calendar,
   Layers
 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, doc, setDoc, deleteDoc, query, orderBy, serverTimestamp, writeBatch } from "firebase/firestore"
+import { collection, doc, setDoc, deleteDoc, query, serverTimestamp, writeBatch } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
-import { CurrentAffairHubItem, CurrentAffairType, Question } from "@/types"
+import { CurrentAffairHubItem, Question } from "@/types"
 import { cn } from "@/lib/utils"
 import * as XLSX from 'xlsx';
 
 /**
- * @fileOverview Institutional Current Affairs Management Hub v1.0.
- * Supports Daily/Weekly/Monthly structured nodes with integrated MCQs and Bulk Upload.
+ * @fileOverview Institutional Current Affairs Management Hub v1.1.
+ * FIXED: Removed Firestore orderBy to bypass potential index errors; sorting handled client-side.
  */
 
 export default function AdminCurrentAffairs() {
   const db = useFirestore()
   const { toast } = useToast()
   
-  const caQuery = useMemo(() => (db ? query(collection(db, "current_affairs_hub"), orderBy("updatedAt", "desc")) : null), [db])
-  const { data: caItems, loading } = useCollection<CurrentAffairHubItem>(caQuery)
+  const caQuery = useMemo(() => (db ? collection(db, "current_affairs_hub") : null), [db])
+  const { data: rawCaItems, loading } = useCollection<CurrentAffairHubItem>(caQuery as any)
 
   const [editingItem, setEditingItem] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
+
+  const caItems = useMemo(() => {
+     if (!rawCaItems) return [];
+     return [...rawCaItems].sort((a, b) => {
+        const tA = a.updatedAt?.seconds || 0;
+        const tB = b.updatedAt?.seconds || 0;
+        return tB - tA;
+     });
+  }, [rawCaItems]);
 
   const handleSave = async () => {
     if (!db || !editingItem) return

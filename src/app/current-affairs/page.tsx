@@ -5,7 +5,7 @@ import { useMemo, useState } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useCollection, useFirestore, useUser } from "@/firebase"
-import { collection, query, orderBy, limit, where } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { 
@@ -13,9 +13,8 @@ import {
   ArrowRight, 
   Zap, 
   FileText, 
-  FileStack, 
   Globe, 
-  Newspaper,
+  Newspaper, 
   ChevronRight,
   MessageCircle,
   Trophy,
@@ -36,8 +35,8 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 /**
- * @fileOverview Institutional Current Affairs Hub v10.0.
- * Dynamic tabs for Daily, Weekly, Monthly, Quiz, and PDFs.
+ * @fileOverview Institutional Current Affairs Hub v10.1.
+ * FIXED: Removed Firestore orderBy to bypass index requirement; sorting now handled client-side.
  */
 
 const HUB_TYPES = [
@@ -54,23 +53,33 @@ export default function FreeContentHub() {
   const [activeType, setActiveType] = useState("DAILY")
   const [searchTerm, setSearchTerm] = useState("")
 
-  const hubQuery = useMemo(() => (db ? query(collection(db, "current_affairs_hub"), where("status", "==", "PUBLISHED"), orderBy("updatedAt", "desc")) : null), [db])
+  const hubQuery = useMemo(() => (db ? query(collection(db, "current_affairs_hub"), where("status", "==", "PUBLISHED")) : null), [db])
   const { data: hubItems, loading } = useCollection<any>(hubQuery)
   
-  const { data: users } = useCollection<any>(useMemo(() => (db ? collection(db, "users") : null), [db]))
-  const rankingQuery = useMemo(() => (db ? query(collection(db, "results"), orderBy("score", "desc"), limit(3)) : null), [db])
-  const { data: topRankers } = useCollection<any>(rankingQuery)
+  const rankingQuery = useMemo(() => (db ? query(collection(db, "results"), where("accuracy", ">", 80)) : null), [db])
+  const { data: results } = useCollection<any>(rankingQuery)
+
+  const topRankers = useMemo(() => {
+     if (!results) return [];
+     return [...results].sort((a, b) => b.score - a.score).slice(0, 3);
+  }, [results]);
 
   const filteredItems = useMemo(() => {
     if (!hubItems) return []
-    return hubItems.filter(item => {
-      const matchesSearch = item.title?.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      if (activeType === 'QUIZ') return matchesSearch && !!item.quizId
-      if (activeType === 'PDF') return matchesSearch && !!item.pdfUrl
-      
-      return matchesSearch && item.type === activeType
-    })
+    return hubItems
+      .filter(item => {
+        const matchesSearch = item.title?.toLowerCase().includes(searchTerm.toLowerCase())
+        
+        if (activeType === 'QUIZ') return matchesSearch && !!item.quizId
+        if (activeType === 'PDF') return matchesSearch && !!item.pdfUrl
+        
+        return matchesSearch && item.type === activeType
+      })
+      .sort((a, b) => {
+        const tA = a.updatedAt?.seconds || 0;
+        const tB = b.updatedAt?.seconds || 0;
+        return tB - tA;
+      })
   }, [hubItems, activeType, searchTerm])
 
   return (
