@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -71,7 +72,7 @@ export default function Navbar() {
                  <SheetContent 
                    side="left" 
                    className={cn(
-                     "p-0 border-none w-[290px] overflow-hidden shadow-5xl transition-all duration-200 bg-[#0F172A]",
+                     "p-0 border-none w-[290px] overflow-hidden shadow-5xl transition-all duration-200 bg-white",
                      "top-0 h-screen"
                    )}
                  >
