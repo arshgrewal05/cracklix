@@ -1,14 +1,14 @@
 
 "use client"
 
-import { useState, Suspense, useEffect } from "react"
+import { useState, Suspense, useEffect, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import Logo from "@/components/brand/Logo"
-import { ShieldCheck, Mail, Lock, ChevronLeft, User, Phone, AlertCircle, RefreshCw, Eye, EyeOff } from "lucide-react"
+import { ShieldCheck, Mail, Lock, ChevronLeft, User, Phone, AlertCircle, RefreshCw, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAuth, useFirestore } from "@/firebase"
 import { 
   signInWithEmailAndPassword, 
@@ -26,8 +26,8 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 
 /**
- * @fileOverview Login & Sign Up Hub v2.0.
- * UPDATED: Added password visibility toggles (Eye/EyeOff) for better UX.
+ * @fileOverview Optimized Login Hub v3.0.
+ * PERFORMANCE: Implemented route prefetching and transition handling to eliminate navigation lag.
  */
 
 export default function LoginPage() {
@@ -51,6 +51,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false)
   const [resetLoading, setResetLoading] = useState(false)
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -59,6 +60,12 @@ function LoginContent() {
   const { toast } = useToast()
 
   const returnUrl = searchParams.get("returnUrl") || "/dashboard"
+
+  // Prefetch routes to eliminate navigation lag
+  useEffect(() => {
+    router.prefetch('/dashboard');
+    router.prefetch('/admin');
+  }, [router]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -72,7 +79,10 @@ function LoginContent() {
       if (mode === 'login') {
         await signInWithEmailAndPassword(auth, email, password)
         toast({ title: "Login Successful", description: "Welcome back!" })
-        router.push(returnUrl)
+        startTransition(() => {
+          router.push(returnUrl)
+        })
+        // Note: We don't set loading(false) here on success to maintain the button spinner during navigation
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password)
         const user = userCredential.user
@@ -88,17 +98,19 @@ function LoginContent() {
           pinnedExams: []
         })
         toast({ title: "Account Created", description: "Welcome to Cracklix!" })
-        router.push(returnUrl)
+        startTransition(() => {
+          router.push(returnUrl)
+        })
       }
     } catch (error: any) {
       toast({ variant: "destructive", title: "Error", description: error.message })
-    } finally {
       setLoading(false)
     }
   }
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider()
+    setLoading(true)
     try {
       const result = await signInWithPopup(auth, provider)
       const user = result.user
@@ -111,12 +123,13 @@ function LoginContent() {
           state: "Punjab", createdAt: new Date().toISOString(), status: 'Free',
           pinnedExams: []
         })
-        router.push(returnUrl)
-      } else {
-        router.push(returnUrl)
       }
+      startTransition(() => {
+        router.push(returnUrl)
+      })
     } catch (error: any) {
       toast({ variant: "destructive", title: "Login Failed", description: error.message })
+      setLoading(false)
     }
   }
 
@@ -142,13 +155,15 @@ function LoginContent() {
     }
   };
 
+  const isActuallyLoading = loading || isPending;
+
   return (
     <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center p-6 relative overflow-hidden text-white">
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full" />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="z-10 w-full max-w-md">
         <div className="flex flex-col items-center mb-10"><Logo variant="light" className="scale-110" /></div>
         
-        {returnUrl !== "/dashboard" && (
+        {returnUrl !== "/dashboard" && returnUrl !== "/" && (
            <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl mb-6 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
               <AlertCircle className="h-5 w-5 text-primary shrink-0" />
               <p className="text-[11px] font-black uppercase tracking-widest text-primary">Please login to continue.</p>
@@ -226,12 +241,13 @@ function LoginContent() {
                 </div>
               )}
               
-              <Button type="submit" className="w-full h-14 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-xl shadow-xl border-none transition-all active:scale-95" disabled={loading}>
-                {loading ? "Please Wait..." : (mode === 'login' ? "Login" : "Sign Up")}
+              <Button type="submit" className="w-full h-14 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-xl shadow-xl border-none transition-all active:scale-95" disabled={isActuallyLoading}>
+                {isActuallyLoading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
+                {isActuallyLoading ? "Redirecting..." : (mode === 'login' ? "Login" : "Sign Up")}
               </Button>
             </form>
             
-            <Button variant="outline" className="w-full h-12 border-white/10 bg-white/5 text-white gap-3 rounded-xl font-bold text-xs hover:bg-white/10" onClick={handleGoogleSignIn}>
+            <Button variant="outline" className="w-full h-12 border-white/10 bg-white/5 text-white gap-3 rounded-xl font-bold text-xs hover:bg-white/10" onClick={handleGoogleSignIn} disabled={isActuallyLoading}>
               Continue with Google
             </Button>
 
@@ -253,7 +269,7 @@ function LoginContent() {
       </motion.div>
 
       {/* RESET PASSWORD DIALOG */}
-      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+      <Dialog open={isResetDialogOpen} onOpenChange={isResetDialogOpen && !resetLoading ? setIsResetDialogOpen : undefined}>
         <DialogContent className="bg-[#0F172A] text-white border-white/10 rounded-[2.5rem] max-w-[400px] p-10 shadow-5xl">
           <DialogHeader className="text-center space-y-4">
             <div className="h-16 w-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary shadow-xl">

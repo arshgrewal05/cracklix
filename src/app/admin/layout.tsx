@@ -1,3 +1,4 @@
+
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
@@ -46,9 +47,8 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Hardened Admin Layout v13.0.
- * FIXED: Navigation clicks responding on first tick by simplifying event hierarchy.
- * FIXED: Mobile Sheet backdrop no longer blocks desktop interactions.
+ * @fileOverview Hardened Admin Layout v14.0.
+ * PERFORMANCE: Optimized redirect logic to eliminate "stuck" states after login.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -69,19 +69,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!loading && mounted) {
       if (!user) {
-        router.push('/login?returnUrl=/admin');
+        // Use immediate router.push to avoid layout flickering
+        router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`);
       } else if (!isAdmin) {
         router.push('/dashboard');
       }
     }
-  }, [user, profile, loading, router, isAdmin, mounted])
+  }, [user, profile, loading, router, isAdmin, mounted, pathname])
 
   const handleLogout = async () => {
     await signOut(auth)
     router.push('/login')
   }
 
-  // Hydration Guard for initial load
+  // Hydration Guard + Loading state
   if (!mounted || loading) return (
     <div className="h-screen w-full bg-[#0F172A] flex flex-col items-center justify-center space-y-6">
        <ShieldCheck className="h-12 w-12 text-primary animate-pulse" />
