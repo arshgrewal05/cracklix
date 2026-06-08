@@ -1,9 +1,9 @@
 import { Firestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v49.0.
+ * @fileOverview Institutional Seeding Engine v50.0.
  * Features: High-Fidelity Verified Official Logos for Punjab & National Exam Hubs.
- * UPDATED: Mandatory official CTET logo fixed for all teaching verticals.
+ * UPDATED: Mandatory official PSTET logo fixed for all teaching verticals.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Cracklix Global Registry Sync...');
@@ -14,6 +14,7 @@ export async function seedInitialData(db: Firestore) {
   const ppscJpg = "https://upload.wikimedia.org/wikipedia/en/a/a1/Punjab_Public_Service_Commission.jpg";
   const policeEmblem = "https://upload.wikimedia.org/wikipedia/en/b/b5/Punjab_Police_India_Logo.png";
   const ctetLogo = "https://cdnbbsr.s3waas.gov.in/s3443dec3062d0286986e21dc0631734c9/uploads/2023/03/2023032156.png";
+  const pstetLogo = "https://pstet.pseb.ac.in/img/main-logo-2.png";
   const ssscLogo = "https://highcourtchd.gov.in/images/logo.png";
   const pspclLogo = "https://pspcl.in/assets/images/logo.png";
   const armyEmblem = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Indian_Army_Insignia_circular.png/1280px-Indian_Army_Insignia_circular.png";
@@ -29,6 +30,7 @@ export async function seedInitialData(db: Firestore) {
     { id: 'army', abbreviation: 'ARMY', name: 'Indian Army Recruitment', region: 'National', category: 'CENTRAL_BOARD', iconUrl: armyEmblem },
     { id: 'education', abbreviation: 'EDUCATION', name: 'Education Recruitment Board Punjab', region: 'Punjab', category: 'TEACHING_BOARD', iconUrl: punjabEmblem },
     { id: 'cbse', abbreviation: 'CBSE', name: 'Central Board of Secondary Education (CTET)', region: 'National', category: 'TEACHING_BOARD', iconUrl: ctetLogo },
+    { id: 'pstet', abbreviation: 'PSTET', name: 'Punjab State Teacher Eligibility Test (PSEB)', region: 'Punjab', category: 'TEACHING_BOARD', iconUrl: pstetLogo },
     { id: 'ibps', abbreviation: 'IBPS', name: 'Institute of Banking Personnel Selection', region: 'National', category: 'BANKING_BOARD', iconUrl: ibpsLogo }
   ];
 
@@ -54,7 +56,7 @@ export async function seedInitialData(db: Firestore) {
     // Teaching Nodes (CTET & ETT)
     { id: 'ctet-paper-1', boardId: 'cbse', name: 'CTET Paper 1', category: 'TEACHING', description: 'Central Teacher Eligibility Test (Primary Stage).', iconUrl: ctetLogo },
     { id: 'ctet-paper-2', boardId: 'cbse', name: 'CTET Paper 2', category: 'TEACHING', description: 'Central Teacher Eligibility Test (Elementary Stage).', iconUrl: ctetLogo },
-    { id: 'pstet-hub', boardId: 'education', name: 'PSTET (Paper 1 & 2)', category: 'TEACHING', description: 'Punjab State Teacher Eligibility Test recruitment.', iconUrl: punjabEmblem },
+    { id: 'pstet-hub', boardId: 'pstet', name: 'PSTET Hub', category: 'TEACHING', description: 'Punjab State Teacher Eligibility Test recruitment.', iconUrl: pstetLogo },
     { id: 'ett-cadre', boardId: 'education', name: 'ETT Cadre', category: 'TEACHING', description: 'Elementary Teacher Training recruitment hub.', iconUrl: punjabEmblem },
     { id: 'master-cadre', boardId: 'education', name: 'Master Cadre', category: 'TEACHING', description: 'Subject-wise teacher recruitment for Punjab Schools.', iconUrl: punjabEmblem }
   ];

@@ -18,8 +18,8 @@ import { FirestorePermissionError } from "@/firebase/errors"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Authority Hub v27.0 - Hardened Mandatory Branding Engine.
- * Features: Persistent official logos for PSSSB, PSPCL, and CTET.
+ * @fileOverview Authority Hub v28.0 - Hardened Mandatory Branding Engine.
+ * Features: Persistent official logos for PSSSB, PSPCL, CTET, and PSTET.
  */
 
 export default function ExamManagement() {
@@ -40,6 +40,7 @@ export default function ExamManagement() {
   const psssbOfficialLogo = "https://sssb.punjab.gov.in/wp-content/themes/ssbtheme/images/punjab-gov.svg";
   const pspclOfficialLogo = "https://pspcl.in/assets/images/logo.png";
   const ctetOfficialLogo = "https://cdnbbsr.s3waas.gov.in/s3443dec3062d0286986e21dc0631734c9/uploads/2023/03/2023032156.png";
+  const pstetOfficialLogo = "https://pstet.pseb.ac.in/img/main-logo-2.png";
 
   const handleSave = async () => {
     if (!db || !editingBoard) return
@@ -58,11 +59,16 @@ export default function ExamManagement() {
     const isPsssb = abbrev === 'PSSSB';
     const isPspcl = abbrev === 'PSPCL' || abbrev === 'PSTCL';
     const isCtet = abbrev === 'CTET' || abbrev === 'CBSE';
+    const isPstet = abbrev === 'PSTET';
     
     const payload = { 
       ...editingBoard, 
       id: boardId,
-      iconUrl: isPsssb ? psssbOfficialLogo : isPspcl ? pspclOfficialLogo : isCtet ? ctetOfficialLogo : (editingBoard.iconUrl || ""),
+      iconUrl: isPsssb ? psssbOfficialLogo : 
+               isPspcl ? pspclOfficialLogo : 
+               isCtet ? ctetOfficialLogo : 
+               isPstet ? pstetOfficialLogo :
+               (editingBoard.iconUrl || ""),
       updatedAt: serverTimestamp()
     }
     
@@ -140,8 +146,8 @@ export default function ExamManagement() {
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-white/5 h-20">
                 <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Identity</TableHead>
-                <TableHead className="text-[10px) font-black uppercase tracking-widest text-slate-400">Short Code</TableHead>
-                <TableHead className="text-[10px) font-black uppercase tracking-widest text-slate-400">Authority Name</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Short Code</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Authority Name</TableHead>
                 <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Audit</TableHead>
               </TableRow>
             </TableHeader>
@@ -156,9 +162,14 @@ export default function ExamManagement() {
                 const isPsssb = abbrev === 'PSSSB';
                 const isPspcl = abbrev === 'PSPCL' || abbrev === 'PSTCL';
                 const isCtet = abbrev === 'CTET' || abbrev === 'CBSE';
+                const isPstet = abbrev === 'PSTET';
                 const isArmy = board.id?.toLowerCase() === 'army' || abbrev === 'ARMY';
                 
-                const effectiveIcon = isPsssb ? psssbOfficialLogo : isPspcl ? pspclOfficialLogo : isCtet ? ctetOfficialLogo : board.iconUrl;
+                const effectiveIcon = isPsssb ? psssbOfficialLogo : 
+                                     isPspcl ? pspclOfficialLogo : 
+                                     isCtet ? ctetOfficialLogo : 
+                                     isPstet ? pstetOfficialLogo :
+                                     board.iconUrl;
 
                 return (
                   <TableRow key={board.id} className="hover:bg-slate-50 group border-slate-50 transition-all">
@@ -171,7 +182,7 @@ export default function ExamManagement() {
                           ) : (
                             <img 
                               src={effectiveIcon} 
-                              className={cn("h-full w-full object-contain p-2", (isArmy || isCtet) ? "scale-150" : "")} 
+                              className={cn("h-full w-full object-contain p-2", (isArmy || isCtet || isPstet) ? "scale-150" : "")} 
                               referrerPolicy="no-referrer"
                               alt={board.abbreviation}
                               onError={() => setFailedImages(p => ({...p, [board.id]: true}))}
@@ -231,7 +242,7 @@ export default function ExamManagement() {
                         <img 
                           src={editingBoard.iconUrl} 
                           referrerPolicy="no-referrer"
-                          className={cn("absolute inset-0 w-full h-full object-contain p-4 group-hover:scale-110 transition-transform", (editingBoard.id === 'army' || editingBoard.abbreviation?.toUpperCase() === 'ARMY' || editingBoard.abbreviation?.toUpperCase() === 'CTET') ? "scale-150" : "")} 
+                          className={cn("absolute inset-0 w-full h-full object-contain p-4 group-hover:scale-110 transition-transform", (editingBoard.id === 'army' || editingBoard.abbreviation?.toUpperCase() === 'ARMY' || editingBoard.abbreviation?.toUpperCase() === 'CTET' || editingBoard.abbreviation?.toUpperCase() === 'PSTET') ? "scale-150" : "")} 
                           alt="Preview"
                         />
                       ) : (
