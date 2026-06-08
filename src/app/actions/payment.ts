@@ -14,7 +14,7 @@ import {
 /**
  * @fileOverview Secure Pass Management & Payment Actions.
  * Handles Manual UPI approval and role-based pass grants.
- * Removed: Razorpay SDK integration.
+ * Rebuild: Strictly follows the Blueprint structure for 'pass' object.
  */
 
 export async function submitManualPayment(data: {
@@ -70,12 +70,18 @@ export async function approvePaymentRequest(requestId: string, adminId: string) 
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + (planData.durationDays || 30));
 
-    // 2. Update User Registry
+    // 2. Update User Registry (Dual-field Strategy: legacy status + new pass object)
     const userRef = doc(db, 'users', data.userId);
     await updateDoc(userRef, { 
       status: data.planId,
       passExpiryDate: expiryDate.toISOString(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      pass: {
+        active: true,
+        plan: planData.id?.toUpperCase() || 'PREMIUM',
+        purchaseDate: new Date().toISOString(),
+        expiryDate: expiryDate.toISOString()
+      }
     });
 
     // 3. Mark Request as APPROVED

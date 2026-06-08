@@ -29,8 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Mock Node Gateway v17.0.
- * HARDENED: Synced accessLevel and accessType logic for consistent premium gating.
+ * @fileOverview Institutional Mock Node Gateway v18.0.
+ * HARDENED: Robust Access Level evaluation (Checks both accessLevel and accessType).
  */
 
 export default function MockOverviewPage() {
@@ -55,11 +55,11 @@ export default function MockOverviewPage() {
         return;
       }
 
-      // SYNC CHECK: Standardized access Level detection
-      const access = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
-      const isPremium = access === 'PREMIUM';
+      // HARMONIZED ACCESS CHECK
+      const tier = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
+      const isPremium = tier === 'PREMIUM';
       
-      console.log(`[AUDIT] Mock Gateway: ${mock.title} | Access: ${access} | User: ${user?.uid}`);
+      console.log(`[AUDIT] Mock Gateway: ${mock.title} | Tier: ${tier} | User: ${user?.uid}`);
 
       // 1. Fetch User Results for this Mock
       if (user) {
@@ -86,7 +86,17 @@ export default function MockOverviewPage() {
         return;
       }
 
-      // Status check (Normalize case)
+      // Pass Object Check
+      if (profile?.pass?.active === true) {
+         const expiry = new Date(profile.pass.expiryDate);
+         if (expiry > new Date()) {
+            setIsLocked(false);
+            setAccessChecked(true);
+            return;
+         }
+      }
+
+      // Legacy Status check
       const status = (profile?.status || '').toLowerCase();
       const hasStatusPass = status !== '' && status !== 'free';
 
@@ -96,31 +106,7 @@ export default function MockOverviewPage() {
         return;
       }
 
-      // Final subscription check
-      if (user) {
-        try {
-          const subQuery = query(
-            collection(db, "subscriptions"), 
-            where("userId", "==", user.uid),
-            where("status", "==", "active"),
-            limit(1)
-          );
-          const subSnap = await getDocs(subQuery);
-          
-          let subFound = false;
-          if (!subSnap.empty) {
-            const subData = subSnap.docs[0].data();
-            const expiry = new Date(subData.expiryDate);
-            if (expiry > new Date()) subFound = true;
-          }
-          setIsLocked(!subFound);
-        } catch (e) {
-          setIsLocked(true);
-        }
-      } else {
-        setIsLocked(true);
-      }
-      
+      setIsLocked(true);
       setAccessChecked(true);
     }
     checkAccessAndAttempts();
@@ -186,9 +172,9 @@ export default function MockOverviewPage() {
                  {isLocked ? (
                     <Button 
                        onClick={() => router.push('/pass')} 
-                       className="w-full h-14 md:h-16 px-10 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl gap-3 transition-all active:scale-95 border-none"
+                       className="w-full h-14 md:h-16 px-10 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl gap-3 transition-all active:scale-95 border-none flex items-center justify-center"
                     >
-                      <Lock className="h-5 w-5" /> UNLOCK TEST
+                      <Lock className="h-5 w-5" /> UNLOCK WITH PASS
                     </Button>
                  ) : isLimitReached ? (
                     <div className="bg-rose-50 border border-rose-100 p-4 rounded-xl flex items-center gap-4 text-left shadow-sm">

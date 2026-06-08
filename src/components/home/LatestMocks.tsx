@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 
 /**
- * @fileOverview High-Density Mock Feed v10.0.
- * HARDENED: Unified Premium Access Control Logic.
+ * @fileOverview High-Density Mock Feed v11.0.
+ * HARDENED: Robust Access Level evaluation (Checks both accessLevel and accessType).
  */
 
 export default function LatestMocks() {
@@ -29,8 +29,18 @@ export default function LatestMocks() {
 
   const hasPass = useMemo(() => {
      if (!profile) return false;
+     
+     // 1. Admin bypass
      const role = (profile.role || '').toUpperCase();
      if (role === 'ADMIN' || role === 'SUPER_ADMIN') return true;
+
+     // 2. Pass Object Audit
+     if (profile.pass?.active === true) {
+        const expiry = new Date(profile.pass.expiryDate);
+        if (expiry > new Date()) return true;
+     }
+
+     // 3. Legacy Status check
      const status = (profile.status || '').toLowerCase();
      return status !== '' && status !== 'free';
   }, [profile]);
@@ -49,7 +59,7 @@ export default function LatestMocks() {
                <Zap className="h-3 w-3 text-primary" />
                <span className="text-[7px] md:text-[10px] font-black uppercase tracking-widest text-slate-500">Live Feed</span>
             </div>
-            <h2 className="text-2xl md:text-4xl font-headline font-black text-[#000000] uppercase tracking-tight">
+            <h2 className="text-2xl md:text-4xl font-black text-[#000000] font-headline uppercase tracking-tight">
               LATEST <span className="text-primary">MOCKS</span>
             </h2>
             <p className="text-[11px] md:text-lg text-slate-500 font-medium">Updated for upcoming exams.</p>
@@ -65,9 +75,10 @@ export default function LatestMocks() {
           ) : mocks.map((mock, i) => {
             const boardId = mock.boardIds?.[0] || mock.boardId;
             const board = boards?.find((b: any) => b.id === boardId);
-            const isPremium = (mock.accessType || 'FREE').toUpperCase() === 'PREMIUM';
             
-            // CONVERSION GATE
+            // HARMONIZED ACCESS CHECK
+            const tier = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
+            const isPremium = tier === 'PREMIUM';
             const locked = isPremium && !hasPass;
 
             return (
@@ -79,7 +90,7 @@ export default function LatestMocks() {
                        {board?.iconUrl ? <img src={board.iconUrl} className="p-1.5 h-full w-full object-contain" alt="Logo" referrerPolicy="no-referrer" /> : <Zap className="h-4 w-4 text-primary" />}
                     </div>
                     <Badge className={cn("border-none text-[6px] md:text-[8px] font-black uppercase px-2 py-0.5 rounded shadow-sm", isPremium ? "bg-amber-100 text-amber-600" : "bg-primary/5 text-primary")}>
-                       {isPremium ? "PREMIUM" : (board?.abbreviation || 'GOVT')}
+                       {tier}
                     </Badge>
                   </div>
                   <h3 className="font-black text-[13px] md:text-base text-[#000000] leading-tight mb-2 uppercase line-clamp-2 min-h-[32px] md:min-h-[40px] group-hover:text-primary transition-colors">{mock.title}</h3>
@@ -93,9 +104,9 @@ export default function LatestMocks() {
                     {locked ? (
                        <Button 
                         onClick={() => router.push('/pass')} 
-                        className="w-full h-9 md:h-12 bg-orange-500 hover:bg-orange-600 text-white font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg shadow-lg border-none active:scale-95"
+                        className="w-full h-9 md:h-12 bg-orange-500 hover:bg-orange-600 text-white font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg shadow-lg border-none active:scale-95 flex items-center justify-center gap-2"
                        >
-                          <Lock className="h-3 w-3 mr-2" /> UNLOCK TEST
+                          <Lock className="h-3 w-3" /> UNLOCK WITH PASS
                        </Button>
                     ) : (
                        <Button asChild className="w-full h-9 md:h-12 bg-[#0F172A] hover:bg-black text-white font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg shadow-lg border-none active:scale-95">

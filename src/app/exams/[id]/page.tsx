@@ -33,8 +33,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Hub v18.0.
- * UPDATED: Synchronized accessLevel and accessType for consistent gating.
+ * @fileOverview Institutional Exam Hub v19.0.
+ * HARDENED: Robust Access Level evaluation (Checks both accessLevel and accessType).
  */
 
 export default function ExamHubPage() {
@@ -209,9 +209,10 @@ function MockList({ data, results, hasActivePass }: { data: any[], results: any[
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
          {data.map((mock: any) => {
             const result = results?.find((r: any) => r.mockId === mock.id);
-            // SYNC CHECK: Check both accessLevel and accessType
-            const accessLevel = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
-            const isFree = accessLevel === 'FREE';
+            
+            // HARMONIZED ACCESS CHECK
+            const tier = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
+            const isFree = tier === 'FREE';
             
             // Logic: PREMIUM + NO PASS = LOCKED
             const isLocked = !isFree && !hasActivePass;
@@ -223,7 +224,7 @@ function MockList({ data, results, hasActivePass }: { data: any[], results: any[
                         <div className="flex items-center gap-2">
                            {isLocked && <Lock className="h-3 w-3 text-amber-500" />}
                            <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded shadow-sm", isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
-                              {accessLevel}
+                              {tier}
                            </Badge>
                         </div>
                         {result && <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">AUDITED</span>}
@@ -237,9 +238,9 @@ function MockList({ data, results, hasActivePass }: { data: any[], results: any[
                         {isLocked ? (
                            <Button 
                              onClick={() => router.push('/pass')} 
-                             className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-3 transition-all active:scale-95 border-none"
+                             className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-3 transition-all active:scale-95 border-none flex items-center justify-center"
                            >
-                              <Lock className="h-4 w-4" /> UNLOCK TEST
+                              <Lock className="h-4 w-4" /> UNLOCK WITH PASS
                            </Button>
                         ) : result ? (
                            <div className="flex flex-col sm:flex-row gap-2">
@@ -291,7 +292,7 @@ function NotesList({ data, hasActivePass }: { data: any[], hasActivePass: boolea
                         {isLocked ? (
                           <Button 
                             onClick={() => router.push('/pass')} 
-                            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-2 border-none transition-all active:scale-95"
+                            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-2 border-none transition-all active:scale-95 flex items-center justify-center"
                           >
                              <Lock className="h-4 w-4" /> UNLOCK WITH PASS
                           </Button>
