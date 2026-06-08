@@ -50,8 +50,8 @@ import { MockType, Difficulty, AccessType, LanguageDisplayMode } from "@/types"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Elite Institutional Mock Architect v51.0.
- * UPDATED: Hardened 'Unused Only' logic to strictly block repeated assets.
+ * @fileOverview Elite Institutional Mock Architect v52.0.
+ * FIXED: Recalibrated 'Unused Only' logic to be inclusive of fresh assets while blocking used ones.
  */
 
 const SELECTION_RULES = [
@@ -197,9 +197,9 @@ function MockBuilderContent() {
       const qStatus = q.status || 'UNUSED';
       const qUsedCount = q.usedCount || 0;
 
-      // STRICT RULE: If 'unused-only' is checked, question MUST have status UNUSED and 0 usedCount
+      // RECALIBRATED UNUSED LOGIC: Exclude only if explicitly USED, REPEATED or usedCount > 0
       if (activeRules.includes('unused-only')) {
-         if (qStatus !== 'UNUSED' || qUsedCount > 0) return false;
+         if (qStatus === 'USED' || qStatus === 'REPEATED' || qUsedCount > 0) return false;
       }
       
       if (activeRules.includes('no-locked') && qStatus === 'LOCKED') return false;

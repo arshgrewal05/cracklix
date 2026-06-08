@@ -36,8 +36,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Bulk Ingestion Hub v8.0.
- * FIXED: Explicit QuestionLifecycleStatus set to UNUSED for all new assets.
+ * @fileOverview Institutional Bulk Ingestion Hub v9.0.
+ * FIXED: Enforced strict 'UNUSED' status for all new registry assets.
  */
 
 export default function BulkImportPage() {
@@ -71,8 +71,12 @@ export default function BulkImportPage() {
     }
 
     const result = parseBulkQuestions(rawText, metadata);
-    // Explicitly enforce UNUSED status for parsed questions
-    const questionsWithStatus = result.questions.map(q => ({ ...q, status: 'UNUSED' }));
+    // Explicitly enforce UNUSED status for all parsed questions
+    const questionsWithStatus = result.questions.map(q => ({ 
+       ...q, 
+       status: 'UNUSED',
+       usedCount: 0 
+    }));
     setParsedQuestions(questionsWithStatus);
 
     if (result.questions.length > 0) {
@@ -143,7 +147,7 @@ export default function BulkImportPage() {
           </div>
         </div>
         <Button onClick={handleSaveToRegistry} disabled={isSyncing || parsedQuestions.length === 0} className="bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[11px] tracking-widest rounded-xl h-14 px-12 gap-3 shadow-2xl">
-          {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4 text-primary fill-current" />} Commit Staged Assets
+          {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4 text-primary" />} Commit Staged Assets
         </Button>
       </div>
 
@@ -211,7 +215,7 @@ export default function BulkImportPage() {
                 </div>
                 {parsedQuestions.map((q, idx) => (
                   <div key={idx} className="relative group">
-                    <Card className="border-none shadow-3xl rounded-[3rem] bg-white p-12 text-left group overflow-visible border border-slate-50 transition-all hover:border-primary/20">
+                    <Card className="border-none shadow-3xl rounded-[3rem] bg-white p-12 text-left group overflow-visible border border-slate-100 transition-all hover:border-primary/20">
                        <div className="flex justify-between items-start mb-10 border-b border-slate-100 pb-8">
                           <Badge className="bg-[#0F172A] text-white border-none text-[10px] font-black px-6 py-2 rounded-xl uppercase tracking-widest">Asset {idx + 1}</Badge>
                           <div className="flex gap-3">
