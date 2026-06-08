@@ -5,7 +5,7 @@ import { useMemo, useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { useDoc, useFirestore, useUser, useCollection } from "@/firebase"
+import { useDoc, useFirestore, useUser } from "@/firebase"
 import { doc, collection, query, where, getDocs, limit } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -19,18 +19,16 @@ import {
   Info,
   Lock,
   Zap,
-  Gem,
-  AlertCircle,
-  History,
-  Play
+  Play,
+  AlertCircle
 } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Mock Node Gateway v18.0.
- * HARDENED: Robust Access Level evaluation (Checks both accessLevel and accessType).
+ * @fileOverview Institutional Mock Node Gateway v19.0.
+ * HARDENED: Robust Access Level evaluation with strict conversion buttons.
  */
 
 export default function MockOverviewPage() {
@@ -47,69 +45,37 @@ export default function MockOverviewPage() {
   const [previousAttempts, setPreviousAttempts] = useState<any[]>([]);
 
   useEffect(() => {
-    async function checkAccessAndAttempts() {
+    async function checkAccess() {
       if (mockLoading) return;
+      if (!mock || !db) { setAccessChecked(true); return; }
 
-      if (!mock || !db) {
-        setAccessChecked(true);
-        return;
-      }
-
-      // HARMONIZED ACCESS CHECK
-      const tier = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
+      const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
       const isPremium = tier === 'PREMIUM';
-      
-      console.log(`[AUDIT] Mock Gateway: ${mock.title} | Tier: ${tier} | User: ${user?.uid}`);
 
-      // 1. Fetch User Results for this Mock
       if (user) {
          try {
-           const qResults = query(collection(db, "results"), where("userId", "==", user.uid), where("mockId", "==", mockId));
-           const resSnap = await getDocs(qResults);
+           const resSnap = await getDocs(query(collection(db, "results"), where("userId", "==", user.uid), where("mockId", "==", mockId), limit(1)));
            setPreviousAttempts(resSnap.docs.map(d => d.data()));
-         } catch (e) {
-           console.error("Attempt Fetch Error:", e);
-         }
+         } catch (e) {}
       }
 
-      // 2. PASS ACCESS AUDIT
-      if (!isPremium) {
-        setIsLocked(false);
-        setAccessChecked(true);
-        return;
-      }
+      if (!isPremium) { setIsLocked(false); setAccessChecked(true); return; }
 
       const role = (profile?.role || '').toUpperCase();
-      if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-        setIsLocked(false);
-        setAccessChecked(true);
-        return;
+      if (role === 'ADMIN' || role === 'SUPER_ADMIN') { setIsLocked(false); setAccessChecked(true); return; }
+      
+      if (profile?.pass?.active === true && new Date(profile.pass.expiryDate) > new Date()) {
+         setIsLocked(false); setAccessChecked(true); return;
       }
 
-      // Pass Object Check
-      if (profile?.pass?.active === true) {
-         const expiry = new Date(profile.pass.expiryDate);
-         if (expiry > new Date()) {
-            setIsLocked(false);
-            setAccessChecked(true);
-            return;
-         }
-      }
-
-      // Legacy Status check
       const status = (profile?.status || '').toLowerCase();
-      const hasStatusPass = status !== '' && status !== 'free';
+      if (status !== '' && status !== 'free') { setIsLocked(false); setAccessChecked(true); return; }
 
-      if (hasStatusPass) {
-        setIsLocked(false);
-        setAccessChecked(true);
-        return;
-      }
-
+      console.log(`[AUDIT] MockGateway LOCKED: ${mock.title} | Tier: ${tier} | User: ${user?.uid}`);
       setIsLocked(true);
       setAccessChecked(true);
     }
-    checkAccessAndAttempts();
+    checkAccess();
   }, [mock, mockLoading, user, profile, db, mockId]);
 
   const attemptsLeft = useMemo(() => {
@@ -119,109 +85,55 @@ export default function MockOverviewPage() {
 
   const isLimitReached = attemptsLeft === 0;
 
-  const showSkeleton = mockLoading || userLoading || (user && !accessChecked);
+  if (mockLoading || userLoading || (user && !accessChecked)) return <div className="h-screen flex items-center justify-center bg-white"><Skeleton className="h-16 w-16 rounded-full animate-pulse" /></div>;
 
-  if (showSkeleton) return (
-    <div className="h-screen flex items-center justify-center bg-white">
-      <Skeleton className="h-16 w-16 rounded-full animate-pulse" />
-    </div>
-  );
+  if (!mock) return <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4"><Info className="h-12 w-12 opacity-10" /><p className="font-black uppercase tracking-widest text-xs">Registry node missing</p></div>;
 
-  if (!mock) return (
-    <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4">
-      <Info className="h-12 w-12 opacity-10" />
-      <p className="font-black uppercase tracking-widest text-xs">Registry node missing</p>
-      <Button asChild variant="ghost" className="text-primary font-black uppercase text-[10px]">
-        <Link href="/mocks">Back to List</Link>
-      </Button>
-    </div>
-  );
-
-  const tier = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
-  const isPremiumMock = tier === 'PREMIUM';
+  const tierField = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-body">
       <Navbar />
-      
       <main className="flex-1 text-left">
-        <section className="bg-slate-50 border-b border-slate-100 py-6 md:py-12">
+        <section className="bg-slate-50 border-b border-slate-100 py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
               <div className="flex items-start gap-4 flex-1">
-                <Button variant="ghost" onClick={() => router.back()} className="rounded-full h-10 w-10 border border-slate-200 bg-white flex items-center justify-center text-slate-400 p-0">
-                  <ChevronLeft className="h-5 w-5" />
-                </Button>
+                <Button variant="ghost" onClick={() => router.back()} className="rounded-full h-10 w-10 border border-slate-200 bg-white p-0"><ChevronLeft className="h-5 w-5" /></Button>
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
-                      <Badge className={cn("border-none px-3 py-0.5 rounded font-black uppercase text-[8px] tracking-widest shadow-sm", isPremiumMock ? "bg-amber-100 text-amber-600" : "bg-emerald-50 text-emerald-600")}>
-                        {tier}
+                      <Badge className={cn("border-none px-3 py-0.5 rounded font-black uppercase text-[8px] tracking-widest shadow-sm", tierField === 'PREMIUM' ? "bg-amber-100 text-amber-600" : "bg-emerald-50 text-emerald-600")}>
+                        {tierField}
                       </Badge>
-                      {isLocked && <Badge className="bg-slate-100 text-slate-500 border-none px-3 py-0.5 rounded font-black uppercase text-[8px] tracking-widest flex items-center gap-1"><Lock className="h-3 w-3" /> PASS REQUIRED</Badge>}
                   </div>
                   <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase leading-tight tracking-tight">{mock.title}</h1>
                   <div className="flex items-center gap-6 pt-1 text-slate-500 font-bold text-[10px] md:text-sm uppercase tracking-widest">
                       <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {mock.duration} Mins</span>
                       <span className="flex items-center gap-2"><BookOpen className="h-4 w-4 text-primary" /> {mock.totalQuestions} Qs</span>
-                      {mock.attemptLimit > 0 && <span className="flex items-center gap-2 text-rose-500"><History className="h-4 w-4" /> {attemptsLeft} Attempts Left</span>}
                   </div>
                 </div>
               </div>
-
               <div className="w-full md:w-auto">
                  {isLocked ? (
-                    <Button 
-                       onClick={() => router.push('/pass')} 
-                       className="w-full h-14 md:h-16 px-10 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl gap-3 transition-all active:scale-95 border-none flex items-center justify-center"
-                    >
-                      <Lock className="h-5 w-5" /> UNLOCK WITH PASS
+                    <Button onClick={() => router.push('/pass')} className="w-full h-14 md:h-16 px-10 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl gap-3 border-none transition-all active:scale-95 flex items-center justify-center">
+                      <Lock className="h-5 w-5" /> UNLOCK TEST
                     </Button>
                  ) : isLimitReached ? (
                     <div className="bg-rose-50 border border-rose-100 p-4 rounded-xl flex items-center gap-4 text-left shadow-sm">
                        <AlertCircle className="h-8 w-8 text-rose-600" />
-                       <div>
-                          <p className="text-[10px] font-black uppercase text-rose-700 tracking-widest leading-none mb-1">Attempt Limit Reached</p>
-                          <p className="text-xs font-bold text-rose-500 uppercase leading-none">Max {mock.attemptLimit} attempts audited.</p>
-                       </div>
+                       <div><p className="text-[10px] font-black uppercase text-rose-700 tracking-widest leading-none mb-1">Attempt Limit Reached</p><p className="text-xs font-bold text-rose-500 uppercase leading-none">Max {mock.attemptLimit} attempts audited.</p></div>
                     </div>
                  ) : (
-                    <Button asChild className="w-full h-14 md:h-16 px-10 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl gap-3 group border-none transition-all active:scale-95">
-                      <Link href={`/mocks/${mockId}/instructions`} className="flex items-center justify-center gap-3">
-                         <Play className="h-5 w-5 fill-current" /> ATTEMPT NOW <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      </Link>
+                    <Button asChild className="w-full h-14 md:h-16 px-10 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl border-none transition-all active:scale-95">
+                      <Link href={`/mocks/${mockId}/instructions`} className="flex items-center justify-center gap-3"><Play className="h-5 w-5 fill-current" /> ATTEMPT NOW <ArrowRight className="h-4 w-4" /></Link>
                     </Button>
                  )}
               </div>
             </div>
           </div>
         </section>
-
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <div className="lg:col-span-8 space-y-8">
-                 <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 space-y-6">
-                    <h3 className="text-lg font-headline font-black uppercase text-[#0F172A] flex items-center gap-3"><Info className="h-5 w-5 text-primary" /> Institutional Guidelines</h3>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       <GuidelineItem text="Authentication node required for evaluation." />
-                       <GuidelineItem text="Negative marking (-0.25) active for mismatched nodes." />
-                       <GuidelineItem text={`Attempt Limit: ${mock.attemptLimit > 0 ? mock.attemptLimit + ' Max' : 'Unlimited'}`} />
-                       <GuidelineItem text="Official 2026 marking scheme applied." />
-                    </ul>
-                 </div>
-              </div>
-           </div>
-        </div>
       </main>
       <Footer />
     </div>
   )
-}
-
-function GuidelineItem({ text }: { text: string }) {
-   return (
-      <li className="flex gap-3 items-start">
-         <ShieldCheck className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-         <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">{text}</span>
-      </li>
-   )
 }

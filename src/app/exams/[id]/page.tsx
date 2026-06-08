@@ -33,8 +33,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Hub v19.0.
- * HARDENED: Robust Access Level evaluation (Checks both accessLevel and accessType).
+ * @fileOverview Institutional Exam Hub v20.0.
+ * HARDENED: Explicit UNLOCK TEST conversion nodes with strict logic audit logs.
  */
 
 export default function ExamHubPage() {
@@ -67,24 +67,16 @@ export default function ExamHubPage() {
   const { data: userResults } = useCollection<any>(resultsQuery)
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
 
-  // SPECIFICATION: Strict Pass Access Guard
   const hasActivePass = useMemo(() => {
      if (!profile) return false;
-     
-     // 1. Administrative bypass
      const role = (profile.role || '').toUpperCase();
      if (role === 'ADMIN' || role === 'SUPER_ADMIN') return true;
-     
-     // 2. Blueprint PASS Check
      if (profile.pass?.active === true) {
         const expiry = new Date(profile.pass.expiryDate);
         if (expiry > new Date()) return true;
      }
-
-     // 3. Status check (Normalize case)
      const status = (profile.status || '').toLowerCase();
      if (status !== '' && status !== 'free') return true;
-     
      return false;
   }, [profile]);
 
@@ -92,9 +84,7 @@ export default function ExamHubPage() {
     const mocks = (rawMocks || []).filter(m => {
        return m.examId === examId || (m.examIds && Array.isArray(m.examIds) && m.examIds.includes(examId));
     });
-    
     const notes = rawNotes || [];
-
     return {
       FULL: mocks.filter(m => m.mockType === 'FULL'),
       SUBJECT: mocks.filter(m => m.mockType === 'SUBJECT'),
@@ -114,33 +104,24 @@ export default function ExamHubPage() {
   );
 
   const logoUrl = exam.iconUrl || activeBoard?.iconUrl;
-  const isArmy = exam.boardId?.toLowerCase() === 'army' || exam.id?.toLowerCase().includes('army');
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50 font-body">
       <Navbar />
       
-      <section className="bg-white border-b border-slate-100 py-3 md:py-6 text-left">
+      <section className="bg-white border-b border-slate-100 py-4 md:py-6 text-left">
          <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex items-center gap-4 md:gap-8">
                <button onClick={() => router.back()} className="h-10 w-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black shrink-0 transition-all">
                   <ChevronLeft className="h-5 w-5" />
                </button>
-               
                <div className="h-10 w-10 md:h-14 md:w-14 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative overflow-hidden shrink-0 shadow-inner">
                   {logoUrl && !imgFailed ? (
-                    <img 
-                      src={logoUrl} 
-                      className={cn("w-full h-full object-contain p-1.5", isArmy ? "scale-125" : "")} 
-                      alt="Board Logo" 
-                      referrerPolicy="no-referrer" 
-                      onError={() => setImgFailed(true)}
-                    />
+                    <img src={logoUrl} className="w-full h-full object-contain p-1.5" alt="Logo" referrerPolicy="no-referrer" onError={() => setImgFailed(true)} />
                   ) : (
                     <GraduationCap className="h-5 w-5 md:h-8 md:w-8 text-slate-300" />
                   )}
                </div>
-
                <div className="min-w-0">
                   <h1 className="text-lg md:text-2xl font-black text-[#0F172A] uppercase leading-tight tracking-tight truncate">
                      {activeBoard?.abbreviation || 'GOVT'} {exam.name}
@@ -151,7 +132,7 @@ export default function ExamHubPage() {
          </div>
       </section>
 
-      <main className="container mx-auto px-4 py-4 md:py-8 max-w-6xl pb-40">
+      <main className="container mx-auto px-4 py-8 max-w-6xl pb-40">
          <Tabs defaultValue="FULL" className="space-y-6">
             <div className="bg-white border border-slate-100 rounded-xl p-1 shadow-sm overflow-x-auto no-scrollbar">
                <TabsList className="bg-transparent border-none p-0 flex h-10 w-full justify-start gap-1">
@@ -160,7 +141,6 @@ export default function ExamHubPage() {
                   <DashboardTab value="SECTIONAL" label="Sectional Tests" icon={<ListTree className="h-3 w-3" />} />
                   <DashboardTab value="PYQ" label="PYQ Papers" icon={<Layers className="h-3 w-3" />} />
                   <DashboardTab value="NOTES" label="Study Notes" icon={<FileText className="h-3 w-3" />} />
-                  <DashboardTab value="SYLLABUS" label="Syllabus" icon={<Info className="h-3 w-3" />} />
                </TabsList>
             </div>
 
@@ -169,21 +149,10 @@ export default function ExamHubPage() {
                <TabsContent value="SUBJECT" className="m-0"><MockList data={groupedContent.SUBJECT} results={userResults} hasActivePass={hasActivePass} /></TabsContent>
                <TabsContent value="SECTIONAL" className="m-0"><MockList data={groupedContent.SECTIONAL} results={userResults} hasActivePass={hasActivePass} /></TabsContent>
                <TabsContent value="PYQ" className="m-0"><MockList data={groupedContent.PYQ} results={userResults} hasActivePass={hasActivePass} /></TabsContent>
-               
                <TabsContent value="NOTES" className="m-0"><NotesList data={groupedContent.NOTES} hasActivePass={hasActivePass} /></TabsContent>
-               <TabsContent value="SYLLABUS" className="m-0"><NotesList data={groupedContent.SYLLABUS} hasActivePass={hasActivePass} /></TabsContent>
             </div>
          </Tabs>
       </main>
-
-      {!hasActivePass && user && (
-        <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 p-4 md:p-6 md:px-[25%] flex items-center justify-center shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-           <Button onClick={() => router.push('/pass')} className="w-full h-12 md:h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-[10px] md:text-sm rounded-xl transition-all shadow-xl">
-              Get Active Pass for Premium Hub
-           </Button>
-        </div>
-      )}
-
       <Footer />
     </div>
   )
@@ -191,10 +160,7 @@ export default function ExamHubPage() {
 
 function DashboardTab({ value, label, icon }: any) {
    return (
-      <TabsTrigger 
-         value={value} 
-         className="px-4 h-full font-black text-[9px] uppercase tracking-wider text-slate-400 data-[state=active]:bg-[#0F172A] data-[state=active]:text-white rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5"
-      >
+      <TabsTrigger value={value} className="px-4 h-full font-black text-[9px] uppercase tracking-wider text-slate-400 data-[state=active]:bg-[#0F172A] data-[state=active]:text-white rounded-lg transition-all whitespace-nowrap flex items-center gap-1.5">
          {icon} {label}
       </TabsTrigger>
    )
@@ -209,24 +175,19 @@ function MockList({ data, results, hasActivePass }: { data: any[], results: any[
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
          {data.map((mock: any) => {
             const result = results?.find((r: any) => r.mockId === mock.id);
-            
-            // HARMONIZED ACCESS CHECK
-            const tier = (mock.accessLevel || mock.accessType || 'FREE').toUpperCase();
-            const isFree = tier === 'FREE';
-            
-            // Logic: PREMIUM + NO PASS = LOCKED
-            const isLocked = !isFree && !hasActivePass;
+            const tierField = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+            const isPremium = tierField === 'PREMIUM';
+            const isLocked = isPremium && !hasActivePass;
+
+            console.log(`[AUDIT] ExamHub Card: ${mock.title} | Tier: ${tierField} | hasPass: ${hasActivePass} | Locked: ${isLocked}`);
 
             return (
                <Card key={mock.id} className="border-none shadow-sm rounded-2xl bg-white hover:shadow-md transition-all text-left group">
                   <CardContent className="p-5 md:p-8 space-y-4">
                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                           {isLocked && <Lock className="h-3 w-3 text-amber-500" />}
-                           <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded shadow-sm", isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
-                              {tier}
-                           </Badge>
-                        </div>
+                        <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded shadow-sm", isPremium ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-600")}>
+                           {tierField}
+                        </Badge>
                         {result && <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">AUDITED</span>}
                      </div>
                      <h3 className="text-sm md:text-lg font-black text-[#0F172A] uppercase leading-tight group-hover:text-primary transition-colors">{mock.title}</h3>
@@ -240,15 +201,15 @@ function MockList({ data, results, hasActivePass }: { data: any[], results: any[
                              onClick={() => router.push('/pass')} 
                              className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-3 transition-all active:scale-95 border-none flex items-center justify-center"
                            >
-                              <Lock className="h-4 w-4" /> UNLOCK WITH PASS
+                              <Lock className="h-4 w-4" /> UNLOCK TEST
                            </Button>
                         ) : result ? (
                            <div className="flex flex-col sm:flex-row gap-2">
-                              <Button asChild className="flex-1 h-11 bg-primary text-white hover:bg-orange-600 border-none font-black uppercase text-[10px] rounded-xl shadow-md">
+                              <Button asChild className="flex-1 h-11 bg-primary text-white font-black uppercase text-[10px] rounded-xl">
                                  <Link href={`/results/${mock.id}`}>View Score</Link>
                               </Button>
-                              <Button asChild variant="outline" className="flex-1 h-11 border-slate-200 text-slate-600 hover:bg-slate-50 font-black uppercase text-[10px] rounded-xl gap-2">
-                                 <Link href={`/mocks/${mock.id}/instructions`}><RefreshCw className="h-3.5 w-3.5" /> Re-attempt</Link>
+                              <Button asChild variant="outline" className="flex-1 h-11 border-slate-200 font-black uppercase text-[10px] rounded-xl">
+                                 <Link href={`/mocks/${mock.id}/instructions`}>Re-attempt</Link>
                               </Button>
                            </div>
                         ) : (
@@ -268,41 +229,30 @@ function MockList({ data, results, hasActivePass }: { data: any[], results: any[
 function NotesList({ data, hasActivePass }: { data: any[], hasActivePass: boolean }) {
    const router = useRouter();
    if (data.length === 0) return <EmptyNode label="No Materials Archive Found" />;
-
    return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
          {data.map((note: any) => {
-            const isFree = note.isFree !== false; // Default to free if not set
+            const isFree = note.isFree !== false;
             const isLocked = !isFree && !hasActivePass;
-
             return (
-               <Card key={note.id} className="border-none shadow-sm rounded-2xl bg-white hover:shadow-md transition-all text-left group">
-                  <CardContent className="p-5 md:p-8 space-y-4">
-                     <div className="flex items-center justify-between">
-                        <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded", isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
-                           {isFree ? 'FREE' : 'PREMIUM'}
-                        </Badge>
-                     </div>
-                     <h3 className="text-sm md:text-lg font-black text-[#0F172A] uppercase leading-tight group-hover:text-primary transition-colors">{note.title}</h3>
-                     <div className="flex items-center gap-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-50 pt-3">
-                        <span className="flex items-center gap-1.5"><FileText className="h-3 w-3" /> STUDY ASSET</span>
-                        <span className="flex items-center gap-1.5"><Download className="h-3 w-3" /> PDF</span>
-                     </div>
-                     <div className="pt-2">
-                        {isLocked ? (
-                          <Button 
-                            onClick={() => router.push('/pass')} 
-                            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-2 border-none transition-all active:scale-95 flex items-center justify-center"
-                          >
-                             <Lock className="h-4 w-4" /> UNLOCK WITH PASS
-                          </Button>
-                        ) : (
-                          <Button asChild className="w-full h-11 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] rounded-xl border-none shadow-lg">
-                             <a href={note.pdfUrl} target="_blank" rel="noopener noreferrer"><Download className="h-4 w-4 mr-2" /> Download Node</a>
-                          </Button>
-                        )}
-                     </div>
-                  </CardContent>
+               <Card key={note.id} className="border-none shadow-sm rounded-2xl bg-white p-5 md:p-8 space-y-4">
+                  <div className="flex items-center justify-between">
+                     <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded", isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
+                        {isFree ? 'FREE' : 'PREMIUM'}
+                     </Badge>
+                  </div>
+                  <h3 className="text-sm md:text-lg font-black text-[#0F172A] uppercase leading-tight">{note.title}</h3>
+                  <div className="pt-2">
+                     {isLocked ? (
+                       <Button onClick={() => router.push('/pass')} className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-2 border-none">
+                          <Lock className="h-4 w-4" /> UNLOCK TEST
+                       </Button>
+                     ) : (
+                       <Button asChild className="w-full h-11 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] rounded-xl shadow-lg">
+                          <a href={note.pdfUrl} target="_blank" rel="noopener noreferrer"><Download className="h-4 w-4 mr-2" /> Download Node</a>
+                       </Button>
+                     )}
+                  </div>
                </Card>
             )
          })}
@@ -311,10 +261,5 @@ function NotesList({ data, hasActivePass }: { data: any[], hasActivePass: boolea
 }
 
 function EmptyNode({ label }: { label: string }) {
-   return (
-      <div className="py-20 text-center border-2 border-dashed border-slate-100 rounded-3xl opacity-20">
-         <Zap className="h-10 w-10 mx-auto mb-4" />
-         <p className="font-black uppercase tracking-[0.2em] text-[10px]">{label}</p>
-      </div>
-   )
+   return <div className="py-20 text-center border-2 border-dashed border-slate-100 rounded-3xl opacity-20"><Zap className="h-10 w-10 mx-auto mb-4" /><p className="font-black uppercase tracking-[0.2em] text-[10px]">{label}</p></div>;
 }
