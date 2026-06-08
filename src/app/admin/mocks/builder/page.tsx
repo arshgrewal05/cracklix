@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Switch } from "@/components/ui/switch"
 import { 
   ChevronLeft, 
   Database, 
@@ -24,38 +23,27 @@ import {
   Zap,
   Clock,
   PlusCircle,
-  Filter,
-  BookOpen,
   Lock,
-  History,
   Target,
-  Languages,
   ShieldCheck,
   Settings2,
   CheckCircle2,
-  Gem,
-  LayoutGrid,
   Landmark,
-  ChevronRight,
   GraduationCap,
   AlertTriangle,
-  FileStack,
-  ListTree,
-  SearchCode,
-  Unlock,
   MoveUp,
   MoveDown
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
-import { collection, doc, setDoc, serverTimestamp, query, limit, getDocs, writeBatch, where } from "firebase/firestore"
+import { collection, doc, setDoc, serverTimestamp, query, limit, getDocs, writeBatch, where, documentId } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { MockType, Difficulty, AccessLevel, LanguageDisplayMode } from "@/types"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Ultimate Mock Architect Panel v41.0.
- * RESTORED: Multi-Board selection, Multi-Exam selection, and detailed Marking controls.
+ * @fileOverview Institutional Mock Architect v45.0 (Full Function Recovery).
+ * FEATURES: Primary Source Board, Multi-Target Boards, Multi-Vertical Exams, and Precise Marking.
  */
 
 const SELECTION_RULES = [
@@ -94,10 +82,9 @@ function MockBuilderContent() {
   const [isPublishing, setIsPublishing] = useState(false)
   const [mockData, setMockData] = useState<any>({
     title: "", 
-    boardId: "", 
-    boardIds: [] as string[],
-    examId: "",
-    examIds: [] as string[],
+    boardId: "", // Primary Source
+    boardIds: [] as string[], // Multi-Targets
+    examIds: [] as string[], // Multi-Verticals
     duration: 120, 
     difficulty: "Medium" as Difficulty, 
     mockType: "FULL" as MockType, 
@@ -115,7 +102,7 @@ function MockBuilderContent() {
   const [activeSectionId, setActiveSectionId] = useState('sec-1')
   const [bankSelection, setBankSelection] = useState<string[]>([])
 
-  // Load Bank from Primary Board
+  // Load Bank from Primary Source Board
   useEffect(() => {
     async function fetchBank() {
       if (!db || !mockData.boardId) return
@@ -133,12 +120,11 @@ function MockBuilderContent() {
 
   useEffect(() => {
     if (existingMock) {
-      setMockData(prev => ({ 
-        ...prev, 
+      setMockData({ 
         ...existingMock,
         boardIds: existingMock.boardIds || (existingMock.boardId ? [existingMock.boardId] : []),
         examIds: existingMock.examIds || (existingMock.examId ? [existingMock.examId] : []),
-      }));
+      });
 
       // Hydrate sections if questions are available
       if (existingMock.questionIds && questionBank.length > 0) {
@@ -324,7 +310,7 @@ function MockBuilderContent() {
                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Multi-Vertical Assignment</p>
                    
                    <div className="space-y-4">
-                      <Label className="text-[9px] font-black uppercase text-slate-500">Board Hubs</Label>
+                      <Label className="text-[9px] font-black uppercase text-slate-500">Target Board Hubs</Label>
                       <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
                          {boards?.map((b: any) => (
                             <label key={b.id} className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-all">
@@ -342,7 +328,7 @@ function MockBuilderContent() {
                    </div>
 
                    <div className="space-y-4">
-                      <Label className="text-[9px] font-black uppercase text-slate-500">Exam Hubs</Label>
+                      <Label className="text-[9px] font-black uppercase text-slate-500">Target Exam Hubs</Label>
                       <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
                          {exams?.map((ex: any) => (
                             <label key={ex.id} className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-all">
