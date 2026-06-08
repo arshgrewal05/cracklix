@@ -12,9 +12,8 @@ import {
 } from 'firebase/firestore';
 
 /**
- * @fileOverview Secure Pass Management & Payment Actions.
- * Handles Manual UPI approval and role-based pass grants.
- * Rebuild: Strictly follows the Blueprint structure for 'pass' object.
+ * @fileOverview Hardened Manual Payment Actions v2.0.
+ * Handles the submission and approval of manual UPI transaction nodes.
  */
 
 export async function submitManualPayment(data: {
@@ -70,18 +69,18 @@ export async function approvePaymentRequest(requestId: string, adminId: string) 
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + (planData.durationDays || 30));
 
-    // 2. Update User Registry (Dual-field Strategy: legacy status + new pass object)
+    // 2. Update User Registry
     const userRef = doc(db, 'users', data.userId);
     await updateDoc(userRef, { 
-      status: data.planId,
-      passExpiryDate: expiryDate.toISOString(),
-      updatedAt: serverTimestamp(),
       pass: {
         active: true,
         plan: planData.id?.toUpperCase() || 'PREMIUM',
         purchaseDate: new Date().toISOString(),
-        expiryDate: expiryDate.toISOString()
-      }
+        expiryDate: expiryDate.toISOString(),
+        freePassClaimed: planData.id === 'free-pass'
+      },
+      status: planData.id,
+      updatedAt: serverTimestamp()
     });
 
     // 3. Mark Request as APPROVED
@@ -89,18 +88,6 @@ export async function approvePaymentRequest(requestId: string, adminId: string) 
       status: 'APPROVED',
       approvedBy: adminId,
       updatedAt: serverTimestamp()
-    });
-
-    // 4. Create Subscription Record
-    await addDoc(collection(db, 'subscriptions'), {
-      userId: data.userId,
-      planId: data.planId,
-      planName: planData.name,
-      status: 'active',
-      startDate: serverTimestamp(),
-      expiryDate: expiryDate.toISOString(),
-      verifiedManual: true,
-      transactionId: data.transactionId
     });
 
     return { success: true };
