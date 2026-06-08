@@ -44,7 +44,8 @@ export default function MockOverviewPage() {
       if (mockLoading) return;
       if (!mock || !db) { setAccessChecked(true); return; }
 
-      const isPremium = mock.accessLevel === 'PREMIUM';
+      const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+      const isPremium = tier === 'PREMIUM';
       
       if (user) {
          try {
@@ -67,6 +68,12 @@ export default function MockOverviewPage() {
       } else if (profile?.pass?.active === true) {
          const expiry = new Date(profile.pass.expiryDate);
          if (expiry > new Date()) hasPass = true;
+      } else {
+         // Legacy status whitelist
+         const status = (profile?.status || '').trim().toLowerCase();
+         if (status !== '' && status !== 'free' && status !== 'student' && status !== 'aspirant') {
+            hasPass = true;
+         }
       }
       
       setIsLocked(!hasPass);
@@ -86,7 +93,8 @@ export default function MockOverviewPage() {
 
   if (!mock) return <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4"><Info className="h-12 w-12 opacity-10" /><p className="font-black uppercase tracking-widest text-xs">Registry node missing</p></div>;
 
-  const isPremium = mock.accessLevel === 'PREMIUM';
+  const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+  const isPremium = tier === 'PREMIUM';
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-body">
@@ -103,7 +111,7 @@ export default function MockOverviewPage() {
                         "border-none text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest shadow-sm", 
                         isPremium ? "bg-amber-100 text-amber-600" : "bg-emerald-50 text-emerald-600"
                       )}>
-                        {isPremium ? "PREMIUM" : "FREE"}
+                        {tier}
                       </Badge>
                   </div>
                   <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase leading-tight tracking-tight">{mock.title}</h1>

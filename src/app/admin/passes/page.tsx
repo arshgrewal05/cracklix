@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2, Edit, Save, Gem, Zap, Lock, X, ChevronRight, ShieldOff, ListPlus, Loader2 } from "lucide-react"
+import { Plus, Trash2, Edit, Save, Gem, Zap, Lock, X, ChevronRight, ShieldOff, ListPlus, Loader2, CheckCircle2 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, doc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -26,7 +26,7 @@ export default function PassManagement() {
   const { toast } = useToast()
   
   const passQuery = useMemo(() => (db ? collection(db, "passes") : null), [db])
-  const { data: rawPasses, loading } = useCollection<any>(passQuery)
+  const { data: rawPasses, loading: loading } = useCollection<any>(passQuery)
 
   const passes = useMemo(() => {
     if (!rawPasses) return []

@@ -71,6 +71,11 @@ export default function ExamHubPage() {
         const expiry = new Date(profile.pass.expiryDate);
         return expiry > new Date();
      }
+     
+     // Legacy Fallback Whitelist
+     const status = (profile.status || '').trim().toLowerCase();
+     if (status !== '' && status !== 'free' && status !== 'student' && status !== 'aspirant') return true;
+
      return false;
   }, [profile]);
 
@@ -169,7 +174,8 @@ function MockList({ data, results, isPassActive }: { data: any[], results: any[]
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
          {data.map((mock: any) => {
             const result = results?.find((r: any) => r.mockId === mock.id);
-            const isPremium = mock.accessLevel === 'PREMIUM';
+            const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+            const isPremium = tier === 'PREMIUM';
             const isLocked = isPremium && !isPassActive;
 
             return (
@@ -180,7 +186,7 @@ function MockList({ data, results, isPassActive }: { data: any[], results: any[]
                            "border-none text-[8px] font-black px-2 py-0.5 rounded shadow-sm", 
                            isPremium ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-600"
                         )}>
-                           {isPremium ? "PREMIUM" : "FREE"}
+                           {tier}
                         </Badge>
                         {result && <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">AUDITED</span>}
                      </div>
