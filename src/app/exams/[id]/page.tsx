@@ -32,11 +32,6 @@ import { useMemo, useState, useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
-/**
- * @fileOverview Institutional Exam Hub v22.0.
- * DEBUG: Added runtime logs for accessLevel, isPremium, and user.pass.active.
- */
-
 export default function ExamHubPage() {
   const params = useParams()
   const router = useRouter()
@@ -67,23 +62,15 @@ export default function ExamHubPage() {
   const { data: userResults } = useCollection<any>(resultsQuery)
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
 
-  const hasActivePass = useMemo(() => {
+  const isPassActive = useMemo(() => {
      if (!profile) return false;
-     
-     // 1. Administrative Whitelist
-     const role = (profile.role || '').toUpperCase();
-     if (role === 'ADMIN' || role === 'SUPER_ADMIN') return true;
+     const isAdmin = profile.role === 'ADMIN' || profile.role === 'SUPER_ADMIN';
+     if (isAdmin) return true;
 
-     // 2. Blueprint Pass Registry Audit
      if (profile.pass?.active === true) {
-        const expiryDate = profile.pass.expiryDate ? new Date(profile.pass.expiryDate) : null;
-        if (expiryDate && expiryDate > new Date()) return true;
+        const expiry = new Date(profile.pass.expiryDate);
+        return expiry > new Date();
      }
-
-     // 3. Legacy Status Audit (Strictly Block 'Free' and empty)
-     const s = (profile.status || '').trim().toLowerCase();
-     if (s !== '' && s !== 'free' && s !== 'student' && s !== 'aspirant') return true;
-
      return false;
   }, [profile]);
 
@@ -152,11 +139,11 @@ export default function ExamHubPage() {
             </div>
 
             <div className="animate-in fade-in duration-500">
-               <TabsContent value="FULL" className="m-0"><MockList data={groupedContent.FULL} results={userResults} hasActivePass={hasActivePass} profile={profile} /></TabsContent>
-               <TabsContent value="SUBJECT" className="m-0"><MockList data={groupedContent.SUBJECT} results={userResults} hasActivePass={hasActivePass} profile={profile} /></TabsContent>
-               <TabsContent value="SECTIONAL" className="m-0"><MockList data={groupedContent.SECTIONAL} results={userResults} hasActivePass={hasActivePass} profile={profile} /></TabsContent>
-               <TabsContent value="PYQ" className="m-0"><MockList data={groupedContent.PYQ} results={userResults} hasActivePass={hasActivePass} profile={profile} /></TabsContent>
-               <TabsContent value="NOTES" className="m-0"><NotesList data={groupedContent.NOTES} hasActivePass={hasActivePass} /></TabsContent>
+               <TabsContent value="FULL" className="m-0"><MockList data={groupedContent.FULL} results={userResults} isPassActive={isPassActive} /></TabsContent>
+               <TabsContent value="SUBJECT" className="m-0"><MockList data={groupedContent.SUBJECT} results={userResults} isPassActive={isPassActive} /></TabsContent>
+               <TabsContent value="SECTIONAL" className="m-0"><MockList data={groupedContent.SECTIONAL} results={userResults} isPassActive={isPassActive} /></TabsContent>
+               <TabsContent value="PYQ" className="m-0"><MockList data={groupedContent.PYQ} results={userResults} isPassActive={isPassActive} /></TabsContent>
+               <TabsContent value="NOTES" className="m-0"><NotesList data={groupedContent.NOTES} isPassActive={isPassActive} /></TabsContent>
             </div>
          </Tabs>
       </main>
@@ -173,7 +160,7 @@ function DashboardTab({ value, label, icon }: any) {
    )
 }
 
-function MockList({ data, results, hasActivePass, profile }: { data: any[], results: any[], hasActivePass: boolean, profile: any }) {
+function MockList({ data, results, isPassActive }: { data: any[], results: any[], isPassActive: boolean }) {
    const router = useRouter();
 
    if (data.length === 0) return <EmptyNode label="Awaiting Content Registry" />;
@@ -182,19 +169,18 @@ function MockList({ data, results, hasActivePass, profile }: { data: any[], resu
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
          {data.map((mock: any) => {
             const result = results?.find((r: any) => r.mockId === mock.id);
-            const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
-            const isPremium = tier === 'PREMIUM';
-            const isLocked = isPremium && !hasActivePass;
-
-            // RUNTIME DEBUG LOGS
-            console.log(`[RUNTIME_VAL] ${mock.title} | test.accessLevel: ${mock.accessLevel} | test.isPremium: ${isPremium} | user.pass.active: ${profile?.pass?.active}`);
+            const isPremium = mock.accessLevel === 'PREMIUM';
+            const isLocked = isPremium && !isPassActive;
 
             return (
                <Card key={mock.id} className="border-none shadow-sm rounded-2xl bg-white hover:shadow-md transition-all text-left group">
                   <CardContent className="p-5 md:p-8 space-y-4">
                      <div className="flex items-center justify-between">
-                        <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded shadow-sm", isPremium ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-600")}>
-                           {tier}
+                        <Badge className={cn(
+                           "border-none text-[8px] font-black px-2 py-0.5 rounded shadow-sm", 
+                           isPremium ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-600"
+                        )}>
+                           {isPremium ? "PREMIUM" : "FREE"}
                         </Badge>
                         {result && <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">AUDITED</span>}
                      </div>
@@ -209,7 +195,7 @@ function MockList({ data, results, hasActivePass, profile }: { data: any[], resu
                              onClick={() => router.push('/pass')} 
                              className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-3 transition-all active:scale-95 border-none flex items-center justify-center"
                            >
-                              <Lock className="h-4 w-4" /> UNLOCK TEST
+                              <Lock className="h-4 w-4" /> UNLOCK WITH PASS
                            </Button>
                         ) : result ? (
                            <div className="flex flex-col sm:flex-row gap-2">
@@ -234,30 +220,29 @@ function MockList({ data, results, hasActivePass, profile }: { data: any[], resu
    )
 }
 
-function NotesList({ data, hasActivePass }: { data: any[], hasActivePass: boolean }) {
+function NotesList({ data, isPassActive }: { data: any[], isPassActive: boolean }) {
    const router = useRouter();
    if (data.length === 0) return <EmptyNode label="No Materials Archive Found" />;
    return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
          {data.map((note: any) => {
-            const isFree = note.isFree !== false;
-            const isLocked = !isFree && !hasActivePass;
+            const isLocked = !note.isFree && !isPassActive;
             return (
                <Card key={note.id} className="border-none shadow-sm rounded-2xl bg-white p-5 md:p-8 space-y-4">
                   <div className="flex items-center justify-between">
-                     <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded", isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
-                        {isFree ? 'FREE' : 'PREMIUM'}
+                     <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded", note.isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600")}>
+                        {note.isFree ? 'FREE' : 'PREMIUM'}
                      </Badge>
                   </div>
                   <h3 className="text-sm md:text-lg font-black text-[#0F172A] uppercase leading-tight">{note.title}</h3>
                   <div className="pt-2">
                      {isLocked ? (
                        <Button onClick={() => router.push('/pass')} className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] rounded-xl shadow-xl gap-2 border-none">
-                          <Lock className="h-4 w-4" /> UNLOCK TEST
+                          <Lock className="h-4 w-4" /> UNLOCK WITH PASS
                        </Button>
                      ) : (
                        <Button asChild className="w-full h-11 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] rounded-xl lg shadow-lg">
-                          <a href={note.pdfUrl} target="_blank" rel="noopener noreferrer"><Download className="h-4 w-4 mr-2" /> Download Node</a>
+                          <a href={note.pdfUrl} target="_blank" rel="noopener noreferrer"><Download className="h-4 w-4 mr-2" /> Download Note</a>
                        </Button>
                      )}
                   </div>

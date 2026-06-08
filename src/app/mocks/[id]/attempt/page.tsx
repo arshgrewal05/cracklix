@@ -23,13 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
-
-/**
- * @fileOverview Production Hardened CBT Attempt Engine v40.0.
- * HARDENED: Robust Save & Exit clearing and strict Premium gate.
- */
 
 export default function MockAttemptPage() {
   const params = useParams();
@@ -58,19 +51,6 @@ export default function MockAttemptPage() {
   const startTime = useExamStore(s => s.startTime);
   const language = useExamStore(s => s.language); 
 
-  const q = questions[currentIdx];
-  const selectedAnswer = answers[currentIdx];
-  
-  const effectiveLanguage = useMemo(() => {
-    if (!q) return language;
-    const sectionName = (q.sectionId || "").toUpperCase();
-    const subjectId = (q.subjectId || "").toUpperCase();
-    if (sectionName.includes("PUNJABI") || subjectId.includes("PUNJABI")) return "PUNJABI";
-    if (sectionName.includes("ENGLISH") || subjectId.includes("ENGLISH")) return "ENGLISH";
-    if (sectionName.includes("HINDI") || subjectId.includes("HINDI")) return "HINDI";
-    return language;
-  }, [q, language]);
-
   useEffect(() => {
     async function loadExam() {
       if (!db || !user || !mockId) return;
@@ -80,12 +60,19 @@ export default function MockAttemptPage() {
         const mData = mockSnap.data();
         setMockData(mData);
 
-        const tier = (mData.accessLevel || mData.accessType || 'FREE').trim().toUpperCase();
+        const isPremium = mData.accessLevel === 'PREMIUM';
         const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN';
-        const hasPass = (profile?.pass?.active === true && new Date(profile.pass.expiryDate) > new Date()) || ((profile?.status || '').toLowerCase() !== '' && (profile?.status || '').toLowerCase() !== 'free');
+        
+        let isPassActive = false;
+        if (isAdmin) {
+          isPassActive = true;
+        } else if (profile?.pass?.active === true) {
+          const expiry = new Date(profile.pass.expiryDate);
+          if (expiry > new Date()) isPassActive = true;
+        }
 
-        if (tier === 'PREMIUM' && !isAdmin && !hasPass) {
-           toast({ variant: "destructive", title: "Access Denied", description: "Premium pass required for this series." });
+        if (isPremium && !isPassActive) {
+           toast({ variant: "destructive", title: "Access Denied", description: "Active PASS required for premium mocks." });
            router.push(`/mocks/${mockId}`);
            return;
         }
@@ -151,7 +138,7 @@ export default function MockAttemptPage() {
       <ExamHeader onPaletteToggle={() => setIsPaletteOpen(true)} onExitRequest={() => setShowExitModal(true)} />
       <main className="flex-1 flex flex-col overflow-hidden bg-slate-50/30">
         <AnimatePresence>{isPaused && (<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-[100] bg-[#0B1528]/95 backdrop-blur-xl flex items-center justify-center p-6"><div className="bg-white rounded-[3rem] p-12 space-y-8 text-center max-w-sm"><div className="h-20 w-20 bg-orange-50 rounded-[2rem] flex items-center justify-center mx-auto text-primary shadow-2xl"><Play className="h-10 w-10 fill-current" /></div><h2 className="text-2xl font-headline font-black text-[#0F172A] uppercase">Test Paused</h2><Button onClick={() => setPaused(false)} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-[10px]">Resume Test</Button></div></motion.div>)}</AnimatePresence>
-        <div className="flex-1 flex flex-col overflow-hidden"><SubjectTabs /><div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center"><div className="w-full max-w-5xl p-2 md:p-6 space-y-4">{q && <motion.div key={currentIdx} initial={{ opacity: 0, x: 5 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }}><QuestionRenderer language={effectiveLanguage} question={{...q, displayId: (currentIdx + 1).toString()}} selectedAnswer={selectedAnswer} onSelect={(idx) => setAnswer(currentIdx, idx, db)} className="shadow-md border-none p-4 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem]" /></motion.div>}<TacticalFooter onSubmit={() => setShowSubmitModal(true)} /></div></div></div>
+        <div className="flex-1 flex flex-col overflow-hidden"><SubjectTabs /><div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center"><div className="w-full max-w-5xl p-2 md:p-6 space-y-4">{questions[currentIdx] && <motion.div key={currentIdx} initial={{ opacity: 0, x: 5 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }}><QuestionRenderer language={language} question={{...questions[currentIdx], displayId: (currentIdx + 1).toString()}} selectedAnswer={answers[currentIdx]} onSelect={(idx) => setAnswer(currentIdx, idx, db)} className="shadow-md border-none p-4 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem]" /></motion.div>}<TacticalFooter onSubmit={() => setShowSubmitModal(true)} /></div></div></div>
       </main>
       <Sheet open={isPaletteOpen} onOpenChange={setIsPaletteOpen}><SheetContent side="right" className="p-0 border-none w-[85vw] md:w-[400px] h-full"><SheetHeader className="sr-only"><SheetTitle>Question Map</SheetTitle></SheetHeader><QuestionPalette onSelect={(idx) => { useExamStore.getState().setCurrentIdx(idx); setIsPaletteOpen(false); }} onSubmit={() => setShowSubmitModal(true)} /></SheetContent></Sheet>
       <Dialog open={showExitModal} onOpenChange={setShowExitModal}><DialogContent className="max-w-[440px] rounded-[2.5rem] p-12 bg-white text-center"><div className="space-y-10"><div className="h-16 w-16 bg-blue-50/50 rounded-2xl flex items-center justify-center mx-auto text-blue-500"><LogOut className="h-8 w-8" /></div><DialogTitle className="text-3xl font-headline font-black uppercase text-[#0F172A]">Pause Test?</DialogTitle><p className="text-sm font-bold text-slate-400 uppercase">Your progress will be saved. You can resume later.</p><div className="flex gap-4 pt-4"><Button variant="ghost" onClick={() => setShowExitModal(false)} className="flex-1 h-16 font-black uppercase text-[11px]">Cancel</Button><Button onClick={handleManualExit} className="flex-1 h-16 bg-[#F97316] text-white rounded-xl font-black uppercase text-[11px] shadow-xl border-none">Save & Exit</Button></div></div></DialogContent></Dialog>

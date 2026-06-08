@@ -1,7 +1,8 @@
+
 'use client';
 
 import Link from "next/link";
-import { Menu, Search, Zap, CreditCard, LogOut, ShieldCheck, Megaphone, Target, LayoutGrid, Award, Gem, User, Sparkles, Newspaper } from "lucide-react";
+import { Menu, Search, Zap, CreditCard, LogOut, ShieldCheck, Megaphone, Target, LayoutGrid, Award, Gem, User, Sparkles, Newspaper, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/brand/Logo";
 import { useState, useMemo, useEffect } from "react";
@@ -22,12 +23,6 @@ import { doc } from "firebase/firestore";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
-
-/**
- * @fileOverview Production-Grade Global Navigation v8.0.
- * FIXED: All buttons and links respond on FIRST click via strict hydration mounting.
- * FIXED: Mobile Sidebar no longer blocks desktop interaction nodes.
- */
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -50,10 +45,21 @@ export default function Navbar() {
     router.push('/');
   };
 
-  const isFounder = user?.email === 'arshdeepgrewal1122@gmail.com';
-  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
+  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN';
 
-  // Render Skeleton for initial pass to avoid hydration click-deadlock
+  const passStatus = useMemo(() => {
+    if (!profile?.pass) return null;
+    const active = profile.pass.active;
+    const expiry = new Date(profile.pass.expiryDate);
+    const isExpired = expiry < new Date();
+    
+    return {
+      active: active && !isExpired,
+      label: isExpired ? "PASS EXPIRED" : `PASS ACTIVE`,
+      expiry: expiry.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    };
+  }, [profile]);
+
   if (!mounted) {
     return (
       <div className="h-16 w-full bg-[#0B1528] flex items-center justify-between px-6 border-b border-white/5">
@@ -84,16 +90,8 @@ export default function Navbar() {
                      <Menu className="h-5 w-5" />
                    </button>
                  </SheetTrigger>
-                 <SheetContent 
-                   side="left" 
-                   className={cn(
-                     "p-0 border-none w-[290px] overflow-hidden shadow-5xl transition-all duration-200 bg-[#0F172A] z-[2000]",
-                     "top-0 h-screen"
-                   )}
-                 >
-                   <SheetHeader className="sr-only">
-                      <SheetTitle>Menu Hub</SheetTitle>
-                   </SheetHeader>
+                 <SheetContent side="left" className="p-0 border-none w-[290px] overflow-hidden shadow-5xl transition-all duration-200 bg-[#0F172A] z-[2000] top-0 h-screen">
+                   <SheetHeader className="sr-only"><SheetTitle>Menu Hub</SheetTitle></SheetHeader>
                    <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
                  </SheetContent>
                </Sheet>
@@ -117,6 +115,20 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Phase 15: Header Widget */}
+            {user && passStatus && (
+               <div className={cn(
+                 "hidden lg:flex items-center gap-3 px-4 py-1.5 rounded-xl border-2 transition-all",
+                 passStatus.active ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+               )}>
+                  {passStatus.active ? <Gem className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                  <div className="flex flex-col text-left">
+                     <span className="text-[8px] font-black uppercase leading-none tracking-widest">{passStatus.label}</span>
+                     <span className="text-[7px] font-bold opacity-60 leading-none mt-1">EXP: {passStatus.expiry}</span>
+                  </div>
+               </div>
+            )}
+
             <Link href="/search" className="text-slate-400 hover:text-white p-2 rounded-2xl hover:bg-white/5 transition-all active:scale-95 border border-white/5 pointer-events-auto">
               <Search className="h-5 w-5" />
             </Link>
@@ -132,35 +144,16 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-60 bg-[#0F172A] border-white/10 text-white rounded-[2rem] p-2 shadow-5xl animate-in fade-in zoom-in-95 duration-200 z-[1001]" align="end">
                   <DropdownMenuLabel className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Student Area</DropdownMenuLabel>
-                  
                   <DropdownNavItem href="/profile" icon={<User className="h-4 w-4 text-blue-400" />} label="My Profile" />
                   <DropdownNavItem href="/dashboard" icon={<Award className="h-4 w-4 text-emerald-400" />} label="My Results" />
-                  <DropdownNavItem href="/pass" icon={<Gem className="h-4 w-4 text-primary" />} label="Elite Pass" />
-                  
-                  {isAdmin && (
-                    <DropdownNavItem 
-                      href="/admin" 
-                      icon={<ShieldCheck className="h-4 w-4 text-rose-500" />} 
-                      label="Admin Portal" 
-                      className="bg-rose-500/10 mt-1"
-                    />
-                  )}
-                  
+                  <DropdownNavItem href="/pass" icon={<Gem className="h-4 w-4 text-primary" />} label="Elite Pass Hub" />
+                  {isAdmin && <DropdownNavItem href="/admin" icon={<ShieldCheck className="h-4 w-4 text-rose-500" />} label="Admin Portal" className="bg-rose-500/10 mt-1" />}
                   <DropdownMenuSeparator className="bg-white/5 my-2" />
-                  
-                  <DropdownMenuItem 
-                    onClick={handleLogout} 
-                    className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5 focus:text-rose-500 text-rose-500/80"
-                  >
-                    <LogOut className="h-4 w-4 shrink-0" />
-                    <span className="font-bold text-[12px] tracking-tight uppercase">Logout</span>
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5 focus:text-rose-500 text-rose-500/80"><LogOut className="h-4 w-4 shrink-0" /><span className="font-bold text-[12px] tracking-tight uppercase">Logout</span></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-95 border-none cursor-pointer">
-                <Link href="/login">Login</Link>
-              </Button>
+              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-95 border-none cursor-pointer"><Link href="/login">Login</Link></Button>
             )}
           </div>
         </div>

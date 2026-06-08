@@ -6,19 +6,16 @@ import Footer from "@/components/layout/Footer"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, Zap, ArrowRight, ShieldCheck, Gem, Loader2, Sparkles, Star, Lock } from "lucide-react"
+import { CheckCircle2, Zap, ArrowRight, ShieldCheck, Gem, Loader2, Sparkles, Star, Lock, Gift } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { useUser } from "@/firebase"
-import { useMemo } from "react"
+import { useUser, useFirestore } from "@/firebase"
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore"
+import { useMemo, useState } from "react"
+import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
-/**
- * @fileOverview Rebuilt Cracklix Pass Center.
- * SPECIFICATION: Tiered Plans (Monthly, Quarterly, Yearly) with industry pricing.
- */
-
-const PASS_PLANS = [
+const PAID_PLANS = [
   {
     id: "monthly",
     name: "Monthly PASS",
@@ -32,7 +29,7 @@ const PASS_PLANS = [
       "Premium Sectional Tests",
       "All Official PYQ Papers",
       "Regional Rank Index",
-      "Basic AI Rationalization"
+      "AI Rationalization Tutors"
     ]
   },
   {
@@ -69,14 +66,48 @@ const PASS_PLANS = [
 ];
 
 export default function PassPage() {
-  const { profile, loading } = useUser()
+  const { user, profile, loading } = useUser()
+  const db = useFirestore()
+  const { toast } = useToast()
+  const [claiming, setClaiming] = useState(false)
 
   const activePassLabel = useMemo(() => {
      if (!profile?.pass?.active) return null;
      const expiry = new Date(profile.pass.expiryDate);
-     if (expiry < new Date()) return null;
+     if (expiry < new Date()) return "PASS EXPIRED";
      return `ACTIVE: Expires ${expiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
   }, [profile]);
+
+  const handleClaimFreePass = async () => {
+    if (!user || !db) return
+    if (profile?.pass?.freePassClaimed) {
+      toast({ variant: "destructive", title: "Audit Blocked", description: "Free pass has already been claimed for this account." })
+      return
+    }
+
+    setClaiming(true)
+    try {
+      const expiry = new Date()
+      expiry.setDate(expiry.getDate() + 7)
+      
+      await updateDoc(doc(db, "users", user.uid), {
+        pass: {
+          active: true,
+          plan: 'FREE_PASS',
+          purchaseDate: new Date().toISOString(),
+          expiryDate: expiry.toISOString(),
+          freePassClaimed: true
+        },
+        updatedAt: serverTimestamp()
+      })
+
+      toast({ title: "Free Pass Activated", description: "Your 7-day preparation node is now live." })
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Claim Failed" })
+    } finally {
+      setClaiming(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#020817] font-body pb-safe overflow-x-hidden text-white">
@@ -89,6 +120,7 @@ export default function PassPage() {
            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <Badge className={cn(
                  "px-6 py-2 rounded-full font-black uppercase text-[10px] tracking-[0.2em] mb-8 shadow-2xl",
+                 activePassLabel === 'PASS EXPIRED' ? "bg-rose-500/20 text-rose-400 border-rose-500/30" :
                  activePassLabel ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-primary/20 text-primary border-primary/30"
               )}>
                  {activePassLabel || "Elite Preparation Registry 2026"}
@@ -102,16 +134,32 @@ export default function PassPage() {
            </motion.div>
         </div>
 
-        {/* Benefits Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-24 max-w-5xl mx-auto">
-           <Benefit icon={<Zap className="text-primary" />} label="Premium Mocks" />
-           <Benefit icon={<ShieldCheck className="text-blue-500" />} label="Subject Tests" />
-           <Benefit icon={<Star className="text-amber-500" />} label="PYQ Access" />
-           <Benefit icon={<Sparkles className="text-emerald-500" />} label="AI Tutors" />
-        </div>
+        {/* Phase 4: Free Pass Node */}
+        {!profile?.pass?.freePassClaimed && (
+           <div className="max-w-xl mx-auto mb-24">
+              <Card className="bg-emerald-500/10 border-2 border-emerald-500/20 rounded-[3rem] p-10 md:p-12 text-center space-y-8 shadow-3xl shadow-emerald-500/5 group hover:border-emerald-500/40 transition-all">
+                 <div className="h-16 w-16 bg-emerald-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-2xl transition-transform group-hover:scale-110">
+                    <Gift className="h-8 w-8" />
+                 </div>
+                 <div className="space-y-2">
+                    <h3 className="text-3xl font-headline font-black uppercase text-emerald-400">Claim Free Pass</h3>
+                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">7 DAYS UNRESTRICTED AUDIT</p>
+                 </div>
+                 <p className="text-sm text-slate-300 font-medium">New aspirants can claim a one-time 7-day trial pass to experience all premium content.</p>
+                 <Button 
+                   onClick={handleClaimFreePass}
+                   disabled={claiming}
+                   className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[11px] tracking-[0.2em] rounded-2xl shadow-xl transition-all active:scale-95"
+                 >
+                    {claiming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-5 w-5 mr-3" />}
+                    Claim FREE Pass
+                 </Button>
+              </Card>
+           </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 items-stretch justify-center">
-           {PASS_PLANS.map((plan, idx) => (
+           {PAID_PLANS.map((plan, idx) => (
              <motion.div 
                key={plan.id} 
                initial={{ opacity: 0, y: 30 }} 
@@ -164,7 +212,7 @@ export default function PassPage() {
                    <CardFooter className="p-10 md:p-12 pt-0">
                       <Button asChild className="w-full h-16 md:h-20 rounded-[2rem] bg-primary hover:bg-orange-600 text-white font-black uppercase text-[11px] tracking-[0.2em] shadow-3xl transition-all active:scale-95 border-none">
                          <Link href={`/checkout?plan=${plan.id}`}>
-                            BUY PASS <ArrowRight className="ml-3 h-5 w-5" />
+                            BUY NOW <ArrowRight className="ml-3 h-5 w-5" />
                          </Link>
                       </Button>
                    </CardFooter>
@@ -172,33 +220,8 @@ export default function PassPage() {
              </motion.div>
            ))}
         </div>
-
-        <div className="mt-32 p-12 md:p-24 rounded-[4rem] bg-white/5 text-white relative overflow-hidden border border-white/5 text-left">
-           <div className="absolute top-0 right-0 p-16 opacity-5 rotate-12"><Star className="h-80 w-80" /></div>
-           <div className="max-w-3xl relative z-10 space-y-8">
-              <h2 className="text-4xl md:text-6xl font-headline font-black uppercase tracking-tight">Full Platform <br/> Mastery Node</h2>
-              <p className="text-base md:text-xl text-slate-400 font-medium leading-relaxed max-w-xl">
-                 One institutional pass for all recruitments. Don't waste money on separate series. Access every premium node verified by Arsh Grewal Management.
-              </p>
-              <div className="flex flex-col sm:row items-center gap-6 pt-4">
-                 <Button asChild className="w-full sm:w-auto h-16 px-12 bg-white text-black hover:bg-slate-200 rounded-2xl font-black uppercase tracking-widest text-xs border-none">
-                    <Link href="/mocks">Explore Free Catalog</Link>
-                 </Button>
-                 <Link href="/contact" className="text-slate-500 hover:text-white font-black uppercase text-[10px] tracking-widest">Inquire for Library/Coaching Pass</Link>
-              </div>
-           </div>
-        </div>
       </main>
       <Footer />
     </div>
   )
-}
-
-function Benefit({ icon, label }: any) {
-   return (
-      <div className="p-6 bg-white/5 rounded-[2.5rem] border border-white/5 flex flex-col items-center gap-4 text-center">
-         <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center shadow-inner">{icon}</div>
-         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</span>
-      </div>
-   )
 }

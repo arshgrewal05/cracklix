@@ -26,11 +26,6 @@ import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
-/**
- * @fileOverview Institutional Mock Node Gateway v21.0.
- * DEBUG: Added runtime logs for accessLevel, isPremium, and user.pass.active.
- */
-
 export default function MockOverviewPage() {
   const params = useParams()
   const router = useRouter()
@@ -49,12 +44,8 @@ export default function MockOverviewPage() {
       if (mockLoading) return;
       if (!mock || !db) { setAccessChecked(true); return; }
 
-      const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
-      const isPremium = tier === 'PREMIUM';
-
-      // RUNTIME DEBUG LOGS
-      console.log(`[RUNTIME_VAL] GATEWAY | accessLevel: ${mock.accessLevel} | isPremium: ${isPremium} | user.pass.active: ${profile?.pass?.active}`);
-
+      const isPremium = mock.accessLevel === 'PREMIUM';
+      
       if (user) {
          try {
            const resSnap = await getDocs(query(collection(db, "results"), where("userId", "==", user.uid), where("mockId", "==", mockId), limit(1)));
@@ -62,21 +53,20 @@ export default function MockOverviewPage() {
          } catch (e) {}
       }
 
-      // If test is Free, always unlock
-      if (!isPremium) { setIsLocked(false); setAccessChecked(true); return; }
+      if (!isPremium) { 
+        setIsLocked(false); 
+        setAccessChecked(true); 
+        return; 
+      }
 
-      // Evaluate Pass Whitelist
       let hasPass = false;
+      const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN';
       
-      const role = (profile?.role || '').toUpperCase();
-      if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
+      if (isAdmin) {
          hasPass = true;
       } else if (profile?.pass?.active === true) {
-         const expiry = profile.pass.expiryDate ? new Date(profile.pass.expiryDate) : null;
-         if (expiry && expiry > new Date()) hasPass = true;
-      } else {
-         const status = (profile?.status || '').trim().toLowerCase();
-         if (status !== '' && status !== 'free' && status !== 'student') hasPass = true;
+         const expiry = new Date(profile.pass.expiryDate);
+         if (expiry > new Date()) hasPass = true;
       }
       
       setIsLocked(!hasPass);
@@ -96,7 +86,7 @@ export default function MockOverviewPage() {
 
   if (!mock) return <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4"><Info className="h-12 w-12 opacity-10" /><p className="font-black uppercase tracking-widest text-xs">Registry node missing</p></div>;
 
-  const tierField = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+  const isPremium = mock.accessLevel === 'PREMIUM';
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-body">
@@ -109,8 +99,11 @@ export default function MockOverviewPage() {
                 <Button variant="ghost" onClick={() => router.back()} className="rounded-full h-10 w-10 border border-slate-200 bg-white p-0"><ChevronLeft className="h-5 w-5" /></Button>
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
-                      <Badge className={cn("border-none text-[8px] font-black px-2 py-0.5 rounded font-black uppercase text-[8px] tracking-widest shadow-sm", tierField === 'PREMIUM' ? "bg-amber-100 text-amber-600" : "bg-emerald-50 text-emerald-600")}>
-                        {tierField}
+                      <Badge className={cn(
+                        "border-none text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest shadow-sm", 
+                        isPremium ? "bg-amber-100 text-amber-600" : "bg-emerald-50 text-emerald-600"
+                      )}>
+                        {isPremium ? "PREMIUM" : "FREE"}
                       </Badge>
                   </div>
                   <h1 className="text-xl md:text-4xl font-headline font-black text-[#0F172A] uppercase leading-tight tracking-tight">{mock.title}</h1>
@@ -124,7 +117,7 @@ export default function MockOverviewPage() {
                  {isLocked ? (
                     <Button onClick={() => router.push('/pass')} className="w-full h-14 md:h-16 px-10 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-[11px] rounded-2xl shadow-xl gap-3 border-none transition-all active:scale-95 flex items-center justify-center"
                     >
-                      <Lock className="h-5 w-5" /> UNLOCK TEST
+                      <Lock className="h-5 w-5" /> UNLOCK WITH PASS
                     </Button>
                  ) : isLimitReached ? (
                     <div className="bg-rose-50 border border-rose-100 p-4 rounded-xl flex items-center gap-4 text-left shadow-sm">

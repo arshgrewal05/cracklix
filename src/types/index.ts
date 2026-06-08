@@ -6,7 +6,6 @@ export type ContentStatus = 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'ARCHIVED';
 export type QuestionLifecycleStatus = 'UNUSED' | 'USED' | 'LOCKED' | 'DUPLICATE' | 'REPEATED';
 export type Gender = 'Male' | 'Female' | 'Other';
 
-// SPECIFICATION: Access Levels
 export type AccessLevel = 'FREE' | 'PREMIUM';
 
 export type QuestionStatus = 'not-visited' | 'not-answered' | 'answered' | 'marked' | 'answered-marked';
@@ -46,7 +45,6 @@ export interface MockTest {
   boardIds?: string[];
   examIds: string[];
   mockType: MockType;
-  // SPECIFICATION: Unified Access Level
   accessLevel: AccessLevel;
   duration: number;
   totalQuestions: number;
@@ -80,11 +78,11 @@ export interface UserProfile {
   gender?: Gender;
   subscriptions?: string[];
   pinnedExams?: string[];
-  // SPECIFICATION: Pass Subscription System
   pass?: {
     active: boolean;
-    plan: 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
+    plan: 'FREE_PASS' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
     purchaseDate: string;
     expiryDate: string;
+    freePassClaimed: boolean;
   };
 }
