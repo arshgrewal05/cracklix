@@ -41,7 +41,8 @@ import {
   History,
   Globe,
   LayoutGrid,
-  Tags
+  Tags,
+  SearchCode
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
 import { collection, doc, setDoc, serverTimestamp, query, limit, getDocs, writeBatch, where, documentId, orderBy } from "firebase/firestore"
@@ -51,8 +52,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Mock Architect v65.0.
- * UPDATED: Multi-Board Assignment Hub and Test Category Integration.
+ * @fileOverview Institutional Mock Architect v68.0.
+ * UPDATED: Integrated Subject Hub Registry for Active Assembly and added Target Hub context.
  */
 
 export default function MockBuilderPage() {
@@ -527,52 +528,103 @@ function MockBuilderContent() {
 
               <TabsContent value="assembly" className="space-y-12 m-0 animate-in fade-in duration-300">
                  <div className="space-y-10">
-                    {sections.map((sec, sIdx) => (
-                       <div key={sec.id} className="space-y-6">
-                          <div className="flex items-center justify-between bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                             <div className="flex items-center gap-6">
-                                <div className="h-10 w-10 bg-[#0F172A] text-white rounded-xl flex items-center justify-center font-black text-sm shadow-xl">{sIdx + 1}</div>
-                                <Input 
-                                  value={sec.name} 
-                                  onChange={e => setSections(p => p.map(s => s.id === sec.id ? { ...s, name: e.target.value } : s))} 
-                                  className="h-10 w-72 bg-transparent border-none font-black uppercase text-sm focus-visible:ring-0 p-0 text-[#0F172A]" 
-                                />
-                             </div>
-                             <div className="flex items-center gap-4">
-                                <Badge className="bg-primary text-white border-none font-black text-[9px] px-3 py-1 uppercase">{sec.questions.length} Assets Linked</Badge>
-                                <Button variant="ghost" size="icon" onClick={() => setSections(p => p.filter(s => s.id !== sec.id))} className="h-10 w-10 text-rose-500 hover:bg-rose-50 rounded-xl"><Trash2 className="h-5 w-5" /></Button>
-                             </div>
-                          </div>
+                    <div className="flex items-center justify-between px-2">
+                       <div className="flex items-center gap-4">
+                          <Layers className="h-6 w-6 text-primary" />
+                          <h3 className="font-headline font-black text-2xl uppercase text-[#0F172A]">Active Assembly Hub</h3>
+                       </div>
+                       <div className="flex items-center gap-3">
+                          {mockData.boardIds?.map((bid: string) => (
+                             <Badge key={bid} className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase">TARGET: {bid}</Badge>
+                          ))}
+                       </div>
+                    </div>
 
-                          <div className="grid grid-cols-1 gap-2 pl-12">
-                             {sec.questions.map((q, qIdx) => (
-                                <div key={q.id} className="flex items-center justify-between p-4 bg-white border border-slate-50 rounded-2xl group/item hover:shadow-lg transition-all">
-                                   <div className="flex items-center gap-6 min-w-0">
-                                      <span className="text-[10px] font-black text-slate-300 w-6 uppercase">#{qIdx + 1}</span>
-                                      <p className="text-sm font-bold text-slate-500 truncate max-w-2xl">{q.englishQuestion}</p>
+                    <div className="grid grid-cols-1 gap-6">
+                      {sections.map((sec, sIdx) => (
+                        <Card key={sec.id} className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden border border-slate-50 hover:border-primary/20 transition-all group">
+                           <div className="flex items-center justify-between p-8 bg-slate-50/50 border-b border-slate-50">
+                              <div className="flex items-center gap-6">
+                                 <div className="h-10 w-10 bg-[#0F172A] text-white rounded-xl flex items-center justify-center font-black text-sm shadow-xl shrink-0">{sIdx + 1}</div>
+                                 <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                       <SearchCode className="h-3 w-3 text-primary" />
+                                       <span className="text-[10px] font-black uppercase text-primary tracking-widest">Subject Hub</span>
+                                    </div>
+                                    <Input 
+                                      value={sec.name} 
+                                      onChange={e => setSections(p => p.map(s => s.id === sec.id ? { ...s, name: e.target.value } : s))} 
+                                      className="h-10 w-full md:w-80 bg-transparent border-none font-black uppercase text-xl focus-visible:ring-0 p-0 text-[#0F172A]" 
+                                    />
+                                 </div>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                 <div className="text-right hidden md:block">
+                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">ASSETS LINKED</p>
+                                    <p className="text-xl font-headline font-black text-[#0F172A]">{sec.questions.length}</p>
+                                 </div>
+                                 <Button variant="ghost" size="icon" onClick={() => setSections(p => p.filter(s => s.id !== sec.id))} className="h-12 w-12 text-rose-500 hover:bg-rose-50 rounded-2xl transition-colors"><Trash2 className="h-5 w-5" /></Button>
+                              </div>
+                           </div>
+
+                           <div className="p-8 space-y-4">
+                              <div className="grid grid-cols-1 gap-2">
+                                 {sec.questions.map((q, qIdx) => (
+                                    <div key={q.id} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl group/item hover:bg-white hover:shadow-lg transition-all">
+                                       <div className="flex items-center gap-6 min-w-0">
+                                          <span className="text-[10px] font-black text-slate-300 w-6 uppercase">#{qIdx + 1}</span>
+                                          <p className="text-sm font-bold text-slate-600 truncate max-w-2xl">{q.englishQuestion}</p>
+                                       </div>
+                                       <button 
+                                         onClick={() => setSections(p => p.map(s => s.id === sec.id ? { ...s, questions: s.questions.filter((item: any) => item.id !== q.id) } : s))}
+                                         className="opacity-0 group-hover/item:opacity-100 text-rose-400 hover:text-rose-600 transition-all p-2"
+                                       >
+                                          <X className="h-4 w-4" />
+                                       </button>
+                                    </div>
+                                 ))}
+                                 {sec.questions.length === 0 && (
+                                    <div className="py-20 text-center border-2 border-dashed border-slate-100 rounded-[2.5rem] opacity-20 flex flex-col items-center gap-4">
+                                       <BookOpen className="h-12 w-12 text-slate-400" />
+                                       <p className="font-black uppercase tracking-[0.4em] text-[10px] text-slate-500">Awaiting Bank Link</p>
+                                    </div>
+                                 )}
+                              </div>
+                           </div>
+                        </Card>
+                      ))}
+                    </div>
+
+                    <div className="pt-10 border-t border-slate-100">
+                       <div className="flex flex-col items-center gap-6">
+                          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Institutional Assembly Protocol</p>
+                          <div className="flex flex-wrap justify-center gap-4 w-full">
+                             <Select onValueChange={(val) => {
+                                const sub = subjects?.find((s:any) => s.id === val);
+                                if (!sub) return;
+                                setSections([...sections, { id: `sec-${Date.now()}`, name: sub.name, questions: [] }]);
+                             }}>
+                                <SelectTrigger className="w-full md:w-[480px] h-20 bg-white border-dashed border-2 border-slate-200 rounded-[2.5rem] shadow-xl hover:border-primary transition-all flex items-center justify-center gap-4">
+                                   <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary"><Plus className="h-6 w-6" /></div>
+                                   <span className="font-black uppercase tracking-[0.2em] text-slate-500 text-sm">ADD SUBJECT HUB</span>
+                                </SelectTrigger>
+                                <SelectContent className="rounded-[2rem] p-4 shadow-5xl border-none">
+                                   <DropdownMenuLabel className="text-[9px] font-black uppercase text-slate-400 tracking-widest px-4 mb-2">Subject Registry</DropdownMenuLabel>
+                                   {subjects?.map((s: any) => (
+                                      <SelectItem key={s.id} value={s.id} className="rounded-xl px-6 py-4 font-black uppercase text-[11px] tracking-widest hover:bg-primary/5 cursor-pointer">
+                                         {s.name}
+                                      </SelectItem>
+                                   ))}
+                                   <div className="p-2 pt-4 border-t border-slate-100 mt-2">
+                                      <Button onClick={() => setSections([...sections, { id: `sec-${Date.now()}`, name: `Section ${sections.length + 1}`, questions: [] }])} variant="ghost" className="w-full rounded-xl h-12 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5">
+                                         <PlusCircle className="h-4 w-4 mr-2" /> Custom Section
+                                      </Button>
                                    </div>
-                                   <button 
-                                     onClick={() => setSections(p => p.map(s => s.id === sec.id ? { ...s, questions: s.questions.filter((item: any) => item.id !== q.id) } : s))}
-                                     className="opacity-0 group-hover/item:opacity-100 text-rose-400 hover:text-rose-600 transition-all p-2"
-                                   >
-                                      <X className="h-4 w-4" />
-                                   </button>
-                                </div>
-                             ))}
-                             {sec.questions.length === 0 && (
-                                <div className="py-12 text-center border-2 border-dashed border-slate-100 rounded-3xl opacity-20 italic font-black uppercase text-[10px] text-slate-400">Section Hub Empty</div>
-                             )}
+                                </SelectContent>
+                             </Select>
                           </div>
                        </div>
-                    ))}
-
-                    <Button 
-                      onClick={() => setSections([...sections, { id: `sec-${Date.now()}`, name: `Section ${sections.length + 1}`, questions: [] }])} 
-                      variant="outline" 
-                      className="w-full border-dashed border-2 h-20 rounded-[2.5rem] font-black uppercase text-[11px] tracking-[0.2em] text-slate-400 hover:border-primary hover:text-primary transition-all bg-white shadow-sm"
-                    >
-                       <PlusCircle className="h-5 w-5 mr-3" /> Add Recruitment Section
-                    </Button>
+                    </div>
                  </div>
               </TabsContent>
            </Tabs>
@@ -581,3 +633,12 @@ function MockBuilderContent() {
     </div>
   )
 }
+
+function FilterChip({ active, label, onClick, color = "text-slate-400" }: any) {
+   return (<button onClick={onClick} className={cn("px-6 py-2.5 rounded-xl font-black uppercase text-[9px] tracking-[0.2em] transition-all border-2 whitespace-nowrap", active ? "bg-[#0F172A] border-[#0F172A] text-white shadow-xl" : "bg-white border-slate-50 hover:border-slate-100 " + color)}>{label}</button>)
+}
+
+function DropdownMenuLabel({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <div className={cn("px-2 py-1.5 text-sm font-semibold", className)}>{children}</div>
+}
+
