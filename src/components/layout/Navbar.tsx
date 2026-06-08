@@ -24,8 +24,9 @@ import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Elite Global Navigation Hub v7.5.
- * FIXED: Hydration mismatch by deferring dynamic state rendering.
+ * @fileOverview Production-Grade Global Navigation v8.0.
+ * FIXED: All buttons and links respond on FIRST click via strict hydration mounting.
+ * FIXED: Mobile Sidebar no longer blocks desktop interaction nodes.
  */
 
 export default function Navbar() {
@@ -52,10 +53,20 @@ export default function Navbar() {
   const isFounder = user?.email === 'arshdeepgrewal1122@gmail.com';
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
 
+  // Render Skeleton for initial pass to avoid hydration click-deadlock
+  if (!mounted) {
+    return (
+      <div className="h-16 w-full bg-[#0B1528] flex items-center justify-between px-6 border-b border-white/5">
+        <Skeleton className="h-8 w-32 bg-white/5" />
+        <Skeleton className="h-10 w-10 rounded-full bg-white/5" />
+      </div>
+    );
+  }
+
   return (
     <div className="sticky top-0 z-[1000] w-full pointer-events-auto">
-      {mounted && settings?.showAnnouncement && (
-        <div className="bg-primary text-white py-1.5 px-4 flex items-center justify-center gap-2 overflow-hidden relative shadow-2xl">
+      {settings?.showAnnouncement && (
+        <div className="bg-primary text-white py-1.5 px-4 flex items-center justify-center gap-2 overflow-hidden relative shadow-2xl pointer-events-none">
           <Megaphone className="h-3 w-3 shrink-0 animate-bounce" />
           <p className="text-[9px] font-black uppercase tracking-[0.3em] whitespace-nowrap overflow-hidden text-ellipsis">
             {settings.announcement}
@@ -69,14 +80,14 @@ export default function Navbar() {
             <div className="flex items-center gap-1 md:gap-6">
                <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
                  <SheetTrigger asChild>
-                   <button className="text-white p-2 hover:bg-white/5 rounded-2xl transition-all active:scale-90 cursor-pointer border border-white/5">
+                   <button className="text-white p-2 hover:bg-white/5 rounded-2xl transition-all active:scale-90 cursor-pointer border border-white/5 focus:outline-none">
                      <Menu className="h-5 w-5" />
                    </button>
                  </SheetTrigger>
                  <SheetContent 
                    side="left" 
                    className={cn(
-                     "p-0 border-none w-[290px] overflow-hidden shadow-5xl transition-all duration-200 bg-[#0F172A]",
+                     "p-0 border-none w-[290px] overflow-hidden shadow-5xl transition-all duration-200 bg-[#0F172A] z-[2000]",
                      "top-0 h-screen"
                    )}
                  >
@@ -90,36 +101,36 @@ export default function Navbar() {
             </div>
 
             <div className="hidden lg:flex items-center gap-10 text-[12px] font-black uppercase tracking-[0.2em] text-[#7A8B9E]">
-              <Link href="/my-exams" className={cn("transition-colors flex items-center gap-2 hover:text-white", mounted && pathname === '/my-exams' ? 'text-white' : '')}>
+              <Link href="/my-exams" className={cn("transition-colors flex items-center gap-2 hover:text-white pointer-events-auto", pathname === '/my-exams' ? 'text-white' : '')}>
                 <Target className="h-4 w-4 text-primary" /> My Exams
               </Link>
-              <Link href="/mocks" className={cn("transition-colors hover:text-white", mounted && pathname === '/mocks' ? 'text-white' : '')}>
+              <Link href="/mocks" className={cn("transition-colors hover:text-white pointer-events-auto", pathname === '/mocks' ? 'text-white' : '')}>
                 Mocks
               </Link>
-              <Link href="/pass" className={cn("transition-all flex items-center gap-2 px-5 py-2 rounded-xl border", mounted && pathname === '/pass' ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'bg-primary/10 border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/20')}>
+              <Link href="/pass" className={cn("transition-all flex items-center gap-2 px-5 py-2 rounded-xl border pointer-events-auto", pathname === '/pass' ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'bg-primary/10 border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/20')}>
                 <Gem className="h-4 w-4" /> PASS
               </Link>
-              <Link href="/current-affairs" className={cn("transition-colors flex items-center gap-2 hover:text-white", mounted && pathname === '/current-affairs' ? 'text-white' : '')}>
+              <Link href="/current-affairs" className={cn("transition-colors flex items-center gap-2 hover:text-white pointer-events-auto", pathname === '/current-affairs' ? 'text-white' : '')}>
                 <Newspaper className="h-4 w-4 text-primary" /> Current Affairs
               </Link>
             </div>
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
-            <Link href="/search" className="text-slate-400 hover:text-white p-2 rounded-2xl hover:bg-white/5 transition-all active:scale-95 border border-white/5">
+            <Link href="/search" className="text-slate-400 hover:text-white p-2 rounded-2xl hover:bg-white/5 transition-all active:scale-95 border border-white/5 pointer-events-auto">
               <Search className="h-5 w-5" />
             </Link>
 
-            {!mounted || loading ? (
+            {loading ? (
               <Skeleton className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-white/5" />
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-9 w-9 md:h-11 md:w-11 p-0 rounded-xl md:rounded-2xl overflow-hidden border-2 border-primary/20 hover:border-primary transition-all bg-[#0F172A] shadow-2xl focus-visible:ring-0 active:scale-95">
+                  <Button variant="ghost" className="h-9 w-9 md:h-11 md:w-11 p-0 rounded-xl md:rounded-2xl overflow-hidden border-2 border-primary/20 hover:border-primary transition-all bg-[#0F172A] shadow-2xl focus-visible:ring-0 active:scale-95 cursor-pointer">
                     <StudentAvatar profile={profile} className="h-full w-full border-none" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-60 bg-[#0F172A] border-white/10 text-white rounded-[2rem] p-2 shadow-5xl animate-in fade-in zoom-in-95 duration-200" align="end">
+                <DropdownMenuContent className="w-60 bg-[#0F172A] border-white/10 text-white rounded-[2rem] p-2 shadow-5xl animate-in fade-in zoom-in-95 duration-200 z-[1001]" align="end">
                   <DropdownMenuLabel className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Student Area</DropdownMenuLabel>
                   
                   <DropdownNavItem href="/profile" icon={<User className="h-4 w-4 text-blue-400" />} label="My Profile" />
@@ -147,7 +158,7 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-95 border-none">
+              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-95 border-none cursor-pointer">
                 <Link href="/login">Login</Link>
               </Button>
             )}
@@ -161,7 +172,7 @@ export default function Navbar() {
 function DropdownNavItem({ href, icon, label, className }: any) {
   return (
     <DropdownMenuItem asChild className={cn("flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5", className)}>
-      <Link href={href} className="w-full flex items-center gap-3">
+      <Link href={href} className="w-full flex items-center gap-3 pointer-events-auto">
         <span className="shrink-0">{icon}</span>
         <span className="font-bold text-[12px] tracking-tight uppercase">{label}</span>
       </Link>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
@@ -47,8 +46,9 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Fully Restored Admin Layout v12.0.
- * RECOVERED: All administrative nodes including QA, Health, Gazette, and Reports.
+ * @fileOverview Hardened Admin Layout v13.0.
+ * FIXED: Navigation clicks responding on first tick by simplifying event hierarchy.
+ * FIXED: Mobile Sheet backdrop no longer blocks desktop interactions.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -57,36 +57,42 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isFounder = user?.email === 'arshdeepgrewal1122@gmail.com';
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && mounted) {
       if (!user) {
         router.push('/login?returnUrl=/admin');
       } else if (!isAdmin) {
         router.push('/dashboard');
       }
     }
-  }, [user, profile, loading, router, isAdmin])
+  }, [user, profile, loading, router, isAdmin, mounted])
 
   const handleLogout = async () => {
     await signOut(auth)
     router.push('/login')
   }
 
-  if (loading) return (
+  // Hydration Guard for initial load
+  if (!mounted || loading) return (
     <div className="h-screen w-full bg-[#0F172A] flex flex-col items-center justify-center space-y-6">
        <ShieldCheck className="h-12 w-12 text-primary animate-pulse" />
-       <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Checking Access...</p>
+       <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Initializing Registry...</p>
     </div>
   )
   
   if (!user || !isAdmin) return null
 
   const SideNavContent = () => (
-    <div className="flex flex-col h-full bg-[#0F172A]">
+    <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto">
        <div className="p-6">
           <Logo variant="light" className="origin-left" />
        </div>
@@ -138,14 +144,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </SidebarGroup>
        </div>
 
-       <div className="p-6 border-t border-white/5 bg-black/20">
+       <div className="p-6 border-t border-white/5 bg-black/20 shrink-0">
           <div className="flex items-center gap-3">
              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                 <User className="h-4 w-4" />
              </div>
              <div className="text-left">
                 <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none mb-1">ADMIN LOGIN</p>
-                <p className="text-[11px] font-black text-white uppercase tracking-tight">{profile?.name || 'ADMIN'}</p>
+                <p className="text-[11px] font-black text-white uppercase tracking-tight truncate max-w-[120px]">{profile?.name || 'ADMIN'}</p>
              </div>
           </div>
        </div>
@@ -154,20 +160,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-white font-body overflow-x-hidden">
-        <Sidebar className="hidden lg:flex border-r border-white/5 bg-[#0F172A]">
+      <div className="flex min-h-screen w-full bg-white font-body overflow-x-hidden pointer-events-auto">
+        <Sidebar className="hidden lg:flex border-r border-white/5 bg-[#0F172A] z-[50]">
            <SideNavContent />
         </Sidebar>
         
-        <SidebarInset className="flex flex-col bg-white min-w-0 max-w-full">
-          <header className="h-14 md:h-16 border-b border-slate-200 flex items-center px-4 md:px-6 justify-between bg-white sticky top-0 z-[50] shrink-0">
+        <SidebarInset className="flex flex-col bg-white min-w-0 max-w-full relative">
+          <header className="h-14 md:h-16 border-b border-slate-200 flex items-center px-4 md:px-6 justify-between bg-white sticky top-0 z-[100] shrink-0">
             <div className="flex items-center gap-1 md:gap-3 overflow-hidden">
               <div className="lg:hidden">
                  <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                     <SheetTrigger asChild>
-                       <button className="p-2 rounded-xl bg-slate-50 text-[#0F172A]"><Menu className="h-5 w-5" /></button>
+                       <button className="p-2 rounded-xl bg-slate-50 text-[#0F172A] hover:bg-slate-100 transition-colors cursor-pointer"><Menu className="h-5 w-5" /></button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="p-0 border-none w-[280px] bg-[#0F172A]">
+                    <SheetContent side="left" className="p-0 border-none w-[280px] bg-[#0F172A] z-[1001]">
                        <SheetHeader className="sr-only">
                           <SheetTitle>Admin Menu</SheetTitle>
                        </SheetHeader>
@@ -175,7 +181,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </SheetContent>
                  </Sheet>
               </div>
-              <SidebarTrigger className="hidden lg:flex text-[#0F172A]" />
+              <SidebarTrigger className="hidden lg:flex text-[#0F172A] hover:bg-slate-50 cursor-pointer" />
               
               <div className="h-4 w-[1px] bg-slate-200 mx-2 hidden md:block" />
               <BackButton label="Dashboard" fallback="/admin" className="hidden xs:flex" />
@@ -187,11 +193,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
             
-            <Button variant="ghost" size="icon" onClick={handleLogout} className="text-slate-400 hover:text-rose-500 rounded-xl">
+            <Button variant="ghost" size="icon" onClick={handleLogout} className="text-slate-400 hover:text-rose-500 rounded-xl cursor-pointer">
                <LogOut className="h-5 w-5" />
             </Button>
           </header>
-          <main className="flex-1 p-4 md:p-8 bg-white overflow-y-auto overflow-x-hidden min-w-0">
+          <main className="flex-1 p-4 md:p-8 bg-white overflow-y-auto overflow-x-hidden min-w-0 pointer-events-auto">
             <div className="max-w-full">
                {children}
             </div>
@@ -208,9 +214,9 @@ function AdminNavItem({ icon, label, href, active }: { icon: React.ReactNode, la
       <SidebarMenuButton 
         asChild 
         isActive={active}
-        className={`px-6 transition-all font-medium h-12 group ${active ? 'bg-white/5 text-primary' : 'hover:bg-white/5 hover:text-primary text-white/60'}`}
+        className={`px-6 transition-all font-medium h-12 group cursor-pointer ${active ? 'bg-white/5 text-primary' : 'hover:bg-white/5 hover:text-primary text-white/60'}`}
       >
-        <Link href={href} className="flex items-center gap-4 w-full text-left">
+        <Link href={href} className="flex items-center gap-4 w-full text-left pointer-events-auto">
           <div className="shrink-0 flex items-center justify-center size-5">
             {icon}
           </div>
