@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect, Suspense } from "react"
@@ -50,8 +49,8 @@ import { MockType, Difficulty, AccessType, LanguageDisplayMode } from "@/types"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Elite Institutional Mock Architect v47.0.
- * FIXED: Strict Uniqueness Protocol applied to Exam and Board selection (hides duplicates by name).
+ * @fileOverview Elite Institutional Mock Architect v48.0.
+ * HARDENED: Deploy Engine with Batch Chunking and Pre-flight validation.
  */
 
 const SELECTION_RULES = [
@@ -88,7 +87,6 @@ function MockBuilderContent() {
   const { data: allExamsRaw } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
   const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects") : null), [db]))
   
-  // UNIQUE BOARD REGISTRY FILTER
   const boards = useMemo(() => {
      if (!rawBoards) return [];
      const unique = new Map();
@@ -99,7 +97,6 @@ function MockBuilderContent() {
      return Array.from(unique.values()).sort((a, b) => a.abbreviation.localeCompare(b.abbreviation));
   }, [rawBoards]);
 
-  // UNIQUE EXAM REGISTRY FILTER (Prevents redundant nodes like PSTET 1, PSTET 1 from showing)
   const allExams = useMemo(() => {
      if (!allExamsRaw) return [];
      const unique = new Map();
@@ -220,11 +217,16 @@ function MockBuilderContent() {
       return
     }
 
+    const flatQuestionIds = sections.flatMap(s => s.questions.map(q => q.id));
+    if (flatQuestionIds.length === 0) {
+      toast({ variant: "destructive", title: "Deployment Rejected", description: "At least one question must be linked to a section." })
+      return;
+    }
+
     setIsPublishing(true)
     const finalId = mockId || `mock-${Date.now()}`
     const mockRef = doc(db, "mocks", finalId)
     
-    const flatQuestionIds = sections.flatMap(s => s.questions.map(q => q.id));
     const sectionMetadata = sections.map(s => ({ name: s.name, count: s.questions.length })).filter(s => s.count > 0);
 
     let finalExamIds = [...(mockData.examIds || [])];
@@ -246,20 +248,27 @@ function MockBuilderContent() {
       totalMarks: flatQuestionIds.length * (parseFloat(mockData.positiveMarks) || 1),
     };
 
-    // Hardened control for undefined fields
-    Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+    // Strict cleaning
+    Object.keys(payload).forEach(k => (payload[k] === undefined || payload[k] === null) && delete payload[k]);
 
     try {
       await setDoc(mockRef, payload, { merge: true });
-      const batch = writeBatch(db);
-      flatQuestionIds.forEach(id => {
-         batch.update(doc(db, "questions", id), {
+      
+      // CHUNKED BATCH UPDATE (To handle > 500 questions)
+      const CHUNK_SIZE = 450;
+      for (let i = 0; i < flatQuestionIds.length; i += CHUNK_SIZE) {
+        const chunk = flatQuestionIds.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(db);
+        chunk.forEach(id => {
+          batch.update(doc(db, "questions", id), {
             status: 'USED',
             usedCount: (questionBank.find(q => q.id === id)?.usedCount || 0) + 1,
             lastUsedDate: new Date().toISOString()
-         });
-      });
-      await batch.commit();
+          });
+        });
+        await batch.commit();
+      }
+
       toast({ title: "Series Deployed", description: "The mock has been synced to the registry." });
       router.push("/admin/mocks")
     } catch (e: any) {

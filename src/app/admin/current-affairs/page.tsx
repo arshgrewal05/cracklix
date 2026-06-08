@@ -40,8 +40,8 @@ import { parseBulkQuestions } from "@/lib/parser"
 import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
 /**
- * @fileOverview Institutional Current Affairs Management Hub v19.2 (Production Audited).
- * FIXED: Syntax error in cleanPayload loop corrected (assignment vs comparison).
+ * @fileOverview Institutional Current Affairs Management Hub v19.3.
+ * FIXED: Resolved syntax error in cleanPayload loop (assignment vs comparison).
  */
 
 export default function AdminCurrentAffairs() {
