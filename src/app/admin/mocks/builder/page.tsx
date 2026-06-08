@@ -52,8 +52,10 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Mock Architect v12.1.
- * UPDATED: Implemented strict unique filtering for Boards and Exams to remove redundancy.
+ * @fileOverview Institutional Mock Architect v12.5.
+ * UPDATED: Enhanced Question Bank display with Board Identity.
+ * FIXED: Strictly removed all duplicate board and exam entries using ID and Name normalization.
+ * STYLE: Set Target Vertical labels to high-contrast black.
  */
 
 export default function MockBuilderPage() {
@@ -80,12 +82,13 @@ function MockBuilderContent() {
   const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
   const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects") : null), [db]))
   
-  // --- UNIQUE REGISTRY FILTERS ---
+  // --- STRICT UNIQUE REGISTRY FILTERS ---
   const uniqueBoards = useMemo(() => {
     if (!boards) return [];
     const unique = new Map();
     boards.forEach(b => {
-      if (!unique.has(b.id)) unique.set(b.id, b);
+      const key = b.id || b.abbreviation;
+      if (!unique.has(key)) unique.set(key, b);
     });
     return Array.from(unique.values()).sort((a, b) => (a.abbreviation || "").localeCompare(b.abbreviation || ""));
   }, [boards]);
@@ -94,7 +97,8 @@ function MockBuilderContent() {
     if (!exams) return [];
     const unique = new Map();
     exams.forEach(e => {
-      if (!unique.has(e.id)) unique.set(e.id, e);
+      const key = e.id || e.name?.toLowerCase().trim();
+      if (!unique.has(key)) unique.set(key, e);
     });
     return Array.from(unique.values()).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, [exams]);
@@ -371,12 +375,12 @@ function MockBuilderContent() {
                     </div>
 
                     <div className="space-y-3">
-                       <Label className="text-[9px] font-black uppercase text-slate-400">Target Authority Boards</Label>
+                       <Label className="text-[9px] font-black uppercase text-slate-500">Target Authority Boards</Label>
                        <div className="max-h-32 overflow-y-auto custom-scrollbar pr-2 space-y-2">
                           {uniqueBoards?.map((b: any) => (
                              <div key={b.id} className="flex items-center space-x-3 p-2 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => toggleBoardId(b.id)}>
                                 <Checkbox checked={mockData.boardIds?.includes(b.id) || mockData.boardId === b.id} className="border-slate-300" />
-                                <span className="text-[10px] font-bold text-[#0F172A] uppercase">{b.abbreviation} Hub</span>
+                                <span className="text-[10px] font-black text-[#000000] uppercase">{b.abbreviation} Hub</span>
                              </div>
                           ))}
                        </div>
@@ -384,12 +388,12 @@ function MockBuilderContent() {
 
                     {mockData.assignmentMode !== 'AUTHORITY' && (
                        <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
-                          <Label className="text-[9px] font-black uppercase text-slate-400">Target Recruitment Verticals</Label>
+                          <Label className="text-[9px] font-black uppercase text-[#000000]">Target Recruitment Verticals</Label>
                           <div className="max-h-48 overflow-y-auto custom-scrollbar pr-2 space-y-2">
                              {uniqueExams?.filter(e => mockData.boardIds?.includes(e.boardId) || !mockData.boardIds?.length).map((e: any) => (
                                 <div key={e.id} className="flex items-center space-x-3 p-2 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => toggleExamId(e.id)}>
                                    <Checkbox checked={mockData.examIds?.includes(e.id)} className="border-slate-300" />
-                                   <span className="text-[10px] font-bold text-[#0F172A] uppercase">{e.name}</span>
+                                   <span className="text-[10px] font-black text-[#000000] uppercase">{e.name}</span>
                                 </div>
                              ))}
                           </div>
@@ -530,31 +534,37 @@ function MockBuilderContent() {
                        Array.from({length: 5}).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-2xl bg-white" />)
                     ) : filteredBank.length > 0 ? (
                        <div className="grid grid-cols-1 gap-3">
-                          {filteredBank.map((q) => (
-                             <div 
-                               key={q.id} 
-                               onClick={() => setBankSelection(p => p.includes(q.id) ? p.filter(id => id !== q.id) : [...p, q.id])}
-                               className={cn(
-                                 "group p-6 rounded-[2rem] border-2 transition-all cursor-pointer flex items-center gap-8 text-left",
-                                 bankSelection.includes(q.id) ? "bg-primary/5 border-primary shadow-xl" : "bg-white border-slate-100 hover:border-slate-300"
-                               )}
-                             >
-                                <div className={cn(
-                                   "h-8 w-8 rounded-full border-[3px] flex items-center justify-center transition-all",
-                                   bankSelection.includes(q.id) ? "bg-primary border-primary" : "border-slate-200 group-hover:border-primary/40"
-                                )}>
-                                   {bankSelection.includes(q.id) && <CheckCircle2 className="h-5 w-5 text-white" />}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                   <div className="flex items-center gap-3 mb-2">
-                                      <Badge variant="outline" className="bg-slate-50 border-slate-100 text-[#0F172A] font-black uppercase text-[8px] px-2 py-0.5">{q.subjectId}</Badge>
-                                      {q.status === 'USED' && <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black uppercase">Used In Mock</Badge>}
-                                      {q.status === 'LOCKED' && <Badge className="bg-amber-50 text-amber-600 border-none text-[8px] font-black uppercase">Locked</Badge>}
+                          {filteredBank.map((q) => {
+                             const board = uniqueBoards.find(b => b.id === q.boardId);
+                             return (
+                                <div 
+                                  key={q.id} 
+                                  onClick={() => setBankSelection(p => p.includes(q.id) ? p.filter(id => id !== q.id) : [...p, q.id])}
+                                  className={cn(
+                                    "group p-6 rounded-[2rem] border-2 transition-all cursor-pointer flex items-center gap-8 text-left",
+                                    bankSelection.includes(q.id) ? "bg-primary/5 border-primary shadow-xl" : "bg-white border-slate-100 hover:border-slate-300"
+                                  )}
+                                >
+                                   <div className={cn(
+                                      "h-8 w-8 rounded-full border-[3px] flex items-center justify-center transition-all",
+                                      bankSelection.includes(q.id) ? "bg-primary border-primary" : "border-slate-200 group-hover:border-primary/40"
+                                   )}>
+                                      {bankSelection.includes(q.id) && <CheckCircle2 className="h-5 w-5 text-white" />}
                                    </div>
-                                   <p className="font-bold text-[#0F172A] truncate text-base">{q.englishQuestion}</p>
+                                   <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-3 mb-2">
+                                         <Badge className="bg-[#0F172A] text-white border-none font-black uppercase text-[8px] px-3 py-1 rounded shadow-sm">
+                                            {board?.abbreviation || q.boardId || 'UNMAPPED'}
+                                         </Badge>
+                                         <Badge variant="outline" className="bg-slate-50 border-slate-100 text-[#0F172A] font-black uppercase text-[8px] px-2 py-0.5">{q.subjectId}</Badge>
+                                         {q.status === 'USED' && <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black uppercase">Used In Mock</Badge>}
+                                         {q.status === 'LOCKED' && <Badge className="bg-amber-50 text-amber-600 border-none text-[8px] font-black uppercase">Locked</Badge>}
+                                      </div>
+                                      <p className="font-black text-[#000000] text-lg leading-snug line-clamp-1">{q.englishQuestion}</p>
+                                   </div>
                                 </div>
-                             </div>
-                          ))}
+                             )
+                          })}
                        </div>
                     ) : (
                        <div className="py-32 text-center opacity-20"><Database className="h-20 w-20 mx-auto mb-4" /><p className="font-black uppercase tracking-widest text-sm text-slate-500">No Registry Assets Found</p></div>
@@ -667,5 +677,17 @@ function MockBuilderContent() {
         </div>
       </div>
     </div>
+  )
+}
+
+function MetricCard({ label, value, icon }: any) {
+  return (
+    <Card className="border-none shadow-2xl bg-white p-10 rounded-[3rem] relative overflow-hidden group border border-slate-100">
+       <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">{icon}</div>
+       <div className="space-y-4 relative z-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{label}</p>
+          <p className="text-5xl font-headline font-black text-[#0F172A]">{value}</p>
+       </div>
+    </Card>
   )
 }
