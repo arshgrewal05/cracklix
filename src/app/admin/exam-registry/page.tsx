@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -33,8 +34,9 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Master Registry v2.4.
- * UPDATED: Synchronized Logo Scaling logic with Catalog Hub to prevent 'Loading' failures.
+ * @fileOverview Institutional Exam Master Registry v2.5.
+ * UPDATED: Synchronized Logo Scaling logic with Catalog Hub.
+ * FIXED: High-Fidelity scaling for CTET, IBPS, and SSC logos.
  */
 
 export default function ExamRegistryPage() {
@@ -205,6 +207,8 @@ export default function ExamRegistryPage() {
                 const isArmy = bid === 'army' || e.id?.toLowerCase().includes('army') || abbrev === 'ARMY';
                 const isPolice = bid.includes('police') || abbrev.includes('POLICE');
                 const isEdu = bid.includes('education') || bid.includes('pseb') || abbrev === 'PSEB' || e.name?.toLowerCase().includes('ett') || e.name?.toLowerCase().includes('master') || abbrev === 'EDUCATION' || abbrev === 'CBSE' || abbrev === 'CTET';
+                const isIbps = bid.includes('ibps') || abbrev === 'IBPS';
+                const isSsc = bid.includes('ssc') || abbrev === 'SSC';
 
                 return (
                   <TableRow key={e.id} className="hover:bg-slate-50 border-slate-50 transition-colors group">
@@ -214,7 +218,7 @@ export default function ExamRegistryPage() {
                             {logoUrl && !isImgFailed ? (
                               <img 
                                 src={logoUrl} 
-                                className={cn("w-full h-full object-contain p-2", isArmy ? "scale-150" : (isPolice || isEdu) ? "scale-125 p-1.5" : "")} 
+                                className={cn("w-full h-full object-contain p-2", isArmy ? "scale-150" : (isPolice || isEdu || isIbps || isSsc) ? "scale-125 p-1.5" : "")} 
                                 alt="Logo" 
                                 referrerPolicy="no-referrer"
                                 onError={() => setFailedImages(p => ({ ...p, [e.id]: true }))}
