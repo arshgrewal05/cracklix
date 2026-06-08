@@ -19,7 +19,8 @@ import {
   X,
   Shield,
   Sparkles,
-  Newspaper
+  Newspaper,
+  Award
 } from "lucide-react";
 import Link from "next/link";
 import { useUser, useAuth } from "@/firebase";
@@ -34,7 +35,7 @@ import { Button } from "@/components/ui/button";
 
 /**
  * @fileOverview Institutional Sidebar.
- * FIXED: Hydration mismatch and standard Current Affairs icon usage.
+ * FIXED: Ambiguous Tailwind class resolved by moving duration to style prop.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {

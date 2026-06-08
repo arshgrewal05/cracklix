@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo } from "react"
@@ -41,9 +40,8 @@ import { parseBulkQuestions } from "@/lib/parser"
 import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
 /**
- * @fileOverview Institutional Current Affairs Management Hub v18.0.
- * UPDATED: Added full Options Matrix and Correct Answer selector to question editing.
- * FIXED: Controlled input warnings resolved by adding fallback values.
+ * @fileOverview Institutional Current Affairs Management Hub v19.0.
+ * FIXED: Controlled input warnings resolved by using nullish coalescing.
  */
 
 export default function AdminCurrentAffairs() {
@@ -298,13 +296,13 @@ export default function AdminCurrentAffairs() {
                      
                      <div className="space-y-1.5">
                         <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Quiz Title</Label>
-                        <Input value={editingItem?.title || ""} onChange={e => setEditingItem({...editingItem, title: e.target.value})} className="h-12 rounded-xl border-slate-100 bg-white font-black text-sm" placeholder="e.g. Daily GK 24 Oct" />
+                        <Input value={editingItem?.title ?? ""} onChange={e => setEditingItem({...editingItem, title: e.target.value})} className="h-12 rounded-xl border-slate-100 bg-white font-black text-sm" placeholder="e.g. Daily GK 24 Oct" />
                      </div>
 
                      <div className="space-y-1.5">
                         <Label className="text-[9px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Layers className="h-3 w-3" /> Hub Category</Label>
                         <select 
-                           value={editingItem?.type || "DAILY"} 
+                           value={editingItem?.type ?? "DAILY"} 
                            onChange={e => setEditingItem({...editingItem, type: e.target.value as CurrentAffairType})} 
                            className="w-full h-11 bg-white border-slate-200 rounded-xl px-4 font-black uppercase text-[9px] outline-none shadow-sm"
                         >
@@ -319,7 +317,7 @@ export default function AdminCurrentAffairs() {
                      <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-1.5">
                            <Label className="text-[9px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Languages className="h-3 w-3" /> CBT Assessment Language</Label>
-                           <select value={editingItem?.language || "English & Punjabi"} onChange={e => setEditingItem({...editingItem, language: e.target.value})} className="w-full h-11 bg-[#0B1528] text-white border-none rounded-xl px-4 font-black uppercase text-[9px] outline-none shadow-xl">
+                           <select value={editingItem?.language ?? "English & Punjabi"} onChange={e => setEditingItem({...editingItem, language: e.target.value})} className="w-full h-11 bg-[#0B1528] text-white border-none rounded-xl px-4 font-black uppercase text-[9px] outline-none shadow-xl">
                               <option value="English & Punjabi">English & Punjabi</option>
                               <option value="English & Hindi">English & Hindi</option>
                            </select>
@@ -331,17 +329,17 @@ export default function AdminCurrentAffairs() {
                         
                         <div className="space-y-1.5">
                            <Label className="text-[9px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Clock className="h-3 w-3" /> Test Duration (Mins)</Label>
-                           <Input type="number" value={editingItem?.duration || ""} onChange={e => setEditingItem({...editingItem, duration: e.target.value})} className="h-11 rounded-xl border-none bg-white font-black shadow-sm" />
+                           <Input type="number" value={editingItem?.duration ?? ""} onChange={e => setEditingItem({...editingItem, duration: e.target.value})} className="h-11 rounded-xl border-none bg-white font-black shadow-sm" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                            <div className="space-y-1.5">
                               <Label className="text-[9px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Target className="h-3 w-3 text-emerald-500" /> Pos (+)</Label>
-                              <Input type="number" step="0.5" value={editingItem?.positiveMarks || ""} onChange={e => setEditingItem({...editingItem, positiveMarks: e.target.value})} className="h-11 rounded-xl border-none bg-white font-black shadow-sm text-center" />
+                              <Input type="number" step="0.5" value={editingItem?.positiveMarks ?? ""} onChange={e => setEditingItem({...editingItem, positiveMarks: e.target.value})} className="h-11 rounded-xl border-none bg-white font-black shadow-sm text-center" />
                            </div>
                            <div className="space-y-1.5">
                               <Label className="text-[9px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><AlertTriangle className="h-3 w-3 text-rose-500" /> Neg (-)</Label>
-                              <Input type="number" step="0.05" value={editingItem?.negativeMarks || ""} onChange={e => setEditingItem({...editingItem, negativeMarks: e.target.value})} className="h-11 rounded-xl border-none bg-white font-black shadow-sm text-center" />
+                              <Input type="number" step="0.05" value={editingItem?.negativeMarks ?? ""} onChange={e => setEditingItem({...editingItem, negativeMarks: e.target.value})} className="h-11 rounded-xl border-none bg-white font-black shadow-sm text-center" />
                            </div>
                         </div>
                      </div>
@@ -349,13 +347,13 @@ export default function AdminCurrentAffairs() {
                      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200/50">
                         <div className="space-y-1.5">
                            <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Archive Month</Label>
-                           <select value={editingItem?.month || "January"} onChange={e => setEditingItem({...editingItem, month: e.target.value})} className="w-full h-11 bg-white border-none rounded-xl px-4 font-bold text-[10px] outline-none shadow-sm">
+                           <select value={editingItem?.month ?? "January"} onChange={e => setEditingItem({...editingItem, month: e.target.value})} className="w-full h-11 bg-white border-none rounded-xl px-4 font-bold text-[10px] outline-none shadow-sm">
                            {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map(m => <option key={m} value={m}>{m}</option>)}
                            </select>
                         </div>
                         <div className="space-y-1.5">
                            <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Year</Label>
-                           <Input value={editingItem?.year || ""} onChange={e => setEditingItem({...editingItem, year: e.target.value})} className="h-11 rounded-xl border-none bg-white font-bold shadow-sm text-center" />
+                           <Input value={editingItem?.year ?? ""} onChange={e => setEditingItem({...editingItem, year: e.target.value})} className="h-11 rounded-xl border-none bg-white font-bold shadow-sm text-center" />
                         </div>
                      </div>
                   </Card>
@@ -448,12 +446,12 @@ export default function AdminCurrentAffairs() {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">English Statement</Label>
-                     <Textarea value={editQForm?.englishQuestion || ""} onChange={e => setEditQForm({...editQForm, englishQuestion: e.target.value})} className="h-32 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner text-[#0F172A]" />
+                     <Textarea value={editQForm?.englishQuestion ?? ""} onChange={e => setEditQForm({...editQForm, englishQuestion: e.target.value})} className="h-32 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner text-[#0F172A]" />
                   </div>
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Secondary Statement</Label>
                      <Textarea 
-                        value={editingItem?.language === 'English & Hindi' ? (editQForm?.hindiQuestion || "") : (editQForm?.punjabiQuestion || "")} 
+                        value={editingItem?.language === 'English & Hindi' ? (editQForm?.hindiQuestion ?? "") : (editQForm?.punjabiQuestion ?? "")} 
                         onChange={e => setEditQForm({...editQForm, [editingItem?.language === 'English & Hindi' ? 'hindiQuestion' : 'punjabiQuestion']: e.target.value})} 
                         className="h-32 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner text-[#0F172A]" 
                      />
@@ -470,16 +468,16 @@ export default function AdminCurrentAffairs() {
                                  <div className="h-7 w-7 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-black text-xs">{opt}</div>
                                  <Label className="text-[10px] font-black uppercase text-slate-500">English Text</Label>
                               </div>
-                              <button onClick={() => setEditQForm({...editQForm, correctAnswer: opt})} className={cn("h-6 w-6 rounded-full border-2 transition-all flex items-center justify-center", editQForm?.correctAnswer === opt ? "bg-emerald-50 border-emerald-500 text-white" : "border-slate-200 hover:border-primary")}>
-                                 {editQForm?.correctAnswer === opt && <CheckCircle2 className="h-4 w-4" />}
+                              <button onClick={() => setEditQForm({...editQForm, correctAnswer: opt})} className={cn("h-6 w-6 rounded-full border-2 transition-all flex items-center justify-center", (editQForm?.correctAnswer ?? "A") === opt ? "bg-emerald-50 border-emerald-500 text-white" : "border-slate-200 hover:border-primary")}>
+                                 {(editQForm?.correctAnswer ?? "A") === opt && <CheckCircle2 className="h-4 w-4" />}
                               </button>
                            </div>
-                           <Input value={editQForm?.[`option${opt}English`] || ""} onChange={e => setEditQForm({...editQForm, [`option${opt}English`]: e.target.value})} className="bg-white border-none font-bold h-12 rounded-xl" />
+                           <Input value={editQForm?.[`option${opt}English`] ?? ""} onChange={e => setEditQForm({...editQForm, [`option${opt}English`]: e.target.value})} className="bg-white border-none font-bold h-12 rounded-xl" />
                            
                            <div className="pt-2 space-y-2">
                               <Label className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-2"><Globe className="h-3 w-3" /> Secondary Text</Label>
                               <Input 
-                                 value={editingItem?.language === 'English & Hindi' ? (editQForm?.[`option${opt}Hindi`] || "") : (editQForm?.[`option${opt}Punjabi`] || "")} 
+                                 value={editingItem?.language === 'English & Hindi' ? (editQForm?.[`option${opt}Hindi`] ?? "") : (editQForm?.[`option${opt}Punjabi`] ?? "")} 
                                  onChange={e => setEditQForm({...editQForm, [editingItem?.language === 'English & Hindi' ? `option${opt}Hindi` : `option${opt}Punjabi`]: e.target.value})} 
                                  className="bg-white border-none font-bold h-12 rounded-xl" 
                               />
@@ -492,12 +490,12 @@ export default function AdminCurrentAffairs() {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-slate-100">
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">English Rationalization</Label>
-                     <Textarea value={editQForm?.englishExplanation || ""} onChange={e => setEditQForm({...editQForm, englishExplanation: e.target.value})} className="h-32 rounded-2xl bg-slate-900 text-emerald-400 font-medium p-6 shadow-2xl" />
+                     <Textarea value={editQForm?.englishExplanation ?? ""} onChange={e => setEditQForm({...editQForm, englishExplanation: e.target.value})} className="h-32 rounded-2xl bg-slate-900 text-emerald-400 font-medium p-6 shadow-2xl" />
                   </div>
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Secondary Rationalization</Label>
                      <Textarea 
-                        value={editingItem?.language === 'English & Hindi' ? (editQForm?.hindiExplanation || "") : (editQForm?.punjabiExplanation || "")} 
+                        value={editingItem?.language === 'English & Hindi' ? (editQForm?.hindiExplanation ?? "") : (editQForm?.punjabiExplanation ?? "")} 
                         onChange={e => setEditQForm({...editQForm, [editingItem?.language === 'English & Hindi' ? 'hindiExplanation' : 'punjabiExplanation']: e.target.value})} 
                         className="h-32 rounded-2xl bg-slate-900 text-blue-400 font-medium p-6 shadow-2xl" 
                      />

@@ -1,4 +1,3 @@
-
 "use client"
 
 import Navbar from "@/components/layout/Navbar"
@@ -15,8 +14,8 @@ import { useMemo } from "react"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Cracklix Pass Hub v2.0.
- * UPDATED: Removed daily analysis from pass benefits text.
+ * @fileOverview Cracklix Pass Hub v2.1.
+ * FIXED: Explicit transitionDuration style to avoid Tailwind warnings.
  */
 export default function PassPage() {
   const db = useFirestore()
@@ -122,7 +121,7 @@ export default function PassPage() {
            viewport={{ once: true }}
            className="mt-32 md:mt-48 p-12 md:p-24 rounded-[4rem] bg-gradient-to-br from-[#0B1528] to-primary/10 text-white relative overflow-hidden shadow-5xl border border-white/5 text-left"
         >
-           <div className="absolute top-0 right-0 p-16 opacity-5 rotate-12"><Star className="h-80 w-80" /></div>
+           <div className="absolute top-0 right-0 p-16 opacity-5 rotate-12 group-hover:scale-110 transition-transform" style={{ transitionDuration: '2000ms' }}><Star className="h-80 w-80" /></div>
            <div className="max-w-3xl relative z-10 space-y-10">
               <div className="flex items-center gap-6">
                  <ShieldCheck className="h-12 w-12 md:h-20 md:w-20 text-primary" />

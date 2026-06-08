@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState, useEffect } from "react"
@@ -38,8 +37,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import ShareButton from "@/components/navigation/ShareButton"
 
 /**
- * @fileOverview Student Dashboard v15.0.
- * UPDATED: Strictly real-time stats (Removed Hardcoded Defaults).
+ * @fileOverview Student Dashboard v16.0.
+ * FIXED: Standardized duration style to prevent Tailwind warnings.
  */
 
 export default function StudentDashboard() {

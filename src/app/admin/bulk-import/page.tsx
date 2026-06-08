@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo } from "react"
@@ -36,9 +35,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Bulk Ingestion Hub v6.0.
- * UPDATED: Added full Options Matrix and Correct Answer selector to individual node editing.
- * FIXED: Controlled input warnings resolved by adding fallback values.
+ * @fileOverview Institutional Bulk Ingestion Hub v7.0.
+ * FIXED: Controlled input warnings resolved by using nullish coalescing.
  */
 
 export default function BulkImportPage() {
@@ -246,12 +244,12 @@ export default function BulkImportPage() {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">English Statement</Label>
-                     <Textarea value={editForm?.englishQuestion || ""} onChange={e => setEditForm({...editForm, englishQuestion: e.target.value})} className="h-32 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner text-[#0F172A]" />
+                     <Textarea value={editForm?.englishQuestion ?? ""} onChange={e => setEditForm({...editForm, englishQuestion: e.target.value})} className="h-32 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner text-[#0F172A]" />
                   </div>
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">{isHindiMode ? 'Hindi Statement' : 'Punjabi Statement'}</Label>
                      <Textarea 
-                        value={isHindiMode ? (editForm?.hindiQuestion || "") : (editForm?.punjabiQuestion || "")} 
+                        value={isHindiMode ? (editForm?.hindiQuestion ?? "") : (editForm?.punjabiQuestion ?? "")} 
                         onChange={e => setEditForm({...editForm, [isHindiMode ? 'hindiQuestion' : 'punjabiQuestion']: e.target.value})} 
                         className="h-32 rounded-2xl bg-slate-50 border-none font-bold text-lg p-6 shadow-inner text-[#0F172A]" 
                      />
@@ -268,16 +266,16 @@ export default function BulkImportPage() {
                                  <div className="h-7 w-7 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-black text-xs">{opt}</div>
                                  <Label className="text-[10px] font-black uppercase text-slate-500">English Text</Label>
                               </div>
-                              <button onClick={() => setEditForm({...editForm, correctAnswer: opt})} className={cn("h-6 w-6 rounded-full border-2 transition-all flex items-center justify-center", editForm?.correctAnswer === opt ? "bg-emerald-50 border-emerald-500 text-white" : "border-slate-200 hover:border-primary")}>
-                                 {editForm?.correctAnswer === opt && <CheckCircle2 className="h-4 w-4" />}
+                              <button onClick={() => setEditForm({...editForm, correctAnswer: opt})} className={cn("h-6 w-6 rounded-full border-2 transition-all flex items-center justify-center", (editForm?.correctAnswer ?? "A") === opt ? "bg-emerald-50 border-emerald-500 text-white" : "border-slate-200 hover:border-primary")}>
+                                 {(editForm?.correctAnswer ?? "A") === opt && <CheckCircle2 className="h-4 w-4" />}
                               </button>
                            </div>
-                           <Input value={editForm?.[`option${opt}English`] || ""} onChange={e => setEditForm({...editForm, [`option${opt}English`]: e.target.value})} className="bg-white border-none font-bold h-12 rounded-xl" />
+                           <Input value={editForm?.[`option${opt}English`] ?? ""} onChange={e => setEditForm({...editForm, [`option${opt}English`]: e.target.value})} className="bg-white border-none font-bold h-12 rounded-xl" />
                            
                            <div className="pt-2 space-y-2">
                               <Label className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-2"><Globe className="h-3 w-3" /> {isHindiMode ? 'Hindi Text' : 'Punjabi Text'}</Label>
                               <Input 
-                                 value={isHindiMode ? (editForm?.[`option${opt}Hindi`] || "") : (editForm?.[`option${opt}Punjabi`] || "")} 
+                                 value={isHindiMode ? (editForm?.[`option${opt}Hindi`] ?? "") : (editForm?.[`option${opt}Punjabi`] ?? "")} 
                                  onChange={e => setEditForm({...editForm, [isHindiMode ? `option${opt}Hindi` : `option${opt}Punjabi`]: e.target.value})} 
                                  className="bg-white border-none font-bold h-12 rounded-xl" 
                               />
@@ -290,12 +288,12 @@ export default function BulkImportPage() {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-slate-100">
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">English Rationalization</Label>
-                     <Textarea value={editForm?.englishExplanation || ""} onChange={e => setEditForm({...editForm, englishExplanation: e.target.value})} className="h-32 rounded-2xl bg-slate-900 text-emerald-400 font-medium p-6 shadow-2xl" />
+                     <Textarea value={editForm?.englishExplanation ?? ""} onChange={e => setEditForm({...editForm, englishExplanation: e.target.value})} className="h-32 rounded-2xl bg-slate-900 text-emerald-400 font-medium p-6 shadow-2xl" />
                   </div>
                   <div className="space-y-3">
                      <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">{isHindiMode ? 'Hindi Rationalization' : 'Punjabi Rationalization'}</Label>
                      <Textarea 
-                        value={isHindiMode ? (editForm?.hindiExplanation || "") : (editForm?.punjabiExplanation || "")} 
+                        value={isHindiMode ? (editForm?.hindiExplanation ?? "") : (editForm?.punjabiExplanation ?? "")} 
                         onChange={e => setEditForm({...editForm, [isHindiMode ? 'hindiExplanation' : 'punjabiExplanation']: e.target.value})} 
                         className="h-32 rounded-2xl bg-slate-900 text-blue-400 font-medium p-6 shadow-2xl" 
                      />
