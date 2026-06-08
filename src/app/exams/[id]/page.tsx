@@ -32,6 +32,12 @@ import { useMemo, useState, useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
+/**
+ * @fileOverview Institutional Exam Hub v12.0.
+ * UPDATED: Rebuilt access logic to strictly follow pass.active blueprint.
+ * DEBUG: Added [RUNTIME_VAL] logs for real-time audit.
+ */
+
 export default function ExamHubPage() {
   const params = useParams()
   const router = useRouter()
@@ -67,15 +73,12 @@ export default function ExamHubPage() {
      const isAdmin = profile.role === 'ADMIN' || profile.role === 'SUPER_ADMIN';
      if (isAdmin) return true;
 
-     if (profile.pass?.active === true) {
+     // STRICT BLUEPRINT CHECK ONLY
+     if (profile.pass && profile.pass.active === true) {
         const expiry = new Date(profile.pass.expiryDate);
         return expiry > new Date();
      }
      
-     // Legacy Fallback Whitelist
-     const status = (profile.status || '').trim().toLowerCase();
-     if (status !== '' && status !== 'free' && status !== 'student' && status !== 'aspirant') return true;
-
      return false;
   }, [profile]);
 
@@ -174,9 +177,12 @@ function MockList({ data, results, isPassActive }: { data: any[], results: any[]
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
          {data.map((mock: any) => {
             const result = results?.find((r: any) => r.mockId === mock.id);
-            const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+            const tier = (mock.accessLevel || 'FREE').trim().toUpperCase();
             const isPremium = tier === 'PREMIUM';
             const isLocked = isPremium && !isPassActive;
+
+            // CRITICAL AUDIT LOG
+            console.log(`[RUNTIME_VAL] Mock: ${mock.title} | accessLevel: ${tier} | isPremium: ${isPremium} | isPassActive: ${isPassActive} | isLocked: ${isLocked}`);
 
             return (
                <Card key={mock.id} className="border-none shadow-sm rounded-2xl bg-white hover:shadow-md transition-all text-left group">

@@ -14,8 +14,9 @@ import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 
 /**
- * @fileOverview High-Density Mock Feed v14.0.
- * DEBUG: Added runtime logs for accessLevel, isPremium, and user.pass.active.
+ * @fileOverview High-Density Mock Feed v15.0.
+ * UPDATED: Rebuilt access logic to strictly follow pass.active blueprint.
+ * DEBUG: Added [RUNTIME_VAL] logs for real-time audit.
  */
 
 export default function LatestMocks() {
@@ -29,21 +30,15 @@ export default function LatestMocks() {
 
   const hasActivePass = useMemo(() => {
      if (!profile) return false;
-     
-     // 1. Administrative Whitelist
-     const role = (profile.role || '').toUpperCase();
-     if (role === 'ADMIN' || role === 'SUPER_ADMIN') return true;
+     const isAdmin = profile.role === 'ADMIN' || profile.role === 'SUPER_ADMIN';
+     if (isAdmin) return true;
 
-     // 2. Blueprint Pass Registry Audit
-     if (profile.pass?.active === true) {
-        const expiryDate = profile.pass.expiryDate ? new Date(profile.pass.expiryDate) : null;
-        if (expiryDate && expiryDate > new Date()) return true;
+     // STRICT BLUEPRINT CHECK ONLY
+     if (profile.pass && profile.pass.active === true) {
+        const expiry = new Date(profile.pass.expiryDate);
+        return expiry > new Date();
      }
-
-     // 3. Legacy Status Audit
-     const s = (profile.status || '').trim().toLowerCase();
-     if (s !== '' && s !== 'free' && s !== 'student' && s !== 'aspirant') return true;
-
+     
      return false;
   }, [profile]);
 
@@ -69,12 +64,12 @@ export default function LatestMocks() {
              Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 md:h-64 w-full rounded-2xl" />)
           ) : mocks.map((mock, i) => {
             const board = boards?.find((b: any) => b.id === (mock.boardIds?.[0] || mock.boardId));
-            const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+            const tier = (mock.accessLevel || 'FREE').trim().toUpperCase();
             const isPremium = tier === 'PREMIUM';
             const locked = isPremium && !hasActivePass;
 
-            // RUNTIME DEBUG LOGS
-            console.log(`[RUNTIME_VAL] FEED | ${mock.title} | accessLevel: ${mock.accessLevel} | isPremium: ${isPremium} | user.pass.active: ${profile?.pass?.active}`);
+            // CRITICAL AUDIT LOG
+            console.log(`[RUNTIME_VAL] FEED | ${mock.title} | accessLevel: ${tier} | isPremium: ${isPremium} | hasActivePass: ${hasActivePass} | locked: ${locked}`);
 
             return (
               <motion.div key={mock.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} viewport={{ once: true }}>

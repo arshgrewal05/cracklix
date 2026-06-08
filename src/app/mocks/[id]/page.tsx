@@ -26,6 +26,12 @@ import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
+/**
+ * @fileOverview Individual Mock Gateway v11.0.
+ * UPDATED: Rebuilt access logic to strictly follow pass.active blueprint.
+ * DEBUG: Added [RUNTIME_VAL] logs for real-time audit.
+ */
+
 export default function MockOverviewPage() {
   const params = useParams()
   const router = useRouter()
@@ -44,7 +50,7 @@ export default function MockOverviewPage() {
       if (mockLoading) return;
       if (!mock || !db) { setAccessChecked(true); return; }
 
-      const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+      const tier = (mock.accessLevel || 'FREE').trim().toUpperCase();
       const isPremium = tier === 'PREMIUM';
       
       if (user) {
@@ -65,17 +71,14 @@ export default function MockOverviewPage() {
       
       if (isAdmin) {
          hasPass = true;
-      } else if (profile?.pass?.active === true) {
+      } else if (profile?.pass && profile.pass.active === true) {
          const expiry = new Date(profile.pass.expiryDate);
          if (expiry > new Date()) hasPass = true;
-      } else {
-         // Legacy status whitelist
-         const status = (profile?.status || '').trim().toLowerCase();
-         if (status !== '' && status !== 'free' && status !== 'student' && status !== 'aspirant') {
-            hasPass = true;
-         }
       }
       
+      // CRITICAL AUDIT LOG
+      console.log(`[RUNTIME_VAL] GATEWAY | ${mock.title} | tier: ${tier} | hasPass: ${hasPass}`);
+
       setIsLocked(!hasPass);
       setAccessChecked(true);
     }
@@ -93,7 +96,7 @@ export default function MockOverviewPage() {
 
   if (!mock) return <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4"><Info className="h-12 w-12 opacity-10" /><p className="font-black uppercase tracking-widest text-xs">Registry node missing</p></div>;
 
-  const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
+  const tier = (mock.accessLevel || 'FREE').trim().toUpperCase();
   const isPremium = tier === 'PREMIUM';
 
   return (
