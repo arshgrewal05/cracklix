@@ -31,7 +31,10 @@ import {
   ChevronRight,
   Landmark,
   GraduationCap,
-  ClipboardList
+  ClipboardList,
+  Activity,
+  FileWarning,
+  Rocket
 } from "lucide-react"
 import Link from "next/link"
 import Logo from "@/components/brand/Logo"
@@ -44,8 +47,8 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Consolidated Admin Layout v10.0.
- * UPDATED: Merged redundant registry links into a single 'Master Registry' node.
+ * @fileOverview Fully Restored Admin Layout v12.0.
+ * RECOVERED: All administrative nodes including QA, Health, Gazette, and Reports.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -89,11 +92,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
        </div>
        <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden">
           <SidebarGroup>
-            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Registry Hub</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Master Registry</SidebarGroupLabel>
             <SidebarMenu>
               <AdminNavItem icon={<LayoutDashboard />} label="Dashboard" href="/admin" active={pathname === "/admin"} />
-              <AdminNavItem icon={<ClipboardList className="text-amber-400" />} label="Master Registry" href="/admin/registry" active={pathname === "/admin/registry"} />
-              <AdminNavItem icon={<Database />} label="Global MCQ Bank" href="/admin/questions" active={pathname === "/admin/questions"} />
+              <AdminNavItem icon={<Landmark className="text-amber-400" />} label="Authority Hub" href="/admin/exams" active={pathname === "/admin/exams"} />
+              <AdminNavItem icon={<GraduationCap className="text-blue-400" />} label="Exam Registry" href="/admin/exam-registry" active={pathname === "/admin/exam-registry"} />
+              <AdminNavItem icon={<SearchCode className="text-emerald-400" />} label="Subject List" href="/admin/subjects" active={pathname === "/admin/subjects"} />
+              <AdminNavItem icon={<Database />} label="Global Bank" href="/admin/questions" active={pathname === "/admin/questions"} />
+              <AdminNavItem icon={<Rocket className="text-primary" />} label="Bulk Ingestion" href="/admin/bulk-import" active={pathname === "/admin/bulk-import"} />
             </SidebarMenu>
           </SidebarGroup>
 
@@ -105,22 +111,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <AdminNavItem icon={<Newspaper className="text-emerald-400" />} label="Current Affairs" href="/admin/current-affairs" active={pathname === "/admin/current-affairs"} />
               <AdminNavItem icon={<FileStack className="text-blue-500" />} label="PYQ Repository" href="/admin/pyqs" active={pathname === "/admin/pyqs"} />
               <AdminNavItem icon={<FileText className="text-rose-400" />} label="Study Notes" href="/admin/notes" active={pathname === "/admin/notes"} />
+              <AdminNavItem icon={<Sparkles className="text-amber-500" />} label="Free Hub CMS" href="/admin/free-content" active={pathname === "/admin/free-content"} />
             </SidebarMenu>
           </SidebarGroup>
 
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Financials</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Financial Hub</SidebarGroupLabel>
             <SidebarMenu>
               <AdminNavItem icon={<Gem className="text-primary" />} label="Pass Manager" href="/admin/passes" active={pathname === "/admin/passes"} />
-              <AdminNavItem icon={<CreditCard className="text-emerald-400" />} label="Payments Hub" href="/admin/payments" active={pathname === "/admin/payments" || pathname === "/admin/payments/verify"} />
+              <AdminNavItem icon={<CreditCard className="text-emerald-400" />} label="Verify Payments" href="/admin/payments/verify" active={pathname === "/admin/payments/verify"} />
+              <AdminNavItem icon={<CreditCard className="text-slate-400" />} label="Revenue Hub" href="/admin/payments" active={pathname === "/admin/payments"} />
             </SidebarMenu>
           </SidebarGroup>
 
           <SidebarGroup className="mt-4">
-            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Governance</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Integrity & Governance</SidebarGroupLabel>
             <SidebarMenu>
               <AdminNavItem icon={<Users className="text-blue-400" />} label="Students" href="/admin/users" active={pathname === "/admin/users"} />
+              <AdminNavItem icon={<ShieldAlert className="text-rose-500" />} label="CBT Integrity" href="/admin/qa" active={pathname === "/admin/qa"} />
+              <AdminNavItem icon={<Bell className="text-orange-400" />} label="Exam Gazette" href="/admin/notifications" active={pathname === "/admin/notifications"} />
+              <AdminNavItem icon={<FileWarning className="text-rose-400" />} label="Audit Queue" href="/admin/reports" active={pathname === "/admin/reports"} />
               <AdminNavItem icon={<History className="text-slate-400" />} label="Audit Trail" href="/admin/audit-logs" active={pathname === "/admin/audit-logs"} />
+              <AdminNavItem icon={<HeartPulse className="text-rose-500" />} label="System Health" href="/admin/health" active={pathname === "/admin/health"} />
               <AdminNavItem icon={<Settings className="text-primary" />} label="System Portal" href="/admin/settings" active={pathname === "/admin/settings"} />
             </SidebarMenu>
           </SidebarGroup>

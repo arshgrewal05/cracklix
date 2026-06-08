@@ -49,8 +49,9 @@ import { MockType, Difficulty, AccessType, LanguageDisplayMode } from "@/types"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Elite Institutional Mock Architect v40.0.
- * Restored: All metadata, categories, language modes, and assignment logic.
+ * @fileOverview Elite Institutional Mock Architect v41.0.
+ * RECOVERED: Language Protocol, Test Categories, Access Gating, and Selection Logic.
+ * HARDENED: Unused tracking logic treating null status as UNUSED.
  */
 
 const SELECTION_RULES = [
@@ -201,7 +202,7 @@ function MockBuilderContent() {
 
     let finalExamIds = [...mockData.examIds];
     if (assignmentMode === 'BOARD') {
-       const boardExams = allExams?.filter((e: any) => mockData.boardIds.includes(e.boardId)).map((e: any) => e.id) || [];
+       const boardExams = allExams?.filter((e: any) => (mockData.boardIds || []).includes(e.boardId)).map((e: any) => e.id) || [];
        finalExamIds = Array.from(new Set([...finalExamIds, ...boardExams]));
     }
 
@@ -255,7 +256,6 @@ function MockBuilderContent() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 px-4">
         <div className="lg:col-span-4 space-y-8 overflow-y-auto max-h-[85vh] custom-scrollbar pr-2">
           
-          {/* STEP 1: SOURCE AUTHORITY */}
           <Card className="border-none shadow-4xl rounded-[3rem] bg-[#0F172A] text-white p-10 space-y-8">
              <div className="space-y-6">
                <div className="space-y-4">
@@ -272,7 +272,6 @@ function MockBuilderContent() {
             </div>
           </Card>
 
-          {/* STEP 2: METADATA & CATEGORIES */}
           <Card className="border-none shadow-4xl rounded-[3rem] bg-white p-10 space-y-8">
              <div className="space-y-8">
                 <p className="text-[10px] font-black uppercase text-primary tracking-[0.3em] ml-1">Step 2: Institutional Metadata</p>
@@ -351,7 +350,6 @@ function MockBuilderContent() {
              </div>
           </Card>
 
-          {/* STEP 3: TARGET ASSIGNMENT */}
           <Card className="border-none shadow-4xl rounded-[3rem] bg-white p-10 space-y-8">
              <div className="space-y-6">
                 <p className="text-[10px] font-black uppercase text-primary tracking-[0.3em] ml-1">Step 3: Target Hubs</p>
@@ -375,8 +373,8 @@ function MockBuilderContent() {
                   {assignmentMode === 'BOARD' ? (
                      <div className="grid grid-cols-1 gap-2">
                         {boards?.map((b: any) => (
-                           <div key={b.id} className={cn("flex items-center gap-3 p-3 rounded-xl border", mockData.boardIds.includes(b.id) ? "border-primary bg-primary/5" : "border-slate-50")}>
-                              <Checkbox checked={mockData.boardIds.includes(b.id)} onCheckedChange={(checked) => {
+                           <div key={b.id} className={cn("flex items-center gap-3 p-3 rounded-xl border", (mockData.boardIds || []).includes(b.id) ? "border-primary bg-primary/5" : "border-slate-50")}>
+                              <Checkbox checked={(mockData.boardIds || []).includes(b.id)} onCheckedChange={(checked) => {
                                  const current = mockData.boardIds || [];
                                  setMockData({...mockData, boardIds: checked ? [...current, b.id] : current.filter(id => id !== b.id)});
                               }} />
@@ -387,8 +385,8 @@ function MockBuilderContent() {
                   ) : (
                      <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto custom-scrollbar border-l-2 border-slate-100 pl-4">
                         {allExams?.map((e: any) => (
-                           <div key={e.id} className={cn("flex items-center gap-3 p-3 rounded-lg border", mockData.examIds.includes(e.id) ? "border-primary bg-primary/5" : "border-slate-50")}>
-                              <Checkbox checked={mockData.examIds.includes(e.id)} onCheckedChange={(checked) => {
+                           <div key={e.id} className={cn("flex items-center gap-3 p-3 rounded-lg border", (mockData.examIds || []).includes(e.id) ? "border-primary bg-primary/5" : "border-slate-50")}>
+                              <Checkbox checked={(mockData.examIds || []).includes(e.id)} onCheckedChange={(checked) => {
                                  const current = mockData.examIds || [];
                                  if (assignmentMode === 'SINGLE') {
                                     setMockData({...mockData, examIds: checked ? [e.id] : []});
@@ -405,7 +403,6 @@ function MockBuilderContent() {
              </div>
           </Card>
 
-          {/* STEP 4: SELECTION LOGIC */}
           <Card className="border-none shadow-4xl rounded-[3rem] bg-white p-10 space-y-8">
              <div className="space-y-6">
                 <p className="text-[10px] font-black uppercase text-primary tracking-[0.3em] ml-1">Step 4: Selection Logic</p>
