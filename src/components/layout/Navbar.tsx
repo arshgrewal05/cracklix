@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from "next/link";
@@ -24,6 +23,9 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
 
+// FOUNDER WHITELIST - PERMANENT AUTHORITY
+const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
+
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -45,7 +47,9 @@ export default function Navbar() {
     router.push('/');
   };
 
-  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN';
+  // PERMANENT AUTHORITY CHECK (Absolute Bypass)
+  const isFounder = user?.email && SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase());
+  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
 
   const passStatus = useMemo(() => {
     if (!profile?.pass) return null;
@@ -115,7 +119,6 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Phase 15: Header Widget */}
             {user && passStatus && (
                <div className={cn(
                  "hidden lg:flex items-center gap-3 px-4 py-1.5 rounded-xl border-2 transition-all",

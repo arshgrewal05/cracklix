@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
@@ -47,14 +46,14 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Institutional Security Protocol v99.0.
+ * @fileOverview Institutional Security Protocol v99.1.
  * HARDENED: Permanent Super Admin Authority for Arsh Grewal.
  */
 
-// FOUNDER WHITELIST - PERMANENT AUTHORITY
+// FOUNDER WHITELIST - PERMANENT AUTHORITY (Absolute Security)
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.Node }) {
   const { user, profile, loading } = useUser()
   const auth = useAuth()
   const router = useRouter()
@@ -66,8 +65,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setMounted(true);
   }, []);
 
-  // PERMANENT AUTHORITY CHECK (Hardcoded Bypass)
-  const isFounder = user?.email && SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase());
+  // PERMANENT AUTHORITY CHECK (Hardcoded Immunity)
+  const userEmail = user?.email?.toLowerCase();
+  const isFounder = userEmail && SUPER_ADMIN_WHITELIST.includes(userEmail);
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (!user) {
         router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`);
       } else if (!isAdmin) {
-        // Only redirect if NOT hardcoded founder or DB admin
+        // Strict guard: Only non-admins/non-founders are sent back to dashboard
         router.push('/dashboard');
       }
     }
@@ -156,7 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
              </div>
              <div className="text-left">
                 <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none mb-1">ADMIN LOGIN</p>
-                <p className="text-[11px] font-black text-white uppercase tracking-tight truncate max-w-[120px]">{profile?.name || 'ADMIN'}</p>
+                <p className="text-[11px] font-black text-white uppercase tracking-tight truncate max-w-[120px]">{profile?.name || (isFounder ? 'FOUNDER' : 'ADMIN')}</p>
              </div>
           </div>
        </div>
