@@ -12,8 +12,8 @@ import { useCollection, useFirestore } from "@/firebase";
 import { collection } from "firebase/firestore";
 
 /**
- * @fileOverview High-Density Mobile-First Hero.
- * Updated: Action button changed to 'Mastery Hubs' with fixed text visibility.
+ * @fileOverview High-Density Mobile-First Hero v32.0.
+ * UPDATED: Consolidated buttons into a single "Start Practice" node leading to the Exam Hub.
  */
 
 export default function Hero() {
@@ -38,14 +38,14 @@ export default function Hero() {
          <div className="h-full w-full bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:30px_30px]" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
+      <div className="container mx-auto px-4 relative z-10 max-w-7xl text-left">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
           
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-4 md:space-y-10 text-left"
+            className="space-y-4 md:space-y-10"
           >
             <div className="space-y-2 md:space-y-6">
                <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
@@ -56,7 +56,7 @@ export default function Hero() {
                   CRACK EVERY <br/> <span className="text-primary">RECRUITMENT.</span>
                </h1>
                <p className="text-[13px] md:text-xl text-slate-400 font-medium max-w-lg leading-relaxed">
-                  High-fidelity practice series for PSSSB, PPSC, Police, and Army. Upcoming exam patterns.
+                  High-fidelity practice series for PSSSB, PPSC, Police, and Army. Updated pattern based preparation.
                </p>
             </div>
 
@@ -79,11 +79,8 @@ export default function Hero() {
             </form>
 
             <div className="flex flex-wrap gap-4 mt-6">
-              <Button asChild className="bg-primary hover:bg-orange-600 text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] h-14 shadow-xl shadow-primary/20 transition-all active:scale-95 border-none">
-                 <Link href="/mocks">Start Practice <Zap className="ml-2 h-4 w-4" /></Link>
-              </Button>
-              <Button asChild className="bg-white hover:bg-slate-100 text-[#08152D] px-10 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] h-14 shadow-xl transition-all active:scale-95 border-none">
-                 <Link href="/exams">Mastery Hubs <LayoutGrid className="ml-2 h-4 w-4" /></Link>
+              <Button asChild className="bg-primary hover:bg-orange-600 text-white px-12 py-4 rounded-xl font-black uppercase tracking-widest text-[11px] h-16 shadow-2xl shadow-primary/30 transition-all active:scale-95 border-none group">
+                 <Link href="/exams">Start Practice <Zap className="ml-3 h-5 w-5 group-hover:scale-125 transition-transform" /></Link>
               </Button>
             </div>
           </motion.div>

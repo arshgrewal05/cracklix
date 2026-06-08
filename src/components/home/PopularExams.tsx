@@ -12,8 +12,8 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview High-Density Exam Hub Catalog v9.0.
- * UPDATED: Fully dynamic real-time mock and question registry synchronization.
+ * @fileOverview High-Density Exam Hub Catalog v10.0.
+ * UPDATED: Renamed to "Hall of Exams" and hardened for real-time live data sync.
  */
 
 export default function PopularExams() {
@@ -52,13 +52,9 @@ export default function PopularExams() {
 
   const exams = useMemo(() => {
     if (!rawExams) return [];
-    return rawExams.filter((exam: any) => {
-      const board = boards?.find(b => b.id === exam.boardId);
-      const hasLogo = exam.iconUrl || board?.iconUrl;
-      const isFailed = failedImages[exam.id];
-      return hasLogo && !isFailed;
-    }).slice(0, 8);
-  }, [rawExams, boards, failedImages]);
+    // Only sort by name, no filtering to ensure all "real" items show up
+    return [...rawExams].sort((a: any, b: any) => a.name.localeCompare(b.name)).slice(0, 8);
+  }, [rawExams]);
 
   return (
     <section className="py-8 md:py-16 bg-transparent">
@@ -66,14 +62,14 @@ export default function PopularExams() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-12 gap-4 text-left">
           <div className="space-y-1">
             <h2 className="text-2xl md:text-4xl font-black text-[#000000] font-headline uppercase tracking-tight">
-              EXAM <span className="text-primary">CATALOG</span>
+              HALL OF <span className="text-primary">EXAMS</span>
             </h2>
             <p className="text-slate-500 text-sm md:text-lg font-medium">
-              Verified preparation hubs for official recruitments.
+              Real-time preparation hubs for official Punjab recruitments.
             </p>
           </div>
           <Link href="/exams" className="text-primary font-black text-[7px] md:text-[8px] uppercase tracking-[0.2em] flex items-center group gap-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-slate-100 hover:shadow-lg transition-all">
-            Full Catalog <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
+            Open Catalog <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -87,6 +83,7 @@ export default function PopularExams() {
               const isArmy = exam.boardId?.toLowerCase() === 'army' || exam.id?.toLowerCase().includes('army');
               const liveTestsCount = statsMap.mocks[exam.id] || 0;
               const liveQuestionsCount = statsMap.qs[exam.id] || 0;
+              const isFailed = failedImages[exam.id];
 
               return (
                 <motion.div
@@ -102,7 +99,7 @@ export default function PopularExams() {
                       
                       <div className="flex items-center gap-4 md:gap-8 relative z-10">
                         <div className="shrink-0 h-14 w-14 md:h-20 md:w-20 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-all group-hover:bg-white relative overflow-hidden">
-                           {logoUrl ? (
+                           {logoUrl && !isFailed ? (
                              <img 
                                src={logoUrl} 
                                className={cn("w-full h-full object-contain p-2 md:p-3 transition-transform duration-500 group-hover:scale-110", isArmy ? "scale-125" : "")} 
@@ -131,7 +128,7 @@ export default function PopularExams() {
                              </div>
                              <div className="flex items-center gap-1.5">
                                 <BookOpen className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 text-primary" />
-                                <span className="text-[8px] md:text-[10px] font-black text-[#0F172A] uppercase">{liveQuestionsCount > 0 ? liveQuestionsCount : '0'}+ Qs</span>
+                                <span className="text-[8px] md:text-[10px] font-black text-[#0F172A] uppercase">{liveQuestionsCount} Qs</span>
                              </div>
                           </div>
                         </div>
@@ -144,7 +141,7 @@ export default function PopularExams() {
           ) : (
             <div className="col-span-full py-12 text-center opacity-20 border-2 border-dashed border-slate-100 rounded-2xl">
                <ShieldCheck className="h-10 w-10 mx-auto mb-2" />
-               <p className="font-black uppercase tracking-widest text-[9px]">Syncing Registry Hub...</p>
+               <p className="font-black uppercase tracking-widest text-[9px]">Syncing Hall of Exams...</p>
             </div>
           )}
         </div>
