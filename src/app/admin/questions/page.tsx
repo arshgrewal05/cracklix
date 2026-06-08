@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useMemo, useState, useEffect, useCallback, Suspense } from "react"
@@ -53,6 +54,7 @@ function QuestionBankContent() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isBulkProcessing, setIsBulkProcessing] = useState(false)
 
+  // STABILIZED DATA LISTENERS
   const boardsQuery = useMemo(() => (db ? collection(db, "boards") : null), [db]);
   const subjectsQuery = useMemo(() => (db ? collection(db, "subjects") : null), [db]);
   const examsQuery = useMemo(() => (db ? collection(db, "exams") : null), [db]);
@@ -97,7 +99,7 @@ function QuestionBankContent() {
     setLastDoc(null)
     setHasMore(true)
     fetchQuestions(false)
-  }, [boardParam, activeTab]); // Dependencies strictly controlled
+  }, [boardParam, activeTab]);
 
   const filteredQuestions = useMemo(() => {
     if (!questions) return []
@@ -120,7 +122,6 @@ function QuestionBankContent() {
       batch.update(doc(db, "questions", id), { status: newStatus, updatedAt: serverTimestamp() });
     });
 
-    // Optimistic background commit
     batch.commit().catch(() => toast({ variant: "destructive", title: "Bulk Update Failed" }));
     
     setQuestions(prev => prev.map(q => selectedIds.includes(q.id) ? { ...q, status: newStatus } : q));

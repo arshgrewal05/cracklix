@@ -51,7 +51,7 @@ export default function StudentDashboard() {
     if (!loading && !user) router.push("/login")
   }, [user, loading, router])
 
-  // STABILIZED QUERY (Limited to latest 10 for dashboard performance)
+  // STABILIZED QUERY (Limited to latest 15 for dashboard performance)
   const resultsQuery = useMemo(() => {
     if (!db || !user) return null
     return query(collection(db, "results"), where("userId", "==", user.uid), limit(15))
