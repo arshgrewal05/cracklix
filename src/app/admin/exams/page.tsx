@@ -18,8 +18,8 @@ import { FirestorePermissionError } from "@/firebase/errors"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Authority Hub v31.0 - Hardened Mandatory Branding Engine.
- * Features: Persistent official logos for PSSSB, Punjab Police, PSPCL, CTET, PSTET, PSEB, and SSC.
+ * @fileOverview Authority Hub v32.0 - Hardened Mandatory Branding Engine.
+ * Features: Permanent official logos for PSSSB, Police, PSEB, PSPCL, CTET, PSTET, and SSC.
  */
 
 export default function ExamManagement() {
@@ -57,13 +57,13 @@ export default function ExamManagement() {
     const boardId = editingBoard.id || `board-${Date.now()}`
     const boardRef = doc(db, "boards", boardId)
     
-    // MANDATORY BRANDING PROTOCOL
+    // MANDATORY BRANDING PROTOCOL (LOCKED)
     const abbrev = editingBoard.abbreviation?.toUpperCase();
     const isPsssb = abbrev === 'PSSSB';
     const isPspcl = abbrev === 'PSPCL' || abbrev === 'PSTCL';
     const isCtet = abbrev === 'CTET' || abbrev === 'CBSE';
     const isPstet = abbrev === 'PSTET';
-    const isEducation = abbrev === 'EDUCATION' || abbrev === 'PSEB';
+    const isEducation = abbrev === 'EDUCATION' || abbrev === 'PSEB' || abbrev.includes('ETT') || abbrev.includes('MASTER') || abbrev.includes('LECTURER');
     const isPolice = abbrev.includes('POLICE');
     const isSsc = abbrev === 'SSC';
     
@@ -172,7 +172,7 @@ export default function ExamManagement() {
                 const isPspcl = abbrev === 'PSPCL' || abbrev === 'PSTCL';
                 const isCtet = abbrev === 'CTET' || abbrev === 'CBSE';
                 const isPstet = abbrev === 'PSTET';
-                const isEducation = abbrev === 'EDUCATION' || abbrev === 'PSEB';
+                const isEducation = abbrev === 'EDUCATION' || abbrev === 'PSEB' || abbrev.includes('ETT') || abbrev.includes('MASTER') || abbrev.includes('LECTURER');
                 const isPolice = abbrev.includes('POLICE');
                 const isSsc = abbrev === 'SSC';
                 const isArmy = board.id?.toLowerCase() === 'army' || abbrev === 'ARMY';

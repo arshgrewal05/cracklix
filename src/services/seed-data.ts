@@ -1,9 +1,9 @@
 import { Firestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Engine v53.0.
+ * @fileOverview Institutional Seeding Engine v54.0.
  * Features: High-Fidelity Verified Official Logos for Punjab & National Exam Hubs.
- * UPDATED: Added mandatory official SSC logo from gov domain.
+ * UPDATED: Hardened mandatory logos for PSSSB, Police, and Teaching verticals.
  */
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Cracklix Global Registry Sync...');
@@ -42,28 +42,37 @@ export async function seedInitialData(db: Firestore) {
 
   // 2. CANONICAL EXAM MASTER HUBS
   const exams = [
+    // PSSSB VERTICALS (Hardened Branding)
     { id: 'psssb-clerk-gen', boardId: 'psssb', name: 'PSSSB Clerk (General/IT/Accounts)', category: 'STATE', description: 'Clerical recruitment for multi-departmental Punjab govt posts.', iconUrl: psssbLogo },
+    { id: 'psssb-tech-field', boardId: 'psssb', name: 'Technical / Field Posts (Librarian/Storekeeper)', category: 'STATE', description: 'Specialized recruitment for technical and field positions.', iconUrl: psssbLogo },
+    { id: 'psssb-group-d', boardId: 'psssb', name: 'PSSSB Group D (Sewadar/Chowkidar)', category: 'STATE', description: 'Group D recruitment for various Punjab departments.', iconUrl: psssbLogo },
     { id: 'punjab-patwari', boardId: 'psssb', name: 'Revenue Patwari 2026', category: 'STATE', description: 'Prepare for Revenue Patwari, Canal Patwari and Ziladar recruitment.', iconUrl: psssbLogo },
+    { id: 'psssb-senior-asst', boardId: 'psssb', name: 'Senior Assistant cum Inspector', category: 'STATE', description: 'Senior level clerical and field officer recruitment.', iconUrl: psssbLogo },
+
+    // PUNJAB POLICE VERTICALS (Hardened Branding)
     { id: 'police-si', boardId: 'punjab-police', name: 'Sub-Inspector (Dist/Armed)', category: 'POLICE', description: 'District and Armed Cadre recruitment for Punjab Police.', iconUrl: policeEmblem },
     { id: 'police-constable', boardId: 'punjab-police', name: 'Constable Recruitment', category: 'POLICE', description: 'Direct recruitment for Constable posts in Punjab Police.', iconUrl: policeEmblem },
+    { id: 'police-hc-asi', boardId: 'punjab-police', name: 'Head Constable / ASI', category: 'POLICE', description: 'Mid-tier recruitment for Punjab Police cadre.', iconUrl: policeEmblem },
+    { id: 'police-jail-warder', boardId: 'punjab-police', name: 'Jail Warder & Matron', category: 'POLICE', description: 'Recruitment for Punjab Prisons department.', iconUrl: policeEmblem },
+    { id: 'police-tss', boardId: 'punjab-police', name: 'Technical Support Services (TSS)', category: 'POLICE', description: 'Technical recruitment for Punjab Police support nodes.', iconUrl: policeEmblem },
+
+    // TEACHING VERTICALS (Hardened Branding)
+    { id: 'ett-cadre', boardId: 'education', name: 'ETT Cadre', category: 'TEACHING', description: 'Elementary Teacher Training recruitment hub.', iconUrl: psebOfficialLogo },
+    { id: 'master-cadre', boardId: 'education', name: 'Master Cadre', category: 'TEACHING', description: 'Subject-wise teacher recruitment for Punjab Schools.', iconUrl: psebOfficialLogo },
+    { id: 'lecturer-cadre', boardId: 'education', name: 'Lecturer Cadre', category: 'TEACHING', description: 'School Lecturer recruitment for Punjab education hubs.', iconUrl: psebOfficialLogo },
+
+    // Other canonical hubs
     { id: 'ppsc-pcs', boardId: 'ppsc', name: 'PCS Executive Prelims', category: 'CIVIL', description: 'Higher Class A & B services including DSP and Tehsildar posts.', iconUrl: ppscJpg },
     { id: 'hc-clerk', boardId: 'high-court', name: 'High Court Clerk (SSSC)', category: 'JUDICIAL', description: 'Clerical recruitment for High Court of Punjab & Haryana.', iconUrl: ssscLogo },
     { id: 'ibps-po', boardId: 'ibps', name: 'IBPS PO / Clerk', category: 'BANKING', description: 'Central banking recruitment exams.', iconUrl: ibpsLogo },
     { id: 'ssc-cgl', boardId: 'ssc', name: 'SSC CGL', category: 'CENTRAL', description: 'Combined Graduate Level Examination for central posts.', iconUrl: sscLogo },
     { id: 'ssc-chsl', boardId: 'ssc', name: 'SSC CHSL', category: 'CENTRAL', description: 'Combined Higher Secondary Level Examination.', iconUrl: sscLogo },
     { id: 'ssc-mts', boardId: 'ssc', name: 'SSC MTS & Havildar', category: 'CENTRAL', description: 'Multi-Tasking Staff recruitment examination.', iconUrl: sscLogo },
-    
-    // Power Nodes
     { id: 'pspcl-clerk', boardId: 'pspcl', name: 'PSPCL Clerk / LDC', category: 'TECHNICAL', description: 'Recruitment for Punjab State Power Corporation.', iconUrl: pspclLogo },
     { id: 'pspcl-alm', boardId: 'pspcl', name: 'ALM / Lineman', category: 'TECHNICAL', description: 'Assistant Lineman recruitment for Punjab State Power Corporation.', iconUrl: pspclLogo },
-    { id: 'pstcl-ae', boardId: 'pspcl', name: 'PSTCL AE / JE', category: 'TECHNICAL', description: 'Technical recruitment for Transmission Corporation.', iconUrl: pspclLogo },
-
-    // Teaching Nodes (CTET & ETT)
     { id: 'ctet-paper-1', boardId: 'cbse', name: 'CTET Paper 1', category: 'TEACHING', description: 'Central Teacher Eligibility Test (Primary Stage).', iconUrl: ctetLogo },
     { id: 'ctet-paper-2', boardId: 'cbse', name: 'CTET Paper 2', category: 'TEACHING', description: 'Central Teacher Eligibility Test (Elementary Stage).', iconUrl: ctetLogo },
-    { id: 'pstet-hub', boardId: 'pstet', name: 'PSTET Hub', category: 'TEACHING', description: 'Punjab State Teacher Eligibility Test recruitment.', iconUrl: pstetLogo },
-    { id: 'ett-cadre', boardId: 'education', name: 'ETT Cadre', category: 'TEACHING', description: 'Elementary Teacher Training recruitment hub.', iconUrl: psebOfficialLogo },
-    { id: 'master-cadre', boardId: 'education', name: 'Master Cadre', category: 'TEACHING', description: 'Subject-wise teacher recruitment for Punjab Schools.', iconUrl: psebOfficialLogo }
+    { id: 'pstet-hub', boardId: 'pstet', name: 'PSTET Hub', category: 'TEACHING', description: 'Punjab State Teacher Eligibility Test recruitment.', iconUrl: pstetLogo }
   ];
 
   for (const e of exams) {

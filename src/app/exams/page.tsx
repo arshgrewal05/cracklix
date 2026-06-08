@@ -17,8 +17,9 @@ import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview High-Density Responsive Exam Catalog v12.0.
- * UPDATED: Optimized high-fidelity rendering for PSSSB, PSPCL, and SSC logos.
+ * @fileOverview High-Density Responsive Exam Catalog v13.0.
+ * UPDATED: Optimized high-fidelity rendering for PSSSB, Police, and PSEB logos.
+ * FIXED: Mandatory branding protocol for ETT/Master Cadre.
  */
 
 export default function ExamsCatalog() {
@@ -148,10 +149,13 @@ function CatalogContent() {
               const isImgFailed = failedImages[exam.id];
               
               const bid = exam.boardId?.toLowerCase() || "";
+              const abbrev = board?.abbreviation?.toUpperCase() || "";
+              
               const isArmy = bid === 'army' || exam.id?.toLowerCase().includes('army');
-              const isPolice = bid.includes('police');
-              const isPower = bid.includes('pspcl') || bid.includes('pstcl');
-              const isSsc = bid === 'ssc' || exam.id?.toLowerCase().includes('ssc');
+              const isPolice = bid.includes('police') || abbrev.includes('POLICE');
+              const isPower = bid.includes('pspcl') || bid.includes('pstcl') || abbrev.includes('PSPCL');
+              const isSsc = bid === 'ssc' || exam.id?.toLowerCase().includes('ssc') || abbrev === 'SSC';
+              const isEdu = bid.includes('education') || bid.includes('pseb') || abbrev === 'PSEB' || exam.name?.toLowerCase().includes('ett') || exam.name?.toLowerCase().includes('master');
 
               return (
                 <Card key={exam.id} className="border-none shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl md:rounded-[3rem] bg-white group overflow-hidden text-left h-full flex flex-col border border-slate-100 p-4 md:p-10 relative">
@@ -169,7 +173,7 @@ function CatalogContent() {
                                 <img 
                                   src={logoUrl} 
                                   className={cn("w-full h-full object-contain p-1.5 md:p-2 transition-transform duration-500 group-hover:scale-105", 
-                                    isArmy ? "scale-125" : isPolice ? "scale-110 p-1" : (isPower || isSsc) ? "scale-110" : ""
+                                    isArmy ? "scale-125" : (isPolice || isEdu) ? "scale-110 p-1" : (isPower || isSsc) ? "scale-110" : ""
                                   )} 
                                   alt="Board Logo" 
                                   referrerPolicy="no-referrer" 
