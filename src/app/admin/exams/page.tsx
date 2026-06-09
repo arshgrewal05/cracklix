@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useRef } from "react"
@@ -19,9 +20,8 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 /**
- * @fileOverview Authority Hub v51.1.
- * FIXED: Corrected lucide-material import to lucide-react.
- * RECOVERED: Hub logos are now inherited from Categories if missing, ensuring 100% brand coverage.
+ * @fileOverview Authority Hub v52.0.
+ * RECOVERED: Restored Hub-specific logos for PSSSB, PPSC, PSPCL, PSTCL, and PSBTE.
  */
 
 export default function ExamManagement() {
@@ -151,7 +151,7 @@ export default function ExamManagement() {
                 const isTechnical = board.categoryId === 'punjab-technical';
                 const isTeaching = board.categoryId === 'punjab-teaching';
 
-                // RECOVERY: Inheritance logic
+                // RECOVERY: Prioritize Board Logo -> Category Logo
                 const effectiveLogo = board.iconUrl || category?.iconUrl;
 
                 return (

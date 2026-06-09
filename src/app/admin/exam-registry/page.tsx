@@ -33,8 +33,8 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Master Registry v6.0.
- * RECOVERED: Hierarchical branding logic ensures all verticals display recovered institutional logos.
+ * @fileOverview Institutional Exam Master Registry v7.0.
+ * RECOVERED: Hierarchical branding logic ensures all verticals display recovered institutional logos from Boards.
  */
 
 export default function ExamRegistryPage() {

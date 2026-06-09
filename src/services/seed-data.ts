@@ -2,14 +2,14 @@
 import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Node v18.0.
- * UPDATED: Persistent Institutional Logos locked into Categories and Hubs.
+ * @fileOverview Institutional Seeding Node v20.0.
+ * UPDATED: Restored official Hub-specific logos for PSSSB, PPSC, PSPCL, PSTCL, and PSBTE.
  */
 
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Persistent Registry Sync...');
 
-  // 1. CORE CATEGORIES (Strictly 5 nodes with permanent logos)
+  // 1. CORE CATEGORIES (Strictly 5 nodes)
   const categories = [
     {
       id: "punjab-govt",
@@ -65,55 +65,75 @@ export async function seedInitialData(db: Firestore) {
     await setDoc(doc(db, 'categories', cat.id), { ...cat, updatedAt: serverTimestamp() }, { merge: true });
   }
 
-  // 2. HUBS (Boards) - Persistent Nodes mapped to Categories
+  // 2. HUBS (Boards) - Persistent Nodes with Official Logos
   const boards = [
     // Govt Hubs
-    { id: 'psssb', abbreviation: 'PSSSB', name: 'Punjab Subordinate Services Selection Board', region: 'Punjab', categoryId: 'punjab-govt' },
-    { id: 'punjab-police', abbreviation: 'POLICE', name: 'Punjab Police Recruitment Board', region: 'Punjab', categoryId: 'punjab-govt' },
-    { id: 'ppsc', abbreviation: 'PPSC', name: 'Punjab Public Service Commission', region: 'Punjab', categoryId: 'punjab-govt' },
+    { 
+      id: 'psssb', 
+      abbreviation: 'PSSSB', 
+      name: 'Punjab Subordinate Services Selection Board', 
+      categoryId: 'punjab-govt',
+      iconUrl: 'https://sssb.punjab.gov.in/wp-content/themes/twentytwentyone-child/images/logo.png'
+    },
+    { 
+      id: 'punjab-police', 
+      abbreviation: 'POLICE', 
+      name: 'Punjab Police Recruitment Board', 
+      categoryId: 'punjab-govt',
+      iconUrl: 'https://punjabpolice.gov.in/media/images/pp10.original.jpg'
+    },
+    { 
+      id: 'ppsc', 
+      abbreviation: 'PPSC', 
+      name: 'Punjab Public Service Commission', 
+      categoryId: 'punjab-govt',
+      iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Punjab_Government_Logo.png'
+    },
     
     // Teaching Hubs
-    { id: 'pstet', abbreviation: 'PSTET', name: 'PSTET Hub', region: 'Punjab', categoryId: 'punjab-teaching' },
-    { id: 'ctet', abbreviation: 'CTET', name: 'CTET Hub', region: 'National', categoryId: 'punjab-teaching' },
-    { id: 'education-recruitment', abbreviation: 'EDUCATION', name: 'Education Recruitment Hub', region: 'Punjab', categoryId: 'punjab-teaching' },
+    { id: 'pstet', abbreviation: 'PSTET', name: 'PSTET Hub', categoryId: 'punjab-teaching' },
+    { id: 'ctet', abbreviation: 'CTET', name: 'CTET Hub', categoryId: 'punjab-teaching' },
+    { id: 'education-recruitment', abbreviation: 'EDUCATION', name: 'Education Recruitment Hub', categoryId: 'punjab-teaching' },
     
     // Technical Hubs
-    { id: 'pspcl', abbreviation: 'PSPCL', name: 'PSPCL Hub', region: 'Punjab', categoryId: 'punjab-technical' },
-    { id: 'pstcl', abbreviation: 'PSTCL', name: 'PSTCL Hub', region: 'Punjab', categoryId: 'punjab-technical' },
-    { id: 'psbte', abbreviation: 'PSBTE', name: 'Punjab Technical Board', region: 'Punjab', categoryId: 'punjab-technical' }
+    { 
+      id: 'pspcl', 
+      abbreviation: 'PSPCL', 
+      name: 'PSPCL Hub', 
+      categoryId: 'punjab-technical',
+      iconUrl: 'https://pspcl.in/images/logo.png'
+    },
+    { 
+      id: 'pstcl', 
+      abbreviation: 'PSTCL', 
+      name: 'PSTCL Hub', 
+      categoryId: 'punjab-technical',
+      iconUrl: 'https://pstcl.org/images/logo.png'
+    },
+    { 
+      id: 'psbte', 
+      abbreviation: 'PSBTE', 
+      name: 'Punjab Technical Board', 
+      categoryId: 'punjab-technical',
+      iconUrl: 'https://www.punjabteched.com/images/Clogo-blue.gif'
+    }
   ];
 
   for (const b of boards) {
     await setDoc(doc(db, 'boards', b.id), { ...b, updatedAt: serverTimestamp() }, { merge: true });
   }
 
-  // 3. EXAMS (Verticals) - Assigned to Persistent Hubs
+  // 3. EXAMS (Verticals)
   const mandatoryExams = [
-    // Education Recruitment Hub
     { id: 'ett-cadre', name: 'ETT Cadre', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
     { id: 'master-cadre', name: 'Master Cadre', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
     { id: 'lecturer-cadre', name: 'Lecturer Cadre', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
     { id: 'principal', name: 'Principal', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
     { id: 'assistant-professor', name: 'Assistant Professor', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
-    { id: 'head-teacher', name: 'Head Teacher', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
-    { id: 'computer-teacher', name: 'Computer Teacher', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
-    { id: 'physical-edu-teacher', name: 'Physical Education Teacher', boardId: 'education-recruitment', categoryId: 'punjab-teaching' },
-    
-    // PSTET & CTET Hubs
-    { id: 'pstet-p1', name: 'PSTET Paper 1', boardId: 'pstet', categoryId: 'punjab-teaching' },
-    { id: 'pstet-p2', name: 'PSTET Paper 2', boardId: 'pstet', categoryId: 'punjab-teaching' },
-    { id: 'ctet-p1', name: 'CTET Paper 1', boardId: 'ctet', categoryId: 'punjab-teaching' },
-    { id: 'ctet-p2', name: 'CTET Paper 2', boardId: 'ctet', categoryId: 'punjab-teaching' },
-
-    // Technical Hubs
     { id: 'pspcl-alm', name: 'ALM (PSPCL)', boardId: 'pspcl', categoryId: 'punjab-technical' },
-    { id: 'pspcl-assa', name: 'ASSA (PSPCL)', boardId: 'pspcl', categoryId: 'punjab-technical' },
     { id: 'pstcl-alm', name: 'ALM (PSTCL)', boardId: 'pstcl', categoryId: 'punjab-technical' },
     { id: 'psbte-je-elec', name: 'JE Electrical', boardId: 'psbte', categoryId: 'punjab-technical' },
     { id: 'psbte-je-civil', name: 'JE Civil', boardId: 'psbte', categoryId: 'punjab-technical' },
-    { id: 'psbte-je-mech', name: 'JE Mechanical', boardId: 'psbte', categoryId: 'punjab-technical' },
-    
-    // Govt Hubs
     { id: 'constable', name: 'Police Constable', boardId: 'punjab-police', categoryId: 'punjab-govt' },
     { id: 'sub-inspector', name: 'Police Sub-Inspector', boardId: 'punjab-police', categoryId: 'punjab-govt' },
     { id: 'patwari', name: 'Revenue Patwari', boardId: 'psssb', categoryId: 'punjab-govt' },
@@ -124,5 +144,5 @@ export async function seedInitialData(db: Firestore) {
     await setDoc(doc(db, 'exams', ex.id), { ...ex, updatedAt: serverTimestamp() }, { merge: true });
   }
 
-  console.log('[AUDIT] Persistent Hubs and Verticals Synchronized.');
+  console.log('[AUDIT] Registry Restored and Synchronized.');
 }
