@@ -52,8 +52,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview FINAL HIGH-FIDELITY Mock Architect v71.0.
- * UPDATED: Implemented display limiting for Question Bank to resolve memory instability.
+ * @fileOverview FINAL HIGH-FIDELITY Mock Architect v72.0.
+ * UPDATED: Oval Emerald/Rose marks cards matching screenshot. Small 8px rectangle stats.
  */
 
 export default function MockBuilderPage() {
@@ -127,7 +127,6 @@ function MockBuilderContent() {
     if (!db) return
     setBankLoading(true)
     try {
-      // Fetch a reasonable maximum for construction to maintain browser performance
       const q = query(collection(db, "questions"), limit(2000))
       const snap = await getDocs(q)
       setQuestionBank(snap.docs.map(d => ({ ...d.data(), id: d.id })))
@@ -327,12 +326,12 @@ function MockBuilderContent() {
           </Button>
           <div className="text-left">
             <h1 className="text-2xl md:text-5xl font-headline font-black uppercase tracking-tight text-[#0F172A] leading-none">{isEditing ? "Modify Series" : "Mock Architect"}</h1>
-            <p className="text-[10px] md:text-xs uppercase font-black tracking-[0.3em] text-slate-400 mt-2">Institutional Assembly Hub</p>
+            <p className="text-[10px] md:text-xs uppercase font-black tracking-widest text-slate-400 mt-2 tracking-[0.3em]">Institutional Assembly Hub</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
            <Button onClick={handlePublish} disabled={isPublishing} className="bg-[#0F172A] hover:bg-black text-white font-black px-8 md:px-12 h-14 md:h-16 rounded-xl md:rounded-2xl uppercase text-[11px] tracking-[0.2em] gap-3 shadow-3xl active:scale-95">
-            {isPublishing ? <Loader2 className="h-5 w-5 animate-spin" /> : <ClipboardCheck className="h-6 w-6" />} Deploy Series
+            {isPublishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ClipboardCheck className="h-6 w-6" />} Deploy Series
            </Button>
         </div>
       </div>
@@ -397,7 +396,7 @@ function MockBuilderContent() {
 
               <div className="space-y-3 text-left">
                 <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">TARGET BOARDS</Label>
-                <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
+                <div className="space-y-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
                    {boards?.map((b: any) => (
                       <div 
                          key={b.id} 
@@ -418,7 +417,7 @@ function MockBuilderContent() {
 
               <div className="space-y-3 text-left">
                 <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">TARGET VERTICALS</Label>
-                <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
+                <div className="space-y-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
                    {uniqueExams.map((e: any) => {
                       const isSelected = mockData.examIds?.includes(e.id);
                       return (
@@ -490,24 +489,30 @@ function MockBuilderContent() {
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4">
-                 <div className="bg-[#F0FDF4] p-6 rounded-[3rem] border-2 border-[#DCFCE7] text-center space-y-3 flex flex-col items-center">
-                    <p className="text-[11px] font-black text-[#10B981] uppercase tracking-widest">POSITIVE (+)</p>
+                 <div className="bg-[#F0FDF4] p-8 md:p-10 rounded-full border-2 border-[#DCFCE7] text-center space-y-3 flex flex-col items-center justify-center h-48 md:h-64 shadow-inner group transition-all hover:border-[#10B981]/30">
+                    <div className="space-y-1">
+                       <p className="text-[14px] font-black text-[#10B981] uppercase tracking-widest leading-none">POSITIVE</p>
+                       <p className="text-[12px] font-black text-[#10B981] opacity-50 uppercase tracking-widest">(+)</p>
+                    </div>
                     <Input 
                        type="number" 
                        step="0.1"
                        value={isNaN(mockData.positiveMarks) ? "" : mockData.positiveMarks} 
                        onChange={e => setMockData({...mockData, positiveMarks: parseFloat(e.target.value) || 0})}
-                       className="h-12 bg-transparent border-none text-center font-black text-3xl md:text-5xl text-[#10B981] p-0 focus-visible:ring-0 tabular-nums" 
+                       className="h-16 md:h-20 bg-transparent border-none text-center font-black text-5xl md:text-7xl text-[#10B981] p-0 focus-visible:ring-0 tabular-nums" 
                     />
                  </div>
-                 <div className="bg-[#FEF2F2] p-6 rounded-[3rem] border-2 border-[#FEE2E2] text-center space-y-3 flex flex-col items-center">
-                    <p className="text-[11px] font-black text-[#F43F5E] uppercase tracking-widest">PENALTY (-)</p>
+                 <div className="bg-[#FEF2F2] p-8 md:p-10 rounded-full border-2 border-[#FEE2E2] text-center space-y-3 flex flex-col items-center justify-center h-48 md:h-64 shadow-inner group transition-all hover:border-[#F43F5E]/30">
+                    <div className="space-y-1">
+                       <p className="text-[14px] font-black text-[#F43F5E] uppercase tracking-widest leading-none">PENALTY</p>
+                       <p className="text-[12px] font-black text-[#F43F5E] opacity-50 uppercase tracking-widest">(-)</p>
+                    </div>
                     <Input 
                        type="number" 
                        step="0.01"
                        value={isNaN(mockData.negativeMarks) ? "" : mockData.negativeMarks} 
                        onChange={e => setMockData({...mockData, negativeMarks: parseFloat(e.target.value) || 0})}
-                       className="h-12 bg-transparent border-none text-center font-black text-3xl md:text-5xl text-[#F43F5E] p-0 focus-visible:ring-0 tabular-nums" 
+                       className="h-16 md:h-20 bg-transparent border-none text-center font-black text-5xl md:text-7xl text-[#F43F5E] p-0 focus-visible:ring-0 tabular-nums" 
                     />
                  </div>
               </div>
@@ -548,16 +553,16 @@ function MockBuilderContent() {
                         {/* 1. TOP STATS NODES (RECTANGULAR & SMALL) */}
                         <div className="flex items-center justify-between gap-4 pb-6 border-b border-white/5">
                            <div className="flex gap-4">
-                              <div className="bg-white/5 px-4 py-2 rounded-xl border border-white/10 flex flex-col items-start gap-1 shadow-inner min-w-[120px]">
-                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">FILTERED</span>
-                                 <span className="text-sm md:text-xl font-black text-primary tabular-nums">{filteredBank.length} Q</span>
+                              <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 flex flex-col items-start gap-1 shadow-inner min-w-[110px]">
+                                 <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">FILTERED</span>
+                                 <span className="text-[14px] font-black text-primary tabular-nums">{filteredBank.length} Q</span>
                               </div>
-                              <div className="bg-white/5 px-4 py-2 rounded-xl border border-white/10 flex flex-col items-start gap-1 shadow-inner min-w-[120px]">
-                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">TOTAL BANK</span>
-                                 <span className="text-sm md:text-xl font-black text-white tabular-nums">{questionBank.length} Q</span>
+                              <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 flex flex-col items-start gap-1 shadow-inner min-w-[110px]">
+                                 <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">TOTAL BANK</span>
+                                 <span className="text-[14px] font-black text-white tabular-nums">{questionBank.length} Q</span>
                               </div>
                            </div>
-                           <Badge className="bg-[#F97316] text-white border-none text-[10px] font-black px-4 py-1.5 rounded-lg shadow-3xl uppercase tracking-widest hidden sm:block">
+                           <Badge className="bg-[#F97316] text-white border-none text-[9px] font-black px-4 py-1.5 rounded-lg shadow-3xl uppercase tracking-widest hidden sm:block">
                               Official Hub
                            </Badge>
                         </div>
@@ -607,14 +612,14 @@ function MockBuilderContent() {
                                 </Label>
                                 <Popover>
                                    <PopoverTrigger asChild>
-                                      <button className="w-full h-16 bg-[#F97316] hover:bg-orange-600 text-white rounded-2xl font-black uppercase text-[20px] shadow-5xl tracking-tight transition-all flex items-center justify-center px-6 border-none active:scale-95 group truncate">
+                                      <button className="w-full h-14 bg-[#F97316] hover:bg-orange-600 text-white rounded-xl font-black uppercase text-[14px] shadow-5xl tracking-tight transition-all flex items-center justify-center px-6 border-none active:scale-95 group truncate">
                                          {sections.find(s => s.id === activeSectionId)?.name || "GENERAL HUB"}
                                       </button>
                                    </PopoverTrigger>
                                    <PopoverContent className="w-[320px] md:w-[400px] bg-[#0F172A] border-white/10 p-0 rounded-[2rem] shadow-5xl z-[1001] overflow-hidden">
                                       <div className="p-8 pb-4 border-b border-white/5 flex items-center justify-between">
                                          <p className="text-[12px] font-black uppercase text-slate-500 tracking-widest">GENERAL HUB</p>
-                                         <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black">{sections.length} NODES</Badge>
+                                         <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black"> {sections.length} NODES</Badge>
                                       </div>
                                       <ScrollArea className="h-72">
                                          <div className="space-y-1.5 p-4">
@@ -637,14 +642,14 @@ function MockBuilderContent() {
                               </div>
                               
                               <div className="flex-[2] flex gap-4 w-full">
-                                <div className="flex-1 flex items-center justify-between bg-white/5 px-6 py-3 rounded-2xl border border-white/10 h-16 group hover:bg-white/10 transition-all cursor-pointer shadow-inner">
+                                <div className="flex-1 flex items-center justify-between bg-white/5 px-6 py-3 rounded-xl border border-white/10 h-14 group hover:bg-white/10 transition-all cursor-pointer shadow-inner">
                                     <div className="flex flex-col text-left">
                                        <span className="text-[12px] font-black uppercase text-slate-300 leading-none">UNUSED</span>
                                        <span className="text-[12px] font-black uppercase text-slate-300 leading-none mt-1">ONLY</span>
                                     </div>
                                     <Switch checked={hideUsed} onCheckedChange={setHideUsed} className="data-[state=checked]:bg-[#F97316] scale-110" />
                                 </div>
-                                <div className="flex-1 flex items-center justify-between bg-white/5 px-6 py-3 rounded-2xl border border-white/10 h-16 group hover:bg-white/10 transition-all cursor-pointer shadow-inner">
+                                <div className="flex-1 flex items-center justify-between bg-white/5 px-6 py-3 rounded-xl border border-white/10 h-14 group hover:bg-white/10 transition-all cursor-pointer shadow-inner">
                                     <div className="flex flex-col text-left">
                                        <span className="text-[12px] font-black uppercase text-slate-300 leading-none">BLOCK</span>
                                        <span className="text-[12px] font-black uppercase text-slate-300 leading-none mt-1">REPEATS</span>
@@ -658,14 +663,14 @@ function MockBuilderContent() {
                               <Button 
                                   onClick={handleSelectAllInBank} 
                                   variant="outline"
-                                  className="h-16 flex-1 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[14px] tracking-tight rounded-2xl shadow-xl active:scale-95 truncate"
+                                  className="h-14 flex-1 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[14px] tracking-tight rounded-xl shadow-xl active:scale-95 truncate"
                               >
                                   SELECT ALL FILTERED
                               </Button>
                               <Button 
                                 onClick={handleLinkQuestions}
                                 disabled={bankSelection.length === 0}
-                                className="h-16 flex-[2] bg-[#10B981] hover:bg-[#0E946A] text-white font-black uppercase text-[20px] md:text-[24px] tracking-tight rounded-2xl shadow-5xl border-none transition-all active:scale-95 gap-3"
+                                className="h-14 flex-[2] bg-[#10B981] hover:bg-[#0E946A] text-white font-black uppercase text-[14px] tracking-tight rounded-xl shadow-5xl border-none transition-all active:scale-95 gap-3"
                               >
                                 LINK {bankSelection.length} Q <Zap className="h-6 w-6 fill-current" />
                               </Button>
@@ -741,7 +746,7 @@ function MockBuilderContent() {
               ) : (
                 <div className="space-y-8 flex-1 flex flex-col animate-in fade-in duration-500">
                     <div className="flex items-center justify-between px-6">
-                      <h3 className="text-2xl font-headline font-black text-[#0F172A] uppercase flex items-center gap-4">
+                      <h3 className="text-[14px] font-headline font-black text-[#0F172A] uppercase flex items-center gap-4">
                           <Layers className="h-7 w-7 text-primary" /> Active Assembly Hub
                       </h3>
                       <Badge className="bg-[#0F172A] text-white border-none px-6 py-2 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-xl">

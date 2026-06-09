@@ -26,8 +26,8 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 
 /**
- * @fileOverview Optimized Login Hub v5.0.
- * UPDATED: Integrated returnUrl persistence for Test Access Firewall.
+ * @fileOverview Optimized Login Hub v6.0.
+ * UPDATED: Default redirect set to Home Page (/) for seamless discovery.
  */
 
 // PERMANENT AUTHORITY WHITELIST
@@ -62,11 +62,11 @@ function LoginContent() {
   const db = useFirestore()
   const { toast } = useToast()
 
-  const returnUrl = searchParams.get("returnUrl") || "/dashboard"
+  const returnUrl = searchParams.get("returnUrl") || "/"
 
   // Prefetch routes to eliminate navigation lag
   useEffect(() => {
-    router.prefetch('/dashboard');
+    router.prefetch('/');
     router.prefetch('/admin');
   }, [router]);
 
@@ -162,6 +162,7 @@ function LoginContent() {
     } catch (error: any) {
       toast({ variant: "destructive", title: "Failed to Send", description: error.message });
     } finally {
+      setResetEmail("");
       setResetLoading(false);
     }
   };
