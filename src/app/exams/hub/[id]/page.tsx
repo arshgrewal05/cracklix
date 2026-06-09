@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -16,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Hub Explorer v7.0.
+ * @fileOverview Institutional Hub Explorer v8.0.
  * RECOVERED: Restored hierarchical branding ensures Police and PSPCL exams inherit official logos from parent Hubs.
  */
 

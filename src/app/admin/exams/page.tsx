@@ -19,9 +19,8 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 /**
- * @fileOverview Authority Hub v55.0 (Production Hardened).
- * FIXED: Unterminated string constant and corrected lucide-react imports.
- * RECOVERED: Institutional branding for Punjab Police, PSPCL, PSSSB, and PPSC.
+ * @fileOverview Authority Hub v56.0.
+ * FIXED: Unterminated string constant and corrected icon imports.
  */
 
 export default function ExamManagement() {
@@ -153,7 +152,7 @@ export default function ExamManagement() {
                 const effectiveLogo = board.iconUrl || category?.iconUrl;
 
                 return (
-                  <TableRow key={board.id} className="hover:bg-slate-50 group border-slate-50 transition-all">
+                  <TableRow key={board.id} className="hover:bg-slate-50 border-slate-50 transition-all group">
                     <TableCell className="px-10 py-6">
                       <div className="h-16 w-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden relative shadow-inner group-hover:scale-110 transition-transform">
                           {effectiveLogo && !failedImages[board.id] ? (

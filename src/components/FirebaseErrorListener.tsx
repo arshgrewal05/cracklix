@@ -16,7 +16,7 @@ export function FirebaseErrorListener() {
         throw error;
       }
       
-      // 2. Fallback for non-standard events
+      // 2. Fallback for non-standard events (e.g. from generic try/catch leaks)
       console.error("[CBT SECURITY EVENT]:", error);
     };
 
