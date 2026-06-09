@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash2, Edit, Save, Layers, Search, Loader2, ChevronRight, Landmark, GraduationCap, Zap, Wallet, Globe, ShieldCheck, MoveUp, MoveDown } from "lucide-react"
+import { Plus, Trash2, Edit, Save, Layers, Search, Loader2, Landmark, GraduationCap, Zap, Wallet, Globe, MoveUp, MoveDown } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, doc, setDoc, deleteDoc, serverTimestamp, query, orderBy } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -19,8 +19,8 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Category Governance Node v12.1.
- * FIXED: Hardened controlled inputs to prevent "undefined" value errors.
+ * @fileOverview Institutional Category Governance Node v12.2.
+ * RESTORED: Simplified management view without drill-down links.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -88,7 +88,7 @@ export default function CategoryManagement() {
 
   const handleDelete = async (id: string) => {
     if (!db) return;
-    const confirmMsg = "CRITICAL: Permanently purge this category node? This will leave associated hubs and exams uncategorized.";
+    const confirmMsg = "CRITICAL: Permanently purge this category node?";
     if (!window.confirm(confirmMsg)) return;
 
     try {
@@ -108,7 +108,7 @@ export default function CategoryManagement() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Master Vertical Registry</span>
            </div>
           <h1 className="text-5xl font-black font-headline text-primary uppercase tracking-tight">Category Manager</h1>
-          <p className="text-slate-500 mt-1 font-medium">Coordinate high-level recruitment groups and drill-down into associated hubs.</p>
+          <p className="text-slate-500 mt-1 font-medium">Coordinate high-level recruitment groups and discovery categories.</p>
         </div>
         <Button onClick={() => setEditingCat({ id: "", title: "", description: "", highlight: "", displayOrder: (categories?.length || 0) + 1, color: "text-primary", bgColor: "bg-orange-50" })} className="bg-primary hover:bg-orange-600 h-16 px-12 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl transition-all active:scale-95">
           <Plus className="h-5 w-5" /> Deploy New Category
@@ -123,13 +123,12 @@ export default function CategoryManagement() {
                 <TableRow className="border-slate-100 h-20">
                   <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Vertical Identity</TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-center text-slate-500">Order</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Management Links</TableHead>
                   <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-500">Audit Control</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
-                   Array.from({length: 5}).map((_, i) => <TableRow key={i}><TableCell colSpan={4} className="p-10"><Skeleton className="h-16 w-full rounded-2xl"/></TableCell></TableRow>)
+                   Array.from({length: 5}).map((_, i) => <TableRow key={i}><TableCell colSpan={3} className="p-10"><Skeleton className="h-16 w-full rounded-2xl"/></TableCell></TableRow>)
                 ) : categories?.map((cat: any, idx: number) => (
                   <TableRow key={cat.id} className="hover:bg-slate-50 group border-slate-50 transition-all">
                     <TableCell className="px-10 py-8">
@@ -148,16 +147,6 @@ export default function CategoryManagement() {
                           <button onClick={() => handleReorder(cat, 'up')} disabled={idx === 0} className="p-1 hover:text-primary disabled:opacity-10 transition-all"><MoveUp className="h-3 w-3" /></button>
                           <span className="font-black text-slate-300 text-xl tabular-nums leading-none">{cat.displayOrder}</span>
                           <button onClick={() => handleReorder(cat, 'down')} disabled={idx === categories.length - 1} className="p-1 hover:text-primary disabled:opacity-10 transition-all"><MoveDown className="h-3 w-3" /></button>
-                       </div>
-                    </TableCell>
-                    <TableCell>
-                       <div className="flex items-center gap-3">
-                          <Button asChild variant="outline" className="h-10 px-4 rounded-xl border-slate-200 font-black uppercase text-[8px] tracking-widest gap-2 hover:bg-primary/5 hover:text-primary transition-all">
-                             <Link href={`/admin/exams?category=${cat.id}`}><Landmark className="h-3 w-3" /> Hubs</Link>
-                          </Button>
-                          <Button asChild variant="outline" className="h-10 px-4 rounded-xl border-slate-200 font-black uppercase text-[8px] tracking-widest gap-2 hover:bg-blue-50 hover:text-blue-600 transition-all">
-                             <Link href={`/admin/exam-registry?category=${cat.id}`}><GraduationCap className="h-3 w-3" /> Verticals</Link>
-                          </Button>
                        </div>
                     </TableCell>
                     <TableCell className="text-right px-10">
@@ -222,7 +211,7 @@ export default function CategoryManagement() {
                     value={editingCat?.description ?? ""} 
                     onChange={e => setEditingCat({...editingCat, description: e.target.value})} 
                     className="rounded-xl border-slate-100 bg-slate-50 min-h-[100px] font-medium leading-relaxed" 
-                    placeholder="Describe associated recruitment boards..."
+                    placeholder="Describe category purpose..."
                   />
                </div>
                <div className="grid grid-cols-2 gap-6">

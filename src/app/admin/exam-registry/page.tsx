@@ -11,20 +11,15 @@ import {
   Trash2, 
   Edit, 
   Search, 
-  GitMerge, 
   Loader2, 
   Landmark, 
   GraduationCap,
-  ChevronRight,
-  ShieldCheck,
-  Layers,
   Save,
-  X,
   Shield,
   Zap
 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, query, doc, deleteDoc, writeBatch, setDoc, serverTimestamp, getDocs, where, limit, orderBy } from "firebase/firestore"
+import { collection, query, doc, deleteDoc, setDoc, serverTimestamp, orderBy } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,8 +28,8 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Master Registry v8.1.
- * FIXED: Hardened controlled inputs to prevent "undefined" value errors.
+ * @fileOverview Institutional Exam Master Registry v8.2.
+ * RESTORED: Simplified management view without hierarchical drill-down links.
  */
 
 export default function ExamRegistryPage() {
@@ -88,8 +83,8 @@ export default function ExamRegistryPage() {
   }
 
   return (
-    <div className="space-y-12 pb-24 text-left">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 px-4">
+    <div className="space-y-12 pb-24 text-left px-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div>
            <div className="flex items-center gap-3 mb-2">
               <Landmark className="h-6 w-6 text-amber-500" />
@@ -105,12 +100,12 @@ export default function ExamRegistryPage() {
         </div>
       </div>
 
-      <div className="mx-4 relative group">
+      <div className="relative group">
          <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
          <Input className="h-16 pl-16 rounded-[1.5rem] bg-white border-none shadow-2xl text-lg font-medium" placeholder="Search exam verticals..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
       </div>
 
-      <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden mx-4">
+      <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden">
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-slate-50/50">
@@ -131,7 +126,6 @@ export default function ExamRegistryPage() {
                 const category = categories?.find((c: any) => c.id === e.categoryId);
                 
                 const catId = e.categoryId;
-                const isGovt = catId === 'punjab-govt';
                 const isTeaching = catId === 'punjab-teaching';
                 const isTechnical = catId === 'punjab-technical';
                 const isPolice = e.boardId?.toLowerCase().includes('police') || board?.id.toLowerCase().includes('police');
@@ -192,21 +186,21 @@ export default function ExamRegistryPage() {
                <DialogTitle className="text-2xl font-black font-headline uppercase">Vertical Architect</DialogTitle>
             </DialogHeader>
             <div className="p-10 space-y-6">
-               <div className="space-y-2">
+               <div className="space-y-2 text-left">
                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Assigned Board Hub</Label>
                   <select value={editingExam?.boardId || ""} onChange={e => setEditingExam({...editingExam, boardId: e.target.value})} className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none">
                      <option value="">Select Hub</option>
                      {boards?.map((b:any) => <option key={b.id} value={b.id}>{b.abbreviation} Hub</option>)}
                   </select>
                </div>
-               <div className="space-y-2">
+               <div className="space-y-2 text-left">
                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Relational Category</Label>
                   <select value={editingExam?.categoryId || ""} onChange={e => setEditingExam({...editingExam, categoryId: e.target.value})} className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none">
                      <option value="">Select Category</option>
                      {categories?.map((c:any) => <option key={c.id} value={c.id}>{c.title}</option>)}
                   </select>
                </div>
-               <div className="space-y-2">
+               <div className="space-y-2 text-left">
                   <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Vertical Name</Label>
                   <Input value={editingExam?.name ?? ""} onChange={e => setEditingExam({...editingExam, name: e.target.value})} className="h-12 rounded-xl font-bold" placeholder="e.g. Constable District Cadre" />
                </div>

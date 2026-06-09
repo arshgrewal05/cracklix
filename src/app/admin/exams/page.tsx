@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 /**
- * @fileOverview Authority Hub v62.0.
- * UPDATED: Added displayOrder management for Hub reordering.
+ * @fileOverview Authority Hub v63.0.
+ * RESTORED: Simplified management view without hierarchical drill-down.
  */
 
 export default function ExamManagement() {
@@ -99,7 +99,7 @@ export default function ExamManagement() {
     if (e && e.stopPropagation) e.stopPropagation();
     if (!id || !db) return
     
-    const confirmMsg = "CRITICAL AUDIT: Permanently purge this authority hub from the global registry? This action is irreversible and may affect linked exams.";
+    const confirmMsg = "CRITICAL AUDIT: Permanently purge this authority hub from the global registry?";
     if (!window.confirm(confirmMsg)) return
     
     setIsDeleting(id)
@@ -134,28 +134,28 @@ export default function ExamManagement() {
   }
 
   return (
-    <div className="space-y-12 pb-24 text-[#0F172A] text-left pt-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-6">
+    <div className="space-y-12 pb-24 text-[#0F172A] text-left pt-12 px-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <div className="flex items-center gap-3 mb-2">
               <Globe className="h-6 w-6 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Official Board Registry</span>
            </div>
           <h1 className="text-5xl font-headline font-black text-primary uppercase tracking-tight">Authority Hub</h1>
-          <p className="text-slate-600 mt-1 font-medium">Manage institutional identities for all Punjab and National recruitment boards.</p>
+          <p className="text-slate-600 mt-1 font-medium">Manage institutional identities for recruitment boards.</p>
         </div>
         <Button className="bg-primary hover:bg-primary/90 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl gap-3" onClick={() => setEditingBoard({ abbreviation: "", name: "", description: "", iconUrl: "", categoryId: "", displayOrder: (boards?.length || 0) + 1 })}>
           <Plus className="h-5 w-5" /> Add New Hub
         </Button>
       </div>
 
-      <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden mx-6">
+      <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden">
         <CardContent className="p-0 text-left">
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-white/5 h-20">
                 <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Hub Identity</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Hierarchy</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Order</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Official Name</TableHead>
                 <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Audit Actions</TableHead>
               </TableRow>
@@ -256,12 +256,12 @@ export default function ExamManagement() {
             </div>
 
             <div className="space-y-6 pt-4 border-t border-slate-50">
-              <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Vertical Category</Label><select value={editingBoard?.categoryId || ""} onChange={e => setEditingBoard({...editingBoard, categoryId: e.target.value})} className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-black uppercase text-[10px] outline-none shadow-inner"><option value="">Select Category</option>{categories?.map((c: any) => <option key={c.id} value={c.id}>{c.title}</option>)}</select></div>
+              <div className="space-y-2 text-left"><Label className="text-[9px] font-black uppercase text-slate-400">Vertical Category</Label><select value={editingBoard?.categoryId || ""} onChange={e => setEditingBoard({...editingBoard, categoryId: e.target.value})} className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-black uppercase text-[10px] outline-none shadow-inner"><option value="">Select Category</option>{categories?.map((c: any) => <option key={c.id} value={c.id}>{c.title}</option>)}</select></div>
               <div className="grid grid-cols-2 gap-4">
-                 <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Short Code</Label><input value={editingBoard?.abbreviation || ""} onChange={e => setEditingBoard({...editingBoard, abbreviation: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-black uppercase px-4 outline-none text-[#0F172A]" /></div>
-                 <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Display Order</Label><input type="number" value={editingBoard?.displayOrder || 0} onChange={e => setEditingBoard({...editingBoard, displayOrder: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-black px-4 outline-none text-[#0F172A]" /></div>
+                 <div className="space-y-2 text-left"><Label className="text-[9px] font-black uppercase text-slate-400">Short Code</Label><input value={editingBoard?.abbreviation || ""} onChange={e => setEditingBoard({...editingBoard, abbreviation: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-black uppercase px-4 outline-none text-[#0F172A]" /></div>
+                 <div className="space-y-2 text-left"><Label className="text-[9px] font-black uppercase text-slate-400">Display Order</Label><input type="number" value={editingBoard?.displayOrder || 0} onChange={e => setEditingBoard({...editingBoard, displayOrder: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-black px-4 outline-none text-[#0F172A]" /></div>
               </div>
-              <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Official Hub Name</Label><input value={editingBoard?.name || ""} onChange={e => setEditingBoard({...editingBoard, name: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-bold px-4 outline-none text-[#0F172A]" /></div>
+              <div className="space-y-2 text-left"><Label className="text-[9px] font-black uppercase text-slate-400">Official Hub Name</Label><input value={editingBoard?.name || ""} onChange={e => setEditingBoard({...editingBoard, name: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-bold px-4 outline-none text-[#0F172A]" /></div>
             </div>
 
             {editingBoard?.id && (
