@@ -52,8 +52,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Mock Architect v15.0.
- * HARDENED: Duplicate Question Blocking Engine.
+ * @fileOverview Institutional Mock Architect v15.5.
+ * HARDENED: Strict Registry-Only Subjects and Exams policy.
  * FIXED: High-contrast typography for Question/Board identity.
  */
 
@@ -81,7 +81,7 @@ function MockBuilderContent() {
   const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
   const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects") : null), [db]))
   
-  // --- UNIQUE REGISTRY FILTERS ---
+  // --- UNIQUE REGISTRY FILTERS (Strictly enforced from Registry Hubs) ---
   const uniqueBoards = useMemo(() => {
     if (!boards) return [];
     const unique = new Map();
@@ -101,6 +101,16 @@ function MockBuilderContent() {
     });
     return Array.from(unique.values()).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, [exams]);
+
+  const uniqueSubjects = useMemo(() => {
+    if (!subjects) return [];
+    const unique = new Map();
+    subjects.forEach(s => {
+      const key = s.name?.toLowerCase().trim();
+      if (!unique.has(key)) unique.set(key, s);
+    });
+    return Array.from(unique.values()).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  }, [subjects]);
 
   // --- STATE HUB ---
   const [bankLoading, setBankLoading] = useState(false)
@@ -501,7 +511,7 @@ function MockBuilderContent() {
                           <Label className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-2">Subject Node</Label>
                           <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 font-bold text-sm outline-none transition-all focus:border-primary text-white">
                              <option value="all" className="text-slate-900">All Subjects</option>
-                             {subjects?.map((s:any) => <option key={s.id} value={s.id} className="text-slate-900">{s.name}</option>)}
+                             {uniqueSubjects?.map((s:any) => <option key={s.id} value={s.id} className="text-slate-900">{s.name}</option>)}
                           </select>
                        </div>
                     </div>
@@ -670,7 +680,7 @@ function MockBuilderContent() {
                           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Institutional Assembly Protocol</p>
                           <div className="flex flex-wrap justify-center gap-4 w-full">
                              <Select onValueChange={(val) => {
-                                const sub = subjects?.find((s:any) => s.id === val);
+                                const sub = uniqueSubjects?.find((s:any) => s.id === val);
                                 if (!sub) return;
                                 setSections([...sections, { id: `sec-${Date.now()}`, name: sub.name, questions: [] }]);
                              }}>
@@ -680,7 +690,7 @@ function MockBuilderContent() {
                                 </SelectTrigger>
                                 <SelectContent className="rounded-[2rem] p-4 shadow-5xl border-none">
                                    <div className="text-[9px] font-black uppercase text-slate-400 tracking-widest px-4 mb-2">Subject Registry</div>
-                                   {subjects?.map((s: any) => (
+                                   {uniqueSubjects?.map((s: any) => (
                                       <SelectItem key={s.id} value={s.id} className="rounded-xl px-6 py-4 font-black uppercase text-[11px] tracking-widest hover:bg-primary/5 cursor-pointer text-slate-900">
                                          {s.name}
                                       </SelectItem>
