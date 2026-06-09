@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Edit, Image as ImageIcon, Trash2, Save, Globe, Upload, Loader2, X, Layers, Shield, GraduationCap, Zap, Landmark } from "lucide-react"
+import { Plus, Edit, Image as ImageIcon, Trash2, Save, Globe, Upload, Loader2, X, Layers, Shield, GraduationCap, Zap, Landmark, MoveUp, MoveDown } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useCollection, useFirestore, useStorage } from "@/firebase"
 import { collection, query, doc, deleteDoc, setDoc, serverTimestamp, orderBy } from "firebase/firestore"
@@ -20,9 +20,8 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 /**
- * @fileOverview Authority Hub v61.0.
- * UPDATED: Added prominent delete options in both table and dialog.
- * FIXED: Unterminated string constant on top-bar indicator resolved.
+ * @fileOverview Authority Hub v62.0.
+ * UPDATED: Added displayOrder management for Hub reordering.
  */
 
 export default function ExamManagement() {
@@ -30,7 +29,7 @@ export default function ExamManagement() {
   const storage = useStorage()
   const { toast } = useToast()
   
-  const boardsQuery = useMemo(() => (db ? collection(db, "boards") : null), [db])
+  const boardsQuery = useMemo(() => (db ? query(collection(db, "boards"), orderBy("displayOrder", "asc")) : null), [db])
   const categoriesQuery = useMemo(() => (db ? query(collection(db, "categories"), orderBy("displayOrder", "asc")) : null), [db])
   
   const { data: boards, loading } = useCollection<any>(boardsQuery)
@@ -58,6 +57,7 @@ export default function ExamManagement() {
     const payload = { 
       ...editingBoard, 
       id: boardId,
+      displayOrder: parseInt(editingBoard.displayOrder) || 1,
       updatedAt: serverTimestamp()
     }
     
@@ -70,6 +70,28 @@ export default function ExamManagement() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleReorder = async (board: any, direction: 'up' | 'down') => {
+     if (!db || !boards) return;
+     const idx = boards.findIndex(b => b.id === board.id);
+     const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+     
+     if (swapIdx < 0 || swapIdx >= boards.length) return;
+     
+     const otherBoard = boards[swapIdx];
+     const oldOrder = board.displayOrder || 0;
+     const newOrder = otherBoard.displayOrder || 0;
+
+     try {
+        await Promise.all([
+           setDoc(doc(db, "boards", board.id), { displayOrder: newOrder }, { merge: true }),
+           setDoc(doc(db, "boards", otherBoard.id), { displayOrder: oldOrder }, { merge: true })
+        ]);
+        toast({ title: "Hub Reordered" });
+     } catch (e) {
+        toast({ variant: "destructive", title: "Reorder Failed" });
+     }
   }
 
   const handleDelete = async (e: React.MouseEvent | React.FocusEvent | any, id: string) => {
@@ -122,7 +144,7 @@ export default function ExamManagement() {
           <h1 className="text-5xl font-headline font-black text-primary uppercase tracking-tight">Authority Hub</h1>
           <p className="text-slate-600 mt-1 font-medium">Manage institutional identities for all Punjab and National recruitment boards.</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl gap-3" onClick={() => setEditingBoard({ abbreviation: "", name: "", description: "", iconUrl: "", categoryId: "" })}>
+        <Button className="bg-primary hover:bg-primary/90 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl gap-3" onClick={() => setEditingBoard({ abbreviation: "", name: "", description: "", iconUrl: "", categoryId: "", displayOrder: (boards?.length || 0) + 1 })}>
           <Plus className="h-5 w-5" /> Add New Hub
         </Button>
       </div>
@@ -133,7 +155,7 @@ export default function ExamManagement() {
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-white/5 h-20">
                 <TableHead className="px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Hub Identity</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Registry Context</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Hierarchy</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Official Name</TableHead>
                 <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Audit Actions</TableHead>
               </TableRow>
@@ -143,7 +165,7 @@ export default function ExamManagement() {
                 Array.from({ length: 8 }).map((_, i) => (
                   <TableRow key={i} className="border-slate-50"><TableCell colSpan={4} className="px-10 py-5"><Skeleton className="h-14 w-full rounded-2xl bg-slate-50" /></TableCell></TableRow>
                 ))
-              ) : boards?.map((board: any) => {
+              ) : boards?.map((board: any, idx: number) => {
                 const category = categories?.find(c => c.id === board.categoryId);
                 
                 const id = board.id?.toLowerCase() || "";
@@ -157,29 +179,36 @@ export default function ExamManagement() {
                 return (
                   <TableRow key={board.id} className="hover:bg-slate-50 border-slate-50 transition-all group">
                     <TableCell className="px-10 py-6">
-                      <div className="h-16 w-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden relative shadow-inner group-hover:scale-110 transition-transform">
-                          {effectiveLogo && !failedImages[board.id] ? (
-                            <img 
-                              src={effectiveLogo} 
-                              className="h-full w-full object-contain p-2" 
-                              referrerPolicy="no-referrer"
-                              alt={board.abbreviation}
-                              onError={() => setFailedImages(p => ({...p, [board.id]: true}))}
-                            />
-                          ) : (
-                            <div className="text-primary opacity-40">
-                               {isPolice ? <Shield className="h-8 w-8" /> : 
-                                isTeaching ? <GraduationCap className="h-8 w-8" /> : 
-                                isTechnical ? <Zap className="h-8 w-8" /> :
-                                <Landmark className="h-8 w-8" />}
-                            </div>
-                          )}
+                      <div className="flex items-center gap-6">
+                        <div className="h-16 w-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden relative shadow-inner group-hover:scale-110 transition-transform">
+                            {effectiveLogo && !failedImages[board.id] ? (
+                              <img 
+                                src={effectiveLogo} 
+                                className="h-full w-full object-contain p-2" 
+                                referrerPolicy="no-referrer"
+                                alt={board.abbreviation}
+                                onError={() => setFailedImages(p => ({...p, [board.id]: true}))}
+                              />
+                            ) : (
+                              <div className="text-primary opacity-40">
+                                 {isPolice ? <Shield className="h-8 w-8" /> : 
+                                  isTeaching ? <GraduationCap className="h-8 w-8" /> : 
+                                  isTechnical ? <Zap className="h-8 w-8" /> :
+                                  <Landmark className="h-8 w-8" />}
+                              </div>
+                            )}
+                        </div>
+                        <div>
+                           <p className="font-headline font-black text-primary text-xl tracking-tighter uppercase leading-none">{board.abbreviation}</p>
+                           <Badge variant="outline" className="bg-white border-slate-100 text-slate-400 text-[8px] font-black uppercase w-fit px-1.5 mt-1">{category?.title || "UNCATEGORIZED"}</Badge>
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                       <div className="flex flex-col gap-1">
-                          <p className="font-headline font-black text-primary text-xl tracking-tighter uppercase leading-none">{board.abbreviation}</p>
-                          <Badge variant="outline" className="bg-white border-slate-100 text-slate-400 text-[8px] font-black uppercase w-fit px-1.5">{category?.title || "UNCATEGORIZED"}</Badge>
+                    <TableCell className="text-center">
+                       <div className="flex flex-col items-center gap-1">
+                          <button onClick={() => handleReorder(board, 'up')} disabled={idx === 0} className="p-1 hover:text-primary disabled:opacity-10 transition-all"><MoveUp className="h-3 w-3" /></button>
+                          <span className="font-black text-slate-300 text-xl tabular-nums leading-none">{board.displayOrder || 0}</span>
+                          <button onClick={() => handleReorder(board, 'down')} disabled={idx === boards.length - 1} className="p-1 hover:text-primary disabled:opacity-10 transition-all"><MoveDown className="h-3 w-3" /></button>
                        </div>
                     </TableCell>
                     <TableCell className="text-sm font-bold text-slate-800 leading-tight max-w-xs">{board.name}</TableCell>
@@ -230,13 +259,14 @@ export default function ExamManagement() {
               <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Vertical Category</Label><select value={editingBoard?.categoryId || ""} onChange={e => setEditingBoard({...editingBoard, categoryId: e.target.value})} className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-black uppercase text-[10px] outline-none shadow-inner"><option value="">Select Category</option>{categories?.map((c: any) => <option key={c.id} value={c.id}>{c.title}</option>)}</select></div>
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Short Code</Label><input value={editingBoard?.abbreviation || ""} onChange={e => setEditingBoard({...editingBoard, abbreviation: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-black uppercase px-4 outline-none text-[#0F172A]" /></div>
-                 <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Official Hub Name</Label><input value={editingBoard?.name || ""} onChange={e => setEditingBoard({...editingBoard, name: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-bold px-4 outline-none text-[#0F172A]" /></div>
+                 <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Display Order</Label><input type="number" value={editingBoard?.displayOrder || 0} onChange={e => setEditingBoard({...editingBoard, displayOrder: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-black px-4 outline-none text-[#0F172A]" /></div>
               </div>
+              <div className="space-y-2"><Label className="text-[9px] font-black uppercase text-slate-400">Official Hub Name</Label><input value={editingBoard?.name || ""} onChange={e => setEditingBoard({...editingBoard, name: e.target.value})} className="w-full bg-slate-50 border-none rounded-xl h-12 font-bold px-4 outline-none text-[#0F172A]" /></div>
             </div>
 
             {editingBoard?.id && (
                <div className="pt-6 border-t border-slate-50">
-                  <Button variant="ghost" className="w-full h-14 text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl font-black uppercase text-[10px] tracking-widest gap-3" onClick={() => handleDelete(null, editingBoard.id)} disabled={isDeleting === editingBoard.id}>
+                  <Button variant="ghost" className="w-full h-14 text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl font-black uppercase text-[10px] tracking-widest gap-3" onClick={(e) => handleDelete(e, editingBoard.id)} disabled={isDeleting === editingBoard.id}>
                      <Trash2 className="h-4 w-4" /> Purge Hub from Registry
                   </Button>
                </div>

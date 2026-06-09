@@ -41,6 +41,18 @@
         "active": { "type": "boolean" }
       }
     },
+    "Category": {
+      "title": "Exam Category",
+      "description": "Top-level exam grouping (e.g., Banking, Punjab Govt).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "highlight": { "type": "string" }
+      }
+    },
     "CurrentAffairHubItem": {
       "title": "Current Affair Hub Item",
       "description": "Daily, weekly, or monthly current affairs package.",
@@ -70,6 +82,9 @@
     },
     "/passes/{passId}": {
       "schema": { "$ref": "#/backend/entities/Pass" }
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/backend/entities/Category" }
     },
     "/current_affairs_hub/{caId}": {
       "schema": { "$ref": "#/backend/entities/CurrentAffairHubItem" }

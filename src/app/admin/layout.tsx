@@ -37,7 +37,8 @@ import {
   Rocket,
   ArrowLeftRight,
   ExternalLink,
-  TableOfContents
+  TableOfContents,
+  Box
 } from "lucide-react"
 import Link from "next/link"
 import Logo from "@/components/brand/Logo"
@@ -50,8 +51,8 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Institutional Security Protocol v99.3.
- * UPDATED: Added Category management to the master registry node.
+ * @fileOverview Institutional Security Protocol v99.4.
+ * UPDATED: Added Architecture Manager to Sidebar nodes.
  */
 
 // FOUNDER WHITELIST - PERMANENT AUTHORITY
@@ -104,12 +105,19 @@ export default function AdminLayout({ children }: { children: React.Node }) {
        </div>
        <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden">
           <SidebarGroup>
+            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Architecture</SidebarGroupLabel>
+            <SidebarMenu>
+              <AdminNavItem icon={<Box className="text-primary" />} label="Architecture Manager" href="/admin/architecture" active={pathname?.includes("/admin/architecture")} />
+              <AdminNavItem icon={<TableOfContents className="text-slate-400" />} label="Categories" href="/admin/categories" active={pathname === "/admin/categories"} />
+              <AdminNavItem icon={<Landmark className="text-amber-400" />} label="Authority Hubs" href="/admin/exams" active={pathname === "/admin/exams"} />
+              <AdminNavItem icon={<GraduationCap className="text-blue-400" />} label="Vertical Registry" href="/admin/exam-registry" active={pathname === "/admin/exam-registry"} />
+            </SidebarMenu>
+          </SidebarGroup>
+
+          <SidebarGroup className="mt-4">
             <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Master Registry</SidebarGroupLabel>
             <SidebarMenu>
               <AdminNavItem icon={<LayoutDashboard />} label="Dashboard" href="/admin" active={pathname === "/admin"} />
-              <AdminNavItem icon={<TableOfContents className="text-primary" />} label="Categories" href="/admin/categories" active={pathname === "/admin/categories"} />
-              <AdminNavItem icon={<Landmark className="text-amber-400" />} label="Authority Hubs" href="/admin/exams" active={pathname === "/admin/exams"} />
-              <AdminNavItem icon={<GraduationCap className="text-blue-400" />} label="Vertical Registry" href="/admin/exam-registry" active={pathname === "/admin/exam-registry"} />
               <AdminNavItem icon={<SearchCode className="text-emerald-400" />} label="Subject List" href="/admin/subjects" active={pathname === "/admin/subjects"} />
               <AdminNavItem icon={<Database />} label="Global Bank" href="/admin/questions" active={pathname === "/admin/questions"} />
               <AdminNavItem icon={<Rocket className="text-primary" />} label="Bulk Ingestion" href="/admin/bulk-import" active={pathname === "/admin/bulk-import"} />

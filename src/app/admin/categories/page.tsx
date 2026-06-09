@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash2, Edit, Save, Layers, Search, Loader2, ChevronRight, Landmark, GraduationCap, Zap, Wallet, Globe, ShieldCheck } from "lucide-react"
+import { Plus, Trash2, Edit, Save, Layers, Search, Loader2, ChevronRight, Landmark, GraduationCap, Zap, Wallet, Globe, ShieldCheck, MoveUp, MoveDown } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, doc, setDoc, deleteDoc, serverTimestamp, query, orderBy } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -19,8 +19,8 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Category Governance Node v11.0.
- * UPDATED: Permanent Emblem for Punjab Government Exams.
+ * @fileOverview Institutional Category Governance Node v12.0.
+ * UPDATED: Added MoveUp/Down reordering logic.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -62,6 +62,28 @@ export default function CategoryManagement() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleReorder = async (cat: any, direction: 'up' | 'down') => {
+     if (!db || !categories) return;
+     const idx = categories.findIndex(c => c.id === cat.id);
+     const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+     
+     if (swapIdx < 0 || swapIdx >= categories.length) return;
+     
+     const otherCat = categories[swapIdx];
+     const oldOrder = cat.displayOrder || 0;
+     const newOrder = otherCat.displayOrder || 0;
+
+     try {
+        await Promise.all([
+           setDoc(doc(db, "categories", cat.id), { displayOrder: newOrder }, { merge: true }),
+           setDoc(doc(db, "categories", otherCat.id), { displayOrder: oldOrder }, { merge: true })
+        ]);
+        toast({ title: "Order Updated" });
+     } catch (e) {
+        toast({ variant: "destructive", title: "Reorder Failed" });
+     }
   }
 
   const handleDelete = async (id: string) => {
@@ -108,7 +130,7 @@ export default function CategoryManagement() {
               <TableBody>
                 {loading ? (
                    Array.from({length: 5}).map((_, i) => <TableRow key={i}><TableCell colSpan={4} className="p-10"><Skeleton className="h-16 w-full rounded-2xl"/></TableCell></TableRow>)
-                ) : categories?.map((cat: any) => (
+                ) : categories?.map((cat: any, idx: number) => (
                   <TableRow key={cat.id} className="hover:bg-slate-50 group border-slate-50 transition-all">
                     <TableCell className="px-10 py-8">
                        <div className="flex items-center gap-6">
@@ -121,7 +143,13 @@ export default function CategoryManagement() {
                           </div>
                        </div>
                     </TableCell>
-                    <TableCell className="text-center font-black text-slate-300 text-xl tabular-nums">{cat.displayOrder}</TableCell>
+                    <TableCell className="text-center">
+                       <div className="flex flex-col items-center gap-1">
+                          <button onClick={() => handleReorder(cat, 'up')} disabled={idx === 0} className="p-1 hover:text-primary disabled:opacity-10 transition-all"><MoveUp className="h-3 w-3" /></button>
+                          <span className="font-black text-slate-300 text-xl tabular-nums leading-none">{cat.displayOrder}</span>
+                          <button onClick={() => handleReorder(cat, 'down')} disabled={idx === categories.length - 1} className="p-1 hover:text-primary disabled:opacity-10 transition-all"><MoveDown className="h-3 w-3" /></button>
+                       </div>
+                    </TableCell>
                     <TableCell>
                        <div className="flex items-center gap-3">
                           <Button asChild variant="outline" className="h-10 px-4 rounded-xl border-slate-200 font-black uppercase text-[8px] tracking-widest gap-2 hover:bg-primary/5 hover:text-primary transition-all">
