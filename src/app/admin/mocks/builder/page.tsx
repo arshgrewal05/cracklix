@@ -23,26 +23,22 @@ import {
   Trash2,
   Zap,
   Clock,
-  PlusCircle,
   Lock,
   Target,
   ShieldCheck,
-  Settings2,
   CheckCircle2,
-  History,
   Landmark,
   GraduationCap,
-  AlertTriangle,
   MoveUp,
   MoveDown,
   Languages,
   BookOpen,
-  Info,
   X,
   Globe,
   LayoutGrid,
   Tags,
-  SearchCode
+  SearchCode,
+  Box
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
 import { collection, doc, setDoc, serverTimestamp, query, limit, getDocs, writeBatch, where, documentId, orderBy } from "firebase/firestore"
@@ -52,9 +48,9 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Mock Architect v16.0.
- * UPDATED: Integrated Category -> Hub -> Vertical hierarchy for targeted distribution.
- * FIXED: Removed redundant filters and stabilized selection reactive loops.
+ * @fileOverview Institutional Mock Architect v18.0 (Production Recovery).
+ * RESTORED: Full question bank management, search, and sectional assembly.
+ * UPDATED: Category -> Hub -> Vertical hierarchy for targeted distribution.
  */
 
 export default function MockBuilderPage() {
@@ -75,20 +71,19 @@ function MockBuilderContent() {
   const isEditing = !!mockId
 
   // --- DATA LISTENERS ---
-  const { data: allMocks } = useCollection<any>(useMemo(() => (db ? query(collection(db, "mocks"), orderBy("createdAt", "desc")) : null), [db]))
   const { data: existingMock } = useDoc<any>(useMemo(() => (db && mockId ? doc(db, "mocks", mockId) : null), [db, mockId]))
   const { data: categories } = useCollection<any>(useMemo(() => (db ? query(collection(db, "categories"), orderBy("displayOrder", "asc")) : null), [db]))
-  const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
-  const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]))
-  const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects") : null), [db]))
+  const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards"), orderBy("displayOrder", "asc")) : null), [db]))
+  const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams")) : null), [db]))
+  const { data: subjects } = useCollection<any>(useMemo(() => (db ? collection(db, "subjects")) : null), [db]))
   
   // --- STATE HUB ---
   const [bankLoading, setBankLoading] = useState(false)
   const [questionBank, setQuestionBank] = useState<any[]>([])
   const [isPublishing, setIsPublishing] = useState(false)
   
-  // Filter States
-  const [filterCategory, setFilterCategory] = useState("all")
+  // Question Bank Filters
+  const [searchTerm, setSearchTerm] = useState("")
   const [filterBoard, setFilterBoard] = useState("all")
   const [filterExam, setFilterExam] = useState("all")
   const [filterSubject, setFilterSubject] = useState("all")
@@ -96,14 +91,12 @@ function MockBuilderContent() {
   const [blockDuplicates, setBlockDuplicates] = useState(true)
   const [bankSelection, setBankSelection] = useState<string[]>([])
 
-  // Architecture States
+  // Mock Metadata & Architecture
   const [mockData, setMockData] = useState<any>({
     title: "", 
-    boardId: "", 
     categoryId: "all",
     boardIds: [] as string[],
     examIds: [] as string[],
-    assignmentMode: "SINGLE" as MockAssignmentMode,
     mockType: "FULL" as MockType, 
     duration: 120, 
     difficulty: "Medium" as Difficulty, 
@@ -115,7 +108,7 @@ function MockBuilderContent() {
     attemptLimit: 0,
   })
 
-  // Assembly States
+  // Assembly State
   const [sections, setSections] = useState<any[]>([
     { id: 'sec-1', name: 'General Hub', questions: [] }
   ])
@@ -130,7 +123,6 @@ function MockBuilderContent() {
 
   const filteredExamsForAssignment = useMemo(() => {
      if (!exams) return [];
-     // If Authority mode, show all relevant to selected boards
      if (mockData.boardIds?.length > 0) {
         return exams.filter(e => mockData.boardIds.includes(e.boardId));
      }
@@ -154,20 +146,20 @@ function MockBuilderContent() {
   }, [db])
 
   useEffect(() => {
-    if (existingMock) {
+    if (existingMock && questionBank.length > 0) {
       setMockData({ 
         ...existingMock,
         categoryId: existingMock.categoryId || "all",
         boardIds: existingMock.boardIds || (existingMock.boardId ? [existingMock.boardId] : []),
-        examIds: existingMock.examIds || (existingMock.examId ? [existingMock.examId] : []),
-        assignmentMode: existingMock.assignmentMode || "SINGLE"
+        examIds: existingMock.examIds || (existingMock.examId ? [existingMock.examId] : [])
       });
 
-      if (existingMock.questionIds && questionBank.length > 0) {
+      if (existingMock.questionIds) {
         let currentIndex = 0;
         const hydratedSections = (existingMock.sections || [{ name: 'General Hub', count: existingMock.questionIds.length }]).map((s: any, idx: number) => {
-          const sectionQIds = existingMock.questionIds.slice(currentIndex, currentIndex + (s.count || 0));
-          currentIndex += (s.count || 0);
+          const count = parseInt(s.count) || 0;
+          const sectionQIds = existingMock.questionIds.slice(currentIndex, currentIndex + count);
+          currentIndex += count;
           return { 
             id: `sec-${idx + 1}`, 
             name: s.name, 
@@ -189,6 +181,7 @@ function MockBuilderContent() {
     );
 
     return questionBank.filter((q: any) => {
+      const matchesSearch = !searchTerm || (q.englishQuestion?.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesBoard = filterBoard === "all" || q.boardId === filterBoard;
       const matchesExam = filterExam === "all" || q.examId === filterExam;
       const matchesSub = filterSubject === "all" || q.subjectId === filterSubject;
@@ -200,9 +193,9 @@ function MockBuilderContent() {
       const isContentDuplicate = assemblyHashes.has(qHash);
       const duplicateGuard = !blockDuplicates || (!isContentDuplicate && q.status !== 'DUPLICATE');
       
-      return matchesBoard && matchesExam && matchesSub && notInThisMock && usedGuard && duplicateGuard;
+      return matchesSearch && matchesBoard && matchesExam && matchesSub && notInThisMock && usedGuard && duplicateGuard;
     })
-  }, [questionBank, filterBoard, filterExam, filterSubject, hideUsed, blockDuplicates, sections])
+  }, [questionBank, searchTerm, filterBoard, filterExam, filterSubject, hideUsed, blockDuplicates, sections])
 
   // --- ACTIONS ---
   const handleLinkQuestions = () => {
@@ -238,17 +231,9 @@ function MockBuilderContent() {
     const mockRef = doc(db, "mocks", finalId)
     const sectionMetadata = sections.map(s => ({ name: s.name, count: s.questions.length })).filter(s => s.count > 0);
 
-    let finalExamIds = [...(mockData.examIds || [])];
-    if (mockData.assignmentMode === 'AUTHORITY') {
-       const boardExams = exams?.filter((e: any) => mockData.boardIds.includes(e.boardId)).map((e: any) => e.id) || [];
-       finalExamIds = Array.from(new Set([...finalExamIds, ...boardExams]));
-    }
-
     const payload = {
       ...mockData,
       id: finalId,
-      examIds: finalExamIds,
-      boardIds: mockData.boardIds,
       boardId: mockData.boardIds[0] || "",
       totalQuestions: flatQuestionIds.length,
       questionIds: flatQuestionIds,
@@ -268,7 +253,7 @@ function MockBuilderContent() {
         });
       });
       await batch.commit();
-      toast({ title: "Series Deployed", description: "Mock series is now live in selected hubs." });
+      toast({ title: "Series Deployed", description: "Mock series is now live." });
       router.push("/admin/mocks")
     } catch (e: any) {
       toast({ variant: "destructive", title: "Sync Failed" })
@@ -299,9 +284,11 @@ function MockBuilderContent() {
       {/* TOP COMMAND BAR */}
       <div className="flex flex-wrap items-center justify-between gap-6 px-4">
         <div className="flex items-center gap-6">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl border bg-white h-12 w-12 shadow-sm"><ChevronLeft className="h-6 w-6" /></Button>
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl border bg-white h-12 w-12 shadow-sm">
+             <ChevronLeft className="h-6 w-6" />
+          </Button>
           <div className="text-left">
-            <h1 className="text-2xl md:text-4xl font-headline font-black uppercase tracking-tight text-[#0F172A]">Mock Architect</h1>
+            <h1 className="text-2xl md:text-4xl font-headline font-black uppercase tracking-tight text-[#0F172A]">{isEditing ? "Modify Series" : "Mock Architect"}</h1>
             <p className="text-[9px] md:text-[10px] uppercase font-black tracking-widest text-slate-400 mt-1">Institutional Assembly Hub</p>
           </div>
         </div>
@@ -415,10 +402,10 @@ function MockBuilderContent() {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Clock className="h-3 w-3" /> Duration (Min)</Label>
-                            <Input type="number" value={mockData.duration} onChange={e => setFormData({...mockData, duration: parseInt(e.target.value) || 0})} className="h-11 rounded-xl bg-slate-50 border-none font-black text-center" />
+                            <Input type="number" value={mockData.duration} onChange={e => setMockData({...mockData, duration: parseInt(e.target.value) || 0})} className="h-11 rounded-xl bg-slate-50 border-none font-black text-center" />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Lock className="h-3 w-3" /> Attempt Limit</Label>
+                            <Label className="text-[10px] font-black uppercase text-slate-500 ml-1 flex items-center gap-2"><Lock className="h-3 w-3" /> Limit</Label>
                             <Input type="number" value={mockData.attemptLimit} onChange={e => setMockData({...mockData, attemptLimit: parseInt(e.target.value) || 0})} className="h-11 rounded-xl bg-slate-50 border-none font-black text-center" />
                         </div>
                     </div>
@@ -427,7 +414,7 @@ function MockBuilderContent() {
            </div>
         </div>
 
-        {/* RIGHT: CONTENT HUB */}
+        {/* RIGHT: CONTENT ASSEMBLY HUB */}
         <div className="lg:col-span-8 space-y-6">
            <Tabs defaultValue="bank" className="w-full">
               <TabsList className="bg-slate-100 p-1 h-14 rounded-2xl mb-8 flex justify-start gap-4">
@@ -443,27 +430,40 @@ function MockBuilderContent() {
                  <div className="bg-[#0B1528] rounded-[2.5rem] p-8 md:p-12 text-white space-y-10 shadow-4xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-10 opacity-5"><Zap className="h-40 w-40" /></div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10 text-left">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10 text-left">
+                       <div className="md:col-span-4 relative mb-4">
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                          <Input 
+                            value={searchTerm} 
+                            onChange={e => setSearchTerm(e.target.value)} 
+                            className="h-14 pl-12 rounded-xl bg-white/5 border-white/10 text-white font-medium" 
+                            placeholder="Search keywords..." 
+                          />
+                       </div>
                        <div className="space-y-3">
-                          <Label className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-2">Source Hub</Label>
-                          <select value={filterBoard} onChange={e => setFilterBoard(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 font-bold text-sm outline-none transition-all focus:border-primary text-white">
-                             <option value="all">All Registry Hubs</option>
-                             {boards?.map((b:any) => <option key={b.id} value={b.id}>{b.abbreviation} Hub</option>)}
+                          <Label className="text-[9px] font-black uppercase text-slate-400">Board Hub</Label>
+                          <select value={filterBoard} onChange={e => setFilterBoard(e.target.value)} className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 font-bold text-xs outline-none text-white">
+                             <option value="all">All Boards</option>
+                             {boards?.map((b:any) => <option key={b.id} value={b.id}>{b.abbreviation}</option>)}
                           </select>
                        </div>
                        <div className="space-y-3">
-                          <Label className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-2">Source Vertical</Label>
-                          <select value={filterExam} onChange={e => setFilterExam(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 font-bold text-sm outline-none transition-all focus:border-primary text-white">
-                             <option value="all">All Registry Verticals</option>
+                          <Label className="text-[9px] font-black uppercase text-slate-400">Vertical</Label>
+                          <select value={filterExam} onChange={e => setFilterExam(e.target.value)} className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 font-bold text-xs outline-none text-white">
+                             <option value="all">All Verticals</option>
                              {exams?.map((ex:any) => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
                           </select>
                        </div>
                        <div className="space-y-3">
-                          <Label className="text-[9px] font-black uppercase text-slate-400 flex items-center gap-2">Subject Node</Label>
-                          <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 font-bold text-sm outline-none transition-all focus:border-primary text-white">
-                             <option value="all">All Canonical Subjects</option>
+                          <Label className="text-[9px] font-black uppercase text-slate-400">Subject Hub</Label>
+                          <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)} className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 font-bold text-xs outline-none text-white">
+                             <option value="all">All Subjects</option>
                              {subjects?.map((s:any) => <option key={s.id} value={s.id}>{s.name}</option>)}
                           </select>
+                       </div>
+                       <div className="flex items-center gap-4 bg-white/5 px-6 h-11 rounded-xl border border-white/5 mt-auto">
+                          <span className="text-[9px] font-black uppercase text-slate-400">Unused Only</span>
+                          <Switch checked={hideUsed} onCheckedChange={setHideUsed} className="data-[state=checked]:bg-primary" />
                        </div>
                     </div>
 
@@ -471,7 +471,7 @@ function MockBuilderContent() {
                        <div className="flex flex-wrap items-center justify-between gap-6">
                           <div className="flex flex-wrap items-center gap-6">
                              <div className="space-y-3 text-left min-w-[240px]">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Assign to Section</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Target Section</Label>
                                 <select 
                                   value={activeSectionId} 
                                   onChange={e => setActiveSectionId(e.target.value)} 
@@ -481,16 +481,11 @@ function MockBuilderContent() {
                                 </select>
                              </div>
                              
-                             <div className="flex items-center gap-4 bg-white/5 px-6 h-12 rounded-xl border border-white/5 shadow-inner">
-                                <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Unused Only</span>
-                                <Switch checked={hideUsed} onCheckedChange={setHideUsed} className="data-[state=checked]:bg-primary" />
-                             </div>
-
                              <button 
                                onClick={handleSelectAllInBank} 
-                               className="h-12 px-6 bg-white/5 border border-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 transition-all active:scale-95"
+                               className="h-12 px-6 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 transition-all"
                              >
-                                {bankSelection.length === filteredBank.length ? 'Deselect All' : 'Select All Hub'}
+                                {bankSelection.length === filteredBank.length ? 'Deselect All' : 'Select All Filtered'}
                              </button>
                           </div>
 
@@ -531,7 +526,6 @@ function MockBuilderContent() {
                                    <div className="flex items-center gap-3 mb-2">
                                       <Badge className="bg-[#0F172A] text-white border-none font-black uppercase text-[8px] px-3 py-1 rounded shadow-sm">{q.boardId}</Badge>
                                       <Badge variant="outline" className="bg-slate-50 border-slate-100 text-[#0F172A] font-black uppercase text-[8px] px-2 py-0.5">{q.subjectId}</Badge>
-                                      {q.status === 'USED' && <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black uppercase">USED</Badge>}
                                    </div>
                                    <p className="font-bold text-[#0F172A] text-lg leading-snug line-clamp-1">{q.englishQuestion}</p>
                                 </div>
@@ -539,7 +533,10 @@ function MockBuilderContent() {
                           ))}
                        </div>
                     ) : (
-                       <div className="py-32 text-center opacity-20"><Database className="h-20 w-20 mx-auto mb-4" /><p className="font-black uppercase tracking-widest text-sm text-slate-500">No Registry Assets Found</p></div>
+                       <div className="py-32 text-center opacity-20 flex flex-col items-center gap-4">
+                          <Database className="h-20 w-20 text-slate-300" />
+                          <p className="font-black uppercase tracking-widest text-sm text-slate-500">No Registry Assets Found</p>
+                       </div>
                     )}
                  </div>
               </TabsContent>
@@ -554,7 +551,7 @@ function MockBuilderContent() {
                                <div className="space-y-1 text-left">
                                   <div className="flex items-center gap-2">
                                      <SearchCode className="h-3 w-3 text-primary" />
-                                     <span className="text-[10px] font-black uppercase text-primary tracking-widest">Subject Hub</span>
+                                     <span className="text-[10px] font-black uppercase text-primary tracking-widest">Section Header</span>
                                   </div>
                                   <Input 
                                     value={sec.name} 
@@ -564,7 +561,7 @@ function MockBuilderContent() {
                                </div>
                             </div>
                             <div className="flex items-center gap-4">
-                               <div className="text-right hidden md:block">
+                               <div className="text-right hidden md:block mr-4">
                                   <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">ASSETS LINKED</p>
                                   <p className="text-xl font-headline font-black text-[#0F172A]">{sec.questions.length}</p>
                                 </div>
@@ -574,7 +571,7 @@ function MockBuilderContent() {
 
                          <div className="p-8 space-y-4">
                             <div className="grid grid-cols-1 gap-2">
-                               {sec.questions.map((q, qIdx) => (
+                               {sec.questions.map((q: any, qIdx: number) => (
                                   <div key={q.id} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl group/item hover:bg-white hover:shadow-lg transition-all">
                                      <div className="flex items-center gap-6 min-w-0">
                                         <span className="text-[10px] font-black text-slate-300 w-6 uppercase">#{qIdx + 1}</span>
@@ -602,9 +599,9 @@ function MockBuilderContent() {
                     <div className="pt-10 border-t border-slate-100">
                        <div className="flex flex-col items-center gap-6">
                           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Institutional Assembly Protocol</p>
-                          <Button onClick={() => setSections([...sections, { id: `sec-${Date.now()}`, name: `Subject ${sections.length + 1}`, questions: [] }])} className="h-20 w-full md:w-[480px] bg-white border-dashed border-2 border-slate-200 rounded-[2.5rem] shadow-xl hover:border-primary transition-all flex items-center justify-center gap-4 text-[#0F172A]">
+                          <Button onClick={() => setSections([...sections, { id: `sec-${Date.now()}`, name: `Section ${sections.length + 1}`, questions: [] }])} className="h-20 w-full md:w-[480px] bg-white border-dashed border-2 border-slate-200 rounded-[2.5rem] shadow-xl hover:border-primary transition-all flex items-center justify-center gap-4 text-[#0F172A]">
                              <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-sm"><Plus className="h-6 w-6" /></div>
-                             <span className="font-black uppercase tracking-[0.2em] text-slate-500 text-sm">ADD SUBJECT HUB</span>
+                             <span className="font-black uppercase tracking-[0.2em] text-slate-500 text-sm">ADD SECTION HUB</span>
                           </Button>
                        </div>
                     </div>
