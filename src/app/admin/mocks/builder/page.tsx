@@ -52,9 +52,9 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Mock Architect v12.7.
- * FIXED: Link Assets button overlap resolved using flexible wrap layout.
- * FIXED: Explicit dark text in dropdowns for cross-browser visibility.
+ * @fileOverview Institutional Mock Architect v13.0.
+ * HARDENED: Only show exams from the Exam Registry.
+ * FIXED: Standardized Test Types to Full, Subject, Sectional, and PYQ.
  */
 
 export default function MockBuilderPage() {
@@ -92,6 +92,7 @@ function MockBuilderContent() {
     return Array.from(unique.values()).sort((a, b) => (a.abbreviation || "").localeCompare(b.abbreviation || ""));
   }, [boards]);
 
+  // STALENESS PROTECTION: Only derived from registry, no fallbacks
   const uniqueExams = useMemo(() => {
     if (!exams) return [];
     const unique = new Map();
@@ -339,9 +340,9 @@ function MockBuilderContent() {
                        <Select value={mockData.mockType || "FULL"} onValueChange={(v: any) => setMockData({...mockData, mockType: v})}>
                           <SelectTrigger className="h-11 rounded-xl bg-slate-50 border-none font-bold text-[10px] uppercase"><SelectValue /></SelectTrigger>
                           <SelectContent>
-                             <SelectItem value="FULL">Full Mock</SelectItem>
-                             <SelectItem value="SUBJECT">Subject Test</SelectItem>
-                             <SelectItem value="SECTIONAL">Sectional</SelectItem>
+                             <SelectItem value="FULL">Full Length Mock</SelectItem>
+                             <SelectItem value="SUBJECT">Subject-Wise Test</SelectItem>
+                             <SelectItem value="SECTIONAL">Sectional Test</SelectItem>
                              <SelectItem value="PYQ">PYQ Paper</SelectItem>
                           </SelectContent>
                        </Select>
@@ -425,11 +426,11 @@ function MockBuilderContent() {
                             <Select value={mockData.attemptLimit?.toString() || "0"} onValueChange={(v) => setMockData({...mockData, attemptLimit: parseInt(v)})}>
                                 <SelectTrigger className="h-11 rounded-xl bg-slate-50 border-none font-bold text-[10px] uppercase"><SelectValue placeholder="Limit" /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="0">Unlimited</SelectItem>
-                                    <SelectItem value="1">1 Attempt</SelectItem>
-                                    <SelectItem value="2">2 Attempts</SelectItem>
-                                    <SelectItem value="3">3 Attempts</SelectItem>
-                                    <SelectItem value="5">5 Attempts</SelectItem>
+                                    <SelectItem value="0" className="text-slate-900">Unlimited</SelectItem>
+                                    <SelectItem value="1" className="text-slate-900">1 Attempt</SelectItem>
+                                    <SelectItem value="2" className="text-slate-900">2 Attempts</SelectItem>
+                                    <SelectItem value="3" className="text-slate-900">3 Attempts</SelectItem>
+                                    <SelectItem value="5" className="text-slate-900">5 Attempts</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -492,13 +493,13 @@ function MockBuilderContent() {
                     </div>
 
                     <div className="pt-8 border-t border-white/5 relative z-10">
-                       <div className="flex flex-wrap items-end gap-6">
+                       <div className="flex flex-wrap items-center gap-6">
                           <div className="space-y-3 text-left min-w-[240px]">
                              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Target Section Hub</Label>
                              <select 
                                value={activeSectionId} 
                                onChange={e => setActiveSectionId(e.target.value)} 
-                               className="w-full h-12 bg-primary/20 text-white border border-primary/20 rounded-xl px-4 font-black uppercase text-[10px] outline-none shadow-inner"
+                               className="w-full h-12 bg-primary text-white border-none rounded-xl px-4 font-black uppercase text-[10px] outline-none shadow-inner"
                              >
                                 {sections.map(s => <option key={s.id} value={s.id} className="text-slate-900">{s.name}</option>)}
                              </select>
@@ -580,7 +581,7 @@ function MockBuilderContent() {
                           <Layers className="h-6 w-6 text-primary" />
                           <h3 className="font-headline font-black text-2xl uppercase text-[#0F172A]">Active Assembly Hub</h3>
                        </div>
-                       <div className="flex items-center gap-3">
+                       <div className="flex flex-wrap items-center gap-3">
                           {mockData.boardIds?.map((bid: string) => (
                              <Badge key={bid} className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase">TARGET: {bid}</Badge>
                           ))}
