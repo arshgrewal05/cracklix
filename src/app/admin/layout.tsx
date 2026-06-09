@@ -1,4 +1,3 @@
-
 'use client';
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
@@ -51,13 +50,13 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Institutional Security Protocol v99.7.
- * RESTORED: Architecture Hub / Punjab Tree visibility.
+ * @fileOverview Institutional Security Protocol v99.8.
+ * UPDATED: Removed Punjab Tree and added Category Hub to Master Registry.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
-export default function AdminLayout({ children }: { children: React.Node }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useUser()
   const auth = useAuth()
   const router = useRouter()
@@ -104,16 +103,10 @@ export default function AdminLayout({ children }: { children: React.Node }) {
        </div>
        <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden">
           <SidebarGroup>
-            <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Architecture Hub</SidebarGroupLabel>
-            <SidebarMenu>
-               <AdminNavItem icon={<Box className="text-primary" />} label="Punjab Tree" href="/admin/architecture" active={pathname === "/admin/architecture"} />
-            </SidebarMenu>
-          </SidebarGroup>
-
-          <SidebarGroup className="mt-4">
             <SidebarGroupLabel className="px-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Master Registry</SidebarGroupLabel>
             <SidebarMenu>
               <AdminNavItem icon={<LayoutDashboard />} label="Dashboard" href="/admin" active={pathname === "/admin"} />
+              <AdminNavItem icon={<Layers className="text-primary" />} label="Category Hub" href="/admin/categories" active={pathname === "/admin/categories"} />
               <AdminNavItem icon={<Landmark className="text-amber-400" />} label="Authority Hub" href="/admin/exams" active={pathname === "/admin/exams"} />
               <AdminNavItem icon={<GraduationCap className="text-emerald-400" />} label="Exam Registry" href="/admin/exam-registry" active={pathname === "/admin/exam-registry"} />
               <AdminNavItem icon={<SearchCode className="text-emerald-400" />} label="Subject List" href="/admin/subjects" active={pathname === "/admin/subjects"} />
@@ -239,7 +232,7 @@ export default function AdminLayout({ children }: { children: React.Node }) {
   )
 }
 
-function AdminNavItem({ icon, label, href, active, className }: { icon: React.Node, label: string, href: string, active?: boolean, className?: string }) {
+function AdminNavItem({ icon, label, href, active, className }: { icon: React.ReactNode, label: string, href: string, active?: boolean, className?: string }) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton 
