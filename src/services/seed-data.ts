@@ -1,8 +1,8 @@
 import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Node v25.0.
- * RECOVERED & LOCKED: Restored high-fidelity logos for Punjab Police, PSSSB, PPSC, and Power Boards.
+ * @fileOverview Institutional Seeding Node v26.0.
+ * RECOVERED & LOCKED: Full restoration of institutional logos for PSSSB, PPSC, Police, and Power Boards.
  */
 
 export async function seedInitialData(db: Firestore) {

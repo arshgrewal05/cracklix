@@ -19,8 +19,8 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 /**
- * @fileOverview Authority Hub v56.0.
- * FIXED: Unterminated string constant and corrected icon imports.
+ * @fileOverview Authority Hub v57.0.
+ * FIXED: Unterminated string constant and corrected icon resolution.
  */
 
 export default function ExamManagement() {
