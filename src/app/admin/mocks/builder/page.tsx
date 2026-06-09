@@ -52,9 +52,9 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview FINAL HIGH-FIDELITY Mock Architect v58.0.
- * UPDATED: Assignment Hub (Left Panel) perfectly matched to user screenshot.
- * FIXED: Test Type and Access Level labels/styles strictly synchronized.
+ * @fileOverview FINAL HIGH-FIDELITY Mock Architect v60.0.
+ * FIXED: Target Section Hub popover UI perfectly matched to user screenshot (Orange highlights + Header).
+ * UPDATED: Optimized button scaling and text visibility across all screen modes.
  */
 
 export default function MockBuilderPage() {
@@ -323,7 +323,7 @@ function MockBuilderContent() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10">
         
-        {/* LEFT COLUMN: ASSIGNMENT HUB (SAME AS SAME) */}
+        {/* LEFT COLUMN: ASSIGNMENT HUB */}
         <div className="lg:col-span-4 space-y-8">
            <Card className="border-none shadow-xl rounded-[2.5rem] bg-white p-6 md:p-10 space-y-10 border border-slate-100">
               
@@ -511,7 +511,7 @@ function MockBuilderContent() {
                   activeRightTab === 'BANK' ? "bg-[#0B1528] text-white shadow-xl" : "text-slate-400 hover:text-[#0B1528]"
                 )}
               >
-                 <Database className="h-4 w-4" /> QUESTION BANK
+                 <Database className="h-4 w-4" /> Global Question Bank
               </button>
               <button 
                 onClick={() => setActiveRightTab('ASSEMBLY')}
@@ -520,7 +520,7 @@ function MockBuilderContent() {
                   activeRightTab === 'ASSEMBLY' ? "bg-[#0B1528] text-white shadow-xl" : "text-slate-400 hover:text-[#0B1528]"
                 )}
               >
-                 <Layers className="h-4 w-4" /> ACTIVE ASSEMBLY
+                 <Layers className="h-4 w-4" /> Active Assembly Hub
               </button>
            </div>
 
@@ -584,12 +584,12 @@ function MockBuilderContent() {
 
                         <div className="h-px w-full bg-white/10" />
 
-                        {/* 3. TACTICAL COMMAND BAR (MATCHING SCREENSHOT) */}
+                        {/* 3. TACTICAL COMMAND BAR ("Same to Same") */}
                         <div className="space-y-10">
                           <div className="flex flex-col md:flex-row items-end gap-6">
                               <div className="flex-1 space-y-4 text-left w-full">
                                 <div className="text-[10px] font-black uppercase text-slate-500 tracking-[0.3em] leading-tight">
-                                   TARGET<br/>SECTION<br/>HUB
+                                   TARGET<br/>SECTION HUB
                                 </div>
                                 <Popover>
                                    <PopoverTrigger asChild>
@@ -597,16 +597,19 @@ function MockBuilderContent() {
                                          {sections.find(s => s.id === activeSectionId)?.name || "GENERAL HUB"}
                                       </button>
                                    </PopoverTrigger>
-                                   <PopoverContent className="w-[280px] bg-[#0F172A] border-white/10 p-2 rounded-[2rem] shadow-5xl z-[1001]">
-                                      <ScrollArea className="h-60">
-                                         <div className="space-y-1 p-2">
+                                   <PopoverContent className="w-[320px] bg-[#0F172A] border-white/10 p-0 rounded-[2.5rem] shadow-5xl z-[1001] overflow-hidden">
+                                      <div className="p-8 pb-4 border-b border-white/5">
+                                         <p className="text-[10px] font-black uppercase text-slate-500 tracking-[0.3em]">GENERAL HUB</p>
+                                      </div>
+                                      <ScrollArea className="h-64">
+                                         <div className="space-y-1 p-4">
                                             {sections.map(s => (
                                                <button 
                                                   key={s.id} 
                                                   onClick={() => setActiveSectionId(s.id)}
                                                   className={cn(
-                                                     "w-full p-4 rounded-xl text-left font-black uppercase text-[10px] tracking-widest transition-all",
-                                                     activeSectionId === s.id ? "bg-[#F97316] text-white shadow-lg" : "text-slate-400 hover:bg-white/5 hover:text-white"
+                                                     "w-full p-5 rounded-2xl text-left font-black uppercase text-[12px] tracking-widest transition-all",
+                                                     activeSectionId === s.id ? "bg-[#F97316] text-white shadow-xl" : "text-slate-400 hover:bg-white/5 hover:text-white"
                                                   )}
                                                >
                                                   {s.name}
@@ -707,7 +710,7 @@ function MockBuilderContent() {
                 <div className="space-y-6 flex-1 flex flex-col">
                     <div className="flex items-center justify-between px-4">
                       <h3 className="text-xl font-headline font-black text-[#0F172A] uppercase flex items-center gap-3">
-                          <Layers className="h-5 w-5 text-primary" /> Active Assembly
+                          <Layers className="h-5 w-5 text-primary" /> Active Assembly Hub
                       </h3>
                       <Badge className="bg-primary/10 text-primary border-none px-4 py-1 font-black uppercase text-[9px]">{sections.reduce((acc,s) => acc + s.questions.length, 0)} TOTAL LINKED</Badge>
                     </div>
