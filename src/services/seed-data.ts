@@ -1,8 +1,8 @@
 import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Node v30.0.
- * RECOVERED & LOCKED: Verified official URLs for PSSSB, Police, PSPCL, and Education Hub (PSEB).
+ * @fileOverview Institutional Seeding Node v31.0.
+ * RECOVERED & LOCKED: Verified official URLs for PSSSB, Police, PSPCL, and CTET Hubs.
  */
 
 export async function seedInitialData(db: Firestore) {
@@ -120,7 +120,7 @@ export async function seedInitialData(db: Firestore) {
       abbreviation: 'CTET', 
       name: 'CTET Hub', 
       categoryId: 'punjab-teaching', 
-      iconUrl: 'https://static.pseb.ac.in/uploads/1648628722_PSEBlogo_2.png' 
+      iconUrl: 'https://cdnbbsr.s3waas.gov.in/s3443dec3062d0286986e21dc0631734c9/uploads/2023/03/2023032156.png' 
     },
     { 
       id: 'education-recruitment', 
