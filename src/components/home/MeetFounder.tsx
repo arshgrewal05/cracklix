@@ -9,8 +9,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Founder & Lead Developer Section.
- * Features: High-fidelity circular profile image with Arsh Grewal's official bio and image.
+ * @fileOverview Official Founder & Lead Developer Section v2.1.
+ * FIXED: Replaced arbitrary Tailwind duration with inline style.
  */
 
 export default function MeetFounder() {
@@ -48,7 +48,8 @@ export default function MeetFounder() {
                   <img 
                     src={founderImg} 
                     alt="Arsh Grewal" 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all scale-105 group-hover:scale-100"
+                    style={{ transitionDuration: '2000ms' }}
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                        (e.target as HTMLImageElement).src = "https://picsum.photos/seed/arsh/400/400";
@@ -77,7 +78,7 @@ export default function MeetFounder() {
                
                <div className="relative">
                   <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary/20 rounded-full hidden md:block" />
-                  <p className="text-lg md:text-xl text-slate-500 font-medium leading-relaxed antialiased">
+                  <p className="text-lg md:text-xl text-slate-500 font-medium leading-relaxed antialiased text-left">
                      Founder and Lead Developer of <span className="text-[#0F172A] font-black">CRACKLIX</span>, dedicated to building a modern, fast, and reliable platform for competitive exam preparation. Focused on delivering high-quality mock tests, PYQs, current affairs, analytics, and multilingual learning experiences to help students succeed.
                   </p>
                </div>

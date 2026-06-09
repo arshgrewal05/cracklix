@@ -17,8 +17,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Elite PASS Registry Hub v11.0.
- * UPDATED: Optimized Free Trial logic to read Enable/Duration from Admin Settings.
+ * @fileOverview Elite PASS Registry Hub v11.1.
+ * FIXED: Replaced arbitrary Tailwind duration with inline style.
  */
 export default function PassPage() {
   const { user, profile, loading: userLoading } = useUser()

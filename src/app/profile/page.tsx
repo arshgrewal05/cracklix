@@ -45,8 +45,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Student Profile Center.
- * Simplified Language: Easy language, Editable Target Board & Email.
+ * @fileOverview Student Profile Center v20.1.
+ * FIXED: Replaced arbitrary Tailwind duration with inline style to resolve build warnings.
  */
 export default function ProfilePage() {
   const { user, profile, loading } = useUser()
@@ -316,7 +316,12 @@ export default function ProfilePage() {
                  </Card>
 
                  <div className="bg-primary rounded-[3rem] p-10 text-white space-y-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform duration-[2000ms]"><Award className="h-40 w-40" /></div>
+                    <div 
+                      className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"
+                      style={{ transitionDuration: '2000ms' }}
+                    >
+                       <Award className="h-40 w-40" />
+                    </div>
                     <div className="relative z-10 space-y-4">
                        <h4 className="text-2xl font-headline font-black uppercase leading-tight">Check Your <br/> Rankings</h4>
                        <p className="text-white/70 text-[11px] font-bold uppercase tracking-tight">Compare yourself with others.</p>
@@ -452,7 +457,7 @@ function ProfileDataNode({ icon, label, value, colSpan = 1 }: any) {
          </div>
          <div className="min-w-0 space-y-1 text-left">
             <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{label}</p>
-            <p className="text-sm md:text-base font-bold text-[#0F172A] leading-relaxed break-words uppercase">{value}</p>
+            <p className="text-sm md:text-base font-bold text-[#0F172A] font-bold leading-relaxed break-words uppercase">{value}</p>
          </div>
       </div>
    )

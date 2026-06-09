@@ -18,8 +18,8 @@ import { doc } from "firebase/firestore"
 import Script from "next/script"
 
 /**
- * @fileOverview Institutional Checkout Hub v55.0.
- * Standardized to include Razorpay Secure Online Gateway.
+ * @fileOverview Institutional Checkout Hub v55.1.
+ * FIXED: Replaced arbitrary Tailwind duration with inline style to resolve build warnings.
  */
 
 export default function CheckoutPage() {
@@ -240,7 +240,12 @@ function CheckoutContent() {
 
            <div className="lg:col-span-5 space-y-8">
               <Card className="border-none shadow-5xl rounded-[3.5rem] bg-[#0B1528] text-white p-10 md:p-14 overflow-hidden relative">
-                 <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform duration-[3000ms]"><Gem className="h-48 w-48" /></div>
+                 <div 
+                   className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"
+                   style={{ transitionDuration: '3000ms' }}
+                 >
+                    <Gem className="h-48 w-48" />
+                 </div>
                  <div className="relative z-10 space-y-12">
                     <div className="space-y-2 text-center">
                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Order Registry</p>

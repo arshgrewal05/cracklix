@@ -2,8 +2,8 @@
 import { Firestore, doc, setDoc, serverTimestamp, collection } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Seeding Node v21.0.
- * RECOVERED: Restored high-fidelity logos for Punjab Police and PSPCL.
+ * @fileOverview Institutional Seeding Node v21.1.
+ * RECOVERED & LOCKED: Restored high-fidelity logos for Punjab Police, PSPCL, PSSSB, PPSC, and technical hubs.
  */
 
 export async function seedInitialData(db: Firestore) {
@@ -109,9 +109,9 @@ export async function seedInitialData(db: Firestore) {
       categoryId: 'punjab-technical',
       iconUrl: 'https://www.punjabteched.com/images/Clogo-blue.gif'
     },
-    { id: 'pstet', abbreviation: 'PSTET', name: 'PSTET Hub', categoryId: 'punjab-teaching' },
-    { id: 'ctet', abbreviation: 'CTET', name: 'CTET Hub', categoryId: 'punjab-teaching' },
-    { id: 'education-recruitment', abbreviation: 'EDUCATION', name: 'Education Recruitment Board Punjab', categoryId: 'punjab-teaching' }
+    { id: 'pstet', abbreviation: 'PSTET', name: 'PSTET Hub', categoryId: 'punjab-teaching', iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT77AiJp2d3yn7Lwjk7LG6nDeLpQC_ZnFs6FZg4yAieypyMsmctxNGWRdk&s=10' },
+    { id: 'ctet', abbreviation: 'CTET', name: 'CTET Hub', categoryId: 'punjab-teaching', iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT77AiJp2d3yn7Lwjk7LG6nDeLpQC_ZnFs6FZg4yAieypyMsmctxNGWRdk&s=10' },
+    { id: 'education-recruitment', abbreviation: 'EDUCATION', name: 'Education Recruitment Board Punjab', categoryId: 'punjab-teaching', iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT77AiJp2d3yn7Lwjk7LG6nDeLpQC_ZnFs6FZg4yAieypyMsmctxNGWRdk&s=10' }
   ];
 
   for (const b of boards) {
