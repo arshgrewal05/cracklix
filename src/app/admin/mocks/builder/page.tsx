@@ -49,8 +49,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview FINAL HIGH-FIDELITY Mock Architect v41.0.
- * Perfectly matching the Question Bank screenshot and functional logic.
+ * @fileOverview FINAL HIGH-FIDELITY Mock Architect v45.0.
+ * Perfectly matching the 7:00 AM Morning Build screenshot.
  */
 
 export default function MockBuilderPage() {
@@ -448,7 +448,7 @@ function MockBuilderContent() {
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] ml-1">SOURCE BOARD HUB</Label>
                           <Select value={filterBoard} onValueChange={setFilterBoard}>
-                             <SelectTrigger className="h-14 bg-white/5 border-white/10 rounded-2xl font-bold text-xs text-white px-6"><SelectValue /></SelectTrigger>
+                             <SelectTrigger className="h-14 bg-white/5 border-white/10 rounded-2xl font-bold text-xs text-white px-6"><SelectValue placeholder="All Authorities" /></SelectTrigger>
                              <SelectContent>
                                 <SelectItem value="all">All Boards</SelectItem>
                                 {boards?.map(b => <SelectItem key={b.id} value={b.id}>{b.abbreviation} Hub</SelectItem>)}
@@ -458,7 +458,7 @@ function MockBuilderContent() {
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] ml-1">RECRUITMENT VERTICAL</Label>
                           <Select value={filterExam} onValueChange={setFilterExam}>
-                             <SelectTrigger className="h-14 bg-white/5 border-white/10 rounded-2xl font-bold text-xs text-white px-6"><SelectValue /></SelectTrigger>
+                             <SelectTrigger className="h-14 bg-white/5 border-white/10 rounded-2xl font-bold text-xs text-white px-6"><SelectValue placeholder="All Verticals" /></SelectTrigger>
                              <SelectContent>
                                 <SelectItem value="all">All Exams</SelectItem>
                                 {uniqueExams.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
@@ -468,7 +468,7 @@ function MockBuilderContent() {
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] ml-1">SUBJECT NODE</Label>
                           <Select value={filterSubject} onValueChange={setFilterSubject}>
-                             <SelectTrigger className="h-14 bg-white/5 border-white/10 rounded-2xl font-bold text-xs text-white px-6"><SelectValue /></SelectTrigger>
+                             <SelectTrigger className="h-14 bg-white/5 border-white/10 rounded-2xl font-bold text-xs text-white px-6"><SelectValue placeholder="All Subjects" /></SelectTrigger>
                              <SelectContent>
                                 <SelectItem value="all">All Subjects</SelectItem>
                                 {subjects?.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
@@ -522,7 +522,7 @@ function MockBuilderContent() {
                                       variant="ghost" 
                                       size="icon" 
                                       onClick={(e) => { e.stopPropagation(); handleDeleteFromBank(q.id); }}
-                                      className="h-11 w-11 text-rose-500 hover:bg-rose-500/20 opacity-0 group-hover/q:opacity-100 transition-opacity"
+                                      className="h-11 w-11 text-rose-500 hover:bg-rose-50/20 opacity-0 group-hover/q:opacity-100 transition-opacity"
                                    >
                                       <Trash2 className="h-5 w-5" />
                                    </Button>
@@ -618,7 +618,7 @@ function MockBuilderContent() {
                                 {sec.questions.map((q: any, qIdx: number) => (
                                    <div key={q.id} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl group/item hover:bg-white hover:shadow-lg transition-all">
                                       <div className="flex items-center gap-6 min-w-0">
-                                         <span className="text-[10px] font-black text-slate-300 w-6 uppercase">#{qIdx + 1}</span>
+                                         <span className="text-point-sm font-black text-slate-300 w-6 uppercase">#{qIdx + 1}</span>
                                          <p className="text-sm font-bold text-slate-600 truncate text-left">{q.englishQuestion}</p>
                                       </div>
                                       <button 

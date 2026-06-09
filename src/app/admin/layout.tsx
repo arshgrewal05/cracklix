@@ -50,13 +50,13 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 
 /**
- * @fileOverview Institutional Security Protocol v102.0.
- * RESTORED: Morning standard labels for Authority Hub, Exam Registry, etc.
+ * @fileOverview Institutional Security Protocol v103.0.
+ * RESTORED: Morning labels exactly matching screenshot: AUTHORITY HUB, EXAM REGISTRY, SUBJECT LIST.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.Node }) {
   const { user, profile, loading } = useUser()
   const auth = useAuth()
   const router = useRouter()
@@ -231,7 +231,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   )
 }
 
-function AdminNavItem({ icon, label, href, active, className }: { icon: React.ReactNode, label: string, href: string, active?: boolean, className?: string }) {
+function AdminNavItem({ icon, label, href, active, className }: { icon: React.Node, label: string, href: string, active?: boolean, className?: string }) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton 
