@@ -9,14 +9,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * @fileOverview Institutional Sticky Bottom Navigation for Mobile.
- * Updated: Hidden during active mock attempts to maximize workspace.
+ * UPDATED: Hidden during active mock attempts AND Admin paths to prevent UI collision.
  */
 
 export default function MobileNav() {
   const pathname = usePathname();
 
-  // Guard: Hide navigation during live CBT attempts to prevent UI collision
-  if (pathname?.includes('/attempt')) return null;
+  // Guard: Hide navigation during live CBT attempts or in the Admin Portal
+  if (!pathname || pathname.includes('/attempt') || pathname.startsWith('/admin')) return null;
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
