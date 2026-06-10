@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -23,7 +24,6 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
 
-// FOUNDER WHITELIST - PERMANENT AUTHORITY
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 export default function Navbar() {
@@ -39,16 +39,19 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
     
-    // Check if install prompt is available
-    const checkInstall = () => {
-      if ((window as any).deferredPrompt) setCanInstall(true);
+    const checkInstallAvailability = () => {
+      if (typeof window !== 'undefined' && (window as any).deferredPrompt) {
+        setCanInstall(true);
+      }
     };
+
+    window.addEventListener('pwa-installable', checkInstallAvailability);
+    window.addEventListener('pwa-installed', () => setCanInstall(false));
+    checkInstallAvailability();
     
-    window.addEventListener('beforeinstallprompt', checkInstall);
-    // Initial check
-    checkInstall();
-    
-    return () => window.removeEventListener('beforeinstallprompt', checkInstall);
+    return () => {
+      window.removeEventListener('pwa-installable', checkInstallAvailability);
+    };
   }, []);
   
   const settingsRef = useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]);
@@ -64,12 +67,13 @@ export default function Navbar() {
     if (prompt) {
       prompt.prompt();
       const { outcome } = await prompt.userChoice;
-      if (outcome === 'accepted') setCanInstall(false);
-      (window as any).deferredPrompt = null;
+      if (outcome === 'accepted') {
+        setCanInstall(false);
+        (window as any).deferredPrompt = null;
+      }
     }
   };
 
-  // PERMANENT AUTHORITY CHECK (Absolute Bypass)
   const isFounder = user?.email && SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase());
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
 

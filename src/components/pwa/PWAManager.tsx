@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -7,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Institutional PWA Lifecycle Manager v5.1.
- * FIXED: Resolved "window is not defined" SSR error with hydration guard.
+ * @fileOverview Institutional PWA Lifecycle Manager v6.0.
+ * FIXED: Advanced hydration guard and global event broadcasting for UI sync.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -25,7 +26,6 @@ export default function PWAManager() {
       navigator.serviceWorker.register('/sw.js').then(
         (reg) => {
           console.log('[PWA] ServiceWorker registered');
-          window.dispatchEvent(new CustomEvent('sw-ready'));
         },
         (err) => console.log('[PWA] ServiceWorker registration failed:', err)
       );
@@ -34,9 +34,14 @@ export default function PWAManager() {
     // 2. Install prompt listener
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
+      // Store event globally for other components to access
       (window as any).deferredPrompt = e;
       setDeferredPrompt(e);
       
+      // Dispatch custom event to notify Navbar/Sidebar
+      window.dispatchEvent(new CustomEvent('pwa-installable'));
+      
+      // Show automated banner after delay
       const timer = setTimeout(() => {
         const isExcluded = pathname?.includes('/attempt') || pathname?.startsWith('/admin');
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -51,33 +56,27 @@ export default function PWAManager() {
 
     const handleAppInstalled = () => {
       setDeferredPrompt(null);
-      if (typeof window !== 'undefined') {
-        (window as any).deferredPrompt = null;
-      }
+      (window as any).deferredPrompt = null;
       setShowPrompt(false);
       setIsInstalled(true);
-      console.log('[PWA] Installed successfully');
+      window.dispatchEvent(new CustomEvent('pwa-installed'));
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        setIsInstalled(true);
-      }
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
     }
 
     return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.removeEventListener('appinstalled', handleAppInstalled);
-      }
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, [pathname]);
 
   const handleInstallClick = async () => {
-    const prompt = deferredPrompt || (typeof window !== 'undefined' ? (window as any).deferredPrompt : null);
+    const prompt = deferredPrompt || (window as any).deferredPrompt;
     if (!prompt) return;
 
     prompt.prompt();
@@ -85,19 +84,13 @@ export default function PWAManager() {
     
     if (outcome === 'accepted') {
       setShowPrompt(false);
-    }
-    
-    setDeferredPrompt(null);
-    if (typeof window !== 'undefined') {
       (window as any).deferredPrompt = null;
+      setDeferredPrompt(null);
     }
   };
 
-  // Hydration Guard: Return null during SSR
   if (!mounted) return null;
-
-  const hasGlobalPrompt = typeof window !== 'undefined' && (window as any).deferredPrompt;
-  if (isInstalled || (!deferredPrompt && !hasGlobalPrompt)) return null;
+  if (isInstalled) return null;
 
   return (
     <AnimatePresence>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { 
@@ -37,7 +38,7 @@ import { Button } from "@/components/ui/button";
 
 /**
  * @fileOverview Institutional Sidebar.
- * UPDATED: Added "Install App" button for mobile PWA support.
+ * UPDATED: Optimized event listening for PWA installability.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -52,7 +53,17 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     setMounted(true);
-    if ((window as any).deferredPrompt) setCanInstall(true);
+    
+    const checkInstall = () => {
+      if (typeof window !== 'undefined' && (window as any).deferredPrompt) {
+        setCanInstall(true);
+      }
+    };
+
+    window.addEventListener('pwa-installable', checkInstall);
+    checkInstall();
+    
+    return () => window.removeEventListener('pwa-installable', checkInstall);
   }, []);
 
   const handleLogout = async () => {
@@ -244,7 +255,6 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      {/* SHARE HUB DIALOG */}
       <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
          <DialogContent className="bg-[#0F172A] text-white border-white/10 rounded-[2.5rem] max-w-[340px] p-0 overflow-hidden shadow-5xl">
             <div className="h-1.5 w-full bg-primary" />
