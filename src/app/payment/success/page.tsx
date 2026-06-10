@@ -11,11 +11,6 @@ import { motion } from "framer-motion"
 import { Suspense, useEffect, useState } from "react"
 import { useUser } from "@/firebase"
 
-/**
- * @fileOverview Institutional Payment Success Node.
- * UPDATED: Integrated Cashfree session verification on return.
- */
-
 export default function SuccessPage() {
   return (
     <Suspense fallback={null}>
@@ -26,7 +21,6 @@ export default function SuccessPage() {
 
 function SuccessContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const { user } = useUser()
   const orderId = searchParams.get("order_id")
   const plan = searchParams.get("plan") || "Elite Pass"
@@ -65,7 +59,7 @@ function SuccessContent() {
         {verifying ? (
            <div className="space-y-6">
               <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto" />
-              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Synchronizing Registry...</p>
+              <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Verifying Registry Hub...</p>
            </div>
         ) : (
           <motion.div 
@@ -89,7 +83,7 @@ function SuccessContent() {
              <div className="space-y-4">
                 <h1 className="text-5xl font-headline font-black text-[#0F172A] uppercase">Payment Successful</h1>
                 <p className="text-lg text-slate-500 font-medium leading-relaxed">
-                   Your institutional pass has been successfully synchronized. {verified ? "Your access node is now live." : "Registry sync in progress via background node."}
+                   Your preparation pass has been successfully activated. {verified ? "Your elite prepared node is now live." : "Registry sync in progress via background node."}
                 </p>
              </div>
 
@@ -99,7 +93,7 @@ function SuccessContent() {
                    <span className="text-sm font-mono font-black text-primary truncate max-w-[200px]">{orderId || "ONLINE_NODE"}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                   <span className="text-[10px] font-black uppercase text-slate-400">Pass Hub</span>
+                   <span className="text-[10px] font-black uppercase text-slate-400">Hub Status</span>
                    <span className="text-base font-bold text-[#0F172A] uppercase">{plan} Activated</span>
                 </div>
              </div>
@@ -109,7 +103,7 @@ function SuccessContent() {
                    <Link href="/dashboard">Enter Dashboard <ArrowRight className="h-4 w-4" /></Link>
                 </Button>
                 <Button asChild variant="outline" className="flex-1 h-16 rounded-2xl border-slate-200 font-black uppercase tracking-widest text-xs gap-3">
-                   <Link href="/mocks">Start Practice</Link>
+                   <Link href="/mocks">Browse Mocks</Link>
                 </Button>
              </div>
 

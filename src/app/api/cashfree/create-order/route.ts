@@ -48,7 +48,6 @@ export async function POST(req: Request) {
       },
       order_meta: {
         return_url: `${new URL(req.url).origin}/payment/success?order_id={order_id}&plan=${encodeURIComponent(planData.name)}`,
-        notify_url: `${new URL(req.url).origin}/api/cashfree/webhook`,
       },
       order_note: `Purchase: ${planData.name} Elite Pass`,
     };

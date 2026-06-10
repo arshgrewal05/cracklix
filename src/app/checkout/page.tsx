@@ -6,21 +6,13 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ShieldCheck, Lock, ArrowLeft, Loader2, QrCode, CheckCircle2, Gem, Copy, Download, Zap, CreditCard, Globe } from "lucide-react"
+import { ShieldCheck, Lock, ArrowLeft, Loader2, QrCode, CheckCircle2, Gem, Copy, Zap, CreditCard } from "lucide-react"
 import { useUser, useDoc, useFirestore } from "@/firebase"
 import { useEffect, useState, Suspense, useMemo } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { submitManualPayment } from "@/app/actions/payment"
 import { doc } from "firebase/firestore"
 import Script from "next/script"
-
-/**
- * @fileOverview Institutional Checkout Hub v57.0.
- * UPDATED: Replaced Razorpay with Cashfree Payments SDK v3.
- */
 
 export default function CheckoutPage() {
   return (
@@ -54,7 +46,6 @@ function CheckoutContent() {
 
     setOnlineProcessing(true);
     try {
-      // 1. Create Order Hub (Backend)
       const orderRes = await fetch('/api/cashfree/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,7 +55,7 @@ function CheckoutContent() {
       const orderData = await orderRes.json();
       if (orderData.error) throw new Error(orderData.error);
 
-      // 2. Initialize SDK & Launch Checkout
+      // Initialize SDK
       const cashfree = (window as any).Cashfree({
          mode: process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox'
       });
@@ -75,7 +66,7 @@ function CheckoutContent() {
       });
 
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Gateway Hub Error", description: e.message });
+      toast({ variant: "destructive", title: "Gateway Error", description: e.message });
       setOnlineProcessing(false);
     }
   };
@@ -84,38 +75,8 @@ function CheckoutContent() {
   const upiLink = `upi://pay?pa=${upiId}&pn=Cracklix&am=${planData?.price || 0}&cu=INR`;
   const qrUrl = settings?.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
 
-  const handleCopyUPI = () => {
-    navigator.clipboard.writeText(upiId);
-    toast({ title: "UPI ID Copied" });
-  };
-
-  const handleManualPayment = async () => {
-    if (!user || !profile || !planData) return
-    if (!utr || utr.length < 10) {
-       toast({ variant: "destructive", title: "UTR Invalid", description: "Please enter the 12-digit transaction ID." })
-       return
-    }
-
-    setProcessing(true)
-    try {
-       await submitManualPayment({
-          userId: user.uid,
-          userEmail: user.email || '',
-          userName: profile.name,
-          planId: planId,
-          transactionId: utr
-       })
-       toast({ title: "Registry Synced", description: "Admin will verify your payment node within 24 hours." })
-       router.push("/dashboard")
-    } catch (e: any) {
-       toast({ variant: "destructive", title: "Submission Failed" })
-    } finally {
-       setProcessing(false)
-    }
-  }
-
   if (planLoading) return <div className="h-screen flex items-center justify-center bg-white"><Loader2 className="h-10 w-10 text-primary animate-spin" /></div>
-  if (!planData) return <div className="h-screen flex items-center justify-center bg-slate-50 text-slate-400 font-black uppercase tracking-widest text-xs">Registry Node Not Found</div>
+  if (!planData) return <div className="h-screen flex items-center justify-center text-slate-400 uppercase font-black tracking-widest text-xs">Registry Node Missing</div>
 
   return (
     <div className="min-h-screen bg-slate-50/50 font-body">
@@ -129,7 +90,7 @@ function CheckoutContent() {
            </Button>
            <div className="text-left">
               <h1 className="text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Checkout</h1>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">Secure Transaction Node</p>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">Institutional Billing Node</p>
            </div>
         </div>
 
@@ -140,10 +101,10 @@ function CheckoutContent() {
                  <CardHeader className="p-10 pb-4">
                     <div className="flex items-center gap-4 mb-2">
                        <CreditCard className="h-6 w-6 text-primary" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Recommended Gateway</span>
+                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Fast Activation</span>
                     </div>
-                    <CardTitle className="font-headline font-black text-2xl uppercase">Cashfree Online Node</CardTitle>
-                    <CardDescription className="text-slate-400 font-medium">Instant activation via UPI, Cards, or Netbanking.</CardDescription>
+                    <CardTitle className="font-headline font-black text-2xl uppercase">Cashfree Checkout</CardTitle>
+                    <CardDescription className="text-slate-400 font-medium">Automatic verification via UPI, Cards, or Netbanking.</CardDescription>
                  </CardHeader>
                  <CardContent className="p-10 pt-4">
                     <Button 
@@ -157,30 +118,30 @@ function CheckoutContent() {
                  </CardContent>
               </Card>
 
-              <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+              <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden">
                  <CardHeader className="p-10 bg-slate-50/50 border-b border-slate-100">
                     <div className="flex items-center gap-4 mb-2">
                        <QrCode className="h-5 w-5 text-slate-400" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Alternative Hub</span>
+                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Manual Gateway</span>
                     </div>
-                    <CardTitle className="font-headline font-black text-xl uppercase text-[#0F172A]">Manual UPI Node</CardTitle>
+                    <CardTitle className="font-headline font-black text-xl uppercase text-[#0F172A]">Direct UPI Node</CardTitle>
                  </CardHeader>
                  <CardContent className="p-10 space-y-10">
                     <div className="flex flex-col items-center gap-10">
                        <div className="h-48 w-48 bg-white rounded-3xl border-2 border-slate-50 flex items-center justify-center p-4 shadow-xl">
-                          <img src={qrUrl} alt="Audit QR" className="w-full h-full object-contain" />
+                          <img src={qrUrl} alt="QR" className="w-full h-full object-contain" />
                        </div>
                        <div className="w-full p-5 bg-slate-900 rounded-2xl border border-white/5 flex items-center justify-between shadow-2xl">
-                          <div className="min-w-0 flex-1">
+                          <div className="min-w-0 flex-1 text-left">
                              <p className="text-[8px] font-black text-primary uppercase tracking-widest mb-1">UPI ID</p>
                              <p className="text-base font-black text-white truncate">{upiId}</p>
                           </div>
-                          <Button size="icon" variant="ghost" onClick={handleCopyUPI} className="text-primary hover:bg-white/10 rounded-xl"><Copy className="h-5 w-5" /></Button>
+                          <Button size="icon" variant="ghost" onClick={() => { navigator.clipboard.writeText(upiId); toast({title:"Copied"}); }} className="text-primary hover:bg-white/10 rounded-xl"><Copy className="h-5 w-5" /></Button>
                        </div>
                     </div>
                     <div className="space-y-4 pt-8 border-t border-slate-100">
                        <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">UTR / 12-Digit Transaction ID</Label>
+                          <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">12-Digit Transaction UTR</Label>
                           <Input 
                             value={utr}
                             onChange={e => setUtr(e.target.value.replace(/\D/g, '').slice(0,12))}
@@ -189,7 +150,13 @@ function CheckoutContent() {
                           />
                        </div>
                        <Button 
-                          onClick={handleManualPayment}
+                          onClick={async () => {
+                             if(utr.length < 12) { toast({variant:"destructive", title:"Invalid UTR"}); return; }
+                             setProcessing(true);
+                             await submitManualPayment({ userId: user!.uid, userEmail: user!.email!, userName: profile!.name, planId, transactionId: utr });
+                             toast({title:"Submitted", description:"Admin will audit your payment shortly."});
+                             router.push("/dashboard");
+                          }}
                           disabled={processing}
                           className="w-full h-14 bg-slate-200 hover:bg-slate-300 text-slate-600 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all border-none gap-3"
                        >
@@ -203,12 +170,7 @@ function CheckoutContent() {
 
            <div className="lg:col-span-5 space-y-8">
               <Card className="border-none shadow-5xl rounded-[3.5rem] bg-[#0B1528] text-white p-10 md:p-14 overflow-hidden relative">
-                 <div 
-                   className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"
-                   style={{ transitionDuration: '3000ms' }}
-                 >
-                    <Gem className="h-48 w-48" />
-                 </div>
+                 <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12"><Gem className="h-48 w-48" /></div>
                  <div className="relative z-10 space-y-12">
                     <div className="space-y-2 text-center">
                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Order Registry</p>
