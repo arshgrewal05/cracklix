@@ -10,14 +10,15 @@ import { doc } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Info, CheckCircle2, Clock, BookOpen, Zap, Globe, Languages, ChevronRight } from "lucide-react";
+import { ShieldCheck, Info, CheckCircle2, Clock, BookOpen, Zap, Globe, Languages, ChevronRight, Home } from "lucide-react";
 import { useExamStore } from "@/store/useExamStore";
 import { cn } from "@/lib/utils";
 import { LanguageDisplayMode } from "@/types";
+import Link from "next/link";
 
 /**
- * @fileOverview Testbook-Style Entrance Hub v6.1.
- * UPDATED: Implemented absolute Login Firewall.
+ * @fileOverview Testbook-Style Entrance Hub v6.2.
+ * UPDATED: Fixed blank page when mock data is missing.
  */
 export default function InstructionsPage() {
   const params = useParams();
@@ -62,8 +63,30 @@ export default function InstructionsPage() {
     router.push(`/mocks/${mockId}/attempt`);
   };
 
-  if (loading || userLoading || !user) return <div className="h-screen flex items-center justify-center bg-white"><Zap className="h-10 w-10 text-[#F97316] animate-pulse" /></div>;
-  if (!mock) return null;
+  if (loading || userLoading) return (
+    <div className="h-screen flex flex-col items-center justify-center bg-white space-y-6">
+       <Zap className="h-10 w-10 text-[#F97316] animate-pulse" />
+       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Synchronizing Hub...</p>
+    </div>
+  );
+
+  if (!user) return null;
+
+  if (!mock) return (
+    <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-8 bg-white p-6">
+       <div className="h-24 w-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center border border-slate-100 shadow-inner">
+          <Info className="h-10 w-10 opacity-20" />
+       </div>
+       <div className="text-center space-y-2">
+          <p className="font-black uppercase tracking-[0.3em] text-[10px] text-slate-400">Registry Sync Error</p>
+          <h2 className="text-3xl font-headline font-black text-[#0F172A] uppercase">Instructions Unavailable</h2>
+          <p className="text-sm font-medium text-slate-500 max-w-xs mx-auto">This test node could not be verified in the master registry.</p>
+       </div>
+       <Button asChild className="h-14 px-10 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-xl gap-3">
+          <Link href="/"><Home className="h-4 w-4" /> Return Home</Link>
+       </Button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-slate-50/50 font-body select-none">

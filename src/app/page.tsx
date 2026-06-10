@@ -20,9 +20,8 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 /**
- * @fileOverview Optimized Institutional Landing Hub v57.0.
- * UPDATED: High-fidelity "Box" design for live statistics. 
- * Real-time original data only (0-Baseline).
+ * @fileOverview Optimized Institutional Landing Hub v57.1.
+ * UPDATED: Added safety check to prevent blank page on slow stats load.
  */
 
 export default function HomePage() {
@@ -54,7 +53,7 @@ export default function HomePage() {
   }, [stats]);
 
   return (
-    <main className="min-h-screen bg-white font-body pb-safe overflow-x-hidden">
+    <main className="min-h-screen bg-white font-body pb-safe overflow-x-hidden text-left">
       <Navbar />
       <Hero />
 

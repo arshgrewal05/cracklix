@@ -20,16 +20,16 @@ import {
   Lock,
   Zap,
   Play,
-  AlertCircle
+  AlertCircle,
+  Home
 } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Individual Mock Gateway v18.0.
- * HARDENED: Implementation of "UNLOCK TEST" node for Premium series.
- * UPDATED: Integrated Founder Bypass for registry audit.
+ * @fileOverview Individual Mock Gateway v18.1.
+ * UPDATED: Replaced blank state with a helpful error node.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -100,11 +100,30 @@ export default function MockOverviewPage() {
 
   const isLimitReached = attemptsLeft === 0;
 
-  if (mockLoading || userLoading || (user && !accessChecked)) return <div className="h-screen flex items-center justify-center bg-white"><Skeleton className="h-16 w-16 rounded-full animate-pulse" /></div>;
+  if (mockLoading || userLoading || (user && !accessChecked)) return (
+    <div className="h-screen flex flex-col items-center justify-center bg-white space-y-6">
+       <Zap className="h-12 w-12 text-primary animate-pulse" />
+       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Synchronizing Prep Node...</p>
+    </div>
+  );
 
   if (!user) return null;
 
-  if (!mock) return <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-4"><Info className="h-12 w-12 opacity-10" /><p className="font-black uppercase tracking-widest text-xs">Registry node missing</p></div>;
+  if (!mock) return (
+    <div className="h-screen flex flex-col items-center justify-center text-slate-400 gap-8 bg-white p-6">
+       <div className="h-24 w-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center border border-slate-100 shadow-inner">
+          <Info className="h-10 w-10 opacity-20" />
+       </div>
+       <div className="text-center space-y-2">
+          <p className="font-black uppercase tracking-[0.3em] text-[10px] text-slate-400">Registry Sync Error</p>
+          <h2 className="text-3xl font-headline font-black text-[#0F172A] uppercase">Test Not Found</h2>
+          <p className="text-sm font-medium text-slate-500 max-w-xs mx-auto">This preparation series might have been archived or removed from the live registry.</p>
+       </div>
+       <Button asChild className="h-14 px-10 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-xl gap-3">
+          <Link href="/"><Home className="h-4 w-4" /> Return to Hub</Link>
+       </Button>
+    </div>
+  );
 
   const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
   const isPremium = tier === 'PREMIUM';
@@ -185,5 +204,4 @@ function FeatureNode({ icon, title, desc }: any) {
          <h3 className="text-xl font-black text-[#0F172A] uppercase">{title}</h3>
          <p className="text-slate-400 font-bold uppercase text-[9px] tracking-widest">{desc}</p>
       </div>
-   )
 }
