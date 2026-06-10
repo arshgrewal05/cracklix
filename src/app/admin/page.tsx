@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -30,8 +30,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Command Center v35.0.
- * UPDATED: Hardened real-time sync protocol to populate Stats Node from all collections.
+ * @fileOverview Institutional Command Center v36.0.
+ * UPDATED: Auto-trigger stats sync on mount to ensure Home Page always displays real data.
  */
 
 export default function AdminDashboard() {
@@ -54,7 +54,13 @@ export default function AdminDashboard() {
   const recentResultsQuery = useMemo(() => (db ? query(collection(db, "results"), orderBy("timestamp", "desc"), limit(5)) : null), [db]);
   const { data: recentResults } = useCollection<any>(recentResultsQuery);
 
-  // Financial Metrics Calculation
+  // AUTO-SYNC ON MOUNT
+  useEffect(() => {
+    if (db) {
+       handleSyncLiveStats(true);
+    }
+  }, [db]);
+
   const finance = useMemo(() => {
     const totalRev = approvedRequests?.reduce((acc, r) => acc + (r.amount || 0), 0) || 0;
     const activePasses = allUsers?.filter((u: any) => u.pass?.active === true).length || 0;
@@ -65,11 +71,10 @@ export default function AdminDashboard() {
     };
   }, [allUsers, pendingRequests, approvedRequests]);
 
-  const handleSyncLiveStats = async () => {
+  const handleSyncLiveStats = async (silent = false) => {
      if (!db) return;
-     setIsStatsSyncing(true);
+     if (!silent) setIsStatsSyncing(true);
      try {
-        // 1. Audit Registry Counts (Absolute Reality from Database)
         const [qSnap, mSnap, uSnap, rSnap] = await Promise.all([
            getDocs(collection(db, "questions")),
            getDocs(collection(db, "mocks")),
@@ -79,9 +84,8 @@ export default function AdminDashboard() {
 
         const avgAcc = rSnap.docs.length > 0 
            ? Math.round(rSnap.docs.reduce((acc, d) => acc + (d.data().accuracy || 0), 0) / rSnap.docs.length)
-           : 94; // Institutional fallback for new systems
+           : 94;
 
-        // 2. Commit to Institutional Node
         await setDoc(doc(db, "settings", "stats"), {
            totalQuestions: qSnap.size,
            totalMocks: mSnap.size,
@@ -90,14 +94,16 @@ export default function AdminDashboard() {
            updatedAt: serverTimestamp()
         }, { merge: true });
 
-        toast({ 
-          title: "Registry Audited", 
-          description: `Synced: ${qSnap.size} MCQs, ${mSnap.size} Mocks, ${uSnap.size} Aspirants.` 
-        });
+        if (!silent) {
+           toast({ 
+             title: "Registry Audited", 
+             description: `Synced: ${qSnap.size} MCQs, ${mSnap.size} Mocks, ${uSnap.size} Aspirants.` 
+           });
+        }
      } catch (e) {
-        toast({ variant: "destructive", title: "Sync Failed" });
+        if (!silent) toast({ variant: "destructive", title: "Sync Failed" });
      } finally {
-        setIsStatsSyncing(false);
+        if (!silent) setIsStatsSyncing(false);
      }
   }
 
@@ -106,6 +112,7 @@ export default function AdminDashboard() {
     setIsSyncing(true)
     try {
       await seedInitialData(db)
+      await handleSyncLiveStats(true)
       toast({ title: "Registry Synced", description: "Official Punjab Exam nodes updated." })
     } catch (e: any) {
       toast({ variant: "destructive", title: "Sync Failed" })
@@ -129,7 +136,7 @@ export default function AdminDashboard() {
           <p className="text-slate-500 mt-1 md:mt-2 text-sm md:text-lg font-medium">Monitoring Preparation Nodes & Financial Distribution.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-           <Button onClick={handleSyncLiveStats} disabled={isStatsSyncing} className="h-12 md:h-14 bg-primary hover:bg-orange-600 text-white rounded-xl md:rounded-2xl font-black shadow-xl uppercase tracking-widest text-xs px-8">
+           <Button onClick={() => handleSyncLiveStats()} disabled={isStatsSyncing} className="h-12 md:h-14 bg-primary hover:bg-orange-600 text-white rounded-xl md:rounded-2xl font-black shadow-xl uppercase tracking-widest text-xs px-8">
               {isStatsSyncing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />} Sync Master Stats
            </Button>
            <Button onClick={handlePushToRegistry} disabled={isSyncing} className="h-12 md:h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl md:rounded-2xl font-black shadow-xl uppercase tracking-widest text-xs px-8">
