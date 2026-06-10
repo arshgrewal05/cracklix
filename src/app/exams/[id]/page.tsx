@@ -20,7 +20,7 @@ import {
   Info,
   Lock,
   GraduationCap,
-  ListTree,
+  List,
   Download,
   Layers,
   RefreshCw,
@@ -35,8 +35,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Hub v26.0.
- * FIXED: Re-implemented Attempt Audit logic to correctly count results mapped to this vertical.
+ * @fileOverview Institutional Exam Hub v27.0.
+ * UPDATED: Icons standardized to match screenshot (List icon for Sectional Test).
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -159,7 +159,7 @@ export default function ExamHubPage() {
                   <DashboardTab value="FULL" label="Full Length Mock" icon={<Zap />} />
                   <DashboardTab value="SUBJECT" label="Subject-Wise Test" icon={<BookOpen />} />
                   <DashboardTab value="PYQ" label="PYQ Paper" icon={<Layers />} />
-                  <DashboardTab value="SECTIONAL" label="Sectional Test" icon={<ListTree />} />
+                  <DashboardTab value="SECTIONAL" label="Sectional Test" icon={<List />} />
                   <DashboardTab value="CA" label="Current Affairs" icon={<Newspaper />} />
                   <DashboardTab value="NOTES" label="Study Notes" icon={<FileText />} />
                   <DashboardTab value="ANALYTICS" label="Performance" icon={<BarChart3 />} />
@@ -301,12 +301,4 @@ function PerformanceNode({ label, val, color }: any) {
          <p className={cn("text-3xl font-headline font-black", color)}>{val}</p>
       </div>
    )
-}
-
-function ListTree({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/><path d="M10 6v12"/><path d="M14 6v12"/>
-    </svg>
-  );
 }
