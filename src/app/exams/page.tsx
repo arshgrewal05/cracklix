@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Master Registry Landing.
- * UPDATED: Permanent Emblem for Punjab Government Exams.
+ * @fileOverview Institutional Master Registry Landing v2.0.
+ * UPDATED: Dynamic counts for hubs (Boards) instead of placeholder figures.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -33,8 +33,10 @@ export default function ExamsEntryPage() {
   const catQuery = useMemo(() => (db ? query(collection(db, "categories"), orderBy("displayOrder", "asc")) : null), [db]);
   const boardsQuery = useMemo(() => (db ? collection(db, "boards") : null), [db]);
 
-  const { data: categories, loading } = useCollection<any>(catQuery);
-  const { data: boards } = useCollection<any>(boardsQuery);
+  const { data: categories, loading: catLoading } = useCollection<any>(catQuery);
+  const { data: boards, loading: boardsLoading } = useCollection<any>(boardsQuery);
+
+  const loading = catLoading || boardsLoading;
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50 font-body">

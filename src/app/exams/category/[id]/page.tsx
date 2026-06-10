@@ -16,8 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Category Explorer v6.0.
- * UPDATED: Permanent Emblem for Punjab Government Exams.
+ * @fileOverview Institutional Category Explorer v7.0.
+ * UPDATED: Dynamic exam counts replaced hardcoded placeholders.
  */
 
 const CATEGORY_META: Record<string, any> = {
@@ -96,10 +96,7 @@ export default function CategoryHubsPage() {
                   const id = hub.id?.toLowerCase();
                   const abbrev = hub.abbreviation?.toLowerCase();
                   const isPolice = id.includes('police') || abbrev === 'police';
-                  const isTechnical = catId === 'punjab-technical';
-                  const isTeaching = catId === 'punjab-teaching';
-                  const isGovt = catId === 'punjab-govt';
-
+                  
                   return (
                     <Link key={hub.id} href={`/exams/hub/${hub.id}`}>
                        <Card className="border-none shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col border border-slate-100 p-8 text-left">
@@ -110,8 +107,6 @@ export default function CategoryHubsPage() {
                                 ) : (
                                    <div className="text-primary opacity-40 p-4">
                                       {isPolice ? <Shield className="h-full w-full" /> : 
-                                       isTeaching ? <GraduationCap className="h-full w-full" /> :
-                                       isTechnical ? <Zap className="h-full w-full" /> :
                                        <LandmarkIcon className="h-full w-full" />}
                                    </div>
                                 )}

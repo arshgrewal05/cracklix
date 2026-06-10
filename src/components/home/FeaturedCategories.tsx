@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Landmark, 
@@ -17,21 +17,23 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useCollection, useFirestore } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Institutional Category Entry Nodes v2.0.
- * UPDATED: Strictly matched counts to user screenshot (250+, 120+, 80+, 150+, 300+).
+ * @fileOverview Institutional Category Entry Nodes v3.0.
+ * UPDATED: Implemented real-time dynamic counting for exams. Placeholder counts (250+, 120+, etc.) removed.
  */
 
-const CATEGORIES = [
+const CATEGORY_META = [
   {
     id: "punjab-govt",
     title: "Punjab Government",
     desc: "Police, PSSSB, PPSC & state board recruitments.",
     icon: <img src="https://static.pseb.ac.in/psebwebsite/front_assets/sites/default/files/inline-images/emblem.png" className="h-full w-full object-contain" />,
     color: "text-primary",
-    bgColor: "bg-orange-50",
-    exams: "250+ EXAMS"
+    bgColor: "bg-orange-50"
   },
   {
     id: "punjab-teaching",
@@ -39,8 +41,7 @@ const CATEGORIES = [
     desc: "PSTET, CTET, Master Cadre & ETT verticals.",
     icon: <GraduationCap className="h-8 w-8" />,
     color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    exams: "120+ EXAMS"
+    bgColor: "bg-blue-50"
   },
   {
     id: "punjab-technical",
@@ -48,8 +49,7 @@ const CATEGORIES = [
     desc: "PSPCL, PSTCL, ALM & Technical Assistant posts.",
     icon: <Zap className="h-8 w-8" />,
     color: "text-amber-500",
-    bgColor: "bg-amber-50",
-    exams: "80+ EXAMS"
+    bgColor: "bg-amber-50"
   },
   {
     id: "banking",
@@ -57,8 +57,7 @@ const CATEGORIES = [
     desc: "IBPS, PO, SO, SBI & RBI specialized mocks.",
     icon: <Wallet className="h-8 w-8" />,
     color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
-    exams: "150+ EXAMS"
+    bgColor: "bg-emerald-50"
   },
   {
     id: "central-govt",
@@ -66,12 +65,24 @@ const CATEGORIES = [
     desc: "SSC, Railways, Army & National registries.",
     icon: <Globe className="h-8 w-8" />,
     color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
-    exams: "300+ EXAMS"
+    bgColor: "bg-indigo-50"
   }
 ];
 
 export default function FeaturedCategories() {
+  const db = useFirestore();
+  const { data: exams, loading } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]));
+
+  const categoriesWithCounts = useMemo(() => {
+    return CATEGORY_META.map(cat => {
+      const count = (exams || []).filter(e => e.categoryId === cat.id).length;
+      return {
+        ...cat,
+        countLabel: `${count} EXAMS LIVE`
+      };
+    });
+  }, [exams]);
+
   return (
     <section className="space-y-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 text-left">
@@ -91,7 +102,7 @@ export default function FeaturedCategories() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-        {CATEGORIES.map((cat, idx) => (
+        {categoriesWithCounts.map((cat, idx) => (
           <motion.div
             key={cat.id}
             initial={{ opacity: 0, y: 20 }}
@@ -113,7 +124,11 @@ export default function FeaturedCategories() {
                    </div>
 
                    <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
-                      <span className="text-[10px] font-black text-[#0F172A] uppercase tracking-widest">{cat.exams}</span>
+                      {loading ? (
+                        <Skeleton className="h-3 w-20 bg-slate-100" />
+                      ) : (
+                        <span className="text-[10px] font-black text-[#0F172A] uppercase tracking-widest">{cat.countLabel}</span>
+                      )}
                       <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                          <ChevronRight className="h-4 w-4" />
                       </div>
@@ -126,3 +141,4 @@ export default function FeaturedCategories() {
     </section>
   );
 }
+
