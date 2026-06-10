@@ -19,8 +19,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Optimized Institutional Landing Hub v48.0.
- * UPDATED: Strictly implemented requested "Real Data" formatting (10.0k, 500, 15,000, 94%).
+ * @fileOverview Optimized Institutional Landing Hub v49.0.
+ * UPDATED: Strictly implemented requested "Real Data" with 0 fallback.
  */
 
 export default function HomePage() {
@@ -31,11 +31,11 @@ export default function HomePage() {
   const { data: stats, loading: statsLoading } = useDoc<any>(statsRef);
 
   const liveStats = useMemo(() => {
-    // 1. Audit Registry Values (Authoritative Baseline)
-    const qCount = stats?.totalQuestions || 10000;
-    const mCount = stats?.totalMocks || 500;
-    const uCount = stats?.totalUsers || 15000;
-    const avgAcc = stats?.averageAccuracy || 94;
+    // 1. Audit Registry Values (Authoritative Baseline - fallback to 0)
+    const qCount = stats?.totalQuestions || 0;
+    const mCount = stats?.totalMocks || 0;
+    const uCount = stats?.totalUsers || 0;
+    const avgAcc = stats?.averageAccuracy || 0;
 
     // 2. High-Fidelity Formatting (Match Screenshot)
     const formattedMCQ = qCount >= 1000 
@@ -43,9 +43,9 @@ export default function HomePage() {
       : qCount.toLocaleString();
 
     return {
-      mcqs: formattedMCQ,
-      mocks: mCount.toLocaleString(),
-      users: uCount.toLocaleString(),
+      mcqs: qCount > 0 ? formattedMCQ : "0",
+      mocks: mCount > 0 ? mCount.toLocaleString() : "0",
+      users: uCount > 0 ? uCount.toLocaleString() : "0",
       accuracy: `${avgAcc}%`
     };
   }, [stats]);
@@ -76,7 +76,7 @@ export default function HomePage() {
                   icon={<Users className="text-[#10B981] h-5 w-5 md:h-8 md:w-8" />} 
                   label="ASPIRANTS" 
                   val={liveStats.users} 
-                  highlight
+                  highlight={liveStats.users !== "0"}
                />
                <TrustCard 
                   loading={statsLoading}

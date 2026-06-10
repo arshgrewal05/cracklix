@@ -14,8 +14,8 @@ import { doc } from "firebase/firestore"
 import { useMemo } from "react"
 
 /**
- * @fileOverview Institutional About Hub v3.8.
- * UPDATED: Synced statistics with the authoritative Stats Hub (Real Data).
+ * @fileOverview Institutional About Hub v3.9.
+ * UPDATED: Replaced hardcoded fallback statistics with 0 baseline.
  */
 
 export default function AboutPage() {
@@ -26,12 +26,14 @@ export default function AboutPage() {
   const { data: stats } = useDoc<any>(statsRef);
 
   const liveAspirantCount = useMemo(() => {
-    const count = stats?.totalUsers || 15000;
+    const count = stats?.totalUsers || 0;
+    if (count === 0) return "0";
     return count > 999 ? `${(count / 1000).toFixed(0)}k+` : count.toLocaleString();
   }, [stats]);
 
   const liveQCount = useMemo(() => {
-    const count = stats?.totalQuestions || 10000;
+    const count = stats?.totalQuestions || 0;
+    if (count === 0) return "0";
     return count >= 1000 ? `${(count / 1000).toFixed(1)}k+` : count.toString();
   }, [stats]);
 
@@ -105,7 +107,7 @@ export default function AboutPage() {
                  <StatNode icon={<UserCheck className="text-primary" />} val={liveAspirantCount} label="Active Students" />
                  <StatNode icon={<Flame className="text-orange-500" />} val={liveQCount} label="MCQs Bank" />
                  <StatNode icon={<Globe className="text-blue-400" />} val="22" label="Districts Covered" />
-                 <StatNode icon={<Target className="text-emerald-500" />} val={`${stats?.averageAccuracy || 94}%`} label="Accuracy Rate" />
+                 <StatNode icon={<Target className="text-emerald-500" />} val={`${stats?.averageAccuracy || 0}%`} label="Accuracy Rate" />
               </div>
            </div>
         </section>

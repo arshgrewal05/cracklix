@@ -30,8 +30,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Command Center v32.0.
- * UPDATED: Implemented precise Real-Time Stats Sync for Real Data management.
+ * @fileOverview Institutional Command Center v33.0.
+ * UPDATED: Zero-floor sync protocol. Absolute real database counts are now prioritized.
  */
 
 export default function AdminDashboard() {
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
      if (!db) return;
      setIsStatsSyncing(true);
      try {
-        // 1. Audit Registry Counts
+        // 1. Audit Registry Counts (Absolute Reality)
         const [qSnap, mSnap, uSnap, rSnap] = await Promise.all([
            getDocs(collection(db, "questions")),
            getDocs(collection(db, "mocks")),
@@ -79,18 +79,18 @@ export default function AdminDashboard() {
 
         const avgAcc = rSnap.docs.length > 0 
            ? Math.round(rSnap.docs.reduce((acc, d) => acc + (d.data().accuracy || 0), 0) / rSnap.docs.length)
-           : 94;
+           : 0;
 
-        // 2. Commit to Institutional Node (SYNC REAL DATA)
+        // 2. Commit to Institutional Node (SYNC REAL DATA - No minimum floor)
         await setDoc(doc(db, "settings", "stats"), {
-           totalQuestions: Math.max(10000, qSnap.size),
-           totalMocks: Math.max(500, mSnap.size),
-           totalUsers: Math.max(15000, uSnap.size),
-           averageAccuracy: Math.max(94, avgAcc),
+           totalQuestions: qSnap.size,
+           totalMocks: mSnap.size,
+           totalUsers: uSnap.size,
+           averageAccuracy: avgAcc,
            updatedAt: serverTimestamp()
         }, { merge: true });
 
-        toast({ title: "Live Sync Complete", description: "Public trust bar synchronized with real database counts." });
+        toast({ title: "Live Sync Complete", description: "All public trust bars are now synchronized with absolute database counts." });
      } catch (e) {
         toast({ variant: "destructive", title: "Sync Failed" });
      } finally {
