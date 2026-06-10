@@ -35,8 +35,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Hub v27.0.
- * UPDATED: Icons standardized to match screenshot (List icon for Sectional Test).
+ * @fileOverview Institutional Exam Hub v27.1.
+ * UPDATED: Reordered tabs: Sectional and CA moved after Subject-Wise.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -158,9 +158,9 @@ export default function ExamHubPage() {
                <TabsList className="bg-transparent border-none p-0 flex h-14 w-full justify-start gap-1">
                   <DashboardTab value="FULL" label="Full Length Mock" icon={<Zap />} />
                   <DashboardTab value="SUBJECT" label="Subject-Wise Test" icon={<BookOpen />} />
-                  <DashboardTab value="PYQ" label="PYQ Paper" icon={<Layers />} />
                   <DashboardTab value="SECTIONAL" label="Sectional Test" icon={<List />} />
                   <DashboardTab value="CA" label="Current Affairs" icon={<Newspaper />} />
+                  <DashboardTab value="PYQ" label="PYQ Paper" icon={<Layers />} />
                   <DashboardTab value="NOTES" label="Study Notes" icon={<FileText />} />
                   <DashboardTab value="ANALYTICS" label="Performance" icon={<BarChart3 />} />
                </TabsList>
@@ -170,7 +170,6 @@ export default function ExamHubPage() {
                <TabsContent value="FULL" className="m-0"><MockList data={groupedContent.FULL} results={userResults} isPassActive={isPassActive} user={user} /></TabsContent>
                <TabsContent value="SUBJECT" className="m-0"><MockList data={groupedContent.SUBJECT} results={userResults} isPassActive={isPassActive} user={user} /></TabsContent>
                <TabsContent value="SECTIONAL" className="m-0"><MockList data={groupedContent.SECTIONAL} results={userResults} isPassActive={isPassActive} user={user} /></TabsContent>
-               <TabsContent value="PYQ" className="m-0"><MockList data={groupedContent.PYQ} results={userResults} isPassActive={isPassActive} user={user} /></TabsContent>
                <TabsContent value="CA" className="m-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      {groupedContent.CA.map((item: any) => (
@@ -191,6 +190,7 @@ export default function ExamHubPage() {
                      ))}
                   </div>
                </TabsContent>
+               <TabsContent value="PYQ" className="m-0"><MockList data={groupedContent.PYQ} results={userResults} isPassActive={isPassActive} user={user} /></TabsContent>
                <TabsContent value="NOTES" className="m-0"><NotesList data={groupedContent.NOTES} isPassActive={isPassActive} /></TabsContent>
                <TabsContent value="ANALYTICS" className="m-0">
                   <Card className="border-none shadow-xl rounded-[3rem] bg-white p-12 text-center space-y-8">
@@ -259,7 +259,7 @@ function MockList({ data, results, isPassActive, user }: { data: any[], results:
                         </Button>
                      ) : (
                         <Button onClick={() => router.push(user ? `/mocks/${mock.id}/instructions` : `/login?returnUrl=/mocks/${mock.id}`)} className="w-full h-14 bg-slate-900 hover:bg-black text-white font-black uppercase text-[10px] rounded-2xl shadow-xl gap-2 border-none transition-all active:scale-95">
-                           <Play className="h-4 w-4 fill-current" /> START TEST
+                           <Play className="h-6 w-6 fill-current" /> START TEST
                         </Button>
                      )}
                   </div>
