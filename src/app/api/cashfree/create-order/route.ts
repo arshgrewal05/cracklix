@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 
 /**
  * @fileOverview Audited Cashfree Order Creation Node.
- * Verified: Synchronized with Production Dashboard.
+ * UPDATED: Strictly anchors return_url to the Vercel production domain.
  */
 
 const clientId = process.env.CASHFREE_CLIENT_ID;
@@ -46,8 +46,10 @@ export async function POST(req: Request) {
     const userSnap = await getDoc(doc(db, "users", userId));
     const userData = userSnap.data();
 
-    // Force HTTPS origin for Cashfree production requirements
-    const baseOrigin = (origin || new URL(req.url).origin).replace('http://', 'https://');
+    // VERCEL DOMAIN ANCHORING
+    // Prioritize NEXT_PUBLIC_SITE_URL for return_url to ensure production domain usage
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin || new URL(req.url).origin;
+    const baseOrigin = siteUrl.replace('http://', 'https://');
     const orderId = `order_${Date.now()}_${userId.slice(-4)}`;
 
     const request = {
@@ -61,12 +63,13 @@ export async function POST(req: Request) {
         customer_phone: userData?.phone?.replace(/\D/g, '').slice(-10) || "9999999999",
       },
       order_meta: {
+        // Return URL is now strictly anchored to the site URL
         return_url: `${baseOrigin}/payment/success?order_id={order_id}&plan=${encodeURIComponent(planData.name)}`,
       },
       order_note: `Elite Pass: ${planData.name}`,
     };
 
-    console.log('[CASHFREE_AUDIT] Sending Payload:', JSON.stringify(request));
+    console.log('[CASHFREE_AUDIT] Sending Payload with anchored domain:', baseOrigin);
 
     const response = await Cashfree.PGCreateOrder("2023-08-01", request);
     

@@ -17,8 +17,8 @@ import { doc } from "firebase/firestore"
 import Script from "next/script"
 
 /**
- * @fileOverview Institutional Checkout Node v2.5.
- * Audited: Verified origin passing and secure Cashfree SDK v3 initialization.
+ * @fileOverview Institutional Checkout Node v3.0.
+ * UPDATED: Anchored to production Vercel domain to prevent Cloud Workstation origin issues.
  */
 
 export default function CheckoutPage() {
@@ -52,7 +52,10 @@ function CheckoutContent() {
     if (!user || !profile || !planData || onlineProcessing) return;
 
     setOnlineProcessing(true);
-    console.log(`[CHECKOUT] Initializing Cashfree Flow for ${planId}`);
+    
+    // Determine authoritative origin
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    console.log(`[CHECKOUT] Initializing Cashfree Flow for ${planId} with Site URL: ${siteUrl}`);
 
     try {
       const orderRes = await fetch('/api/cashfree/create-order', {
@@ -61,17 +64,17 @@ function CheckoutContent() {
         body: JSON.stringify({ 
           planId, 
           userId: user.uid,
-          origin: window.location.origin 
+          origin: siteUrl 
         })
       });
 
       const orderData = await orderRes.json();
       if (orderData.error) throw new Error(orderData.error);
 
-      console.log('[CHECKOUT] Order Created. Launching SDK Mode:', process.env.NEXT_PUBLIC_CASHFREE_ENV);
+      console.log('[CHECKOUT] Order Created. Launching SDK mode: production');
       
-      const mode = process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox';
-      const cashfree = (window as any).Cashfree({ mode });
+      // Force production mode to match CF production keys
+      const cashfree = (window as any).Cashfree({ mode: 'production' });
 
       await cashfree.checkout({
          paymentSessionId: orderData.payment_session_id,
@@ -83,7 +86,7 @@ function CheckoutContent() {
       toast({ 
         variant: "destructive", 
         title: "Gateway Connection Error", 
-        description: e.message || "Failed to initialize payment gateway. Please check Whitelist status." 
+        description: e.message || "Failed to initialize payment gateway." 
       });
       setOnlineProcessing(false);
     }
