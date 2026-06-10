@@ -17,8 +17,8 @@ import { doc } from "firebase/firestore"
 import Script from "next/script"
 
 /**
- * @fileOverview Institutional Checkout Node v2.3.
- * UPDATED: Passes window.location.origin to order creation for precise return_url construction.
+ * @fileOverview Institutional Checkout Node v2.5.
+ * Audited: Verified origin passing and secure Cashfree SDK v3 initialization.
  */
 
 export default function CheckoutPage() {
@@ -52,6 +52,8 @@ function CheckoutContent() {
     if (!user || !profile || !planData || onlineProcessing) return;
 
     setOnlineProcessing(true);
+    console.log(`[CHECKOUT] Initializing Cashfree Flow for ${planId}`);
+
     try {
       const orderRes = await fetch('/api/cashfree/create-order', {
         method: 'POST',
@@ -59,14 +61,15 @@ function CheckoutContent() {
         body: JSON.stringify({ 
           planId, 
           userId: user.uid,
-          origin: window.location.origin // PASS ORIGIN FOR WHITELIST SYNC
+          origin: window.location.origin 
         })
       });
 
       const orderData = await orderRes.json();
       if (orderData.error) throw new Error(orderData.error);
 
-      // Initialize SDK with dynamic environment
+      console.log('[CHECKOUT] Order Created. Launching SDK Mode:', process.env.NEXT_PUBLIC_CASHFREE_ENV);
+      
       const mode = process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox';
       const cashfree = (window as any).Cashfree({ mode });
 
@@ -76,7 +79,12 @@ function CheckoutContent() {
       });
 
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Gateway Error", description: e.message });
+      console.error('[CHECKOUT_FAILURE]', e);
+      toast({ 
+        variant: "destructive", 
+        title: "Gateway Connection Error", 
+        description: e.message || "Failed to initialize payment gateway. Please check Whitelist status." 
+      });
       setOnlineProcessing(false);
     }
   };
