@@ -16,10 +16,11 @@ import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { BookOpen, Zap, Users, Target } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Optimized Institutional Landing Hub v42.0.
- * UPDATED: Decommissioned heavy collection listeners. Using stats document for performance.
+ * @fileOverview Optimized Institutional Landing Hub v43.0.
+ * UPDATED: Strictly matched trust bar data and style to user screenshot (10.0k+, 500, 15,000, 94%).
  */
 
 export default function HomePage() {
@@ -37,7 +38,7 @@ export default function HomePage() {
     const avgAcc = stats?.averageAccuracy || 94;
 
     return {
-      mcqs: qCount > 999 ? `${(qCount / 1000).toFixed(1)}k+` : qCount.toString(),
+      mcqs: qCount >= 10000 ? `${(qCount / 1000).toFixed(1)}k+` : qCount.toLocaleString(),
       mocks: mCount,
       users: uCount.toLocaleString(),
       accuracy: `${avgAcc}%`
@@ -49,32 +50,33 @@ export default function HomePage() {
       <Navbar />
       <Hero />
 
-      {/* Trust Stats Bar */}
-      <section className="bg-white py-4 md:py-12 border-b border-slate-50">
+      {/* Trust Stats Bar - "Same to Same" Screenshot Update */}
+      <section className="bg-white py-8 md:py-16 border-b border-slate-50">
          <div className="container mx-auto px-4 max-w-7xl">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
                <TrustCard 
                   loading={statsLoading}
                   icon={<BookOpen className="text-primary h-4 w-4 md:h-6 md:w-6" />} 
-                  label="MCQ Bank" 
+                  label="MCQ BANK" 
                   val={liveStats.mcqs} 
                />
                <TrustCard 
                   loading={statsLoading}
                   icon={<Zap className="text-blue-500 h-4 w-4 md:h-6 md:w-6" />} 
-                  label="Mocks Live" 
+                  label="MOCKS LIVE" 
                   val={liveStats.mocks} 
                />
                <TrustCard 
                   loading={statsLoading}
                   icon={<Users className="text-emerald-500 h-4 w-4 md:h-6 md:w-6" />} 
-                  label="Aspirants" 
+                  label="ASPIRANTS" 
                   val={liveStats.users} 
+                  highlight
                />
                <TrustCard 
                   loading={statsLoading}
                   icon={<Target className="text-amber-500 h-4 w-4 md:h-6 md:w-6" />} 
-                  label="Avg Accuracy" 
+                  label="AVG ACCURACY" 
                   val={liveStats.accuracy} 
                />
             </div>
@@ -99,17 +101,22 @@ export default function HomePage() {
   );
 }
 
-function TrustCard({ icon, label, val, loading }: any) {
+function TrustCard({ icon, label, val, loading, highlight = false }: any) {
    return (
-      <div className="flex items-center gap-3 p-3 md:p-6 rounded-2xl bg-slate-50/50 border border-slate-50 transition-all hover:bg-white hover:shadow-xl">
-         <div className="h-8 w-8 md:h-14 md:w-14 rounded-xl bg-white flex items-center justify-center shrink-0 border border-slate-100 shadow-sm">{icon}</div>
-         <div className="text-left">
+      <div className={cn(
+        "flex items-center gap-4 md:gap-6 p-4 md:p-10 rounded-[2rem] md:rounded-[3rem] transition-all duration-500 border border-slate-50 h-full",
+        highlight 
+          ? "bg-white shadow-[0_35px_60px_-15px_rgba(0,0,0,0.1)] scale-105 z-10" 
+          : "bg-slate-50/30 hover:bg-white hover:shadow-2xl"
+      )}>
+         <div className="h-10 w-10 md:h-16 md:w-16 rounded-2xl md:rounded-3xl bg-white flex items-center justify-center shrink-0 border border-slate-100 shadow-sm">{icon}</div>
+         <div className="text-left space-y-1">
             {loading ? (
                <Skeleton className="h-6 w-16 bg-slate-200" />
             ) : (
-               <p className="text-sm md:text-3xl font-headline font-black text-[#0F172A] leading-none tracking-tight">{val}</p>
+               <p className="text-lg md:text-5xl font-headline font-black text-[#0F172A] leading-none tracking-tighter">{val}</p>
             )}
-            <p className="text-[7px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1 truncate">{label}</p>
+            <p className="text-[7px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 truncate">{label}</p>
          </div>
       </div>
    )
