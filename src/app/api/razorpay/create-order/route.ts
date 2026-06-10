@@ -5,8 +5,8 @@ import { doc, getDoc } from 'firebase/firestore';
 
 /**
  * @fileOverview Razorpay Order Logic (Archived).
- * UPDATED: Stripped Razorpay SDK imports to resolve production build failures.
- * This route is now a placeholder; use Cashfree for active preparation nodes.
+ * UPDATED: Stripped all Razorpay SDK imports to resolve build failures.
+ * Cashfree is now the active preparation node.
  */
 
 export async function POST(req: Request) {
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
     // Razorpay logic disabled in favor of Cashfree.
     return NextResponse.json({ 
-      error: 'Gateway archived. Please utilize the Cashfree preparation node for transactions.',
+      error: 'Legacy gateway archived. Please utilize the Cashfree preparation node for transactions.',
       status: 'ARCHIVED'
     }, { status: 410 });
     

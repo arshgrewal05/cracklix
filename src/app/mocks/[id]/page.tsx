@@ -28,7 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Individual Mock Gateway v18.5.
+ * @fileOverview Individual Mock Gateway v19.0.
  * FIXED: Resolved syntax errors in FeatureNode and main component closure.
  */
 
@@ -197,7 +197,7 @@ export default function MockOverviewPage() {
   )
 }
 
-function FeatureNode({ icon, title, desc }: any) {
+function FeatureNode({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
    return (
       <div className="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 space-y-4 text-center">
          <div className="h-14 w-14 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-xl">{icon}</div>
