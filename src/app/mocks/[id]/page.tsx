@@ -28,8 +28,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Individual Mock Gateway v18.2.
- * FIXED: Resolved JSX syntax errors in FeatureNode and main component closure.
+ * @fileOverview Individual Mock Gateway v18.5.
+ * FIXED: Resolved syntax errors in FeatureNode and main component closure.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -186,8 +186,8 @@ export default function MockOverviewPage() {
            <div className="container mx-auto px-4 max-w-6xl">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                  <FeatureNode icon={<ShieldCheck className="text-emerald-500" />} title="Verified Hub" desc="Official board patterns" />
-                 <FeatureNode icon={<Zap className="text-primary" />} title="Logic Tutors" desc="AI powered solutions" />
-                 <FeatureNode icon={<Target className="text-blue-500" />} title="State Merit" desc="Rankings among 15k+ aspirants" />
+                 <FeatureNode icon={<Zap className="text-primary" />} title="Logic Solutions" desc="Step-by-step explanations" />
+                 <FeatureNode icon={<Target className="text-blue-500" />} title="State Rankings" desc="See where you stand" />
               </div>
            </div>
         </section>
