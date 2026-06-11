@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Institutional PWA Lifecycle Manager v7.1.
- * FIXED: Advanced hydration guard and global event broadcasting for UI sync.
+ * @fileOverview Institutional PWA Lifecycle Manager v8.0.
+ * UPDATED: Fixed "window is not defined" and hardened install event capture.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -25,6 +25,7 @@ export default function PWAManager() {
       navigator.serviceWorker.register('/sw.js').then(
         (reg) => {
           console.log('[PWA] ServiceWorker registered');
+          // Notify app that SW is ready
           window.dispatchEvent(new CustomEvent('sw-ready'));
         },
         (err) => console.log('[PWA] ServiceWorker registration failed:', err)
@@ -50,7 +51,7 @@ export default function PWAManager() {
         if (!isExcluded && !isStandalone) {
           setShowPrompt(true);
         }
-      }, 4000);
+      }, 6000); // 6 second delay for better user experience
       
       return () => clearTimeout(timer);
     };
@@ -114,8 +115,8 @@ export default function PWAManager() {
             </div>
 
             <div className="flex-1 min-w-0 text-left">
-               <h4 className="text-[13px] font-black uppercase tracking-tight leading-none mb-1">Install CRACKLIX App</h4>
-               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Fast access to mocks</p>
+               <h4 className="text-[13px] font-black uppercase tracking-tight leading-none mb-1">Get CRACKLIX App</h4>
+               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Install for fast access</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -123,7 +124,7 @@ export default function PWAManager() {
                 onClick={handleInstallClick}
                 className="h-10 px-4 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[9px] tracking-widest rounded-xl shadow-lg border-none transition-all active:scale-95 gap-2"
                >
-                  <Download className="h-3 w-3" /> Get
+                  <Download className="h-3 w-3" /> Install
                </Button>
                <button 
                 onClick={() => setShowPrompt(false)}

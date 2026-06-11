@@ -1,16 +1,16 @@
 /**
- * @fileOverview Institutional PWA Service Worker v8.0.
- * HARDENED: Mandatory fetch listener enabled for Chrome installability.
+ * @fileOverview Institutional Service Worker v1.0.
+ * Mandatory for PWA installability.
  */
 
-const CACHE_NAME = 'cracklix-v2';
+const CACHE_NAME = 'cracklix-v1';
 const ASSETS_TO_CACHE = [
   '/',
-  '/manifest.webmanifest',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
 ];
 
+// 1. Install Event - Pre-cache essential assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -20,12 +20,15 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
+// 2. Activate Event - Cleanup old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
         })
       );
     })
@@ -33,31 +36,19 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// MANDATORY: The fetch listener is what makes Chrome show the "Install App" prompt
+// 3. Fetch Event - MANDATORY for PWA installability
+// Even a simple pass-through satisfies the browser's requirement
 self.addEventListener('fetch', (event) => {
-  if (event.request.mode === 'navigate') {
+  // Simple "Cache First, then Network" strategy for static icons/assets
+  if (event.request.url.includes('/icons/')) {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match('/');
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request);
       })
     );
     return;
   }
-
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
-});
-
-self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'CRACKLIX Alert', {
-      body: data.message || 'Check out new mock tests.',
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-192x192.png'
-    })
-  );
+  
+  // Normal network request for everything else
+  event.respondWith(fetch(event.request));
 });
