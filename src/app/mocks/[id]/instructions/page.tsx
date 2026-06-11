@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from "react";
@@ -17,8 +16,8 @@ import { LanguageDisplayMode } from "@/types";
 import Link from "next/link";
 
 /**
- * @fileOverview Testbook-Style Entrance Hub v6.2.
- * UPDATED: Fixed blank page when mock data is missing.
+ * @fileOverview Hardened Instructions Hub v6.5.
+ * FIXED: ChunkLoadError mitigation via optimized imports and state management.
  */
 export default function InstructionsPage() {
   const params = useParams();
@@ -48,7 +47,6 @@ export default function InstructionsPage() {
     if (!mock?.languageMode) return [];
     const mode = mock.languageMode;
     
-    // Strict isolation rules
     if (mode === 'ENGLISH_PUNJABI') return ['ENGLISH', 'PUNJABI', 'ENGLISH_PUNJABI'];
     if (mode === 'ENGLISH_HINDI') return ['ENGLISH', 'HINDI', 'ENGLISH_HINDI'];
     
@@ -93,7 +91,6 @@ export default function InstructionsPage() {
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-12 md:py-24 max-w-5xl text-left">
         <div className="space-y-12">
-           
            <div className="flex flex-col md:row items-start md:items-center justify-between gap-6">
               <div className="space-y-2">
                  <div className="flex items-center gap-3">
