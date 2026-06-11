@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -10,19 +9,19 @@ import { collection, query, where } from "firebase/firestore"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Landmark, GraduationCap, ShieldCheck, Zap, Globe, Wallet, Info, Shield, Landmark as LandmarkIcon } from "lucide-center"
+import { ChevronLeft, ChevronRight, Landmark, GraduationCap, ShieldCheck, Zap, Globe, Wallet, Info, Shield, Landmark as LandmarkIcon } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Category Explorer v7.2.
- * UPDATED: Locked permanent logo for Teaching category.
+ * @fileOverview Institutional Category Explorer v7.3.
+ * UPDATED: Applied new logo for Teaching category.
  */
 
 const CATEGORY_META: Record<string, any> = {
   "punjab-govt": { title: "Punjab Government", icon: <img src="https://static.pseb.ac.in/psebwebsite/front_assets/sites/default/files/inline-images/emblem.png" className="h-full w-full object-contain" /> },
-  "punjab-teaching": { title: "Punjab Teaching", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSImf0nQvnFzmw2RVmPBwlZRspEC_fe2x13SGwzIbYBdw&s=10" className="h-full w-full object-contain" /> },
+  "punjab-teaching": { title: "Punjab Teaching", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbNnoge6pNWx1HZYrUJKM58qWk1dDw85xvKPBoG-O4ew&s=10" className="h-full w-full object-contain" /> },
   "punjab-technical": { title: "Punjab Technical", icon: <Zap className="h-full w-full" /> },
   "banking": { title: "Banking Exams", icon: <Wallet className="h-full w-full" /> },
   "central-govt": { title: "Central Govt", icon: <Globe className="h-full w-full" /> }
@@ -67,7 +66,7 @@ export default function CategoryHubsPage() {
                </button>
                <div className="flex items-center gap-3">
                   <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-                     <div className="h-full w-full flex items-center justify-center">
+                     <div className="h-full w-full flex items-center justify-center overflow-hidden rounded-md">
                         {meta.icon}
                      </div>
                   </div>

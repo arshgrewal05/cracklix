@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo } from "react"
@@ -15,13 +14,13 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview RESTORED: Hierarchical Category Discovery v2.2.
- * UPDATED: Locked permanent logo for Teaching category.
+ * @fileOverview RESTORED: Hierarchical Category Discovery v2.3.
+ * UPDATED: Applied new logo for Punjab Teaching category.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
   "punjab-govt": <img src="https://static.pseb.ac.in/psebwebsite/front_assets/sites/default/files/inline-images/emblem.png" className="h-full w-full object-contain p-2" />,
-  "punjab-teaching": <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSImf0nQvnFzmw2RVmPBwlZRspEC_fe2x13SGwzIbYBdw&s=10" className="h-full w-full object-contain p-2" />,
+  "punjab-teaching": <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbNnoge6pNWx1HZYrUJKM58qWk1dDw85xvKPBoG-O4ew&s=10" className="h-full w-full object-contain p-2" />,
   "punjab-technical": <Zap className="h-10 w-10 md:h-12 md:w-12" />,
   "banking": <Wallet className="h-10 w-10 md:h-12 md:w-12" />,
   "central-govt": <Globe className="h-10 w-10 md:h-12 md:w-12" />

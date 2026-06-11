@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -22,8 +21,8 @@ import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Institutional Category Entry Nodes v4.2.
- * UPDATED: Locked permanent logo for Punjab Teaching.
+ * @fileOverview Institutional Category Entry Nodes v4.3.
+ * UPDATED: Replaced Punjab Teaching logo with provided institutional image.
  */
 
 const CATEGORY_META = [
@@ -39,7 +38,7 @@ const CATEGORY_META = [
     id: "punjab-teaching",
     title: "Punjab Teaching",
     desc: "PSTET, CTET, Master Cadre & ETT exams.",
-    icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSImf0nQvnFzmw2RVmPBwlZRspEC_fe2x13SGwzIbYBdw&s=10" className="h-full w-full object-contain" />,
+    icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbNnoge6pNWx1HZYrUJKM58qWk1dDw85xvKPBoG-O4ew&s=10" className="h-full w-full object-contain" />,
     color: "text-blue-600",
     bgColor: "bg-blue-50"
   },
@@ -115,7 +114,9 @@ export default function FeaturedCategories() {
                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">{cat.id !== 'punjab-govt' && cat.id !== 'punjab-teaching' && cat.icon}</div>
                    
                    <div className={cn("h-16 w-16 rounded-2xl flex items-center justify-center mb-8 shadow-inner transition-transform group-hover:scale-110", cat.bgColor, cat.color)}>
-                      {cat.icon}
+                      <div className="h-full w-full flex items-center justify-center overflow-hidden rounded-xl">
+                        {cat.icon}
+                      </div>
                    </div>
                    
                    <div className="space-y-3 flex-1">
