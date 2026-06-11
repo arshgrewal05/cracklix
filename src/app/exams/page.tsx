@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Master Registry Landing v2.1.
+ * @fileOverview Institutional Master Registry Landing v2.2.
  * UPDATED: Locked permanent logo for Punjab Teaching category.
  */
 

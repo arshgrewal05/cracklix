@@ -22,7 +22,7 @@ import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Institutional Category Entry Nodes v4.1.
+ * @fileOverview Institutional Category Entry Nodes v4.2.
  * UPDATED: Locked permanent logo for Punjab Teaching.
  */
 

@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview RESTORED: Hierarchical Category Discovery v2.1.
+ * @fileOverview RESTORED: Hierarchical Category Discovery v2.2.
  * UPDATED: Locked permanent logo for Teaching category.
  */
 
