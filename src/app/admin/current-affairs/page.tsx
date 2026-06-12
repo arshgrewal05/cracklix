@@ -31,7 +31,7 @@ import {
   Globe
 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, doc, setDoc, deleteDoc, serverTimestamp, writeBatch } from "firebase/firestore"
+import { collection, doc, setDoc, deleteDoc, serverTimestamp, writeBatch, query, where } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -41,8 +41,8 @@ import { parseBulkQuestions } from "@/lib/parser"
 import QuestionRenderer from "@/components/questions/QuestionRenderer"
 
 /**
- * @fileOverview Institutional Current Affairs Management Hub v19.6.
- * FIXED: Resolved NaN input value error in mock metadata fields.
+ * @fileOverview Institutional Current Affairs Management Hub v19.7.
+ * FIXED: Added missing query and where imports for registry audit.
  */
 
 export default function AdminCurrentAffairs() {

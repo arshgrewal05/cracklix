@@ -1,3 +1,4 @@
+
 'use client';
 
 import { 
@@ -38,8 +39,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 /**
- * @fileOverview Institutional Mobile Sidebar v8.0.
- * UPDATED: Renamed "Latest News" to "Current Affairs".
+ * @fileOverview Institutional Mobile Sidebar v8.1.
+ * UPDATED: Renamed "Latest News" to "Current Affairs" for platform consistency.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {

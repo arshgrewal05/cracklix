@@ -1,13 +1,14 @@
 
 /**
- * @fileOverview Institutional PWA Service Worker v1.0.
- * Mandatory for Google Play Store (TWA) and browser installability.
+ * @fileOverview Institutional Cracklix Service Worker v1.0.
+ * Mandatory node for PWA installability and offline readiness.
  */
 
-const CACHE_NAME = 'cracklix-v1';
+const CACHE_NAME = 'cracklix-registry-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.webmanifest',
+  'https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png',
   'https://i.ibb.co/VW2MK9ww/file-00000000deec7206abdeca16860cdec1.png'
 ];
 
@@ -22,9 +23,13 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
       );
     })
   );
@@ -32,18 +37,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match('/');
-      })
-    );
-    return;
-  }
-
+  // Simple network-first strategy for dynamic content, cache-fallback for assets
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
   );
 });

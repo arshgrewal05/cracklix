@@ -52,14 +52,13 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview FINAL HIGH-FIDELITY Mock Architect v85.0.
- * UPDATED: Integrated "Select All" for Boards and Duplicate detection warning.
- * PERFORMANCE: Optimized bank selection for large datasets.
+ * @fileOverview FINAL HIGH-FIDELITY Mock Architect v85.1.
+ * FIXED: Defined toggleExamId to resolve unresponsive vertical selector.
  */
 
 export default function MockBuilderPage() {
   return (
-    <Suspense fallback={<div className="h-screen flex items-center justify-center bg-white"><Loader2 className="h-10 w-10 text-primary animate-spin" /></div>}>
+    <Suspense fallback={<div className="h-screen flex items-center justify-center bg-white"><Loader2 className="animate-spin text-primary" /></div>}>
       <MockBuilderContent />
     </Suspense>
   )
@@ -223,6 +222,22 @@ function MockBuilderContent() {
     }).sort((a: any, b: any) => a.name.localeCompare(b.name));
   }, [subjects, subjectSearch]);
 
+  const toggleBoardId = (id: string) => {
+     const current = mockData.boardIds || [];
+     setMockData({
+        ...mockData,
+        boardIds: current.includes(id) ? current.filter(x => x !== id) : [...current, id]
+     });
+  };
+
+  const toggleExamId = (id: string) => {
+     const current = mockData.examIds || [];
+     setMockData({
+        ...mockData,
+        examIds: current.includes(id) ? current.filter(x => x !== id) : [...current, id]
+     });
+  };
+
   const handleLinkQuestions = () => {
     const toAdd = questionBank.filter(q => bankSelection.includes(q.id));
     setSections(prev => prev.map(s => s.id === activeSectionId ? { ...s, questions: [...s.questions, ...toAdd] } : s));
@@ -279,14 +294,6 @@ function MockBuilderContent() {
       setIsPublishing(false)
     }
   }
-
-  const toggleBoardId = (id: string) => {
-     const current = mockData.boardIds || [];
-     setMockData({
-        ...mockData,
-        boardIds: current.includes(id) ? current.filter(x => x !== id) : [...current, id]
-     });
-  };
 
   const handleSelectAllBoards = () => {
      if (mockData.boardIds?.length === boards?.length) {
