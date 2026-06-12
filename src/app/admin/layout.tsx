@@ -38,14 +38,14 @@ import { useUser, useAuth } from "@/firebase"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { signOut } from "firebase/auth"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/navigation/BackButton";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Sidebar Restoration v134.0.
- * RESTORED: Professional header height and trigger positioning.
+ * @fileOverview Institutional Sidebar Restoration v135.0.
+ * FIXED: Removed redundant mobile Sheet to resolve "double sidebar" issue.
+ * FIXED: Added white background container for Logo in dark sidebar.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -55,7 +55,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const auth = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -92,8 +91,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const SideNavContent = ({ onLinkClick }: { onLinkClick?: () => void }) => (
     <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none">
-       <div className="p-6 border-b border-white/5">
-          <Logo variant="light" className="origin-left" href="/admin" />
+       {/* LOGO AREA WITH WHITE BACKGROUND NODE */}
+       <div className="p-6 border-b border-white/5 bg-[#0B1528] flex justify-center">
+          <div className="bg-white p-2 md:p-3 rounded-2xl shadow-xl flex items-center justify-center">
+            <Logo variant="dark" className="origin-left !ml-0" href="/admin" />
+          </div>
        </div>
        <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden pb-10">
           <SidebarGroup>
@@ -173,27 +175,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-white font-body overflow-x-hidden pointer-events-auto">
-        <Sidebar className="hidden lg:flex border-r border-white/5 bg-[#0F172A] z-[50]">
+        {/* ShadCN Sidebar handles its own mobile rendering via SidebarProvider */}
+        <Sidebar className="border-r border-white/5 bg-[#0F172A] z-[50]">
            <SideNavContent />
         </Sidebar>
         
         <SidebarInset className="flex flex-col bg-white min-w-0 max-w-full relative">
           <header className="h-16 md:h-20 border-b border-slate-200 flex items-center px-4 md:px-6 justify-between bg-white sticky top-0 z-[100] shrink-0">
             <div className="flex items-center gap-2 overflow-hidden">
-              <div className="lg:hidden">
-                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                    <SheetTrigger asChild>
-                       <button className="p-2 rounded-xl bg-slate-50 text-[#0F172A] hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none"><Menu className="h-5 w-5" /></button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="p-0 border-none w-[280px] bg-[#0F172A] z-[1001]">
-                       <SheetHeader className="sr-only">
-                          <SheetTitle>Admin Menu</SheetTitle>
-                       </SheetHeader>
-                       <SideNavContent onLinkClick={() => setIsMobileMenuOpen(false)} />
-                    </SheetContent>
-                 </Sheet>
-              </div>
-              <SidebarTrigger className="hidden lg:flex text-[#0F172A] hover:bg-slate-50 cursor-pointer" />
+              {/* Unified Trigger handles both Desktop Collapse and Mobile Open */}
+              <SidebarTrigger className="text-[#0F172A] hover:bg-slate-50 cursor-pointer" />
               
               <Logo variant="dark" className="origin-left" href="/admin" />
               
