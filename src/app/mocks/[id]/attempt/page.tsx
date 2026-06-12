@@ -27,8 +27,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened CBT Engine v36.0 (Merit Hardened).
- * UPDATED: Captured userEmail in results for high-fidelity state rankings.
+ * @fileOverview Hardened CBT Engine v40.0 (Identity Hardened).
+ * UPDATED: Captures Real Name and Email fallback for state-level merit index.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -150,7 +150,7 @@ export default function MockAttemptPage() {
 
     const resultPayload = {
       userId: user.uid, 
-      userName: profile?.name || user.displayName || 'Aspirant', 
+      userName: profile?.name || user.displayName || user.email || 'Student', 
       userEmail: user.email || "",
       mockId, 
       mockTitle: mockData.title || mockTitle,
@@ -173,7 +173,7 @@ export default function MockAttemptPage() {
         status: 'COMPLETED', 
         updatedAt: serverTimestamp() 
       });
-      toast({ title: "Test Submitted", description: "Final audit complete. Results saved." });
+      toast({ title: "Test Submitted", description: "Final check complete. Results saved." });
       router.push(`/results/${mockId}`);
     } catch (e) {
       toast({ variant: "destructive", title: "Sync Failed" });
@@ -270,7 +270,7 @@ export default function MockAttemptPage() {
               <ShieldCheck className="h-12 w-12" />
             </div>
             <DialogTitle className="text-3xl font-headline font-black uppercase text-white">Submit Final</DialogTitle>
-            <p className="text-slate-400 font-medium">Review complete? Audit your score now.</p>
+            <p className="text-slate-400 font-medium">Review complete? Check your score now.</p>
             <div className="flex gap-4 pt-4">
               <Button variant="ghost" onClick={() => setShowSubmitModal(false)} disabled={isSubmittingFinal} className="flex-1 h-16 text-slate-500 font-black uppercase text-[10px]">Go Back</Button>
               <Button onClick={handleSubmitFinal} disabled={isSubmittingFinal} className="flex-1 h-16 bg-primary text-white font-black uppercase text-[10px] rounded-2xl shadow-3xl border-none">

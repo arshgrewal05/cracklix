@@ -39,8 +39,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 /**
- * @fileOverview Institutional Mobile Sidebar v10.0.
- * UPDATED: Set Active Pass background to Cracklix Orange for consistency.
+ * @fileOverview Institutional Mobile Sidebar v11.0.
+ * UPDATED: High-Contrast Orange background for Pass status.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -199,7 +199,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
                    <Download className="h-5 w-5 shrink-0 text-emerald-400" />
                    <span className="text-[13px] uppercase tracking-tight font-black text-white">Install App</span>
                 </div>
-                <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black uppercase animate-pulse">GET</Badge>
+                <Badge className="bg-emerald-50 text-white border-none text-[8px] font-black uppercase animate-pulse">GET</Badge>
              </button>
           )}
 

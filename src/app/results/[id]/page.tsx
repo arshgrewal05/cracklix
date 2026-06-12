@@ -42,8 +42,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 /**
- * @fileOverview Test Results Hub v23.0.
- * UPDATED: Enhanced State Rank names logic (Email fallback) and broader merit data.
+ * @fileOverview Test Results Hub v25.0.
+ * UPDATED: Hardened State Rank names logic (Email fallback) and broader merit list.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -194,7 +194,7 @@ export default function ResultPage() {
         <Tabs defaultValue="SOLUTIONS" className="space-y-6">
            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <TabsList className="bg-white border border-slate-100 p-1 h-12 rounded-xl shadow-sm inline-flex">
-                 <TabsTrigger value="SOLUTIONS" className="rounded-lg px-6 font-black uppercase text-[9px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white">Check Solutions</TabsTrigger>
+                 <TabsTrigger value="SOLUTIONS" className="rounded-lg px-6 font-black uppercase text-[9px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white">Explanation</TabsTrigger>
                  <TabsTrigger value="TOPPER" className="rounded-lg px-6 font-black uppercase text-[9px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white">State Rank</TabsTrigger>
               </TabsList>
               
@@ -231,11 +231,12 @@ export default function ResultPage() {
               <Card className="border-none shadow-md rounded-2xl bg-white p-6">
                  <div className="space-y-3">
                     {meritList.slice(0, 50).map((r: any, i: number) => {
-                       const name = (r.userName && r.userName !== 'Aspirant' && r.userName !== 'Student') ? r.userName : (r.userEmail || "Student");
+                       const name = (r.userName && r.userName !== 'Student' && !r.userName.includes('@')) ? r.userName : (r.userEmail || "Student");
                        return (
                         <div key={r.id} className="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl border border-slate-50">
                            <div className="flex items-center gap-3">
                               <span className="font-black text-slate-300 w-5 text-xs">#{i+1}</span>
+                              <StudentAvatar profile={{ name, gender: r.gender }} className="h-6 w-6 rounded-lg" />
                               <p className="font-bold text-[#0F172A] text-xs uppercase truncate max-w-[200px]">{name}</p>
                            </div>
                            <div className="flex gap-4 items-center">

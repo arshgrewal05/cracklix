@@ -18,8 +18,8 @@ import { ShieldCheck, Zap, Trophy, Target } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Official Institutional Hub v72.0.
- * FIXED: Robust hydration strategy uses a consistent skeleton for the initial server render to eliminate tree mismatches.
+ * @fileOverview Official Institutional Hub v75.0.
+ * FIXED: Hydration-safe logic ensures server and client renders match 100%.
  */
 
 export default function HomePage() {

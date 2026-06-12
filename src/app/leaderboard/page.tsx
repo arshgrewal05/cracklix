@@ -16,8 +16,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Phase 144: State Merit Index (Identity Optimized).
- * UPDATED: Priority name logic (Name > Email > Student) and broader result sync.
+ * @fileOverview Phase 145: State Merit Index (Identity Optimized).
+ * UPDATED: Refined priority name logic (Name > Email > Student) and broader result sync.
  */
 
 export default function LeaderboardPage() {
@@ -45,10 +45,10 @@ export default function LeaderboardPage() {
         
         // IDENTITY PRIORITY: 1. Profile Name, 2. Result Name (if not 'Student'), 3. User Email, 4. Placeholder
         const name = userProfile?.name || 
-                     (r.userName && r.userName !== 'Aspirant' && r.userName !== 'Student' ? r.userName : null) || 
+                     (r.userName && r.userName !== 'Aspirant' && r.userName !== 'Student' && !r.userName.includes('@') ? r.userName : null) || 
                      userProfile?.email || 
                      r.userEmail || 
-                     "Aspirant";
+                     "Student";
 
         const email = userProfile?.email || r.userEmail || "---";
 

@@ -37,7 +37,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 /**
- * @fileOverview Official Current Affairs Hub v10.5.
+ * @fileOverview Official Current Affairs Hub v11.0.
  * UPDATED: Enhanced Merit List identity logic (Email fallback).
  */
 
@@ -112,7 +112,7 @@ export default function FreeContentHub() {
             <div className="space-y-8 relative z-10 max-w-3xl">
               <div className="flex items-center gap-3">
                  <Badge className="bg-primary text-white border-none px-4 py-1.5 rounded-full font-black uppercase text-[10px] tracking-[0.2em] shadow-xl">
-                    CURRENT AFFAIRS HUB
+                    STUDY HUB
                  </Badge>
               </div>
               <h1 className="text-4xl md:text-8xl font-headline font-black tracking-tighter uppercase leading-[0.85]">
@@ -211,7 +211,7 @@ export default function FreeContentHub() {
                       </div>
                       <CardContent className="p-8 space-y-6">
                          {topRankers?.map((res: any, idx: number) => {
-                            const name = (res.userName && res.userName !== 'Aspirant' && res.userName !== 'Student') ? res.userName : (res.userEmail || "Student");
+                            const name = (res.userName && res.userName !== 'Student' && !res.userName.includes('@')) ? res.userName : (res.userEmail || "Student");
                             return (
                               <div key={res.id} className="flex items-center justify-between">
                                  <div className="flex items-center gap-4 text-left">

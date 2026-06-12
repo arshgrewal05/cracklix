@@ -14,8 +14,8 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Hero Hub v62.0.
- * FIXED: Strictly locked text synchronization and hydration guards for "EXAM."
+ * @fileOverview Official Hero Hub v70.0.
+ * FIXED: Hydration-safe logic and Orange branding for verified content icon.
  */
 
 export default function Hero() {
@@ -109,7 +109,6 @@ export default function Hero() {
                     alt="Punjab Police Preparation" 
                     className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" 
                     referrerPolicy="no-referrer"
-                    data-ai-hint="punjab police"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#08152D] via-transparent to-transparent opacity-60" />
                   
