@@ -9,18 +9,12 @@ import {
   Target,
   Trophy,
   Users,
-  Activity,
   ArrowRight,
   BookOpen,
   ClipboardList,
   TrendingUp,
-  Search,
-  CheckCircle2,
-  Sparkles,
-  Award,
   Globe,
-  FileStack,
-  Clock
+  FileStack
 } from "lucide-react";
 import { useUser, useFirestore, useDoc } from "@/firebase";
 import Image from "next/image";
@@ -28,11 +22,12 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 import { doc } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 /**
- * @fileOverview High-Fidelity Institutional Hero v140.0.
- * MATCHED: Perfectly aligned with the reference image (ibb.co/F4D0JLHP).
- * Includes the Stats Bar at the base and floating readiness node.
+ * @fileOverview High-Fidelity Institutional Hero v145.0.
+ * MATCHED: Perfectly aligned with the reference (ibb.co/F4D0JLHP).
+ * Features: Background image hub, floating readiness node, and real-time stats integration.
  */
 export default function Hero() {
   const router = useRouter();
@@ -58,8 +53,8 @@ export default function Hero() {
   if (!mounted) return null;
 
   return (
-    <section className="relative pt-12 pb-16 md:pt-20 md:pb-32 bg-[#0B1528] overflow-hidden text-left">
-      {/* 1. BACKGROUND VISUAL NODE */}
+    <section className="relative pt-12 pb-16 md:pt-24 md:pb-36 bg-[#0B1528] overflow-hidden text-left">
+      {/* BACKGROUND IMAGE HUB */}
       <div className="absolute inset-0 z-0">
          <Image 
            src="https://grppunjab.org/wp-content/uploads/2025/09/PP10_slider.jpg" 
@@ -84,56 +79,56 @@ export default function Hero() {
             >
               {/* Trust Badge */}
               <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full w-fit backdrop-blur-md">
-                <div className="h-5 w-5 bg-amber-500 rounded-full flex items-center justify-center">
+                <div className="h-5 w-5 bg-amber-500 rounded-full flex items-center justify-center shadow-lg">
                    <Trophy className="h-3 w-3 text-white fill-current" />
                 </div>
                 <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/80">
-                  Punjab's Most Trusted Exam Preparation Platform
+                  Punjab's #1 Exam Preparation Hub
                 </span>
               </div>
 
-              {/* Headlines */}
+              {/* Master Headline */}
               <div className="space-y-4">
-                 <h1 className="text-4xl md:text-7xl font-headline font-black leading-[0.95] tracking-tight text-white uppercase">
+                 <h1 className="text-4xl md:text-8xl font-headline font-black leading-[0.95] tracking-tight text-white uppercase">
                     Prepare For Punjab <br />
                     <span className="text-primary">Government Exams</span>
                  </h1>
-                 <p className="text-slate-400 text-sm md:text-lg font-medium max-w-2xl leading-relaxed antialiased">
-                    Join thousands of aspirants preparing for PSSSB, Punjab Police, PPSC, PSTET, PSPCL and other Punjab Government Exams.
+                 <p className="text-slate-400 text-sm md:text-xl font-medium max-w-2xl leading-relaxed antialiased">
+                    Master PSSSB, Punjab Police, PPSC, PSTET, and PSPCL with high-fidelity mocks and AI logic rationalizations.
                  </p>
               </div>
 
-              {/* Feature Tags */}
+              {/* Functional Feature Tags */}
               <div className="flex flex-wrap gap-4">
                  <FeatureTag icon={<ClipboardList className="text-primary" />} label="Full-Length Mocks" />
-                 <FeatureTag icon={<FileStack className="text-primary" />} label="PYQs" />
-                 <FeatureTag icon={<Globe className="text-primary" />} label="Current Affairs" />
-                 <FeatureTag icon={<ShieldCheck className="text-primary" />} label="Detailed Solutions" />
+                 <FeatureTag icon={<FileStack className="text-primary" />} label="Official PYQs" />
+                 <FeatureTag icon={<Globe className="text-primary" />} label="Daily News Hub" />
+                 <FeatureTag icon={<ShieldCheck className="text-primary" />} label="Detailed Logic" />
               </div>
             </motion.div>
 
-            {/* Tactical Buttons */}
+            {/* Tactical Action Nodes */}
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
               <Button 
                 onClick={() => handleAction('/mocks')}
-                className="w-full sm:w-auto h-16 md:h-20 px-12 bg-primary hover:bg-orange-600 text-white rounded-[1.5rem] md:rounded-[2rem] font-black uppercase text-[12px] tracking-[0.2em] shadow-3xl shadow-primary/20 border-none transition-all active:scale-95 gap-4"
+                className="w-full sm:w-auto h-16 md:h-20 px-12 bg-primary hover:bg-orange-600 text-white rounded-[1.5rem] md:rounded-[2rem] font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] shadow-3xl shadow-primary/20 border-none transition-all active:scale-95 gap-4"
               >
                 Start Free Mock <ArrowRight className="h-5 w-5" />
               </Button>
               <Button 
                 onClick={() => handleAction('/exams')}
-                className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-[1.5rem] md:rounded-[2rem] border-2 border-white/20 bg-white/5 text-white hover:bg-white/10 font-black uppercase text-[12px] tracking-[0.2em] transition-all active:scale-95 gap-4"
+                className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-[1.5rem] md:rounded-[2rem] border-2 border-white/20 bg-white/5 text-white hover:bg-white/10 font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] transition-all active:scale-95 gap-4"
               >
-                Explore Exams <ArrowRight className="h-5 w-5" />
+                Explore Hubs <ArrowRight className="h-5 w-5" />
               </Button>
             </div>
 
-            {/* Trending Searches */}
+            {/* Trending Quick Links */}
             <div className="flex flex-wrap items-center gap-4 pt-4">
-               <span className="text-[10px] font-black uppercase text-primary tracking-widest">Trending Searches:</span>
-               {['PSSSB Clerk', 'Excise Inspector', 'Punjab Police', 'PSTET', 'PPSC PCS'].map((t) => (
+               <span className="text-[10px] font-black uppercase text-primary tracking-widest">Hot Exams:</span>
+               {['PSSSB Patwari', 'Punjab Police SI', 'PSTET Hub', 'Master Cadre', 'Excise'].map((t) => (
                   <Link key={t} href={`/search?q=${t}`}>
-                    <Badge variant="outline" className="border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/30 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all cursor-pointer">
+                    <Badge variant="outline" className="border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/30 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all cursor-pointer shadow-sm">
                        {t}
                     </Badge>
                   </Link>
@@ -146,28 +141,28 @@ export default function Hero() {
              <motion.div 
                initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
-               className="bg-[#1A2333]/90 backdrop-blur-2xl rounded-[3rem] p-10 border border-white/10 shadow-5xl relative overflow-hidden"
+               className="bg-[#1A2333]/90 backdrop-blur-2xl rounded-[3rem] p-10 border border-white/10 shadow-5xl relative overflow-hidden group"
              >
-                <div className="absolute top-0 right-0 p-8 opacity-5"><Zap className="h-40 w-40" /></div>
+                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-1000"><Zap className="h-40 w-40" /></div>
                 
                 <div className="relative z-10 text-center space-y-8">
                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Exam Readiness</h3>
                    
-                   <div className="relative h-40 w-40 mx-auto flex items-center justify-center">
+                   <div className="relative h-44 w-44 mx-auto flex items-center justify-center">
                       <svg className="h-full w-full transform -rotate-90">
-                         <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/5" />
-                         <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="440" strokeDashoffset={440 - (440 * 0.82)} className="text-emerald-500 shadow-xl" strokeLinecap="round" />
+                         <circle cx="88" cy="88" r="78" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/5" />
+                         <circle cx="88" cy="88" r="78" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="490" strokeDashoffset={490 - (490 * 0.82)} className="text-emerald-500 shadow-xl" strokeLinecap="round" />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                         <span className="text-5xl font-headline font-black text-white leading-none">82%</span>
+                         <span className="text-6xl font-headline font-black text-white leading-none">82%</span>
                       </div>
                    </div>
 
                    <div className="space-y-4">
-                      <p className="text-emerald-400 font-black uppercase text-[10px] tracking-widest">Keep Practicing!</p>
-                      <div className="bg-white/5 rounded-2xl py-3 px-6 inline-flex items-center gap-2">
+                      <p className="text-emerald-400 font-black uppercase text-[10px] tracking-[0.3em]">Mastery Increasing</p>
+                      <div className="bg-white/5 rounded-2xl py-3 px-6 inline-flex items-center gap-2 border border-white/5">
                          <TrendingUp className="h-4 w-4 text-emerald-500" />
-                         <span className="text-xs font-bold text-white">12% this week</span>
+                         <span className="text-xs font-bold text-white">12% growth this week</span>
                       </div>
                    </div>
                 </div>
@@ -176,8 +171,8 @@ export default function Hero() {
         </div>
 
         {/* BOTTOM STATS STRIP (MATCHED TO REFERENCE) */}
-        <div className="mt-20 md:mt-24 bg-[#0F172A] rounded-[2rem] md:rounded-[3rem] border border-white/5 shadow-5xl overflow-hidden p-6 md:p-10">
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="mt-20 md:mt-32 bg-[#0F172A] rounded-[2rem] md:rounded-[3rem] border border-white/5 shadow-5xl overflow-hidden p-6 md:p-12">
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               <LegacyStatNode 
                 label="Questions" 
                 val={`${stats?.totalQuestions?.toLocaleString() || '50,000'}+`} 
@@ -187,19 +182,19 @@ export default function Hero() {
               <LegacyStatNode 
                 label="Mock Tests" 
                 val={`${stats?.totalMocks || '500'}+`} 
-                icon={<ClipboardList />} 
+                icon={<Zap />} 
                 color="bg-emerald-600" 
               />
               <LegacyStatNode 
-                label="Aspirants" 
+                label="Live Aspirants" 
                 val={`${stats?.totalUsers?.toLocaleString() || '15,000'}+`} 
                 icon={<Users />} 
                 color="bg-orange-600" 
               />
               <LegacyStatNode 
-                label="Success Rate" 
+                label="Accuracy" 
                 val={`${stats?.averageAccuracy || '94'}%`} 
-                icon={<TrendingUp />} 
+                icon={<ShieldCheck />} 
                 color="bg-purple-600" 
               />
            </div>
@@ -212,7 +207,7 @@ export default function Hero() {
 function FeatureTag({ icon, label }: any) {
    return (
       <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm text-slate-300 transition-all hover:border-primary/40 hover:bg-white/10">
-         {React.cloneElement(icon as React.ReactElement, { className: "h-4 w-4" })}
+         {icon}
          <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
       </div>
    )
@@ -220,17 +215,14 @@ function FeatureTag({ icon, label }: any) {
 
 function LegacyStatNode({ label, val, icon, color }: any) {
    return (
-      <div className="flex items-center gap-4 md:gap-6 text-left group cursor-pointer">
-         <div className={cn("h-10 w-10 md:h-14 md:w-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 shadow-inner transition-transform group-hover:scale-110", color)}>
-            {React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 md:h-7 md:w-7 text-white" })}
+      <div className="flex items-center gap-4 md:gap-8 text-left group">
+         <div className={cn("h-12 w-12 md:h-16 md:w-16 rounded-2xl flex items-center justify-center shrink-0 shadow-inner transition-transform group-hover:scale-110", color)}>
+            {icon && Object.assign({}, icon, { props: { className: "h-6 w-6 md:h-8 md:w-8 text-white" } })}
          </div>
          <div>
-            <p className="text-xl md:text-3xl font-headline font-black text-white tabular-nums leading-none tracking-tight">{val}</p>
-            <p className="text-[9px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest mt-1.5">{label}</p>
+            <p className="text-2xl md:text-4xl font-headline font-black text-white tabular-nums leading-none tracking-tight">{val}</p>
+            <p className="text-[9px] md:text-[11px] font-black uppercase text-slate-500 tracking-widest mt-2">{label}</p>
          </div>
       </div>
    )
 }
-
-import React from "react";
-import Link from "next/link";
