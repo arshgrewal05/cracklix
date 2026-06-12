@@ -26,8 +26,8 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Navbar v20.0.
- * UPDATED: Logo positioned 2 spaces (gap-2) to the right of the menu trigger.
+ * @fileOverview Institutional Navbar v20.1.
+ * UPDATED: Logo positioned exactly 2 units (gap-2) to the right of the menu trigger.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -128,7 +128,7 @@ export default function Navbar() {
                    <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
                  </SheetContent>
                </Sheet>
-               <Logo variant="light" className="origin-left scale-90 sm:scale-100" />
+               <Logo variant="light" className="origin-left" />
             </div>
 
             <div className="hidden lg:flex items-center gap-10 text-[12px] font-black uppercase tracking-[0.2em] text-[#7A8B9E]">
