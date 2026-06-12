@@ -13,8 +13,9 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview High-Fidelity Cracklix "C-Check" Icon Reconstruction v4.0.
+ * @fileOverview High-Fidelity Cracklix "C-Check" Icon Reconstruction v5.0.
  * MATCHES: Provided image with glowing arcs, bold C, and integrated checkmark.
+ * UPDATED: Branding text changed to mixed-case "Cracklix".
  */
 export function LogoIcon({ className = "", isDark = false }: { className?: string, isDark?: boolean }) {
   return (
@@ -89,13 +90,13 @@ export default function Logo({ className = "", variant = 'light', showTagline = 
         <div className="flex flex-col items-start justify-center leading-none">
           <div className="flex items-baseline">
             <span className={cn(
-              "text-2xl md:text-3xl font-headline font-[900] tracking-tighter uppercase",
+              "text-2xl md:text-3xl font-headline font-[900] tracking-tight",
               isDark ? "text-[#0F172A]" : "text-white"
             )}>
-              CRACK
+              Crack
             </span>
-            <span className="text-2xl md:text-3xl font-headline font-[900] tracking-tighter uppercase text-primary">
-              LIX
+            <span className="text-2xl md:text-3xl font-headline font-[900] tracking-tight text-primary">
+              lix
             </span>
           </div>
           
