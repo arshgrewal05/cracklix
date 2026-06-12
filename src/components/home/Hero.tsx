@@ -1,3 +1,4 @@
+
 'use client';
 
 import { motion } from "framer-motion";
@@ -13,9 +14,9 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 /**
- * @fileOverview High-Fidelity Hero Hub v90.0 (High-Definition Hardened).
- * UPDATED: Explicit priority rendering for high-definition assets.
- * FIXED: Persistent "Install App" trigger logic.
+ * @fileOverview High-Fidelity Hero Hub v91.0 (Recovery & Sharpness Fix).
+ * FIXED: Reliable image rendering via high-definition Picsum node.
+ * FIXED: Persistent "Install App" trigger for PWA.
  */
 
 export default function Hero() {
@@ -35,12 +36,16 @@ export default function Hero() {
       }
     };
 
-    window.addEventListener('pwa-installable', () => setCanInstall(true));
-    window.addEventListener('pwa-installed', () => setCanInstall(false));
+    const handleInstallable = () => setCanInstall(true);
+    const handleInstalled = () => setCanInstall(false);
+
+    window.addEventListener('pwa-installable', handleInstallable);
+    window.addEventListener('pwa-installed', handleInstalled);
     checkInstallStatus();
     
     return () => {
-      window.removeEventListener('pwa-installable', () => setCanInstall(true));
+      window.removeEventListener('pwa-installable', handleInstallable);
+      window.removeEventListener('pwa-installed', handleInstalled);
     };
   }, []);
   
@@ -154,9 +159,9 @@ export default function Hero() {
 
           <div className="relative w-full block">
             <div className="relative aspect-video sm:aspect-[4/3] w-full max-w-[620px] lg:ml-auto mx-auto mt-10 lg:mt-0">
-               <div className="absolute -inset-6 md:-inset-10 bg-primary/10 blur-[100px] rounded-full opacity-50" />
+               <div className="absolute -inset-6 md:-inset-10 bg-primary/15 blur-[100px] rounded-full opacity-50" />
                
-               <div className="relative h-full w-full rounded-[2rem] md:rounded-[3.5rem] overflow-hidden border-[4px] md:border-[10px] border-white/5 shadow-5xl bg-slate-800 group">
+               <div className="relative h-full w-full rounded-[2rem] md:rounded-[3.5rem] overflow-hidden border-[4px] md:border-[10px] border-white/5 shadow-5xl bg-[#0F172A] group">
                   {mounted && policeImage && (
                     <Image 
                       src={policeImage.imageUrl} 
@@ -165,12 +170,13 @@ export default function Hero() {
                       priority
                       className="object-cover transition-transform duration-[2s] group-hover:scale-110"
                       data-ai-hint={policeImage.imageHint}
+                      sizes="(max-width: 768px) 100vw, 620px"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#08152D] via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#08152D]/80 via-transparent to-transparent opacity-60" />
                   
                   <div className="absolute bottom-4 left-4 right-4 md:bottom-8 md:left-8 md:right-8 flex items-center justify-between">
-                     <div className="bg-white/30 backdrop-blur-xl px-4 py-2 md:px-6 md:py-4 rounded-xl md:rounded-2xl border border-white/20 shadow-2xl flex items-center gap-3 md:gap-4">
+                     <div className="bg-white/10 backdrop-blur-xl px-4 py-2 md:px-6 md:py-4 rounded-xl md:rounded-2xl border border-white/20 shadow-2xl flex items-center gap-3 md:gap-4">
                         <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-primary flex items-center justify-center shadow-lg">
                            <ShieldCheck className="h-4 w-4 md:h-5 md:w-5 text-white" />
                         </div>

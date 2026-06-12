@@ -1,21 +1,22 @@
+
 {
   "placeholderImages": [
     {
       "id": "hero-police",
       "description": "Punjab Police Strategic Asset HD",
-      "imageUrl": "https://punjabpolice.gov.in/media/images/pp10.original.jpg",
+      "imageUrl": "https://picsum.photos/seed/punjab-police-hd/1920/1280",
       "imageHint": "police officer"
     },
     {
       "id": "promo-psssb",
       "description": "PSSSB Official Institutional Promotion",
-      "imageUrl": "https://sssb.punjab.gov.in/wp-content/uploads/2025/08/sssb-1.jpg",
+      "imageUrl": "https://picsum.photos/seed/sssb-hub/1920/1080",
       "imageHint": "psssb official"
     },
     {
       "id": "hero-army",
       "description": "Indian Army Preparation Node",
-      "imageUrl": "https://joinindianarmy.nic.in/writereaddata/Portal/Images/Banner/Banner1.jpg",
+      "imageUrl": "https://picsum.photos/seed/army-prep/1920/1080",
       "imageHint": "indian army"
     },
     {
@@ -39,7 +40,7 @@
     {
       "id": "mock-police",
       "description": "Punjab Police Operational Readiness",
-      "imageUrl": "https://punjabpolice.gov.in/media/images/pp7.original.jpg",
+      "imageUrl": "https://picsum.photos/seed/police-training/800/600",
       "imageHint": "punjab police"
     },
     {
