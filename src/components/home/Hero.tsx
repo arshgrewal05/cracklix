@@ -1,3 +1,4 @@
+
 'use client';
 
 import { motion } from "framer-motion";
@@ -14,7 +15,11 @@ import {
   ClipboardList,
   TrendingUp,
   Globe,
-  FileStack
+  FileStack,
+  CheckCircle2,
+  Lock,
+  Search,
+  Star
 } from "lucide-react";
 import { useUser, useFirestore, useDoc } from "@/firebase";
 import { cn } from "@/lib/utils";
@@ -25,9 +30,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 /**
- * @fileOverview High-Fidelity Institutional Hero v148.0.
- * UPDATED: Integrated user-provided visual hub imagery with professional dark-navy masks.
- * Features: Integrated stats hub and floating readiness dashboard.
+ * @fileOverview FINAL PERMANENT HERO v150.0 (Matched to Design Screenshot).
+ * FEATURES: Institutional Image Hub, Floating Verified Badge, and Real-Time Stats.
  */
 export default function Hero() {
   const router = useRouter();
@@ -56,58 +60,53 @@ export default function Hero() {
 
   return (
     <section className="relative pt-12 pb-16 md:pt-24 md:pb-36 bg-[#0B1528] overflow-hidden text-left">
-      {/* INSTITUTIONAL VISUAL HUB */}
-      <div className="absolute inset-0 z-0">
-         <Image 
-            src={heroImageUrl}
-            alt="Punjab Exam Hub"
-            fill
-            className="object-cover opacity-40 grayscale-[0.2]"
-            priority
-            data-ai-hint="punjab police"
-         />
-         {/* Sophisticated Gradient Masks for Legibility */}
-         <div className="absolute inset-0 bg-gradient-to-r from-[#0B1528] via-[#0B1528]/80 to-transparent" />
-         <div className="absolute inset-0 bg-gradient-to-t from-[#0B1528] via-transparent to-transparent" />
-      </div>
+      {/* Background Subtle Gradient */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           
           {/* LEFT: COMMAND CONTENT */}
-          <div className="lg:col-span-8 space-y-10">
+          <div className="lg:col-span-7 space-y-10">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="space-y-8"
+              className="space-y-6 md:space-y-8"
             >
-              {/* Trust Badge */}
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full w-fit backdrop-blur-md shadow-2xl">
-                <div className="h-5 w-5 bg-amber-500 rounded-full flex items-center justify-center shadow-lg">
-                   <Trophy className="h-3 w-3 text-white fill-current" />
-                </div>
-                <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/80">
-                  Punjab's #1 Exam Preparation Hub
-                </span>
+              {/* Board Registry Header */}
+              <div className="space-y-2">
+                 <p className="text-primary font-black uppercase text-[10px] md:text-xs tracking-[0.4em] leading-none mb-4">
+                    PREPARE FOR
+                 </p>
+                 <div className="flex flex-wrap items-center gap-2 md:gap-4 text-white/40 font-black text-[9px] md:text-[11px] uppercase tracking-widest">
+                    <span className="text-primary">PSSSB</span>
+                    <div className="h-1 w-1 rounded-full bg-white/20" />
+                    <span className="text-primary">POLICE</span>
+                    <div className="h-1 w-1 rounded-full bg-white/20" />
+                    <span className="text-primary">PPSC</span>
+                    <div className="h-1 w-1 rounded-full bg-white/20" />
+                    <span className="text-primary">PSPCL</span>
+                    <div className="h-1 w-1 rounded-full bg-white/20" />
+                    <span className="text-primary">EXCISE</span>
+                 </div>
               </div>
 
               {/* Master Headline */}
-              <div className="space-y-4">
-                 <h1 className="text-4xl md:text-8xl font-headline font-black leading-[0.95] tracking-tight text-white uppercase">
-                    Prepare For Punjab <br />
+              <div className="space-y-4 md:space-y-6">
+                 <h1 className="text-4xl md:text-7xl font-headline font-black leading-[0.95] tracking-tight text-white uppercase">
+                    Master Punjab <br />
                     <span className="text-primary">Government Exams</span>
                  </h1>
                  <p className="text-slate-400 text-sm md:text-xl font-medium max-w-2xl leading-relaxed antialiased">
-                    Master PSSSB, Punjab Police, PPSC, PSTET, and PSPCL with high-fidelity mocks and AI logic rationalizations.
+                    Punjab's smartest preparation platform. Unlock high-fidelity mocks, PYQs, current affairs and detailed AI logic rationalizations.
                  </p>
               </div>
 
               {/* Functional Feature Tags */}
-              <div className="flex flex-wrap gap-4">
-                 <FeatureTag icon={<ClipboardList className="text-primary" />} label="Full-Length Mocks" />
-                 <FeatureTag icon={<FileStack className="text-primary" />} label="Official PYQs" />
-                 <FeatureTag icon={<Globe className="text-primary" />} label="Daily News Hub" />
-                 <FeatureTag icon={<ShieldCheck className="text-primary" />} label="Detailed Logic" />
+              <div className="flex flex-wrap gap-3">
+                 <FeatureTag icon={<Zap className="text-primary" />} label="500+ Mocks" />
+                 <FeatureTag icon={<FileStack className="text-primary" />} label="Verified PYQs" />
+                 <FeatureTag icon={<Globe className="text-primary" />} label="Bilingual Hub" />
               </div>
             </motion.div>
 
@@ -115,13 +114,13 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
               <Button 
                 onClick={() => handleAction('/mocks')}
-                className="w-full sm:w-auto h-16 md:h-20 px-12 bg-primary hover:bg-orange-600 text-white rounded-[1.5rem] md:rounded-[2rem] font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] shadow-3xl shadow-primary/20 border-none transition-all active:scale-95 gap-4"
+                className="w-full sm:w-auto h-16 md:h-20 px-12 bg-primary hover:bg-orange-600 text-white rounded-[1.5rem] md:rounded-[2.5rem] font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] shadow-3xl shadow-primary/20 border-none transition-all active:scale-95 gap-4"
               >
                 Start Free Mock <ArrowRight className="h-5 w-5" />
               </Button>
               <Button 
                 onClick={() => handleAction('/exams')}
-                className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-[1.5rem] md:rounded-[2rem] border-2 border-white/20 bg-white/5 text-white hover:bg-white/10 font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] transition-all active:scale-95 gap-4"
+                className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-[1.5rem] md:rounded-[2.5rem] bg-white text-[#0B1528] hover:bg-slate-100 font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] transition-all active:scale-95 gap-4 border-none shadow-xl"
               >
                 Explore Hubs <ArrowRight className="h-5 w-5" />
               </Button>
@@ -129,8 +128,8 @@ export default function Hero() {
 
             {/* Hot Exams Quick Links */}
             <div className="flex flex-wrap items-center gap-4 pt-4">
-               <span className="text-[10px] font-black uppercase text-primary tracking-widest">Hot Exams:</span>
-               {['PSSSB Patwari', 'Punjab Police SI', 'PSTET Hub', 'Master Cadre', 'Excise'].map((t) => (
+               <span className="text-[10px] font-black uppercase text-primary tracking-widest">Trending:</span>
+               {['PSSSB Patwari', 'Police SI', 'Excise Hub', 'PSTET'].map((t) => (
                   <Link key={t} href={`/search?q=${t}`}>
                     <Badge variant="outline" className="border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/30 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all cursor-pointer shadow-sm">
                        {t}
@@ -140,33 +139,52 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: FLOATING READINESS HUB */}
-          <div className="lg:col-span-4 relative hidden lg:block">
+          {/* RIGHT: INSTITUTIONAL IMAGE HUB (Matched to Screenshot) */}
+          <div className="lg:col-span-5 relative">
              <motion.div 
                initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
-               className="bg-[#1A2333]/90 backdrop-blur-2xl rounded-[3rem] p-10 border border-white/10 shadow-5xl relative overflow-hidden group"
+               className="relative"
              >
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-1000"><Zap className="h-40 w-40" /></div>
+                {/* Visual Glow */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[3.5rem] blur-2xl opacity-50" />
                 
-                <div className="relative z-10 text-center space-y-8">
-                   <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Exam Readiness</h3>
+                {/* Main Rounded Image Hub */}
+                <div className="relative aspect-[4/5] rounded-[3.5rem] md:rounded-[4.5rem] overflow-hidden border-[6px] border-white/5 shadow-5xl bg-[#1A2333]">
+                   <Image 
+                      src={heroImageUrl}
+                      alt="Punjab Police Prep"
+                      fill
+                      className="object-cover"
+                      priority
+                      data-ai-hint="punjab police"
+                   />
                    
-                   <div className="relative h-44 w-44 mx-auto flex items-center justify-center">
-                      <svg className="h-full w-full transform -rotate-90">
-                         <circle cx="88" cy="88" r="78" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/5" />
-                         <circle cx="88" cy="88" r="78" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray="490" strokeDashoffset={490 - (490 * 0.82)} className="text-emerald-500 shadow-xl" strokeLinecap="round" />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                         <span className="text-6xl font-headline font-black text-white leading-none">82%</span>
+                   {/* 1. FLOATING VERIFIED CONTENT BADGE (Bottom Left) */}
+                   <div className="absolute bottom-8 left-8 right-auto z-20 animate-in slide-in-from-left-4 duration-700">
+                      <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 flex items-center gap-4 shadow-2xl">
+                         <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/20">
+                            <ShieldCheck className="h-6 w-6" />
+                         </div>
+                         <div className="text-left">
+                            <p className="text-[8px] md:text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">OFFICIAL HUB</p>
+                            <h3 className="text-sm md:text-xl font-black text-white uppercase mt-1 leading-none">VERIFIED CONTENT</h3>
+                         </div>
                       </div>
                    </div>
 
-                   <div className="space-y-4">
-                      <p className="text-emerald-400 font-black uppercase text-[10px] tracking-[0.3em]">Mastery Increasing</p>
-                      <div className="bg-white/5 rounded-2xl py-3 px-6 inline-flex items-center gap-2 border border-white/5">
-                         <TrendingUp className="h-4 w-4 text-emerald-500" />
-                         <span className="text-xs font-bold text-white">12% growth this week</span>
+                   {/* 2. FLOATING LIVE STUDENTS NODE (Bottom Right - Peek) */}
+                   <div className="absolute bottom-[-10px] right-[-10px] z-30">
+                      <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 shadow-5xl flex flex-col items-center gap-2 border border-slate-100">
+                         <div className="h-10 w-10 bg-orange-50 rounded-xl flex items-center justify-center text-primary shadow-inner">
+                            <Users className="h-5 w-5" />
+                         </div>
+                         <div className="text-center">
+                            <p className="text-xl md:text-3xl font-headline font-black text-[#0F172A] leading-none tabular-nums">
+                               {stats?.totalUsers?.toLocaleString() || '15,000'}+
+                            </p>
+                            <p className="text-[8px] md:text-[9px] font-black uppercase text-slate-400 tracking-widest mt-1">LIVE STUDENTS</p>
+                         </div>
                       </div>
                    </div>
                 </div>
@@ -174,9 +192,10 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* BOTTOM STATS STRIP */}
-        <div className="mt-20 md:mt-32 bg-[#0F172A] rounded-[2rem] md:rounded-[3rem] border border-white/5 shadow-5xl overflow-hidden p-6 md:p-12">
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        {/* BOTTOM STATS STRIP (Integrated Authority) */}
+        <div className="mt-20 md:mt-32 bg-[#0F172A] rounded-[2rem] md:rounded-[3.5rem] border border-white/5 shadow-5xl overflow-hidden p-6 md:p-12 relative">
+           <div className="absolute top-0 right-0 p-8 opacity-[0.03] rotate-12"><Trophy className="h-64 w-64" /></div>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 relative z-10">
               <LegacyStatNode 
                 label="Questions" 
                 val={`${stats?.totalQuestions?.toLocaleString() || '50,000'}+`} 
@@ -190,9 +209,9 @@ export default function Hero() {
                 color="bg-emerald-600" 
               />
               <LegacyStatNode 
-                label="Live Aspirants" 
-                val={`${stats?.totalUsers?.toLocaleString() || '15,000'}+`} 
-                icon={<Users />} 
+                label="State Rank" 
+                val="94%" 
+                icon={<Target />} 
                 color="bg-orange-600" 
               />
               <LegacyStatNode 
@@ -210,9 +229,9 @@ export default function Hero() {
 
 function FeatureTag({ icon, label }: any) {
    return (
-      <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm text-slate-300 transition-all hover:border-primary/40 hover:bg-white/10">
-         {icon}
-         <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+      <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-300 transition-all hover:border-primary/40">
+         {icon && Object.assign({}, icon, { props: { className: "h-3.5 w-3.5 text-primary" } })}
+         <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
       </div>
    )
 }
@@ -224,8 +243,8 @@ function LegacyStatNode({ label, val, icon, color }: any) {
             {icon && Object.assign({}, icon, { props: { className: "h-6 w-6 md:h-8 md:w-8 text-white" } })}
          </div>
          <div>
-            <p className="text-2xl md:text-4xl font-headline font-black text-white tabular-nums leading-none tracking-tight">{val}</p>
-            <p className="text-[9px] md:text-[11px] font-black uppercase text-slate-500 tracking-widest mt-2">{label}</p>
+            <p className="text-xl md:text-3xl font-headline font-black text-white tabular-nums leading-none tracking-tight">{val}</p>
+            <p className="text-[9px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest mt-2">{label}</p>
          </div>
       </div>
    )
