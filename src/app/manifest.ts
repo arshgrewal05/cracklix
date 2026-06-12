@@ -2,11 +2,11 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Institutional PWA Manifest Configuration v11.0.
- * UPDATED: Synchronized with the latest high-fidelity Cracklix master logo.
+ * @fileOverview Institutional PWA Manifest Configuration v12.0.
+ * UPDATED: Synchronized with the latest high-fidelity "Pura Logo" (Full Branding).
  */
 export default function manifest(): MetadataRoute.Manifest {
-  const logoUrl = 'https://i.ibb.co/0yBPqGP6/1000110138-removebg-preview.png';
+  const logoUrl = 'https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png';
 
   return {
     name: 'CRACKLIX | Punjab Exam Hub',

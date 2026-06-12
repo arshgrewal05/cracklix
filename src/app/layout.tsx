@@ -12,7 +12,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const masterLogo = 'https://i.ibb.co/0yBPqGP6/1000110138-removebg-preview.png';
+const masterLogo = 'https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png';
 
 export const metadata: Metadata = {
   title: 'Cracklix | Punjab Exam Hub',

@@ -12,14 +12,14 @@ interface LogoProps {
 
 /**
  * @fileOverview Official Cracklix Master Logo Hub.
- * UPDATED: Integrated high-fidelity 1024px master source.
- * Dimension: Optimized for 250x80px aspect ratio for professional site identity.
+ * UPDATED: Integrated high-fidelity "Pura Logo" (Full Branding) node.
+ * Scaling: Calibrated for professional education hub aspect ratios.
  */
 export function LogoIcon({ className = "" }: { className?: string }) {
   return (
     <div className={cn("relative shrink-0 flex items-center justify-center", className)}>
       <img 
-        src="https://i.ibb.co/0yBPqGP6/1000110138-removebg-preview.png" 
+        src="https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png" 
         alt="Cracklix" 
         className="w-full h-full object-contain"
         referrerPolicy="no-referrer"
@@ -32,11 +32,11 @@ export default function Logo({ className = "", variant = 'light', href = "/" }: 
   return (
     <Link href={href} className={cn("flex items-center group pointer-events-auto select-none shrink-0", className)}>
       {/* 
-         Professional Scaling: 
-         Mobile: w-32 (128px wide)
-         Desktop: w-48 (192px wide)
+         Professional Scale for Full Branding:
+         Mobile: w-36 (Approx 144px)
+         Desktop: w-52 (Approx 208px)
       */}
-      <LogoIcon className="w-32 h-10 md:w-48 md:h-14" />
+      <LogoIcon className="w-36 h-10 md:w-52 md:h-14" />
     </Link>
   );
 }
