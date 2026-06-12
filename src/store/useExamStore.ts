@@ -1,3 +1,4 @@
+
 'use client';
 
 import { create } from 'zustand';
@@ -8,9 +9,9 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
- * @fileOverview Elite CBT Global Store v45.0 (Stability Hardened).
+ * @fileOverview Elite CBT Global Store v46.0 (Stability Hardened).
  * FIXED: Resolved re-take blank screen by forcing a hard state reset if a completed state is detected.
- * ADDED: Robust state clearing for fresh mock attempts.
+ * SYNC: Robust state clearing for fresh mock attempts.
  */
 
 interface ExamStore extends AttemptState {
@@ -68,7 +69,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     // 1. Identify Re-takes or Completed Sessions to trigger a Hard Reset
     const isCompleted = savedState?.status === 'COMPLETED';
     const isTimedOut = savedState?.endTime && now >= savedState.endTime;
-    const isStale = isCompleted || isTimedOut;
+    const isStale = isCompleted || isTimedOut || (state.mockId !== mockId);
 
     const actualStartTime = isStale ? now : (savedState?.startTime || now);
     const finalDuration = duration || 120;
@@ -78,14 +79,13 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
     let initialLang = (state.language && state.language !== '') ? (state.language as string) : finalBaseMode;
     
-    // 2. Adjust language preference based on mock support
     if (finalBaseMode === 'ENGLISH_PUNJABI' && initialLang.includes('HINDI')) {
       initialLang = 'ENGLISH_PUNJABI';
     } else if (finalBaseMode === 'ENGLISH_HINDI' && initialLang.includes('PUNJABI')) {
       initialLang = 'ENGLISH_HINDI';
     }
 
-    // 3. FORCE HARD RESET FOR RE-TAKES TO PREVENT BLANK SCREEN GLITCH
+    // 2. Hard state reset for fresh attempts or re-takes
     set({
       mockId, 
       mockTitle, 
@@ -108,7 +108,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       isSyncing: false
     });
 
-    // 4. Update cloud attempt node immediately if starting fresh
     if (userId && mockId && (isStale || !savedState)) {
       const { firestore: db } = initializeFirebase();
       const attemptRef = doc(db, 'attempts', `${userId}_${mockId}`);

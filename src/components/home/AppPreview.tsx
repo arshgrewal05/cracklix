@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState } from "react";
@@ -9,7 +10,7 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Final Regional Hub Section v8.0.
+ * @fileOverview Final Regional Hub Section v8.1.
  * UPDATED: Promoted 'Download App' (PWA) installation method for students.
  */
 

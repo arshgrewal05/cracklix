@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -26,9 +27,9 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Navbar v30.0 (Stability Hardened).
- * FIXED: Balanced JSX tags and enforced hydration safety for PWA prompts.
- * ADDED: Pulsating Install button for Android/iOS users.
+ * @fileOverview Institutional Navbar v31.0 (Stability Hardened).
+ * FIXED: Balanced JSX tags and enforced hydration safety.
+ * ADDED: Persistent Install button for PWA.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -98,7 +99,7 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-[1000] w-full pointer-events-auto">
       {settings?.showAnnouncement && (
-        <div className="bg-primary text-white py-1 md:py-1.5 flex items-center overflow-hidden relative shadow-2xl pointer-events-none h-7 md:h-8">
+        <div className="bg-primary text-white py-1 md:py-1.5 flex items-center overflow-hidden relative shadow-2xl h-7 md:h-8">
           <div className="flex items-center gap-2 animate-marquee whitespace-nowrap min-w-full">
             <Megaphone className="h-3 w-3 shrink-0 ml-4" />
             <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">
@@ -119,11 +120,11 @@ export default function Navbar() {
           <div className="flex items-center gap-2 md:gap-4">
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
               <SheetTrigger asChild>
-                <button className="text-white p-2.5 hover:bg-white/5 rounded-2xl transition-all active:scale-90 cursor-pointer border border-white/10 focus:outline-none shrink-0 z-10">
+                <button className="text-white p-2.5 hover:bg-white/5 rounded-2xl transition-all active:scale-90 cursor-pointer border border-white/10 focus:outline-none shrink-0">
                   <Menu className="h-6 w-6" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="left" className="p-0 border-none w-[280px] overflow-hidden shadow-5xl transition-all duration-200 bg-[#0F172A] z-[2001] top-0 h-screen">
+              <SheetContent side="left" className="p-0 border-none w-[280px] bg-[#0F172A] z-[2001] h-screen">
                 <SheetHeader className="sr-only"><SheetTitle>Menu Hub</SheetTitle></SheetHeader>
                 <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
               </SheetContent>
@@ -131,16 +132,16 @@ export default function Navbar() {
             <Logo variant="light" className="origin-left" />
 
             <div className="hidden lg:flex items-center gap-10 text-[12px] font-black uppercase tracking-[0.2em] text-[#7A8B9E] ml-10">
-              <Link href="/my-exams" className={cn("transition-colors flex items-center gap-2 hover:text-white pointer-events-auto", pathname === '/my-exams' ? 'text-white' : '')}>
+              <Link href="/my-exams" className={cn("transition-colors flex items-center gap-2 hover:text-white", pathname === '/my-exams' ? 'text-white' : '')}>
                 <Target className="h-4 w-4 text-primary" /> My Exams
               </Link>
-              <Link href="/mocks" className={cn("transition-colors hover:text-white pointer-events-auto", pathname === '/mocks' ? 'text-white' : '')}>
+              <Link href="/mocks" className={cn("transition-colors hover:text-white", pathname === '/mocks' ? 'text-white' : '')}>
                 Practice Tests
               </Link>
-              <Link href="/pass" className={cn("transition-all flex items-center gap-2 px-5 py-2 rounded-xl border pointer-events-auto", pathname === '/pass' ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'bg-primary/10 border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/20')}>
+              <Link href="/pass" className={cn("transition-all flex items-center gap-2 px-5 py-2 rounded-xl border", pathname === '/pass' ? 'bg-primary border-primary text-white shadow-xl' : 'bg-primary/10 border-primary/20 text-primary/80 hover:text-primary')}>
                 <Gem className="h-4 w-4" /> GET PASS
               </Link>
-              <Link href="/current-affairs" className={cn("transition-colors flex items-center gap-2 hover:text-white pointer-events-auto", pathname === '/current-affairs' ? 'text-white' : '')}>
+              <Link href="/current-affairs" className={cn("transition-colors flex items-center gap-2 hover:text-white", pathname === '/current-affairs' ? 'text-white' : '')}>
                 <Newspaper className="h-4 w-4 text-primary" /> Current Affairs
               </Link>
             </div>
@@ -170,7 +171,7 @@ export default function Navbar() {
                </div>
             )}
 
-            <Link href="/search" className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/5 transition-all active:scale-95 border border-white/5 pointer-events-auto">
+            <Link href="/search" className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/5 transition-all border border-white/5">
               <Search className="h-5 w-5" />
             </Link>
 
@@ -179,11 +180,11 @@ export default function Navbar() {
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-9 w-9 md:h-11 md:w-11 p-0 rounded-xl md:rounded-2xl overflow-hidden border-2 border-primary/20 hover:border-primary transition-all bg-[#0F172A] shadow-2xl focus-visible:ring-0 active:scale-95 cursor-pointer">
+                  <Button variant="ghost" className="h-9 w-9 md:h-11 md:w-11 p-0 rounded-xl md:rounded-2xl overflow-hidden border-2 border-primary/20 hover:border-primary transition-all bg-[#0F172A] shadow-2xl">
                     <StudentAvatar profile={profile} className="h-full w-full border-none" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-60 bg-[#0F172A] border-white/10 text-white rounded-[2rem] p-2 shadow-5xl animate-in fade-in zoom-in-95 duration-200 z-[2001]" align="end">
+                <DropdownMenuContent className="w-60 bg-[#0F172A] border-white/10 text-white rounded-[2rem] p-2 shadow-5xl z-[2001]" align="end">
                   <DropdownMenuLabel className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Student Area</DropdownMenuLabel>
                   <DropdownMenuItem asChild className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5">
                     <Link href="/profile" className="w-full flex items-center gap-3">
@@ -219,7 +220,7 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-90 border-none cursor-pointer">
+              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-90 border-none">
                 <Link href="/login">Login</Link>
               </Button>
             )}

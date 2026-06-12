@@ -1,3 +1,4 @@
+
 'use client';
 
 import { 
@@ -38,8 +39,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 /**
- * @fileOverview Institutional Mobile Sidebar v19.0 (Hardened).
- * UPDATED: Reliable 'Install App' trigger for Android/iOS downloads.
+ * @fileOverview Institutional Mobile Sidebar v20.0.
+ * FIXED: Reliable 'Install App' prompt for PWA.
+ * STYLE: High-fidelity layout matching premium apps.
  */
 
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -97,33 +99,9 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
       }
       onClose();
     } else {
-       toast({ title: "App Installed", description: "The Cracklix app is already on your device or not supported by this browser." });
+       toast({ title: "App Installed", description: "The Cracklix app is already on your device." });
     }
   };
-
-  const shareText = "Prepare for Punjab Government Exams with Cracklix. Join 15,000+ students today!";
-  const shareUrl = typeof window !== 'undefined' ? window.location.origin : 'https://cracklix.com';
-
-  const shareOptions = [
-    { 
-      label: "WhatsApp", 
-      icon: <MessageCircle className="h-5 w-5" />, 
-      color: "bg-emerald-500", 
-      href: `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}` 
-    },
-    { 
-      label: "SMS", 
-      icon: <MessageSquare className="h-5 w-5" />, 
-      color: "bg-blue-500", 
-      href: `sms:?body=${encodeURIComponent(shareText + " " + shareUrl)}` 
-    },
-    { 
-      label: "Gmail", 
-      icon: <Mail className="h-5 w-5" />, 
-      color: "bg-rose-500", 
-      href: `mailto:?subject=${encodeURIComponent("Cracklix - Punjab Exam Hub")}&body=${encodeURIComponent(shareText + " " + shareUrl)}` 
-    },
-  ];
 
   const menuItems = [
     { label: "Home Page", href: "/", icon: Home },
@@ -290,22 +268,20 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
                <button onClick={() => setIsShareOpen(false)} className="absolute top-8 right-8 text-slate-500 hover:text-white"><X className="h-5 w-5" /></button>
             </DialogHeader>
             <div className="p-8 pt-0 grid grid-cols-3 gap-4">
-               {shareOptions.map((opt) => (
+               {[
+                 { label: "WhatsApp", icon: <MessageCircle className="h-5 w-5" />, color: "bg-emerald-500", href: "https://wa.me/?text=Prepare%20for%20Punjab%20Exams%20on%20Cracklix!" },
+                 { label: "SMS", icon: <MessageSquare className="h-5 w-5" />, color: "bg-blue-500", href: "sms:?body=Prepare%20for%20Punjab%20Exams%20on%20Cracklix!" },
+                 { label: "Mail", icon: <Mail className="h-5 w-5" />, color: "bg-rose-500", href: "mailto:?subject=Cracklix" }
+               ].map((opt) => (
                   <a 
                     key={opt.label} 
                     href={opt.href} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    onClick={() => {
-                       setIsShareOpen(false);
-                       onClose();
-                    }}
+                    onClick={() => { setIsShareOpen(false); onClose(); }}
                     className="flex flex-col items-center gap-2"
                   >
-                     <div className={cn(
-                       "h-12 w-12 rounded-xl flex items-center justify-center text-white shadow-xl",
-                       opt.color
-                     )}>
+                     <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-white shadow-xl", opt.color)}>
                         {opt.icon}
                      </div>
                      <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">{opt.label}</span>

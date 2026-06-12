@@ -7,15 +7,15 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Zap, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import { useDoc, useFirestore, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Hero Hub v80.1 (Hardened).
- * GATED: Access restricted to authenticated students only.
+ * @fileOverview High-Fidelity Hero Hub v81.0.
+ * FIXED: Hydration mismatch error resolved by strictly rendering "EXAM." headline.
+ * REDIRECT: Actions gated to login wall.
  */
 
 export default function Hero() {
