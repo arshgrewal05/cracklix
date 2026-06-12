@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -8,9 +7,8 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Institutional PWA Lifecycle Manager v21.0.
- * HARDENED: Captures 'beforeinstallprompt' and broadcasts to Navbar/Sidebar.
- * ADDED: Auto-popup with 3s delay for uninstalled students.
+ * @fileOverview Institutional PWA Lifecycle Manager v22.0.
+ * HARDENED: Reliable 'deferredPrompt' capture for home-screen installation.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -22,22 +20,22 @@ export default function PWAManager() {
   useEffect(() => {
     setMounted(true);
 
-    // 1. Service Worker registration (Mandatory for Install prompt)
+    // 1. Service Worker registration
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(
-        (reg) => console.log('[PWA] Node Sync Active'),
-        (err) => console.log('[PWA] Node Sync Offline')
+        (reg) => console.log('[PWA] Service Worker Active'),
+        (err) => console.log('[PWA] Service Worker Offline')
       );
     }
 
     // 2. Capture Install Prompt
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
-      // Store event globally for other UI nodes
+      // Store event globally for other UI nodes (like Hero button)
       (window as any).deferredPrompt = e;
       setDeferredPrompt(e);
       
-      // Dispatch custom event for Navbar and Sidebar
+      // Notify components like Navbar/Hero that app is installable
       window.dispatchEvent(new CustomEvent('pwa-installable'));
       
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;

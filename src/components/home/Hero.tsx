@@ -1,11 +1,10 @@
-
 'use client';
 
 import { motion } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Search, Sparkles, Zap, ShieldCheck } from "lucide-react";
+import { Search, Sparkles, Zap, ShieldCheck, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDoc, useFirestore, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
@@ -14,9 +13,8 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 /**
- * @fileOverview High-Fidelity Hero Hub v87.0.
- * UPDATED: Implemented next/image for ultra-sharp HD rendering.
- * FIXED: Hydration error resolved by strictly locking "EXAM." headline.
+ * @fileOverview High-Fidelity Hero Hub v88.0.
+ * UPDATED: Integrated prominent "Install App" button for PWA conversion.
  */
 
 export default function Hero() {
@@ -25,9 +23,20 @@ export default function Hero() {
   const { user } = useUser();
   const [queryText, setQueryText] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    
+    const checkInstall = () => {
+      if (typeof window !== 'undefined' && (window as any).deferredPrompt) {
+        setCanInstall(true);
+      }
+    };
+
+    window.addEventListener('pwa-installable', checkInstall);
+    checkInstall();
+    return () => window.removeEventListener('pwa-installable', checkInstall);
   }, []);
   
   const policeImage = PlaceHolderImages.find(img => img.id === 'hero-police');
@@ -59,6 +68,18 @@ export default function Hero() {
       return;
     }
     router.push(path);
+  };
+
+  const handleInstallApp = async () => {
+    const prompt = (window as any).deferredPrompt;
+    if (prompt) {
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      if (outcome === 'accepted') {
+        setCanInstall(false);
+        (window as any).deferredPrompt = null;
+      }
+    }
   };
 
   return (
@@ -114,6 +135,15 @@ export default function Hero() {
               >
                  <span className="flex items-center justify-center gap-3">START PRACTICE <Zap className="h-4 w-4 fill-current" /></span>
               </Button>
+
+              {mounted && canInstall && (
+                <Button 
+                  onClick={handleInstallApp}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 md:px-12 rounded-xl font-black uppercase tracking-[0.1em] text-[10px] md:text-[11px] h-14 md:h-16 shadow-2xl transition-all active:scale-95 border-none group cursor-pointer animate-in fade-in zoom-in-95 duration-500"
+                >
+                   <span className="flex items-center justify-center gap-3">INSTALL APP <Download className="h-4 w-4" /></span>
+                </Button>
+              )}
             </div>
           </div>
 
