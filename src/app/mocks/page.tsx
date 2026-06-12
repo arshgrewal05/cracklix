@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview RESTORED: Hierarchical Category Discovery v3.0.
- * UPDATED: Locked permanent logo for Punjab General category.
+ * @fileOverview Institutional Category Discovery v3.1.
+ * UPDATED: Hardened title mapping for Punjab General and Banking icons.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {

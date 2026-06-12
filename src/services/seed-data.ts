@@ -1,19 +1,19 @@
 import { Firestore, doc, setDoc, serverTimestamp, collection, writeBatch } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Punjab-Centric Seeding Node v69.0.
- * UPDATED: Locked permanent logo for Punjab General Exams.
+ * @fileOverview Institutional Punjab-Centric Seeding Node v70.0.
+ * UPDATED: Comprehensive category seeding for General and Banking nodes.
  */
 
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Absolute Punjab Registry Sync...');
   const batch = writeBatch(db);
 
-  // 1. STRATEGIC CATEGORIES
+  // 1. STRATEGIC CATEGORIES (Matched to Student UI Mapping)
   const categories = [
     {
       id: "punjab-govt",
-      title: "Punjab General Exams",
+      title: "Punjab General Exam",
       description: "Police, PSSSB, PPSC and major state board recruitments.",
       highlight: "STATE LEVEL",
       color: "text-primary",
@@ -23,7 +23,7 @@ export async function seedInitialData(db: Firestore) {
     },
     {
       id: "punjab-teaching",
-      title: "Punjab Teaching Exams",
+      title: "Punjab Teaching Exam",
       description: "PSTET, CTET, Master Cadre, ETT & Lecturer recruitment nodes.",
       highlight: "EDUCATIONAL",
       color: "text-blue-600",
@@ -33,13 +33,33 @@ export async function seedInitialData(db: Firestore) {
     },
     {
       id: "punjab-technical",
-      title: "Punjab Technical Exams",
+      title: "Punjab Technical Exam",
       description: "PSPCL, PSTCL, ALM and Technical Board recruitment nodes.",
       highlight: "POWER & TECH",
       color: "text-amber-500",
       bgColor: "bg-amber-50",
       iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo0ZK9JI5KMfg9RoNdIwcsNlpx5IcPBWuKZw&s",
       displayOrder: 3
+    },
+    {
+      id: "banking",
+      title: "Punjab Banking Corporation Exam",
+      description: "State Cooperative Bank, Apex, PADB and Central Bank nodes.",
+      highlight: "FINANCE",
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7McWqZqOgKy-BakccvR02WQdEQFrwuvmHBG5rYJzuEg&s=10",
+      displayOrder: 4
+    },
+    {
+      id: "central-govt",
+      title: "Central Govt",
+      description: "SSC, Railways, Army & National exams.",
+      highlight: "NATIONAL",
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+      iconUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmRNHVIV2W9Pn_87u6EQmluADidwUQWhOotUwQUV_VWtEBWqoxjf-OBEt4&s=10",
+      displayOrder: 5
     }
   ];
 
@@ -57,7 +77,7 @@ export async function seedInitialData(db: Firestore) {
     batch.set(doc(db, 'boards', b.id), { ...b, updatedAt: serverTimestamp() }, { merge: true });
   }
 
-  // 3. SAMPLE QUESTIONS (To ensure count > 0)
+  // 3. SAMPLE QUESTIONS
   const sampleQs = [
     {
       id: "seed-q-1",
@@ -116,11 +136,12 @@ export async function seedInitialData(db: Firestore) {
 
   await batch.commit();
 
-  // 5. FINAL STATS SYNC (Initial baseline)
+  // 5. FINAL STATS SYNC
   await setDoc(doc(db, 'settings', 'stats'), {
      totalQuestions: 2,
      totalMocks: 1,
      totalUsers: 1,
+     totalBoards: 2,
      averageAccuracy: 94,
      updatedAt: serverTimestamp()
   }, { merge: true });

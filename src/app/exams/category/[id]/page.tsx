@@ -15,15 +15,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Category Explorer v8.0.
- * UPDATED: Locked permanent logo for Punjab General category.
+ * @fileOverview Institutional Category Explorer v8.1.
+ * UPDATED: Strictly synchronized mapping for Punjab General and Banking logos.
  */
 
 const CATEGORY_META: Record<string, any> = {
-  "punjab-govt": { title: "Punjab General", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR8W5eTBPdzztA7cziqnMmtWk9InL1yflUD_xb4vAsLw&s=10" className="h-full w-full object-contain" /> },
-  "punjab-teaching": { title: "Punjab Teaching", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbNnoge6pNWx1HZYrUJKM58qWk1dDw85xvKPBoG-O4ew&s=10" className="h-full w-full object-contain" /> },
-  "punjab-technical": { title: "Punjab Technical", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo0ZK9JI5KMfg9RoNdIwcsNlpx5IcPBWuKZw&s" className="h-full w-full object-contain" /> },
-  "banking": { title: "Punjab Banking & Coop", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7McWqZqOgKy-BakccvR02WQdEQFrwuvmHBG5rYJzuEg&s=10" className="h-full w-full object-contain" /> },
+  "punjab-govt": { title: "Punjab General Exam", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR8W5eTBPdzztA7cziqnMmtWk9InL1yflUD_xb4vAsLw&s=10" className="h-full w-full object-contain" /> },
+  "punjab-teaching": { title: "Punjab Teaching Exam", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbNnoge6pNWx1HZYrUJKM58qWk1dDw85xvKPBoG-O4ew&s=10" className="h-full w-full object-contain" /> },
+  "punjab-technical": { title: "Punjab Technical Exam", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo0ZK9JI5KMfg9RoNdIwcsNlpx5IcPBWuKZw&s" className="h-full w-full object-contain" /> },
+  "banking": { title: "Punjab Banking Corporation Exam", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7McWqZqOgKy-BakccvR02WQdEQFrwuvmHBG5rYJzuEg&s=10" className="h-full w-full object-contain" /> },
   "central-govt": { title: "Central Govt", icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmRNHVIV2W9Pn_87u6EQmluADidwUQWhOotUwQUV_VWtEBWqoxjf-OBEt4&s=10" className="h-full w-full object-contain" /> }
 };
 
@@ -40,7 +40,6 @@ export default function CategoryHubsPage() {
   const { data: boards, loading: boardsLoading } = useCollection<any>(boardsQuery);
   const { data: allExams } = useCollection<any>(examsQuery);
 
-  // DYNAMIC DEDUPLICATION HUB
   const categoryHubs = useMemo(() => {
      if (!boards) return [];
      const hubMap = new Map();
@@ -87,13 +86,11 @@ export default function CategoryHubsPage() {
          ) : categoryHubs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                {categoryHubs.map((hub) => {
-                  // HARDENED COUNTING LOGIC
                   const examCount = (allExams || []).filter((e: any) => 
                      e.boardId?.toLowerCase() === hub.id?.toLowerCase() ||
                      e.boardId?.toLowerCase() === hub.abbreviation?.toLowerCase()
                   ).length;
 
-                  // ORIGINAL ICON RECOVERY
                   const id = hub.id?.toLowerCase();
                   const abbrev = hub.abbreviation?.toLowerCase();
                   const isPolice = id.includes('police') || abbrev === 'police';

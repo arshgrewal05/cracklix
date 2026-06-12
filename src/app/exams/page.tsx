@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Master Registry Landing v3.0.
- * UPDATED: Locked permanent logo for Punjab General category.
+ * @fileOverview Institutional Master Registry Landing v3.1.
+ * UPDATED: Aligned mapping with Seed Data for Punjab General and Banking.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {

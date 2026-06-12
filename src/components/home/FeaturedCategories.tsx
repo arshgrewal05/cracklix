@@ -21,14 +21,14 @@ import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Institutional Category Entry Nodes v5.0.
- * UPDATED: Locked permanent logo for Punjab General category.
+ * @fileOverview Institutional Category Entry Nodes v5.1.
+ * UPDATED: Synchronized labels and icons for Punjab General and Banking.
  */
 
 const CATEGORY_META = [
   {
     id: "punjab-govt",
-    title: "Punjab General Exams",
+    title: "Punjab General Exam",
     desc: "Police, PSSSB, PPSC & general state board recruitments.",
     icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR8W5eTBPdzztA7cziqnMmtWk9InL1yflUD_xb4vAsLw&s=10" className="h-full w-full object-contain p-2" />,
     color: "text-primary",
@@ -36,7 +36,7 @@ const CATEGORY_META = [
   },
   {
     id: "punjab-teaching",
-    title: "Punjab Teaching",
+    title: "Punjab Teaching Exam",
     desc: "PSTET, CTET, Master Cadre, ETT & Lecturer recruitment nodes.",
     icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbNnoge6pNWx1HZYrUJKM58qWk1dDw85xvKPBoG-O4ew&s=10" className="h-full w-full object-contain p-2" />,
     color: "text-blue-600",
@@ -44,7 +44,7 @@ const CATEGORY_META = [
   },
   {
     id: "punjab-technical",
-    title: "Punjab Technical",
+    title: "Punjab Technical Exam",
     desc: "PSPCL, PSTCL, ALM & Technical Assistant posts.",
     icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo0ZK9JI5KMfg9RoNdIwcsNlpx5IcPBWuKZw&s" className="h-full w-full object-contain p-2" />,
     color: "text-amber-500",
@@ -52,7 +52,7 @@ const CATEGORY_META = [
   },
   {
     id: "banking",
-    title: "Punjab Banking & Coop",
+    title: "Punjab Banking Corporation Exam",
     desc: "State Cooperative Bank, Apex, PADB and Central Bank nodes.",
     icon: <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7McWqZqOgKy-BakccvR02WQdEQFrwuvmHBG5rYJzuEg&s=10" className="h-full w-full object-contain p-2" />,
     color: "text-emerald-600",
