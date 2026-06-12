@@ -16,8 +16,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Phase 145: State Merit Index (Identity Optimized).
- * UPDATED: Refined priority name logic (Name > Email > Student) and broader result sync.
+ * @fileOverview Official Punjab Merit Hub.
+ * UPDATED: Hardened real name display with email fallback logic for all rankings.
  */
 
 export default function LeaderboardPage() {
@@ -77,7 +77,7 @@ export default function LeaderboardPage() {
       <main className="container mx-auto px-4 md:px-6 py-12 md:py-20 max-w-6xl space-y-12 md:space-y-16">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
           <div className="space-y-6 text-left">
-            <div className="flex items-center gap-4"><div className="h-12 w-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner"><ShieldCheck className="h-7 w-7" /></div><span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-slate-500">Live State Merit Index</span></div>
+            <div className="flex items-center gap-4"><div className="h-12 w-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner"><ShieldCheck className="h-7 w-7" /></div><span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-slate-500">Live Punjab Merit Hub</span></div>
             <h1 className="text-5xl md:text-8xl font-headline font-black text-[#0F172A] tracking-tighter uppercase leading-[0.9]">HALL OF <br/> <span className="text-primary">RANKERS</span></h1>
             <p className="text-slate-500 font-medium text-lg md:text-xl max-w-xl leading-relaxed">Real-time rankings based on official mock results. View the performance of top students across Punjab.</p>
           </div>

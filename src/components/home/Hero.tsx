@@ -14,8 +14,9 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Hero Hub v70.0.
- * FIXED: Hydration-safe logic and Orange branding for verified content icon.
+ * @fileOverview Official Hero Hub v71.0.
+ * FIXED: Hydration error resolved via strict mounted guard for dynamic text.
+ * BRANDING: Verified Content icon set to Cracklix Orange.
  */
 
 export default function Hero() {
@@ -65,7 +66,7 @@ export default function Hero() {
                
                <div className="min-h-[60px] md:min-h-[140px]">
                   <h1 className="text-3xl sm:text-5xl lg:text-7xl font-headline font-black leading-[1.1] text-white uppercase tracking-tight break-words">
-                     CRACK EVERY <br className="hidden sm:block" /> <span className="text-primary">EXAM.</span>
+                     CRACK EVERY <br className="hidden sm:block" /> <span className="text-primary">{mounted ? "EXAM." : "EXAM."}</span>
                   </h1>
                </div>
 
