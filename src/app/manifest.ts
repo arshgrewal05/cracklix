@@ -2,7 +2,7 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Institutional PWA Manifest Configuration v13.0.
+ * @fileOverview Institutional PWA Manifest Configuration v14.0.
  * UPDATED: Optimized with high-fidelity square icons for mobile launcher stability.
  */
 export default function manifest(): MetadataRoute.Manifest {
