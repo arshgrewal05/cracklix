@@ -1,78 +1,97 @@
+
 'use client';
 
 import { motion } from "framer-motion";
-import { Clipboard, Search, TrendingUp, Smartphone } from "lucide-react";
+import { Zap, BookOpen, Layers, FileStack, Newspaper, Activity, Sparkles } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 /**
- * @fileOverview Responsive Features Hub.
- * SIMPLIFIED: Replaced technical jargon with easy words (Solutions, Report).
+ * @fileOverview Refined Features Grid aligned with 'Why Cracklix?' wireframe.
  */
-
 const features = [
   { 
-    icon: <Clipboard className="h-5 w-5 md:h-6 md:w-6" />, 
-    title: "Pattern Based Mocks", 
-    desc: "Practice tests designed exactly like real government exams.",
-    variant: "blue"
+    icon: <Zap className="h-6 w-6" />, 
+    title: "Full Mock Tests", 
+    desc: "Complete patterns for major recruitments.",
+    color: "text-orange-500",
+    bgColor: "bg-orange-50"
   },
   { 
-    icon: <Search className="h-5 w-5 md:h-6 md:w-6" />, 
-    title: "Step-by-step Solutions", 
-    desc: "Detailed explanations to help you understand every answer.",
-    variant: "orange"
+    icon: <BookOpen className="h-6 w-6" />, 
+    title: "Subject Mocks", 
+    desc: "Targeted practice for specific nodes.",
+    color: "text-blue-500",
+    bgColor: "bg-blue-50"
   },
   { 
-    icon: <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />, 
-    title: "Progress Report", 
-    desc: "Check your Punjab state rank and overall preparation level.",
-    variant: "blue"
+    icon: <Layers className="h-6 w-6" />, 
+    title: "Sectional Tests", 
+    desc: "Gurmukhi, GK and Reasoning focus.",
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-50"
   },
   { 
-    icon: <Smartphone className="h-5 w-5 md:h-6 md:w-6" />, 
-    title: "Easy Learning", 
-    desc: "Study anywhere, anytime from your mobile or desktop hub.",
-    variant: "orange"
+    icon: <FileStack className="h-6 w-6" />, 
+    title: "Previous Year Papers", 
+    desc: "Verified audit trail of official exams.",
+    color: "text-amber-500",
+    bgColor: "bg-amber-50"
+  },
+  { 
+    icon: <Newspaper className="h-6 w-6" />, 
+    title: "Current Affairs", 
+    desc: "Daily bilingual updates verified.",
+    color: "text-rose-500",
+    bgColor: "bg-rose-50"
+  },
+  { 
+    icon: <Activity className="h-6 w-6" />, 
+    title: "Performance Analytics", 
+    desc: "Detailed scoring and state ranking.",
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-50"
   },
 ];
 
 export default function Features() {
   return (
-    <section className="bg-[#0B1528] text-white py-12 md:py-24 px-4 md:px-[7.5%] text-center">
-      <div className="container mx-auto">
-        <motion.h2 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-2xl md:text-4xl font-headline font-black mb-10 md:mb-16 uppercase tracking-tight"
-        >
-          Why Choose <span className="text-[#F97316]">Cracklix?</span>
-        </motion.h2>
+    <section className="bg-white py-12 md:py-24">
+      <div className="container mx-auto px-4 max-w-7xl text-left">
+        <div className="flex items-center gap-4 mb-16">
+           <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-inner">
+              <Sparkles className="h-5 w-5" />
+           </div>
+           <h2 className="text-xl md:text-3xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Why Cracklix?</h2>
+        </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {features.map((feature, idx) => (
             <motion.div 
               key={idx}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
               viewport={{ once: true }}
-              className="bg-white/5 border border-white/5 rounded-xl md:rounded-[2rem] p-6 md:p-10 text-left group hover:border-primary/20 transition-all shadow-xl"
+              transition={{ delay: idx * 0.05 }}
             >
-              <div className={`w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-inner ${
-                feature.variant === 'blue' ? 'bg-blue-600/20 text-[#3b82f6]' : 'bg-[#ff7a00]/20 text-[#ff7a00]'
-              }`}>
-                {feature.icon}
-              </div>
-              <h3 className="text-base md:text-xl font-bold mb-2 leading-tight uppercase group-hover:text-[#ff7a00] transition-colors">
-                {feature.title}
-              </h3>
-              <p className="text-slate-400 text-xs md:text-sm leading-relaxed font-medium">
-                {feature.desc}
-              </p>
+               <Card className="border-none shadow-xl rounded-[2.5rem] p-8 md:p-10 group hover:translate-y-[-4px] transition-all bg-slate-50/50 border border-slate-100">
+                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform", feature.bgColor, feature.color)}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-black mb-2 uppercase text-[#0F172A] group-hover:text-primary transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                    {feature.desc}
+                  </p>
+               </Card>
             </motion.div>
           ))}
         </div>
       </div>
     </section>
   );
+}
+
+function cn(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
 }
