@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -26,8 +27,8 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Navbar v24.0.
- * UPDATED: Renamed "News" to "Current Affairs" for better context.
+ * @fileOverview Institutional Navbar v25.0.
+ * UPDATED: Optimized naming and mobile install button.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
