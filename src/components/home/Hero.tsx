@@ -23,8 +23,9 @@ import { Badge } from "@/components/ui/badge";
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Premium Hero Command Center v82.0 (Real Data Sync).
- * INTEGRATION: Connected to settings/stats to display real student counts and accuracy.
+ * @fileOverview Premium Hero Command Center v83.0 (Visibility Fix).
+ * FIXED: White button text visibility corrected using solid background and dark text.
+ * INTEGRATION: Connected to settings/stats for real-time student density data.
  */
 export default function Hero() {
   const router = useRouter();
@@ -165,8 +166,7 @@ export default function Hero() {
               </Button>
               <Button 
                 onClick={() => handleAction('/exams')}
-                variant="outline"
-                className="w-full sm:w-auto border-white/10 hover:bg-white/5 text-white h-16 md:h-20 px-12 rounded-2xl md:rounded-3xl font-black uppercase text-[11px] md:text-sm tracking-[0.2em] transition-all"
+                className="w-full sm:w-auto bg-white hover:bg-slate-100 text-[#0B1528] h-16 md:h-20 px-12 rounded-2xl md:rounded-3xl font-black uppercase text-[11px] md:text-sm tracking-[0.2em] transition-all border-none active:scale-95 shadow-2xl"
               >
                 EXPLORE EXAMS
               </Button>
