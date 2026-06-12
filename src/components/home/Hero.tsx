@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 /**
- * @fileOverview Premium UI/UX Hero Hub v152.0.
- * UPDATED: Optimized marketing text for PSSSB, PSPCL, and Teaching Cadres.
+ * @fileOverview Refined Hero Hub v153.0.
+ * UPDATED: Removed floating dashboard panels for a cleaner aesthetic.
  * STYLE: Dark Navy & Vibrant Orange Brand Identity.
  */
 
@@ -137,43 +137,6 @@ export default function Hero() {
           <div className="lg:col-span-7 relative">
             <div className="relative aspect-[4/3] w-full max-w-[700px] ml-auto">
                
-               {/* Dashboard Panels */}
-               <motion.div 
-                 initial={{ x: 30, opacity: 0 }}
-                 animate={{ x: 0, opacity: 1 }}
-                 transition={{ delay: 0.5 }}
-                 className="absolute -left-10 top-20 z-20 hidden md:block"
-               >
-                  <Card className="bg-[#0F172A]/90 backdrop-blur-2xl border-white/10 p-5 rounded-2xl shadow-5xl w-48 space-y-4">
-                     <div className="flex items-center justify-between">
-                        <Badge className="bg-primary text-white border-none text-[8px] font-black">ACCURACY</Badge>
-                        <TrendingUpIcon className="h-3 w-3 text-emerald-400" />
-                     </div>
-                     <p className="text-3xl font-black text-white leading-none">94%</p>
-                     <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                        <motion.div initial={{ width: 0 }} animate={{ width: "94%" }} className="h-full bg-primary" />
-                     </div>
-                  </Card>
-               </motion.div>
-
-               <motion.div 
-                 initial={{ y: 30, opacity: 0 }}
-                 animate={{ y: 0, opacity: 1 }}
-                 transition={{ delay: 0.7 }}
-                 className="absolute -right-6 bottom-20 z-20 hidden md:block"
-               >
-                  <Card className="bg-primary border-none p-5 rounded-2xl shadow-5xl w-52 space-y-3 text-white">
-                     <div className="flex items-center gap-2">
-                        <Activity className="h-4 w-4" />
-                        <span className="text-[10px] font-black uppercase">Live Updates</span>
-                     </div>
-                     <div className="space-y-2">
-                        <div className="h-1.5 w-full bg-white/20 rounded-full" />
-                        <div className="h-1.5 w-3/4 bg-white/20 rounded-full" />
-                     </div>
-                  </Card>
-               </motion.div>
-               
                {/* Main Student Image */}
                <div className="relative h-full w-full rounded-[3rem] md:rounded-[5rem] overflow-hidden border-[8px] md:border-[12px] border-white/5 shadow-6xl group">
                   {studentImg && (
@@ -189,14 +152,6 @@ export default function Hero() {
                   
                   {/* Glass Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B1528]/80 via-transparent to-transparent opacity-60" />
-                  
-                  {/* Floating Selection Badge */}
-                  <div className="absolute top-10 right-10 flex flex-col items-center gap-2">
-                     <div className="bg-white p-4 rounded-3xl shadow-4xl flex flex-col items-center text-[#0B1528]">
-                        <p className="text-3xl font-black leading-none">10k+</p>
-                        <p className="text-[8px] font-black uppercase tracking-widest mt-1">SELECTIONS</p>
-                     </div>
-                  </div>
                </div>
 
             </div>
@@ -206,12 +161,4 @@ export default function Hero() {
       </div>
     </section>
   );
-}
-
-function TrendingUpIcon({ className }: { className?: string }) {
-   return (
-      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
-      </svg>
-   )
 }
