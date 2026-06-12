@@ -17,7 +17,6 @@ import {
   FileStack
 } from "lucide-react";
 import { useUser, useFirestore, useDoc } from "@/firebase";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 import { doc } from "firebase/firestore";
@@ -25,9 +24,9 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 /**
- * @fileOverview High-Fidelity Institutional Hero v146.0 (Locked).
- * MATCHED: Strictly aligned with the reference (ibb.co/F4D0JLHP).
- * Features: Background image hub, floating readiness node, and real-time stats integration.
+ * @fileOverview High-Fidelity Institutional Hero v147.0 (Clean Hub).
+ * UPDATED: Removed background imagery for a focused, distraction-free command center.
+ * Features: Integrated stats hub and floating readiness dashboard.
  */
 export default function Hero() {
   const router = useRouter();
@@ -54,17 +53,11 @@ export default function Hero() {
 
   return (
     <section className="relative pt-12 pb-16 md:pt-24 md:pb-36 bg-[#0B1528] overflow-hidden text-left">
-      {/* BACKGROUND IMAGE HUB - LOCKED TO OFFICIAL PUNJAB POLICE SLIDER */}
+      {/* CLEAN NAVY HUB - BACKGROUND IMAGE REMOVED */}
       <div className="absolute inset-0 z-0">
-         <Image 
-           src="https://grppunjab.org/wp-content/uploads/2025/09/PP10_slider.jpg" 
-           fill 
-           className="object-cover opacity-30 grayscale-[0.2]" 
-           alt="Punjab Police Institutional Background"
-           priority
-         />
-         <div className="absolute inset-0 bg-gradient-to-r from-[#0B1528] via-[#0B1528]/95 to-transparent" />
-         <div className="absolute inset-0 bg-gradient-to-t from-[#0B1528] via-transparent to-transparent" />
+         <div className="absolute inset-0 bg-gradient-to-br from-[#0B1528] via-[#0F172A] to-[#0B1528]" />
+         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full" />
+         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/5 blur-[100px] rounded-full" />
       </div>
 
       <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
@@ -78,7 +71,7 @@ export default function Hero() {
               className="space-y-8"
             >
               {/* Trust Badge */}
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full w-fit backdrop-blur-md">
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full w-fit backdrop-blur-md shadow-2xl">
                 <div className="h-5 w-5 bg-amber-500 rounded-full flex items-center justify-center shadow-lg">
                    <Trophy className="h-3 w-3 text-white fill-current" />
                 </div>
@@ -87,7 +80,7 @@ export default function Hero() {
                 </span>
               </div>
 
-              {/* Master Headline - Matched to Design */}
+              {/* Master Headline */}
               <div className="space-y-4">
                  <h1 className="text-4xl md:text-8xl font-headline font-black leading-[0.95] tracking-tight text-white uppercase">
                     Prepare For Punjab <br />
@@ -123,7 +116,7 @@ export default function Hero() {
               </Button>
             </div>
 
-            {/* Hot Exams Quick Links (Trending) */}
+            {/* Hot Exams Quick Links */}
             <div className="flex flex-wrap items-center gap-4 pt-4">
                <span className="text-[10px] font-black uppercase text-primary tracking-widest">Hot Exams:</span>
                {['PSSSB Patwari', 'Punjab Police SI', 'PSTET Hub', 'Master Cadre', 'Excise'].map((t) => (
@@ -136,7 +129,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: FLOATING READINESS HUB (Matched to ibb.co/F4D0JLHP) */}
+          {/* RIGHT: FLOATING READINESS HUB */}
           <div className="lg:col-span-4 relative hidden lg:block">
              <motion.div 
                initial={{ opacity: 0, scale: 0.95 }}
@@ -170,7 +163,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* BOTTOM STATS STRIP (Matched to ibb.co/F4D0JLHP bottom part) */}
+        {/* BOTTOM STATS STRIP */}
         <div className="mt-20 md:mt-32 bg-[#0F172A] rounded-[2rem] md:rounded-[3rem] border border-white/5 shadow-5xl overflow-hidden p-6 md:p-12">
            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               <LegacyStatNode 
