@@ -4,13 +4,13 @@ import { initializeFirebase } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 /**
- * @fileOverview Hardened Production Order Node v6.0.
- * UPDATED: Intelligent Key Validation and Auto-Environment Selection.
+ * @fileOverview Hardened Production Order Node v7.0.
+ * UPDATED: Enhanced logging and origin fallback for development workstations.
  */
 
 export async function POST(req: Request) {
   try {
-    const { planId, userId, origin } = await req.json();
+    const { planId, userId, origin: clientOrigin } = await req.json();
     const { firestore: db } = initializeFirebase();
 
     const clientId = process.env.CASHFREE_CLIENT_ID;
@@ -18,18 +18,17 @@ export async function POST(req: Request) {
     const env = process.env.CASHFREE_ENV || 'production';
 
     if (!clientId || !clientSecret) {
-      console.error('[CASHFREE_AUTH_ERR]: API Credentials missing from environment variables (CASHFREE_CLIENT_ID or CASHFREE_CLIENT_SECRET).');
+      console.error('[CASHFREE_AUTH_ERR]: API Credentials missing from environment.');
       return NextResponse.json({ 
         error: 'Gateway authentication keys not configured.',
-        details: 'Ensure CASHFREE_CLIENT_ID and CASHFREE_CLIENT_SECRET are set in Vercel settings.'
+        details: 'Check Vercel environment variables: CASHFREE_CLIENT_ID, CASHFREE_CLIENT_SECRET.'
       }, { status: 500 });
     }
 
-    // Initialize SDK inside handler for serverless stability
+    // Initialize SDK with environment detection
     Cashfree.XClientId = clientId;
     Cashfree.XClientSecret = clientSecret;
     
-    // Auto-detect environment based on key prefix if not explicitly set to production
     const isProd = env === 'production' || clientSecret.startsWith('cf_prod_');
     Cashfree.XEnvironment = isProd ? Cashfree.Environment.PRODUCTION : Cashfree.Environment.SANDBOX;
 
@@ -45,13 +44,14 @@ export async function POST(req: Request) {
     const amount = Number(planData.price);
 
     if (amount <= 0) {
-      return NextResponse.json({ error: 'Direct order creation for free nodes is prohibited.' }, { status: 400 });
+      return NextResponse.json({ error: 'Direct order creation for free nodes is restricted.' }, { status: 400 });
     }
 
     const userSnap = await getDoc(doc(db, "users", userId));
     const userData = userSnap.data();
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin || new URL(req.url).origin;
+    // Workstation/Dev friendly origin detection
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || clientOrigin || new URL(req.url).origin;
     const baseOrigin = siteUrl.replace('http://', 'https://');
     const orderId = `order_${Date.now()}_${userId.slice(-4)}`;
 
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     const errData = error?.response?.data || error;
     console.error('[CASHFREE_ORDER_FAILURE]:', errData);
     return NextResponse.json({ 
-      error: errData.message || 'Transaction node initialization failed.',
+      error: errData.message || 'Payment Hub initialization failed.',
       details: errData
     }, { status: 500 });
   }
