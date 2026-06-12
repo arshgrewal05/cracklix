@@ -17,9 +17,9 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 
 /**
- * @fileOverview High-Fidelity Hero Restoration v62.0.
- * UPDATED: Integrated PPSC into the headline and restored the massive Punjabi tagline.
- * STYLED: Perfectly matched to user-provided screenshot reference with dual-language impact.
+ * @fileOverview High-Fidelity Hero Restoration v63.0.
+ * UPDATED: Expanded vertical list to include PSPCL, PSTET, CTET, Master Cadre, and ETT Cadre.
+ * STYLED: Perfectly matched to user-provided screenshot reference with massive bilingual impact.
  */
 export default function Hero() {
   const router = useRouter();
@@ -75,8 +75,8 @@ export default function Hero() {
                </div>
                
                <div className="space-y-4">
-                  <h2 className="text-xl md:text-4xl font-headline font-black text-white uppercase tracking-tight">
-                     CRACK PSSSB, PPSC & POLICE.
+                  <h2 className="text-xl md:text-4xl font-headline font-black text-white uppercase tracking-tight leading-tight">
+                     CRACK PSSSB, POLICE, PSPCL, PSTET, CTET, MASTER CADRE, ETT CADRE & OTHER PUNJAB GOVT EXAMS.
                   </h2>
                   <p className="text-base md:text-xl font-medium text-slate-400 max-w-xl leading-relaxed">
                      The most trusted practice tests for Punjab Government Exams. Latest pattern based study plans verified by experts.
@@ -144,7 +144,7 @@ export default function Hero() {
                       </div>
                       <div className="text-left pr-4">
                          <p className="text-[9px] md:text-[11px] font-black uppercase text-slate-400 tracking-widest mb-1">LIVE STUDENTS</p>
-                         <p className="text-3xl md:text-5xl font-black text-[#0B1528] leading-none tabular-nums">5</p>
+                         <p className="text-3xl md:text-5xl font-black text-[#0B1528] leading-none tabular-nums">15k+</p>
                       </div>
                    </div>
                 </div>
