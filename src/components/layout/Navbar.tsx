@@ -26,8 +26,9 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Navbar v28.0 (Structural Hardening).
- * FIXED: Balanced JSX tags to resolve 'Expected </', got 'jsx text' error.
+ * @fileOverview Institutional Navbar v30.0 (Stability Hardened).
+ * FIXED: Balanced JSX tags and enforced hydration safety for PWA prompts.
+ * ADDED: Pulsating Install button for Android/iOS users.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -114,7 +115,7 @@ export default function Navbar() {
       )}
 
       <nav className="w-full bg-[#0B1528] border-b border-white/5 h-20 md:h-24 flex items-center shadow-xl backdrop-blur-md bg-opacity-95">
-        <div className="container mx-auto max-full flex items-center justify-between px-3 md:px-6">
+        <div className="container mx-auto max-w-full flex items-center justify-between px-3 md:px-6">
           <div className="flex items-center gap-2 md:gap-4">
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
               <SheetTrigger asChild>
@@ -184,31 +185,47 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-60 bg-[#0F172A] border-white/10 text-white rounded-[2rem] p-2 shadow-5xl animate-in fade-in zoom-in-95 duration-200 z-[2001]" align="end">
                   <DropdownMenuLabel className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Student Area</DropdownMenuLabel>
-                  <DropdownNavItem href="/profile" icon={<User className="h-4 w-4 text-blue-400" />} label="My Profile" />
-                  <DropdownNavItem href="/dashboard" icon={<Award className="h-4 w-4 text-emerald-400" />} label="My Results" />
-                  <DropdownNavItem href="/pass" icon={<Gem className="h-4 w-4 text-primary" />} label="Elite Pass" />
-                  {isAdmin && <DropdownNavItem href="/admin" icon={<ShieldCheck className="h-4 w-4 text-rose-500" />} label="Admin Panel" className="bg-rose-500/10 mt-1" />}
+                  <DropdownMenuItem asChild className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5">
+                    <Link href="/profile" className="w-full flex items-center gap-3">
+                      <User className="h-4 w-4 text-blue-400" />
+                      <span className="font-bold text-[12px] tracking-tight uppercase">My Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5">
+                    <Link href="/dashboard" className="w-full flex items-center gap-3">
+                      <Award className="h-4 w-4 text-emerald-400" />
+                      <span className="font-bold text-[12px] tracking-tight uppercase">My Results</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5">
+                    <Link href="/pass" className="w-full flex items-center gap-3">
+                      <Gem className="h-4 w-4 text-primary" />
+                      <span className="font-bold text-[12px] tracking-tight uppercase">Elite Pass</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5 bg-rose-500/10 mt-1">
+                      <Link href="/admin" className="w-full flex items-center gap-3">
+                        <ShieldCheck className="h-4 w-4 text-rose-500" />
+                        <span className="font-bold text-[12px] tracking-tight uppercase">Admin Panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator className="bg-white/5 my-2" />
-                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5 focus:text-rose-500 text-rose-500/80"><LogOut className="h-4 w-4 shrink-0" /><span className="font-bold text-[12px] tracking-tight uppercase">Logout</span></DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5 focus:text-rose-500 text-rose-500/80">
+                    <LogOut className="h-4 w-4 shrink-0" />
+                    <span className="font-bold text-[12px] tracking-tight uppercase">Logout</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-90 border-none cursor-pointer"><Link href="/login">Login</Link></Button>
+              <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-4 md:px-8 py-2 rounded-xl h-9 md:h-12 uppercase text-[9px] md:text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-90 border-none cursor-pointer">
+                <Link href="/login">Login</Link>
+              </Button>
             )}
           </div>
         </div>
       </nav>
     </div>
-  );
-}
-
-function DropdownNavItem({ href, icon, label, className }: any) {
-  return (
-    <DropdownMenuItem asChild className={cn("flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl transition-all focus:bg-white/5", className)}>
-      <Link href={href} className="w-full flex items-center gap-3 pointer-events-auto">
-        <span className="shrink-0">{icon}</span>
-        <span className="font-bold text-[12px] tracking-tight uppercase">{label}</span>
-      </Link>
-    </DropdownMenuItem>
   );
 }

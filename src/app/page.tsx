@@ -17,8 +17,8 @@ import { ShieldCheck, Zap, Trophy, Target } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Official Hub v82.0 (Production Hardened).
- * FIXED: Hydration errors resolved by deferring dynamic counts to client mount.
+ * @fileOverview Official Hub v85.0 (Production Hardened).
+ * FIXED: Hydration errors resolved by deferring dynamic counts to client mount via strict mounted guard.
  */
 
 export default function HomePage() {

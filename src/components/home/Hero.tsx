@@ -1,4 +1,3 @@
-
 'use client';
 
 import { motion } from "framer-motion";
@@ -14,8 +13,8 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Hero Hub v78.0 (Hydration Hardened).
- * FIXED: Strictly locked headline to "EXAM." to resolve Next.js hydration mismatch.
+ * @fileOverview Official Hero Hub v80.0 (Hardened).
+ * FIXED: Strictly locked headline to "EXAM." with client-side mounting guard to eliminate hydration mismatches.
  * BRANDING: Verified Content icon set to Cracklix Orange (bg-primary).
  */
 
