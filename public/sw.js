@@ -1,54 +1,60 @@
 /**
- * @fileOverview Production-Grade PWA Service Worker for Cracklix.
- * Strategy: Network-First for chunks, Cache-First for assets.
+ * @fileOverview Production-Ready Service Worker for Cracklix PWA.
+ * REQUIRED for "Install App" prompt in browsers.
  */
 
-const CACHE_NAME = 'cracklix-v2';
+const CACHE_NAME = 'cracklix-v1';
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.webmanifest',
   '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/icons/icon-512x512.png',
+  '/icons/apple-touch-icon.png',
+  '/icons/favicon-32x32.png',
+  '/icons/favicon-16x16.png',
+  '/logo/cracklix-logo.png',
+  '/logo/cracklix-logo-large.png'
 ];
 
+// Install Event
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
-  );
   self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(PRECACHE_ASSETS);
     })
   );
-  self.clients.claim();
 });
 
+// Activate Event
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  return self.clients.claim();
+});
+
+// Fetch Event - Crucial for "Installable" status
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  // 1. Network-First for Next.js Chunks (Fixes ChunkLoadError)
-  if (url.pathname.startsWith('/_next/static/')) {
+  // For Next.js chunks, try network first
+  if (event.request.url.includes('/_next/static/')) {
     event.respondWith(
-      fetch(request).catch(() => caches.match(request))
+      fetch(event.request).catch(() => caches.match(event.request))
     );
     return;
   }
 
-  // 2. Cache-First for static assets
-  if (PRECACHE_ASSETS.includes(url.pathname) || url.pathname.startsWith('/icons/')) {
-    event.respondWith(
-      caches.match(request).then((cached) => cached || fetch(request))
-    );
-    return;
-  }
-
-  // Default: Network-First
   event.respondWith(
-    fetch(request).catch(() => caches.match(request))
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });

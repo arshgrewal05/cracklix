@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Institutional PWA Manifest Configuration v6.0.
- * UPDATED: Optimized icon metadata to meet Chrome's strict install criteria.
+ * @fileOverview Institutional PWA Manifest Configuration v7.0.
+ * UPDATED: Optimized to use new verified icon paths from /public/icons/
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {

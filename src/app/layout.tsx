@@ -1,4 +1,3 @@
-
 import type {Metadata, Viewport} from 'next';
 import './globals.css';
 import { Inter } from "next/font/google";
@@ -15,11 +14,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Cracklix | Punjab Exam Hub',
   description: "Punjab's most trusted government exam preparation platform. PSSSB, PPSC, Punjab Police, and more.",
-  manifest: '/manifest.webmanifest', // Point to generated manifest
+  manifest: '/manifest.webmanifest',
   authors: [{ name: 'Arsh Grewal', url: 'https://cracklix.com' }],
   icons: {
-    icon: '/icons/icon-192x192.png',
-    apple: '/icons/icon-192x192.png',
+    icon: [
+      { url: '/icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: '/icons/apple-touch-icon.png',
   },
   appleWebApp: {
     capable: true,
