@@ -3,23 +3,19 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
-  ShieldCheck, 
   Zap, 
   Target, 
   Trophy,
-  Award, 
-  CheckCircle2, 
-  Sparkles, 
   ChevronRight, 
-  Clock, 
-  BookOpen, 
-  Layers, 
-  Check,
   ClipboardList,
   Users,
-  Landmark,
+  Sparkles,
+  BookOpen,
+  Layers,
   Search,
-  Newspaper
+  Newspaper,
+  ShieldCheck,
+  Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,8 +26,8 @@ import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Official CRACKLIX Punjab Government Exam Hero v27.0 (Design Matched).
- * STABILITY: Refactored to match user-provided screenshot precisely.
+ * @fileOverview Definitive Cracklix "Command Center" Hero v30.0.
+ * STABILITY: Guaranteed hydration consistency and explicit icon imports.
  */
 
 function FloatingCard({ icon, label, val, pos, delay }: any) {
@@ -93,14 +89,14 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-[90vh] lg:min-h-screen flex flex-col justify-center bg-[#0B1528] overflow-hidden text-left">
-      {/* GLOW NODES */}
+      {/* Background Glows */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10 py-12 md:py-20">
         <div className="grid lg:grid-cols-12 gap-12 md:gap-20 items-center">
           
-          {/* TEXT CONTENT */}
+          {/* Left Content Column */}
           <div className="lg:col-span-7 space-y-10 md:space-y-16">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -124,14 +120,11 @@ export default function Hero() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="flex flex-col sm:flex-row gap-6"
             >
-              <div className="relative group">
-                 <div className="absolute -left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-orange-950 border border-white/10 flex items-center justify-center text-primary font-black text-xs shadow-xl z-20">N</div>
-                 <Button asChild className="h-16 md:h-20 px-10 md:px-14 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] md:text-xs tracking-[0.2em] rounded-2xl md:rounded-3xl shadow-4xl transition-all active:scale-95 border-none gap-4">
-                  <Link href="/mocks">
-                    START FREE MOCK <Zap className="h-5 w-5 fill-current" />
-                  </Link>
-                </Button>
-              </div>
+              <Button asChild className="h-16 md:h-20 px-10 md:px-14 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] md:text-xs tracking-[0.2em] rounded-2xl md:rounded-3xl shadow-4xl transition-all active:scale-95 border-none gap-4">
+                <Link href="/mocks">
+                  START FREE MOCK <Zap className="h-5 w-5 fill-current" />
+                </Link>
+              </Button>
               
               <Button asChild variant="outline" className="h-16 md:h-20 px-10 md:px-14 border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[10px] md:text-xs tracking-[0.2em] rounded-2xl md:rounded-3xl transition-all active:scale-95 gap-4">
                 <Link href="/exams">
@@ -139,9 +132,23 @@ export default function Hero() {
                 </Link>
               </Button>
             </motion.div>
+
+            {/* Official Recruitment Badges */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="flex flex-wrap gap-2.5 pt-2"
+            >
+              {["PSSSB", "Punjab Police", "PPSC", "PSPCL", "PSTET", "Master Cadre"].map((chip) => (
+                <Badge key={chip} variant="outline" className="px-4 py-2 border-white/5 bg-white/5 text-slate-400 font-black uppercase text-[9px] tracking-widest rounded-lg hover:border-primary/50 hover:text-white transition-all cursor-default">
+                  {chip}
+                </Badge>
+              ))}
+            </motion.div>
           </div>
 
-          {/* DASHBOARD GRAPHIC */}
+          {/* Right Visual Column (With High-Fidelity Custom Image) */}
           <div className="lg:col-span-5 relative hidden lg:block">
              <motion.div 
                initial={{ opacity: 0, scale: 0.95 }}
@@ -151,9 +158,9 @@ export default function Hero() {
              >
                 <div className="relative aspect-square rounded-[4rem] md:rounded-[5rem] bg-gradient-to-tr from-primary/20 to-blue-500/10 border border-white/10 overflow-hidden shadow-5xl group">
                    <img 
-                     src="https://punjabpolice.gov.in/media/images/pp10.original.jpg" 
-                     alt="Selection Prep"
-                     className="w-full h-full object-cover opacity-60 mix-blend-overlay group-hover:scale-105 transition-transform duration-1000"
+                     src="https://i.ibb.co/gZCGMQNJ/IMG-20260612-WA0010.jpg" 
+                     alt="Punjab Selection Prep"
+                     className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-1000"
                      referrerPolicy="no-referrer"
                    />
                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B1528] via-transparent to-transparent" />
@@ -163,28 +170,28 @@ export default function Hero() {
                    icon={<Target className="text-white fill-current" />} 
                    label="ACCURACY" 
                    val="94%" 
-                   pos="top-16 -left-16" 
+                   pos="-top-6 -left-8" 
                    delay={0.6}
                 />
                 <FloatingCard 
                    icon={<Trophy className="text-white" />} 
                    label="PUNJAB RANK" 
                    val="#245" 
-                   pos="top-1/2 -right-12" 
+                   pos="top-1/3 -right-8" 
                    delay={0.8}
                 />
                 <FloatingCard 
                    icon={<Zap className="text-white fill-current" />} 
                    label="READINESS" 
                    val="82%" 
-                   pos="bottom-16 -left-12" 
+                   pos="bottom-10 -left-8" 
                    delay={1}
                 />
              </motion.div>
           </div>
         </div>
 
-        {/* INTEGRATED STATS BAR */}
+        {/* Integrated Stats Section */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
