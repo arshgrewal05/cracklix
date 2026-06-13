@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * @fileOverview Institutional Sticky Bottom Navigation for Mobile.
- * UPDATED: Fixed overlapping z-index and click targets.
+ * UPDATED: Compacted height and elements for better viewport efficiency.
  */
 
 export default function MobileNav() {
@@ -27,14 +27,14 @@ export default function MobileNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-[1100] bg-[#0F172A] border-t border-white/10 pb-[env(safe-area-inset-bottom)] md:hidden shadow-[0_-8px_30px_rgba(0,0,0,0.5)] pointer-events-auto">
-      <div className="flex items-center justify-around h-[80px] px-2 relative">
+      <div className="flex items-center justify-around h-[64px] px-2 relative">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
 
           return (
             <Link key={item.href} href={item.href} className="flex-1 h-full touch-manipulation focus:outline-none">
-              <div className="relative flex flex-col items-center justify-center gap-1.5 h-full py-1">
+              <div className="relative flex flex-col items-center justify-center gap-1 h-full py-1">
                 <AnimatePresence>
                   {isActive && (
                     <motion.div
@@ -42,7 +42,7 @@ export default function MobileNav() {
                       animate={{ opacity: 1, scaleX: 1 }}
                       exit={{ opacity: 0, scaleX: 0 }}
                       layoutId="active-nav-indicator"
-                      className="absolute top-0 w-10 h-1 bg-[#F97316] rounded-full shadow-[0_0_15px_rgba(249,115,22,1)]"
+                      className="absolute top-0 w-8 h-1 bg-[#F97316] rounded-full shadow-[0_0_15px_rgba(249,115,22,1)]"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -50,13 +50,13 @@ export default function MobileNav() {
                 
                 <Icon 
                   className={cn(
-                    "h-6 w-6 transition-all duration-300",
+                    "h-5 w-5 transition-all duration-300",
                     isActive ? "text-[#F97316] scale-110" : "text-slate-500"
                   )} 
                 />
                 
                 <span className={cn(
-                  "text-[9px] font-[900] uppercase tracking-widest transition-colors duration-300",
+                  "text-[8px] font-[900] uppercase tracking-widest transition-colors duration-300",
                   isActive ? "text-white" : "text-slate-500"
                 )}>
                   {item.label}

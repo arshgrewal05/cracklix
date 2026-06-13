@@ -31,7 +31,7 @@
 
   @media (min-width: 1024px) {
     :root {
-      --header-height: 160px;
+      --header-height: 145px;
     }
   }
 }
@@ -63,7 +63,7 @@
 }
 
 .pb-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 64px);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
