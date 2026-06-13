@@ -42,9 +42,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Admin Layout v138.0.
- * UPDATED: Header logo given a Navy background to contrast the white header.
- * UPDATED: Sidebar spacing increased for a more professional, airy feel.
+ * @fileOverview Institutional Admin Layout v140.0.
+ * UPDATED: Header logo container "cropped" to horizontal rectangle for elite branding.
+ * UPDATED: Sidebar spacing expanded (gap-3) for a cleaner hierarchical flow.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -91,15 +91,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const SideNavContent = () => (
     <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none">
        <div className="p-8 flex justify-center">
-          <div className="bg-[#0B1528] w-full rounded-[2.5rem] shadow-2xl flex items-center justify-center py-10 px-6 border border-white/5 group hover:bg-[#081121] transition-all duration-500">
-            <Logo href="/admin" className="scale-110 md:scale-125" />
+          <div className="bg-[#0B1528] w-full h-32 md:h-40 rounded-[2.5rem] shadow-2xl flex items-center justify-center py-6 px-6 border border-white/5 group hover:bg-[#081121] transition-all duration-500 overflow-hidden">
+            <Logo href="/admin" imgClassName="scale-110 md:scale-125" />
           </div>
        </div>
 
        <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden pb-10">
           <SidebarGroup>
             <SidebarGroupLabel className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Main Database</SidebarGroupLabel>
-            <SidebarMenu className="gap-2">
+            <SidebarMenu className="gap-3">
               <AdminNavItem icon={<LayoutDashboard />} label="DASHBOARD" href="/admin" active={pathname === "/admin"} />
               <AdminNavItem icon={<Layers />} label="CATEGORIES" href="/admin/categories" active={pathname === "/admin/categories"} />
               <AdminNavItem icon={<Landmark className="text-amber-400" />} label="HUBS (BOARDS)" href="/admin/exams" active={pathname === "/admin/exams"} />
@@ -110,10 +110,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className="mt-6">
+          <SidebarGroup className="mt-8">
             <SidebarGroupLabel className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Content Hub</SidebarGroupLabel>
-            <SidebarMenu className="gap-2">
-              <AdminNavItem icon={<Wand2 className="text-emerald-400" />} label="BRAND MAGIC" href="/admin/brand-magic" active={pathname === "/admin/brand-magic"} />
+            <SidebarMenu className="gap-3">
+              <AdminNavItem icon={<Wand2 className="text-emerald-400" />} label="BRAND MAGIC" href="/admin/brand-magic" active={pathname === "/brand-magic"} />
               <AdminNavItem icon={<LayoutGrid className="text-orange-500" />} label="MOCK BUILDER" href="/admin/mocks/builder" active={pathname === "/admin/mocks/builder"} />
               <AdminNavItem icon={<Zap className="text-primary" />} label="MOCK MANAGER" href="/admin/mocks" active={pathname === "/admin/mocks"} />
               <AdminNavItem icon={<Newspaper className="text-blue-400" />} label="CURRENT AFFAIRS" href="/admin/current-affairs" active={pathname === "/admin/current-affairs"} />
@@ -124,9 +124,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className="mt-6">
+          <SidebarGroup className="mt-8">
             <SidebarGroupLabel className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Users & Revenue</SidebarGroupLabel>
-            <SidebarMenu className="gap-2">
+            <SidebarMenu className="gap-3">
               <AdminNavItem icon={<Users className="text-blue-400" />} label="STUDENT LIST" href="/admin/users" active={pathname === "/admin/users"} />
               <AdminNavItem icon={<DollarSign className="text-emerald-400" />} label="REVENUE HUB" href="/admin/payments" active={pathname === "/admin/payments"} />
               <AdminNavItem icon={<ShieldCheck className="text-primary" />} label="MANUAL VERIFY" href="/admin/payments/verify" active={pathname === "/admin/payments/verify"} />
@@ -134,9 +134,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className="mt-6">
+          <SidebarGroup className="mt-8">
             <SidebarGroupLabel className="px-6 py-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">System Health</SidebarGroupLabel>
-            <SidebarMenu className="gap-2">
+            <SidebarMenu className="gap-3">
               <AdminNavItem icon={<History className="text-slate-400" />} label="ACTIVITY LOGS" href="/admin/audit-logs" active={pathname === "/admin/audit-logs"} />
               <AdminNavItem icon={<ShieldAlert className="text-rose-500" />} label="ERROR CHECK" href="/admin/qa" active={pathname === "/admin/qa"} />
               <AdminNavItem icon={<HeartPulse className="text-rose-500" />} label="PLATFORM STATUS" href="/admin/health" active={pathname === "/admin/health"} />
@@ -172,8 +172,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <SidebarTrigger className="text-[#0F172A] hover:bg-slate-50 cursor-pointer" />
               
               <div className="flex items-center gap-4">
-                 <div className="bg-[#0B1528] px-4 py-2 rounded-xl shadow-lg flex items-center justify-center">
-                    <Logo variant="light" className="scale-75 md:scale-90 origin-left" href="/admin" />
+                 <div className="bg-[#0B1528] h-10 md:h-12 px-6 rounded-2xl shadow-xl flex items-center justify-center border border-white/5 overflow-hidden">
+                    <Logo variant="light" imgClassName="py-1.5 md:py-2" href="/admin" />
                  </div>
                  
                  <div className="h-6 w-[1px] bg-slate-200 mx-1 md:block" />
