@@ -13,7 +13,6 @@ import {
   GraduationCap,
   Rocket,
   ArrowLeftRight,
-  Box,
   Layers,
   Zap,
   FileText,
@@ -27,7 +26,8 @@ import {
   LayoutGrid,
   Wand2,
   HeartPulse,
-  Settings
+  Settings,
+  Box
 } from "lucide-react"
 import Link from "next/link"
 import Logo from "@/components/brand/Logo"
@@ -39,8 +39,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Institutional Admin Layout v183.0 (Compact Reset).
- * UPDATED: Set sidebar and header logos to exactly h-10 (40px) for a professional scale.
+ * @fileOverview Hardened Mobile-First Admin Layout v185.0.
+ * UPDATED: Responsive Sidebar with safe-area support and PWA optimization.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -78,77 +78,68 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!mounted || loading) return (
     <div className="h-screen w-full bg-[#0F172A] flex flex-col items-center justify-center space-y-6">
        <ShieldCheck className="h-12 w-12 text-primary animate-pulse" />
-       <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Authenticating Registry...</p>
+       <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Securing Registry Hub...</p>
     </div>
   )
   
   if (!user || !isAdmin) return null
 
   const SideNavContent = () => (
-    <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none">
-       <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden pb-10">
+    <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none overflow-hidden">
+       <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden pb-20 pt-safe">
           
-          {/* BRANDING SECTION */}
-          <div className="px-6 pt-8 pb-4 flex justify-center shrink-0">
-             <Logo href="/admin" imgClassName="h-10" />
+          <div className="px-6 pt-8 pb-8 flex justify-start shrink-0">
+             <Logo href="/admin" imgClassName="h-10 origin-left" />
           </div>
 
           <SidebarGroup className="pt-0">
-            <SidebarGroupLabel className="px-6 py-0 h-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Main Database</SidebarGroupLabel>
-            <SidebarMenu className="gap-2 mt-2">
+            <SidebarGroupLabel className="px-6 py-0 h-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">MANAGEMENT HUB</SidebarGroupLabel>
+            <SidebarMenu className="gap-1 mt-4">
               <AdminNavItem icon={<LayoutDashboard />} label="DASHBOARD" href="/admin" active={pathname === "/admin"} />
               <AdminNavItem icon={<Layers />} label="CATEGORIES" href="/admin/categories" active={pathname === "/admin/categories"} />
-              <AdminNavItem icon={<Landmark className="text-amber-400" />} label="HUBS (BOARDS)" href="/admin/exams" active={pathname === "/admin/exams"} />
-              <AdminNavItem icon={<GraduationCap className="text-emerald-400" />} label="EXAM LIST" href="/admin/exam-registry" active={pathname === "/admin/exam-registry"} />
-              <AdminNavItem icon={<SearchCode className="text-emerald-400" />} label="SUBJECT LIST" href="/admin/subjects" active={pathname === "/admin/subjects"} />
-              <AdminNavItem icon={<Box />} label="QUESTION BANK" href="/admin/questions" active={pathname === "/admin/questions"} />
-              <AdminNavItem icon={<Rocket className="text-primary" />} label="BULK UPLOAD" href="/admin/bulk-import" active={pathname === "/admin/bulk-import"} />
+              <AdminNavItem icon={<Landmark />} label="BOARDS HUB" href="/admin/exams" active={pathname === "/admin/exams"} />
+              <AdminNavItem icon={<GraduationCap />} label="EXAM REGISTRY" href="/admin/exam-registry" active={pathname === "/admin/exam-registry"} />
+              <AdminNavItem icon={<SearchCode />} label="SUBJECT HUB" href="/admin/subjects" active={pathname === "/admin/subjects"} />
+              <AdminNavItem icon={<Box />} label="MCQ BANK" href="/admin/questions" active={pathname === "/admin/questions"} />
+              <AdminNavItem icon={<Rocket className="text-primary" />} label="BULK INGEST" href="/admin/bulk-import" active={pathname === "/admin/bulk-import"} />
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className="mt-6">
-            <SidebarGroupLabel className="px-6 py-0 h-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Content Hub</SidebarGroupLabel>
-            <SidebarMenu className="gap-2 mt-2">
-              <AdminNavItem icon={<Wand2 className="text-emerald-400" />} label="BRAND MAGIC" href="/admin/brand-magic" active={pathname === "/admin/brand-magic"} />
-              <AdminNavItem icon={<LayoutGrid className="text-orange-500" />} label="MOCK BUILDER" href="/admin/mocks/builder" active={pathname === "/admin/mocks/builder"} />
-              <AdminNavItem icon={<Zap className="text-primary" />} label="MOCK MANAGER" href="/admin/mocks" active={pathname === "/admin/mocks"} />
-              <AdminNavItem icon={<Newspaper className="text-blue-400" />} label="CURRENT AFFAIRS" href="/admin/current-affairs" active={pathname === "/admin/current-affairs"} />
-              <AdminNavItem icon={<FileText className="text-emerald-400" />} label="STUDY NOTES" href="/admin/notes" active={pathname === "/admin/notes"} />
-              <AdminNavItem icon={<FileStack className="text-amber-400" />} label="PYQ ARCHIVE" href="/admin/pyqs" active={pathname === "/admin/pyqs"} />
-              <AdminNavItem icon={<Sparkles className="text-primary" />} label="FREE HUB CMS" href="/admin/free-content" active={pathname === "/admin/free-content"} />
-              <AdminNavItem icon={<Bell className="text-orange-400" />} label="EXAM NEWS" href="/admin/notifications" active={pathname === "/admin/notifications"} />
+          <SidebarGroup className="mt-8">
+            <SidebarGroupLabel className="px-6 py-0 h-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">CONTENT PULSE</SidebarGroupLabel>
+            <SidebarMenu className="gap-1 mt-4">
+              <AdminNavItem icon={<Wand2 />} label="BRAND MAGIC" href="/admin/brand-magic" active={pathname === "/admin/brand-magic"} />
+              <AdminNavItem icon={<LayoutGrid />} label="MOCK BUILDER" href="/admin/mocks/builder" active={pathname === "/admin/mocks/builder"} />
+              <AdminNavItem icon={<Zap />} label="MOCK MANAGER" href="/admin/mocks" active={pathname === "/admin/mocks"} />
+              <AdminNavItem icon={<Newspaper />} label="CURR. AFFAIRS" href="/admin/current-affairs" active={pathname === "/admin/current-affairs"} />
+              <AdminNavItem icon={<FileText />} label="STUDY NOTES" href="/admin/notes" active={pathname === "/admin/notes"} />
+              <AdminNavItem icon={<FileStack />} label="PYQ ARCHIVE" href="/admin/pyqs" active={pathname === "/admin/pyqs"} />
+              <AdminNavItem icon={<Sparkles />} label="FREE HUB CMS" href="/admin/free-content" active={pathname === "/admin/free-content"} />
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className="mt-6">
-            <SidebarGroupLabel className="px-6 py-0 h-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Users & Revenue</SidebarGroupLabel>
-            <SidebarMenu className="gap-2 mt-2">
-              <AdminNavItem icon={<Users className="text-blue-400" />} label="STUDENT LIST" href="/admin/users" active={pathname === "/admin/users"} />
-              <AdminNavItem icon={<DollarSign className="text-emerald-400" />} label="REVENUE HUB" href="/admin/payments" active={pathname === "/admin"} />
-              <AdminNavItem icon={<ShieldCheck className="text-primary" />} label="MANUAL VERIFY" href="/admin/payments/verify" active={pathname === "/admin/payments/verify"} />
-              <AdminNavItem icon={<Gem className="text-amber-400" />} label="PASS MANAGER" href="/admin/passes" active={pathname === "/admin/passes"} />
-            </SidebarMenu>
-          </SidebarGroup>
-
-          <SidebarGroup className="mt-6">
-            <SidebarGroupLabel className="px-6 py-0 h-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">System Health</SidebarGroupLabel>
-            <SidebarMenu className="gap-2 mt-2">
-              <AdminNavItem icon={<History className="text-slate-400" />} label="ACTIVITY LOGS" href="/admin/audit-logs" active={pathname === "/admin/audit-logs"} />
-              <AdminNavItem icon={<ShieldAlert className="text-rose-500" />} label="ERROR CHECK" href="/admin/qa" active={pathname === "/admin/qa"} />
-              <AdminNavItem icon={<HeartPulse className="text-rose-500" />} label="PLATFORM STATUS" href="/admin/health" active={pathname === "/admin/health"} />
-              <AdminNavItem icon={<Settings className="text-primary" />} label="SYSTEM SETTINGS" href="/admin/settings" active={pathname === "/admin/settings"} />
+          <SidebarGroup className="mt-8">
+            <SidebarGroupLabel className="px-6 py-0 h-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">GOVERNANCE</SidebarGroupLabel>
+            <SidebarMenu className="gap-1 mt-4">
+              <AdminNavItem icon={<Users />} label="STUDENT LIST" href="/admin/users" active={pathname === "/admin/users"} />
+              <AdminNavItem icon={<DollarSign />} label="REVENUE HUB" href="/admin/payments" active={pathname === "/admin/payments"} />
+              <AdminNavItem icon={<ShieldCheck />} label="VERIFY UPI" href="/admin/payments/verify" active={pathname === "/admin/payments/verify"} />
+              <AdminNavItem icon={<Gem />} label="PASS MANAGER" href="/admin/passes" active={pathname === "/admin/passes"} />
+              <AdminNavItem icon={<History />} label="AUDIT LOGS" href="/admin/audit-logs" active={pathname === "/admin/audit-logs"} />
+              <AdminNavItem icon={<HeartPulse />} label="SYSTEM HEALTH" href="/admin/health" active={pathname === "/admin/health"} />
+              <AdminNavItem icon={<Settings />} label="SETTINGS" href="/admin/settings" active={pathname === "/admin/settings"} />
             </SidebarMenu>
           </SidebarGroup>
        </div>
 
-       <div className="p-6 border-t border-white/5 bg-black/20 shrink-0">
-          <div className="flex items-center gap-3">
-             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+       <div className="p-6 border-t border-white/5 bg-black/20 shrink-0 pb-safe">
+          <div className="flex items-center gap-4">
+             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                 <User className="h-5 w-5" />
              </div>
-             <div className="text-left">
-                <p className="text-[7px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none mb-1.5">ADMIN LOGIN</p>
-                <p className="text-[11px] font-black text-white uppercase tracking-tight truncate max-w-[120px]">{profile?.name || (isFounder ? 'FOUNDER' : 'ADMIN')}</p>
+             <div className="text-left min-w-0">
+                <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1.5">ADMIN MODE</p>
+                <p className="text-[12px] font-black text-white uppercase tracking-tight truncate">{profile?.name || 'ADMIN'}</p>
              </div>
           </div>
        </div>
@@ -163,40 +154,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </Sidebar>
         
         <SidebarInset className="flex flex-col bg-white min-w-0 max-w-full relative">
-          <header className="h-[var(--header-height)] border-b border-slate-100 flex items-center px-4 md:px-8 justify-between bg-white sticky top-0 z-10 shrink-0">
-            <div className="flex items-center gap-4 overflow-hidden">
-              <SidebarTrigger className="text-[#0F172A] hover:bg-slate-50 cursor-pointer" />
-              
-              <div className="flex items-center gap-4">
-                 <div className="bg-[#0B1528] rounded-xl px-4 h-12 flex items-center justify-center overflow-hidden shadow-sm">
-                    <Logo variant="dark" href="/admin" imgClassName="h-10" />
-                 </div>
-                 
-                 <div className="h-10 w-[1.5px] bg-slate-200 mx-1 md:block" />
-                 
-                 <div className="flex items-center gap-3">
-                    <ShieldCheck className="h-5 w-5 text-primary" />
-                    <span className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] text-[#0F172A] truncate">Admin Hub</span>
-                 </div>
+          <header className="h-[60px] md:h-20 border-b border-slate-100 flex items-center px-4 md:px-8 justify-between bg-white sticky top-0 z-40 shrink-0 shadow-sm pt-safe">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger className="text-[#0F172A] hover:bg-slate-50 cursor-pointer h-10 w-10 rounded-xl" />
+              <div className="h-6 w-px bg-slate-100 mx-2 hidden sm:block" />
+              <div className="flex flex-col text-left">
+                 <span className="text-[10px] md:text-[11px] font-black uppercase text-primary tracking-widest leading-none">ADMIN HUB</span>
+                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 hidden xs:block">REGISTRY AUDIT ACTIVE</span>
               </div>
             </div>
             
-            <div className="flex items-center gap-2 md:gap-6">
-               <Button asChild variant="outline" className="h-10 px-6 rounded-xl border-slate-200 font-black uppercase text-[10px] tracking-widest gap-2 hover:bg-slate-50 shadow-sm transition-all active:scale-95">
+            <div className="flex items-center gap-2 md:gap-4">
+               <Button asChild variant="outline" className="h-10 px-4 md:px-6 rounded-xl border-slate-200 font-black uppercase text-[10px] tracking-widest gap-2 hover:bg-slate-50 shadow-sm transition-all active:scale-95">
                   <Link href="/">
-                     <ArrowLeftRight className="h-4 w-4 text-primary" /> View Home
+                     <ArrowLeftRight className="h-4 w-4 text-primary" /> <span className="hidden sm:inline">VIEW SITE</span>
                   </Link>
                </Button>
-               <Button variant="ghost" size="icon" onClick={handleLogout} className="text-slate-300 hover:text-rose-500 rounded-xl cursor-pointer">
+               <Button variant="ghost" size="icon" onClick={handleLogout} className="text-slate-300 hover:text-rose-500 rounded-xl h-10 w-10">
                   <LogOut className="h-5 w-5" />
                </Button>
             </div>
           </header>
 
-          <main className="flex-1 p-6 md:p-12 bg-white overflow-y-auto overflow-x-hidden min-w-0 pointer-events-auto">
-            <div className="max-w-full">
-               {children}
-            </div>
+          <main className="flex-1 p-4 md:p-12 bg-white overflow-y-auto overflow-x-hidden min-w-0 pointer-events-auto">
+             <div className="max-w-full">
+                {children}
+             </div>
           </main>
         </SidebarInset>
       </div>
@@ -211,12 +194,12 @@ function AdminNavItem({ icon, label, href, active, className }: { icon: React.Re
         asChild 
         isActive={active}
         className={cn(
-          "px-6 transition-all font-medium h-10 group cursor-pointer",
-          active ? "bg-white/5 text-primary" : "hover:bg-white/5 hover:text-primary text-white/60",
+          "px-6 transition-all font-medium h-11 group cursor-pointer",
+          active ? "bg-white/5 text-primary" : "hover:bg-white/5 hover:text-primary text-slate-400",
           className
         )}
       >
-        <Link href={href} className="flex items-center gap-5 w-full text-left pointer-events-auto">
+        <Link href={href} className="flex items-center gap-4 w-full text-left">
           <div className="shrink-0 flex items-center justify-center size-5">
             {icon}
           </div>

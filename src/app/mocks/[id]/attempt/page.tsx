@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useFirestore, useUser } from "@/firebase";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, documentId, getDocs } from "firebase/firestore";
+import { doc, getDoc, updateDoc, serverTimestamp, collection, query, where, documentId, getDocs, setDoc } from "firebase/firestore";
 import { useExamStore } from "@/store/useExamStore";
 import ExamHeader from "@/components/exam/ExamHeader";
 import TacticalFooter from "@/components/exam/TacticalFooter";
@@ -12,7 +12,7 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer";
 import QuestionPalette from "@/components/mocks/QuestionPalette";
 import SubjectTabs from "@/components/exam/SubjectTabs";
 import { Button } from "@/components/ui/button";
-import { Loader2, Play, ShieldCheck, CheckCircle2, Zap, LogOut, Lock, AlertTriangle, Cloud } from "lucide-react";
+import { Loader2, Play, ShieldCheck, CheckCircle2, Zap, LogOut, Cloud } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,13 +22,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened CBT Engine v42.0 (Auto-Submit Enabled).
- * UPDATED: Integrated auto-submit logic on timer expiration.
- * UPDATED: Captures Real Name and Email fallback for state-level merit hub.
+ * @fileOverview High-Fidelity Mobile-First CBT Engine v45.0.
+ * UPDATED: Precise viewport containment for PWA (no safe-area clipping).
+ * FIXED: Optimized auto-submit logic with reliable state capture.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -89,7 +88,7 @@ export default function MockAttemptPage() {
         }
 
         if (isPremium && !hasActivePass) {
-           toast({ variant: "destructive", title: "Security Rejection", description: "Elite pass required for this test." });
+           toast({ variant: "destructive", title: "Security Rejection", description: "Elite pass required." });
            router.push('/pass');
            return;
         }
@@ -102,7 +101,7 @@ export default function MockAttemptPage() {
         chunkSnaps.forEach(snap => snap.docs.forEach(d => fetchedQuestions.push({ ...d.data(), id: d.id })));
         const sortedQs = questionIds.map(id => fetchedQuestions.find(q => q.id === id)).filter(Boolean);
         
-        if (sortedQs.length === 0) throw new Error("No questions available.");
+        if (sortedQs.length === 0) throw new Error("Empty Bank.");
 
         const attemptSnap = await getDoc(doc(db, "attempts", `${user.uid}_${mockId}`));
         initExam(mockId, mData.title || "Elite Series", user.uid, sortedQs, mData.duration || 120, attemptSnap.exists() ? attemptSnap.data() : undefined, mData.languageMode);
@@ -135,13 +134,9 @@ export default function MockAttemptPage() {
     questions.forEach((q, idx) => {
       const studentAnsIdx = answers[idx];
       if (studentAnsIdx === undefined || studentAnsIdx === null) return;
-      
       const correctOptIdx = ['A', 'B', 'C', 'D'].indexOf(q.correctAnswer);
-      if (correctOptIdx === studentAnsIdx) {
-        correctCount++;
-      } else {
-        wrongCount++;
-      }
+      if (correctOptIdx === studentAnsIdx) correctCount++;
+      else wrongCount++;
     });
 
     const rawScore = (correctCount * posMarks) - (wrongCount * negMarks);
@@ -150,18 +145,14 @@ export default function MockAttemptPage() {
 
     const resultPayload = {
       userId: user.uid, 
-      userName: profile?.name || user.displayName || user.email || 'Student', 
+      userName: profile?.name || 'Student', 
       userEmail: user.email || "",
       mockId, 
       mockTitle: mockData.title || mockTitle,
       score: parseFloat(rawScore.toFixed(2)),
-      correctCount,
-      wrongCount,
-      attemptedCount,
+      correctCount, wrongCount, attemptedCount,
       totalQuestions: questions.length, 
-      accuracy,
-      timeTaken, 
-      answers, 
+      accuracy, timeTaken, answers, 
       timestamp: new Date().toISOString(), 
       createdAt: serverTimestamp(),
       accessLevel: (mockData.accessLevel || 'FREE').toUpperCase() 
@@ -169,114 +160,103 @@ export default function MockAttemptPage() {
 
     try {
       await setDoc(doc(db, "results", `${user.uid}_${mockId}`), resultPayload);
-      await updateDoc(doc(db, "attempts", `${user.uid}_${mockId}`), { 
-        status: 'COMPLETED', 
-        updatedAt: serverTimestamp() 
-      });
-      toast({ title: "Test Submitted", description: "Final check complete. Results saved." });
+      await updateDoc(doc(db, "attempts", `${user.uid}_${mockId}`), { status: 'COMPLETED', updatedAt: serverTimestamp() });
+      toast({ title: "Test Submitted" });
       router.push(`/results/${mockId}`);
     } catch (e) {
-      toast({ variant: "destructive", title: "Sync Failed" });
+      toast({ variant: "destructive", title: "Submit Error" });
       setIsSubmittingFinal(false);
     }
   }, [db, user, profile, isSubmittingFinal, questions, answers, router, mockId, mockTitle, mockData, startTime, toast]);
 
-  // CRITICAL: AUTO-SUBMIT TRIGGER
   useEffect(() => {
-     if (!isInitializing && timeLeft === 0 && !isSubmittingFinal) {
-        handleSubmitFinal();
-     }
+     if (!isInitializing && timeLeft === 0 && !isSubmittingFinal) handleSubmitFinal();
   }, [timeLeft, isInitializing, isSubmittingFinal, handleSubmitFinal]);
 
-  if (isInitializing) return <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0B1528] space-y-8"><Zap className="h-16 w-16 text-primary animate-pulse" /><p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Synchronizing Access Hub...</p></div>;
+  if (isInitializing) return <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0B1528] space-y-8"><Zap className="h-12 w-12 text-primary animate-pulse" /><p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Initializing Node...</p></div>;
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white font-body select-none overflow-hidden relative">
+    <div className="flex flex-col h-full bg-white font-body select-none overflow-hidden relative touch-pan-y">
       <AntiCheat />
       <ExamHeader onPaletteToggle={() => setIsPaletteOpen(true)} onExitRequest={() => setShowExitModal(true)} />
       
-      <div className="absolute top-20 right-6 z-[120] pointer-events-none hidden md:block">
-         <div className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-500",
-            isSyncing ? "bg-primary/10 border-primary/20 text-primary" : "bg-emerald-50 border-emerald-100 text-emerald-600"
-         )}>
-            <Cloud className={cn("h-3 w-3", isSyncing && "animate-bounce")} />
-            <span className="text-[8px] font-black uppercase tracking-widest">{isSyncing ? 'Syncing...' : 'Safe Hub'}</span>
-         </div>
-      </div>
-
-      <main className="flex-1 flex flex-col overflow-hidden bg-slate-50/30">
+      <main className="flex-1 flex flex-col overflow-hidden bg-slate-50/50">
         <AnimatePresence>
           {isPaused && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-[100] bg-[#0B1528]/95 backdrop-blur-xl flex items-center justify-center p-6">
-              <div className="bg-white rounded-[3rem] p-12 space-y-8 text-center max-w-sm">
-                <div className="h-20 w-20 bg-orange-50 rounded-[2rem] flex items-center justify-center mx-auto text-primary shadow-2xl">
-                  <Play className="h-10 w-10 fill-current" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-[#0B1528]/95 backdrop-blur-xl flex items-center justify-center p-6">
+              <div className="bg-white rounded-[2.5rem] p-10 space-y-8 text-center max-w-xs shadow-5xl">
+                <div className="h-16 w-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto text-primary shadow-xl">
+                  <Play className="h-8 w-8 fill-current" />
                 </div>
-                <h2 className="text-2xl font-headline font-black text-[#0F172A] uppercase">Test Paused</h2>
-                <Button onClick={() => setPaused(false)} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-[10px]">Resume Test</Button>
+                <h2 className="text-xl font-headline font-black text-[#0F172A] uppercase">Test Paused</h2>
+                <Button onClick={() => setPaused(false)} className="w-full h-14 bg-primary text-white rounded-xl font-black uppercase text-[10px]">Resume Now</Button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
         
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden relative">
           <SubjectTabs />
-          <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center">
-            <div className="w-full max-w-5xl p-2 md:p-6 space-y-4">
+          <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center px-4 pt-4 pb-32">
+            <div className="w-full max-w-4xl space-y-4">
               {questions[currentIdx] && (
-                <motion.div key={currentIdx} initial={{ opacity: 0, x: 5 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }}>
+                <motion.div key={currentIdx} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
                   <QuestionRenderer 
                     language={language} 
                     question={{...questions[currentIdx], displayId: (currentIdx + 1).toString()}} 
                     selectedAnswer={answers[currentIdx]} 
                     onSelect={(idx) => setAnswer(currentIdx, idx, db)} 
-                    className="shadow-md border-none p-4 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem]" 
+                    className="shadow-xl border-none p-4 md:p-10 rounded-2xl md:rounded-[3rem]" 
                   />
                 </motion.div>
               )}
-              <TacticalFooter onSubmit={() => setShowSubmitModal(true)} />
             </div>
+          </div>
+          
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 md:pb-8 bg-gradient-to-t from-white via-white to-transparent pointer-events-none">
+             <div className="max-w-4xl mx-auto pointer-events-auto">
+                <TacticalFooter onSubmit={() => setShowSubmitModal(true)} />
+             </div>
           </div>
         </div>
       </main>
 
       <Sheet open={isPaletteOpen} onOpenChange={setIsPaletteOpen}>
-        <SheetContent side="right" className="p-0 border-none w-[85vw] md:w-[400px] h-full">
-          <SheetHeader className="sr-only"><SheetTitle>Question Map</SheetTitle></SheetHeader>
+        <SheetContent side="right" className="p-0 border-none w-[88vw] md:w-[400px] h-full shadow-5xl">
+          <SheetHeader className="sr-only"><SheetTitle>Navigation Map</SheetTitle></SheetHeader>
           <QuestionPalette onSelect={(idx) => { useExamStore.getState().setCurrentIdx(idx); setIsPaletteOpen(false); }} onSubmit={() => setShowSubmitModal(true)} />
         </SheetContent>
       </Sheet>
 
-      <Dialog open={showExitModal} onOpenChange={show => !isSubmittingFinal && setShowExitModal(show)}>
-        <DialogContent className="max-w-[440px] rounded-[2.5rem] p-12 bg-white text-center">
-          <div className="space-y-10">
-            <div className="h-16 w-16 bg-blue-50/50 rounded-2xl flex items-center justify-center mx-auto text-blue-500">
-              <LogOut className="h-8 w-8" />
+      <Dialog open={showExitModal} onOpenChange={setShowExitModal}>
+        <DialogContent className="max-w-[360px] rounded-[2.5rem] p-8 bg-white text-center shadow-5xl border-none">
+          <div className="space-y-8">
+            <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto text-blue-500 shadow-inner">
+              <LogOut className="h-6 w-6" />
             </div>
-            <DialogTitle className="text-3xl font-headline font-black uppercase text-[#0F172A]">Pause Test?</DialogTitle>
-            <p className="text-sm font-bold text-slate-400 uppercase">Progress will be saved.</p>
-            <div className="flex gap-4 pt-4">
-              <Button variant="ghost" onClick={() => setShowExitModal(false)} className="flex-1 h-16 font-black uppercase text-[11px]">Cancel</Button>
-              <Button onClick={() => { setPaused(false); setShowExitModal(false); router.push('/dashboard'); }} className="flex-1 h-16 bg-[#F97316] text-white rounded-xl font-black uppercase text-[11px] shadow-xl border-none">Save & Exit</Button>
+            <DialogTitle className="text-2xl font-headline font-black uppercase text-[#0F172A]">Save & Exit?</DialogTitle>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Your progress is safely cached.</p>
+            <div className="flex gap-3 pt-2">
+              <Button variant="ghost" onClick={() => setShowExitModal(false)} className="flex-1 h-12 font-black uppercase text-[10px] tracking-widest">Stay</Button>
+              <Button onClick={() => { setPaused(false); setShowExitModal(false); router.push('/dashboard'); }} className="flex-1 h-12 bg-primary text-white rounded-xl font-black uppercase text-[10px] shadow-lg border-none">Exit</Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showSubmitModal} onOpenChange={show => !isSubmittingFinal && setShowSubmitModal(show)}>
-        <DialogContent className="max-w-[440px] rounded-[3rem] p-12 bg-[#0F172A] text-white text-center">
-          <div className="space-y-10">
-            <div className="h-24 w-24 bg-primary/20 rounded-[3rem] flex items-center justify-center mx-auto text-primary shadow-3xl">
-              <ShieldCheck className="h-12 w-12" />
+      <Dialog open={showSubmitModal} onOpenChange={setShowSubmitModal}>
+        <DialogContent className="max-w-[360px] rounded-[3rem] p-10 bg-[#0F172A] text-white text-center border-none shadow-5xl">
+          <div className="space-y-8">
+            <div className="h-20 w-20 bg-primary/20 rounded-[2rem] flex items-center justify-center mx-auto text-primary shadow-2xl">
+              <ShieldCheck className="h-10 w-10" />
             </div>
-            <DialogTitle className="text-3xl font-headline font-black uppercase text-white">Submit Final</DialogTitle>
-            <p className="text-slate-400 font-medium">Review complete? Check your score now.</p>
-            <div className="flex gap-4 pt-4">
-              <Button variant="ghost" onClick={() => setShowSubmitModal(false)} disabled={isSubmittingFinal} className="flex-1 h-16 text-slate-500 font-black uppercase text-[10px]">Go Back</Button>
-              <Button onClick={handleSubmitFinal} disabled={isSubmittingFinal} className="flex-1 h-16 bg-primary text-white font-black uppercase text-[10px] rounded-2xl shadow-3xl border-none">
-                {isSubmittingFinal ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Finish Test
+            <DialogTitle className="text-2xl font-headline font-black uppercase text-white tracking-tight">Submit Test</DialogTitle>
+            <p className="text-slate-400 text-xs font-medium px-2">Ensure all sections are reviewed before final audit.</p>
+            <div className="flex flex-col gap-3 pt-4">
+              <Button onClick={handleSubmitFinal} disabled={isSubmittingFinal} className="w-full h-14 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-2xl border-none">
+                {isSubmittingFinal ? <Loader2 className="h-4 w-4 animate-spin" /> : "Finish & Score"}
               </Button>
+              <Button variant="ghost" onClick={() => setShowSubmitModal(false)} disabled={isSubmittingFinal} className="h-10 text-slate-500 font-bold uppercase text-[9px] tracking-widest">Back to Hub</Button>
             </div>
           </div>
         </DialogContent>

@@ -1,9 +1,8 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Optimized Institutional PWA Manifest v20.0 (Hardened).
- * UPDATED: Fixed icon shrinking and masking issues by setting purpose to "any maskable".
- * UPDATED: Synchronized background and theme colors with brand identity.
+ * @fileOverview Optimized Institutional PWA Manifest v21.0 (Hardened).
+ * UPDATED: Optimized theme settings and display modes for premium PWA feel.
  */
 export default function manifest(): MetadataRoute.Manifest {
   const brandIcon = 'https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png';
@@ -13,7 +12,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Cracklix',
     description: "Punjab's most trusted government exam preparation platform.",
     start_url: '/',
-    id: 'cracklix-hub',
+    id: 'cracklix-hub-v1',
     display: 'standalone',
     background_color: '#0B1528',
     theme_color: '#0B1528',
@@ -39,11 +38,17 @@ export default function manifest(): MetadataRoute.Manifest {
         description: 'Browse all available practice tests',
       },
       {
+        name: 'My Results',
+        url: '/my-exams',
+        description: 'Track your preparation progress',
+      },
+      {
         name: 'Current Affairs',
         url: '/current-affairs',
         description: 'Daily exam relevant updates',
       },
     ],
+    categories: ['education', 'lifestyle'],
     related_applications: [],
     prefer_related_applications: false
   };

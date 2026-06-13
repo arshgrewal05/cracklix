@@ -49,6 +49,8 @@
     @apply bg-white text-[#0F172A] antialiased;
     -webkit-tap-highlight-color: transparent;
     pointer-events: auto;
+    /* Prevent text zoom on mobile */
+    -webkit-text-size-adjust: 100%;
   }
   
   h1 { @apply text-xl md:text-3xl font-black uppercase tracking-tight leading-tight; }
@@ -64,6 +66,10 @@
 
 .pb-safe {
   padding-bottom: calc(env(safe-area-inset-bottom) + 64px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -89,6 +95,10 @@
   box-shadow: 0 15px 30px -10px rgba(15, 23, 42, 0.15);
 }
 
+.shadow-5xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
 @keyframes marquee {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
@@ -109,4 +119,9 @@
 /* Fix for mobile text clipping on clamped items */
 .truncate-mobile {
   @apply block overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+/* Mobile-First Input Overrides */
+input, textarea, select {
+  font-size: 16px !important; /* Prevents iOS auto-zoom */
 }

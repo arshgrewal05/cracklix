@@ -14,7 +14,9 @@ import {
   Download,
   User,
   Shield,
-  Landmark
+  Landmark,
+  Layers,
+  History
 } from "lucide-react";
 import Link from "next/link";
 import { useUser, useAuth } from "@/firebase";
@@ -25,8 +27,9 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 /**
- * @fileOverview Final Sidebar Hub v48.0 (Ultra-Compact).
- * UPDATED: Further decreased student name, avatar size, and header padding for maximum efficiency.
+ * @fileOverview Hardened Production Sidebar Hub v50.0.
+ * UPDATED: Precise PWA ergonomics with safe-area support.
+ * FIXED: Optimized scroll containment for small devices (320px).
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -63,156 +66,129 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
           (window as any).deferredPrompt = null;
           setHasPrompt(false);
           onClose();
-          toast({ title: "Installation Started", description: "Adding Cracklix to your home screen." });
+          toast({ title: "Welcome!", description: "Adding app to your home screen." });
         }
-      } else {
-        toast({ 
-          title: "App Status", 
-          description: "If this button is inactive, the app is likely already installed. Check your device's home screen." 
-        });
       }
     }
   };
 
   const menuItems = [
-    { label: "HOME PAGE", href: "/", icon: Home },
-    { label: "MY EXAMS", href: "/my-exams", icon: Target },
-    { label: "EXAM LIST", href: "/exams", icon: Landmark },
-    { label: "ELITE PASS", href: "/pass", icon: Gem, hasPro: true },
-    { label: "PRACTICE TESTS", href: "/mocks", icon: Zap },
-    { label: "UPDATES HUB", href: "/current-affairs", icon: Newspaper },
-    { label: "CONTACT US", href: "/contact", icon: MessageCircleQuestion },
+    { label: "Home Hub", href: "/", icon: Home },
+    { label: "My Registry", href: "/my-exams", icon: Target },
+    { label: "Exam List", href: "/exams", icon: Landmark },
+    { label: "Practice Mocks", href: "/mocks", icon: Zap },
+    { label: "Study Updates", href: "/current-affairs", icon: Newspaper },
+    { label: "Study Notes", href: "/notes", icon: FileText },
+    { label: "Leaderboard", href: "/leaderboard", icon: ShieldCheck },
   ];
 
   return (
     <div className="flex flex-col h-full bg-[#0B1528] text-white overflow-y-auto no-scrollbar font-body select-none">
       
-      {/* 1. USER IDENTITY HEADER (ULTRA-COMPACT) */}
-      <div className="px-6 pt-8 pb-4 flex flex-col gap-3 relative overflow-hidden shrink-0">
-        <Shield className="absolute top-8 right-4 h-32 w-32 text-white/[0.02] pointer-events-none" />
+      {/* IDENTITY HEADER */}
+      <div className="px-6 pt-12 pb-6 flex flex-col gap-5 relative overflow-hidden shrink-0 pt-safe">
+        <Shield className="absolute top-10 right-4 h-40 w-40 text-white/[0.03] pointer-events-none" />
         
-        <div className="relative z-10 flex items-center gap-3.5">
-           <div className="relative">
-              <div className="h-12 w-12 rounded-xl border-[2px] border-white/20 flex items-center justify-center bg-[#1E293B] shadow-2xl overflow-hidden">
-                 <User className="h-6 w-6 text-slate-400" />
+        <div className="relative z-10 flex items-center gap-4">
+           <div className="relative shrink-0">
+              <div className="h-14 w-14 rounded-2xl border-[2px] border-white/20 flex items-center justify-center bg-[#1E293B] shadow-2xl overflow-hidden">
+                 <User className="h-7 w-7 text-slate-400" />
               </div>
-              <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-[#10B981] rounded-md border-[2px] border-[#0B1528] flex items-center justify-center text-white">
-                 <ShieldCheck className="h-2 w-2" />
+              <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-[#10B981] rounded-md border-[2px] border-[#0B1528] flex items-center justify-center text-white">
+                 <ShieldCheck className="h-2.5 w-2.5" />
               </div>
            </div>
 
-           <div className="space-y-0.5 text-left">
-              <h2 className="text-[15px] font-black text-white leading-none uppercase tracking-tight">
-                 {profile?.name || "STUDENT"}
+           <div className="space-y-1 text-left min-w-0">
+              <h2 className="text-[17px] font-black text-white leading-none uppercase tracking-tight truncate">
+                 {profile?.name || "ASPIRANT"}
               </h2>
-              <div className="flex flex-col items-start gap-1">
-                 <div className="bg-[#F97316] text-white px-2 py-0.5 rounded-full font-black uppercase text-[7px] tracking-widest shadow-xl">
-                    PASS ACTIVE
-                 </div>
+              <div className="flex items-center gap-2">
+                 <Badge className={cn(
+                    "border-none px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest",
+                    profile?.pass?.active ? "bg-emerald-500 text-white" : "bg-white/10 text-slate-400"
+                 )}>
+                    {profile?.pass?.active ? (profile.pass.plan || 'ELITE') : 'FREE NODE'}
+                 </Badge>
               </div>
            </div>
         </div>
 
         <button 
            onClick={() => { router.push('/profile'); onClose(); }}
-           className="w-full h-9 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-between px-4 group active:scale-95 transition-all relative z-10"
+           className="w-full h-11 rounded-xl border border-white/10 bg-white/[0.03] flex items-center justify-between px-4 group active:scale-95 transition-all relative z-10"
         >
            <div className="flex items-center gap-3">
-              <User className="h-3 w-3 text-[#F97316]" />
-              <span className="text-[8px] font-[900] uppercase tracking-[0.2em] text-slate-200">PROFILE HUB</span>
+              <User className="h-4 w-4 text-[#F97316]" />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-200">PROFILE SETTINGS</span>
            </div>
-           <ChevronRight className="h-3 w-3 text-slate-600" />
+           <ChevronRight className="h-4 w-4 text-slate-600" />
         </button>
       </div>
 
-      {/* 2. DOWNLOAD APP HUB (TIGHTER) */}
+      {/* PWA INSTALL ACTION */}
       <div 
          onClick={handleInstallClick}
          className={cn(
-           "flex items-center justify-between px-6 py-3 border-y border-white/5 cursor-pointer transition-all shrink-0",
-           hasPrompt ? "bg-[#0D242F] active:bg-[#11313d]" : "bg-black/20 opacity-60"
+           "flex items-center justify-between px-6 py-4 border-y border-white/5 cursor-pointer transition-all shrink-0",
+           hasPrompt ? "bg-primary/10 active:bg-primary/20" : "bg-black/20 opacity-50"
          )}
       >
          <div className="flex items-center gap-4">
             <div className={cn(
-              "h-8 w-8 rounded-lg flex items-center justify-center shadow-lg transition-colors",
-              hasPrompt ? "bg-[#10B981] text-white shadow-emerald-500/20" : "bg-white/5 text-slate-500"
+              "h-10 w-10 rounded-xl flex items-center justify-center shadow-lg transition-colors",
+              hasPrompt ? "bg-primary text-white" : "bg-white/5 text-slate-500"
             )}>
-               <Download className="h-3.5 w-3.5" />
+               <Download className="h-4 w-4" />
             </div>
-            <div className="text-left leading-none">
-               <span className="text-[10px] uppercase tracking-tight font-black text-white block mb-0.5">DOWNLOAD APP</span>
-               <p className={cn(
-                 "text-[6px] font-black uppercase tracking-widest",
-                 hasPrompt ? "text-[#10B981]" : "text-slate-500"
-               )}>
-                 {hasPrompt ? "FAST ACCESS" : "INSTALLED"}
+            <div className="text-left leading-tight">
+               <span className="text-[11px] uppercase tracking-tight font-black text-white block mb-0.5">INSTALL CRACKLIX</span>
+               <p className={cn("text-[7px] font-black uppercase tracking-widest", hasPrompt ? "text-primary" : "text-slate-500")}>
+                 {hasPrompt ? "FASTER ACCESS ACTIVE" : "ALREADY INSTALLED"}
                </p>
             </div>
          </div>
-         <button className={cn(
-           "text-white px-2.5 py-1 rounded-full font-black text-[7px] uppercase tracking-tighter shadow-xl border-none transition-all",
-           hasPrompt ? "bg-[#10B981]" : "bg-white/10 text-slate-600"
-         )}>
-            INSTALL
-         </button>
+         {hasPrompt && <Badge className="bg-primary text-white border-none animate-pulse">GET</Badge>}
       </div>
 
-      {/* 3. NAVIGATION MENU (COMPACT) */}
-      <div className="flex flex-col py-1">
+      {/* NAV MENU */}
+      <div className="flex flex-col py-2">
         {menuItems.map((item) => {
-          const isActive = mounted && (pathname === item.href || (pathname === '/' && item.href === '/'));
+          const isActive = mounted && pathname === item.href;
           const Icon = item.icon;
-          
           return (
             <Link 
               key={item.label}
               href={item.href}
               onClick={onClose}
               className={cn(
-                "flex items-center justify-between px-6 h-[52px] transition-all border-l-[3px] relative",
-                isActive ? "bg-white/[0.04] border-[#F97316]" : "hover:bg-white/[0.01] border-transparent"
+                "flex items-center gap-5 px-6 h-[56px] transition-all border-l-[4px]",
+                isActive ? "bg-white/[0.05] border-primary text-white" : "hover:bg-white/[0.02] border-transparent text-slate-400"
               )}
             >
-              <div className="flex items-center gap-4">
-                 <Icon className={cn(
-                   "h-4 w-4 shrink-0 transition-all",
-                   isActive ? "text-[#F97316]" : "text-[#475569]"
-                 )} />
-                 <span className={cn(
-                   "text-[11px] uppercase tracking-tight font-black",
-                   isActive ? "text-white" : "text-[#64748B]"
-                 )}>
-                   {item.label}
-                 </span>
-              </div>
-              
-              {item.hasPro && (
-                <div className="bg-[#F97316]/10 border border-[#F97316]/20 px-1.5 py-0.5 rounded">
-                   <span className="text-[7px] font-black text-[#F97316]">PRO</span>
-                </div>
-              )}
+               <Icon className={cn("h-5 w-5 shrink-0", isActive ? "text-primary" : "text-slate-600")} />
+               <span className={cn("text-[12px] font-black uppercase tracking-tight", isActive ? "text-white" : "text-slate-400")}>
+                 {item.label}
+               </span>
             </Link>
           )
         })}
 
-        <div className="my-4 border-t border-white/5 mx-6 opacity-30" />
+        <div className="my-6 border-t border-white/5 mx-6 opacity-40" />
         
         <button 
           onClick={handleLogout}
-          className="flex items-center gap-4 px-6 h-[52px] text-rose-500 hover:bg-rose-500/5 transition-all w-full text-left active:scale-95"
+          className="flex items-center gap-5 px-6 h-[56px] text-rose-500 hover:bg-rose-500/5 transition-all w-full text-left active:scale-95"
         >
-          <LogOut className="h-4 w-4 shrink-0" />
-          <span className="text-[11px] font-black uppercase tracking-tight">LOG OUT SESSION</span>
+          <LogOut className="h-5 w-5 shrink-0" />
+          <span className="text-[12px] font-black uppercase tracking-tight">LOG OUT SESSION</span>
         </button>
       </div>
 
-      {/* 4. FOOTER CREDITS (REDUCED) */}
-      <div className="mt-auto px-6 py-8 flex flex-col items-center gap-1 bg-black/20 border-t border-white/5">
-         <p className="text-[9px] font-black text-[#F97316] uppercase tracking-[0.2em] text-center">
-            BY ARSH GREWAL
-         </p>
-         <p className="text-[7px] font-bold text-[#334155] uppercase tracking-widest leading-none">© REGISTRY NODE</p>
+      {/* VERSION INFO */}
+      <div className="mt-auto px-6 py-10 flex flex-col items-center gap-1.5 bg-black/30 border-t border-white/5 pb-safe">
+         <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">CRACKLIX PWA v2.0</p>
+         <p className="text-[8px] font-bold text-slate-600 uppercase tracking-widest leading-none text-center">OFFICIAL REGISTRY NODE</p>
       </div>
     </div>
   );
