@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import MobileNav from '@/components/layout/MobileNav';
 import PWAManager from '@/components/pwa/PWAManager';
+import Script from 'next/script';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -56,9 +57,8 @@ export const viewport: Viewport = {
 };
 
 /**
- * @fileOverview Master Layout v21.0 (Hardened).
- * SAFE-RENDER: Added FirebaseClientProvider and PWAManager at top-level.
- * UPDATED: Fixed theme color synchronization for PWA branding.
+ * @fileOverview Master Layout v22.0 (Hardened).
+ * UPDATED: Added early PWA prompt capture script to prevent missed events.
  */
 export default function RootLayout({
   children,
@@ -72,6 +72,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* Early capture of PWA install prompt */}
+        <Script id="pwa-prompt-capture" strategy="beforeInteractive">
+          {`
+            window.deferredPrompt = null;
+            window.addEventListener('beforeinstallprompt', (e) => {
+              e.preventDefault();
+              window.deferredPrompt = e;
+              window.dispatchEvent(new CustomEvent('pwa-installable'));
+            });
+          `}
+        </Script>
       </head>
       <body className={`${inter.variable} font-body antialiased bg-white text-[#0F172A] min-h-screen pb-20 md:pb-0`}>
         <FirebaseClientProvider>

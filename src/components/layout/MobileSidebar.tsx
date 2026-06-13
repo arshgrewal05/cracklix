@@ -25,8 +25,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 /**
- * @fileOverview Final Screenshot Replica Sidebar v44.0.
- * UPDATED: Integrated MY EXAMS node and refined EXAM LIST icon.
+ * @fileOverview Final Screenshot Replica Sidebar v45.0.
+ * UPDATED: Enhanced install app feedback logic.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -47,11 +47,16 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   };
 
   const handleInstallClick = () => {
-    const prompt = (window as any).deferredPrompt;
-    if (prompt) {
-      prompt.prompt();
-    } else {
-       toast({ title: "App Active", description: "Already installed or check browser menu." });
+    if (typeof window !== 'undefined') {
+      const prompt = (window as any).deferredPrompt;
+      if (prompt) {
+        prompt.prompt();
+      } else {
+        toast({ 
+          title: "App Status", 
+          description: "If this button doesn't respond, the app is likely already installed. Check your home screen or browser settings." 
+        });
+      }
     }
   };
 

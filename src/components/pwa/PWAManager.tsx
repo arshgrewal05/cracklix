@@ -7,12 +7,11 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Institutional PWA Lifecycle Manager v27.0 (Hardened).
- * UPDATED: Enhanced registration check and install prompt reliability.
+ * @fileOverview Institutional PWA Lifecycle Manager v28.0 (Hardened).
+ * UPDATED: Focused on UI display logic for the prompt banner.
  */
 export default function PWAManager() {
   const pathname = usePathname();
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -22,52 +21,45 @@ export default function PWAManager() {
     setMounted(true);
 
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(
-          (registration) => {
-            console.log('[PWA] ServiceWorker registered:', registration.scope);
-          },
-          (err) => {
-            console.error('[PWA] ServiceWorker registration failed:', err);
-          }
-        );
-      });
+      navigator.serviceWorker.register('/sw.js').then(
+        (reg) => console.log('[PWA] SW Registered:', reg.scope),
+        (err) => console.log('[PWA] SW Failed:', err)
+      );
     }
 
-    const handleBeforeInstallPrompt = (e: any) => {
-      e.preventDefault();
-      (window as any).deferredPrompt = e;
-      setDeferredPrompt(e);
-      
+    const checkInstallability = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
       const isExcluded = pathname?.includes('/attempt') || pathname?.startsWith('/admin');
       
-      if (!isExcluded && !isStandalone && !isDismissed) {
-        const timer = setTimeout(() => setShowPrompt(true), 5000);
-        return () => clearTimeout(timer);
+      if (!isExcluded && !isStandalone && !isDismissed && (window as any).deferredPrompt) {
+        setShowPrompt(true);
       }
     };
 
+    // Listen for the custom event from our early capture script
+    window.addEventListener('pwa-installable', checkInstallability);
+    
+    // Check immediately in case it already fired
+    const timer = setTimeout(checkInstallability, 3000);
+
     const handleAppInstalled = () => {
-      setDeferredPrompt(null);
       setShowPrompt(false);
       setIsInstalled(true);
-      console.log('[PWA] Application successfully installed locally.');
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('pwa-installable', checkInstallability);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      clearTimeout(timer);
     };
   }, [pathname, isDismissed]);
 
   const handleInstallClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const prompt = deferredPrompt || (window as any).deferredPrompt;
+    const prompt = (window as any).deferredPrompt;
     if (!prompt) return;
 
     prompt.prompt();
@@ -75,7 +67,7 @@ export default function PWAManager() {
     
     if (outcome === 'accepted') {
       setShowPrompt(false);
-      setDeferredPrompt(null);
+      (window as any).deferredPrompt = null;
     }
   };
 

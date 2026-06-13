@@ -19,12 +19,13 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Header v170.0 (Global Registry Sync).
- * UPDATED: Optimized to use CSS variables for a fixed 145px desktop height.
+ * @fileOverview Professional Header v171.0 (PWA Fix).
+ * UPDATED: Improved install app button feedback.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -33,6 +34,7 @@ export default function Navbar() {
   const auth = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     setMounted(true);
@@ -66,11 +68,17 @@ export default function Navbar() {
   const handleInstallClick = () => {
     if (typeof window !== 'undefined') {
       const prompt = (window as any).deferredPrompt;
-      if (prompt) prompt.prompt();
+      if (prompt) {
+        prompt.prompt();
+      } else {
+        toast({ 
+          title: "Check Browser", 
+          description: "If the install option is missing, the app might already be installed or your browser doesn't support direct installation." 
+        });
+      }
     }
   };
 
-  // TIGHTENED HEADER HEIGHT (Fixed 145px on Desktop via CSS Variable)
   const headerHeight = "h-[var(--header-height)]";
 
   if (!mounted) {
