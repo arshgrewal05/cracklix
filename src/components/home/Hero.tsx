@@ -22,10 +22,10 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final High-Fidelity Hero v16.0 (Vibrant & Compact).
- * FIXED: Replaced dark night image with daylight view to eliminate "black" look.
- * FIXED: Reduced gradient densities for maximum background visibility.
- * SCALE: Strictly 200px height on mobile as requested.
+ * @fileOverview Final High-Fidelity Hero v17.0 (Vibrant & Permanent).
+ * FIXED: Permanently fixed background URL with high-vibrancy daylight asset.
+ * FIXED: Reduced gradient density to 30-40% to prevent "black" appearance.
+ * SCALE: Strictly 200px height on mobile for a slim website interface.
  */
 
 export default function Hero() {
@@ -58,21 +58,21 @@ export default function Hero() {
 
   return (
     <section className="relative w-full bg-slate-900 overflow-hidden flex flex-col items-center">
-      {/* 1. BACKGROUND LAYER - Compact 200px Fit */}
-      <div className="w-full relative min-h-[200px] md:min-h-0 md:aspect-[21/9] bg-slate-900">
+      {/* 1. BACKGROUND LAYER - Strict 200px Mobile Fit */}
+      <div className="w-full relative h-[200px] md:h-auto md:aspect-[21/9] bg-slate-900">
         <motion.img 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1.2 }}
-          src="https://images.unsplash.com/photo-1514222134-b57cbb8ce073?q=80&w=2000&auto=format&fit=crop" 
-          alt="Golden Temple Daylight" 
+          transition={{ duration: 1 }}
+          src="https://images.unsplash.com/photo-1594993872457-3150b4ef22ba?q=80&w=2000&auto=format&fit=crop" 
+          alt="Golden Temple Vibrant" 
           className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
           referrerPolicy="no-referrer"
         />
         
-        {/* LIGHTER OVERLAYS - Balanced for daylight image visibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 md:via-black/50 to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
+        {/* ULTRA-LIGHT OVERLAYS - Prevent "Black" look while keeping text readable */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
         
         {/* TEXT CONTENT HUB */}
         <div className="absolute inset-0 z-20 flex items-center">
@@ -96,7 +96,7 @@ export default function Hero() {
                     transition={{ delay: 0.1 }}
                     className="space-y-0.5 md:space-y-4"
                  >
-                    <h1 className="text-[13px] sm:text-4xl md:text-6xl font-black text-white leading-[1.1] tracking-tighter uppercase break-words drop-shadow-2xl">
+                    <h1 className="text-[14px] sm:text-4xl md:text-6xl font-black text-white leading-[1.1] tracking-tighter uppercase break-words drop-shadow-2xl">
                        Prepare Smarter.<br/>
                        <span className="text-primary italic">Score Higher.</span>
                     </h1>
@@ -111,12 +111,12 @@ export default function Hero() {
                     transition={{ delay: 0.2 }}
                     className="flex flex-row gap-1.5 md:gap-4 pt-1"
                  >
-                    <Button asChild className="h-6 md:h-16 px-3 md:px-10 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[6px] md:text-xs tracking-[0.1em] rounded-sm md:rounded-2xl shadow-4xl gap-1 md:gap-2 transition-all active:scale-95 border-none">
+                    <Button asChild className="h-7 md:h-16 px-3 md:px-10 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[6px] md:text-xs tracking-[0.1em] rounded-sm md:rounded-2xl shadow-4xl gap-1 md:gap-2 transition-all active:scale-95 border-none">
                        <Link href="/mocks">
                           Free Mock <ArrowRight className="h-1.5 w-1.5 md:h-4 md:w-4" />
                        </Link>
                     </Button>
-                    <Button asChild variant="outline" className="h-6 md:h-16 px-3 md:px-10 border-white/20 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[6px] md:text-xs tracking-[0.1em] rounded-sm md:rounded-2xl transition-all backdrop-blur-md">
+                    <Button asChild variant="outline" className="h-7 md:h-16 px-3 md:px-10 border-white/20 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[6px] md:text-xs tracking-[0.1em] rounded-sm md:rounded-2xl transition-all backdrop-blur-md">
                        <Link href="/exams">
                           Exam Hub
                        </Link>
