@@ -18,9 +18,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview FINAL CALIBRATED HERO v192.0 (Artifact Masked).
- * FIXED: Masked the sparkle artifact in the background image.
- * FIXED: Maintained Sentence case and mobile box constraints.
+ * @fileOverview FINAL CALIBRATED HERO v194.0 (Double Line Description).
+ * FIXED: Formatted Punjabi description into two lines.
+ * FIXED: Maintained Sentence case, 260px mobile height, and box width constraints.
  */
 
 export default function Hero() {
@@ -103,14 +103,15 @@ export default function Hero() {
                </h1>
             </motion.div>
 
-            {/* DESCRIPTION - SENTENCE CASE */}
+            {/* DESCRIPTION - SENTENCE CASE (DOUBLE LINE) */}
             <motion.p
                initial={{ opacity: 0, y: 10 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.2 }}
                className="text-[9px] md:text-lg text-slate-300 font-medium max-w-lg leading-snug antialiased"
             >
-               Punjab Government Exams di Complete Preparation ik hi Platform te.
+               Punjab Government Exams di Complete <br />
+               Preparation ik hi Platform te.
             </motion.p>
 
             {/* TACTICAL BUTTONS */}
