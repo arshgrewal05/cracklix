@@ -23,8 +23,8 @@ import { Button } from "@/components/ui/button";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Final Performance-Hardened Header v147.0.
- * UPDATED: Doubled logo size (h-24 md:h-28) and expanded header height for maximum visibility.
+ * @fileOverview Final Performance-Hardened Header v148.0.
+ * UPDATED: Restored logo size (h-14) and removed background box.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -70,7 +70,7 @@ export default function Navbar() {
     }
   };
 
-  const headerHeight = "h-[88px] lg:h-[100px]";
+  const headerHeight = "h-20 md:h-24";
 
   if (!mounted) {
     return (
@@ -104,7 +104,7 @@ export default function Navbar() {
                 <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
               </SheetContent>
             </Sheet>
-            <div className="h-20 md:h-24 flex items-center shrink-0">
+            <div className="h-14 flex items-center shrink-0">
                <Logo className="h-full !gap-0 active:scale-95 transition-transform" />
             </div>
           </div>
