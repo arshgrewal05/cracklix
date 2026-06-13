@@ -29,7 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Individual Mock Gateway v22.0 (Hardened).
+ * @fileOverview Individual Mock Gateway v23.0 (Premium Restore).
  * RESTORED: Unlock button for premium preparation nodes is now a permanent fixture.
  * BRANDING: Unlock button set to Cracklix Orange (bg-orange-500).
  */

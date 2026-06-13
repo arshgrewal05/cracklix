@@ -34,7 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Exam Hub v31.0 (Hardened).
+ * @fileOverview Institutional Exam Hub v32.0 (Premium Restore).
  * RESTORED: Unlock button for premium preparation nodes is now restored permanently.
  */
 

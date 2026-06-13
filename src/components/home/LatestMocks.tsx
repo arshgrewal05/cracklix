@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils"
 import { useRouter, usePathname } from "next/navigation"
 
 /**
- * @fileOverview High-Density Mock Feed v21.0 (Production Hardened).
- * RESTORED: Unlock button logic for premium preparation nodes.
+ * @fileOverview High-Density Mock Feed v22.0 (Premium Restore).
+ * RESTORED: Prominent Unlock button for premium preparation nodes.
  * BRANDING: Unlock button set to Cracklix Orange (bg-orange-500).
  */
 
