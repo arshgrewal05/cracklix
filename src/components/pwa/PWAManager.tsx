@@ -7,9 +7,8 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Institutional PWA Lifecycle Manager v26.0 (Ultra-Compact).
- * FIXED: Reliable Close Button logic with explicit event stopping.
- * UPDATED: Reduced size to an ultra-compact low-profile design.
+ * @fileOverview Institutional PWA Lifecycle Manager v27.0 (Hardened).
+ * UPDATED: Enhanced registration check and install prompt reliability.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -23,10 +22,16 @@ export default function PWAManager() {
     setMounted(true);
 
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(
-        () => console.log('[PWA] Active'),
-        () => console.log('[PWA] Offline Ready')
-      );
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(
+          (registration) => {
+            console.log('[PWA] ServiceWorker registered:', registration.scope);
+          },
+          (err) => {
+            console.error('[PWA] ServiceWorker registration failed:', err);
+          }
+        );
+      });
     }
 
     const handleBeforeInstallPrompt = (e: any) => {
@@ -38,7 +43,7 @@ export default function PWAManager() {
       const isExcluded = pathname?.includes('/attempt') || pathname?.startsWith('/admin');
       
       if (!isExcluded && !isStandalone && !isDismissed) {
-        const timer = setTimeout(() => setShowPrompt(true), 4000);
+        const timer = setTimeout(() => setShowPrompt(true), 5000);
         return () => clearTimeout(timer);
       }
     };
@@ -47,6 +52,7 @@ export default function PWAManager() {
       setDeferredPrompt(null);
       setShowPrompt(false);
       setIsInstalled(true);
+      console.log('[PWA] Application successfully installed locally.');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -92,18 +98,15 @@ export default function PWAManager() {
       >
         <div className="bg-[#0B1528] text-white p-2.5 rounded-2xl shadow-5xl border border-white/10 flex items-center gap-3 relative overflow-hidden group">
           
-          {/* Miniature Icon Node */}
           <div className="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
              <Zap className="h-4 w-4 text-[#F97316] fill-current" />
           </div>
 
-          {/* Miniature Content Hub */}
           <div className="flex-1 min-w-0 text-left">
              <h4 className="text-[11px] font-black uppercase tracking-tight leading-none mb-1">Download App</h4>
              <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest leading-tight truncate">Install for easy learning</p>
           </div>
 
-          {/* Action Hub */}
           <div className="flex items-center gap-1.5">
              <Button 
               onClick={handleInstallClick}
