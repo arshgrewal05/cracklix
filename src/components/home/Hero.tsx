@@ -18,9 +18,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final Calibrated Hero v230.0 (High-Fidelity Grid Fix).
- * UPDATED: Replaced scrolling row with 2x2 grid on mobile for full visibility.
- * UPDATED: Uppercased stat labels and refined typography scaling.
+ * @fileOverview Final Calibrated Hero v231.0 (Refined Spacing & Typography).
+ * UPDATED: Reduced vertical spacing between buttons and stats boxes.
+ * UPDATED: Tuned heading sizes for a more professional institutional feel.
  */
 
 export default function Hero() {
@@ -52,10 +52,10 @@ export default function Hero() {
   if (!mounted) return null;
 
   return (
-    <section className="relative w-full bg-[#050B19] overflow-hidden min-h-[500px] md:min-h-[550px] lg:h-[650px] flex flex-col justify-start text-left border-b border-white/5 pb-16 md:pb-20">
+    <section className="relative w-full bg-[#050B19] overflow-hidden min-h-[500px] md:min-h-[550px] lg:h-[620px] flex flex-col justify-start text-left border-b border-white/5 pb-12 md:pb-16">
       
       {/* 1. BACKGROUND ENGINE */}
-      <div className="absolute top-0 left-0 right-0 h-[220px] md:h-[500px] lg:h-[600px] z-0 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[220px] md:h-[500px] lg:h-[580px] z-0 overflow-hidden">
         <motion.img 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -70,13 +70,13 @@ export default function Hero() {
       </div>
 
       {/* 2. CONTENT HUB */}
-      <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl relative z-[30] pt-12 md:pt-20">
-         <div className="max-w-3xl space-y-4 md:space-y-6">
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl relative z-[30] pt-12 md:pt-16">
+         <div className="max-w-3xl space-y-4 md:space-y-5">
             
             <motion.div
                initial={{ opacity: 0, y: 5 }}
                animate={{ opacity: 1, y: 0 }}
-               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-2"
+               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-1"
             >
                <Star className="h-3 w-3 md:h-3.5 md:w-3.5 text-[#F97316] fill-current animate-pulse" />
                <span className="text-[9px] md:text-[10px] font-black text-white tracking-[0.2em] uppercase">#1 PUNJAB PREP PLATFORM</span>
@@ -88,10 +88,10 @@ export default function Hero() {
                transition={{ delay: 0.1 }}
                className="space-y-1 md:space-y-2"
             >
-               <h1 className="text-[32px] xs:text-[40px] sm:text-5xl md:text-6xl lg:text-7xl font-headline font-black text-white leading-[1.05] tracking-tighter uppercase">
+               <h1 className="text-[28px] xs:text-[36px] sm:text-4xl md:text-5xl lg:text-6xl font-headline font-black text-white leading-[1.05] tracking-tighter uppercase">
                   Prepare smarter.
                </h1>
-               <h1 className="text-[32px] xs:text-[40px] sm:text-5xl md:text-6xl lg:text-7xl font-headline font-black text-[#F97316] leading-[1.05] tracking-tighter uppercase">
+               <h1 className="text-[28px] xs:text-[36px] sm:text-4xl md:text-5xl lg:text-6xl font-headline font-black text-[#F97316] leading-[1.05] tracking-tighter uppercase">
                   Score higher.
                </h1>
             </motion.div>
@@ -110,7 +110,7 @@ export default function Hero() {
                initial={{ opacity: 0, y: 10 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.3 }}
-               className="flex flex-col sm:flex-row gap-3 pt-6 md:pt-8"
+               className="flex flex-col sm:flex-row gap-3 pt-6 md:pt-4"
             >
                <Button asChild className="h-14 md:h-16 px-8 md:px-12 bg-[#F97316] hover:bg-orange-600 text-white font-black text-[11px] md:text-sm tracking-[0.1em] rounded-xl md:rounded-2xl shadow-3xl transition-all border-none uppercase active:scale-95">
                   <Link href="/mocks" className="flex items-center gap-3">
@@ -126,8 +126,8 @@ export default function Hero() {
          </div>
       </div>
 
-      {/* 3. TIGHTENED STATS GRID (FIXED FOR MOBILE) */}
-      <div className="mt-12 md:mt-20 z-[40]">
+      {/* 3. TIGHTENED STATS GRID (MOVED UP) */}
+      <div className="mt-8 md:mt-12 z-[40]">
          <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 lg:gap-8">
                {liveStats.map((stat, idx) => (
