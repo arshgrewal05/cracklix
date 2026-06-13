@@ -18,8 +18,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final Calibrated Mobile-First Hero v227.0.
+ * @fileOverview Final Calibrated Mobile-First Hero v228.0.
  * UPDATED: Background image height restricted to 200px on mobile.
+ * UPDATED: Reduced button and card sizes for mobile to match user screenshot.
  */
 
 export default function Hero() {
@@ -41,10 +42,10 @@ export default function Hero() {
     };
 
     return [
-      { id: 'q', icon: <BookOpen className="text-blue-400 h-4 w-4 md:h-6 md:w-6" />, val: formatNumber(stats?.totalQuestions, "439+"), label: "Questions" },
-      { id: 'm', icon: <ClipboardList className="text-orange-400 h-4 w-4 md:h-6 md:w-6" />, val: formatNumber(stats?.totalMocks, "8+"), label: "Mocks" },
-      { id: 'e', icon: <ShieldCheck className="text-blue-500 h-4 w-4 md:h-6 md:w-6" />, val: formatNumber(stats?.totalBoards, "92+"), label: "Exams" },
-      { id: 'u', icon: <Users className="text-emerald-400 h-4 w-4 md:h-6 md:w-6" />, val: formatNumber(stats?.totalUsers, "5+"), label: "Aspirants" }
+      { id: 'q', icon: <BookOpen className="text-blue-400 h-3 w-3 md:h-6 md:w-6" />, val: formatNumber(stats?.totalQuestions, "439+"), label: "Questions" },
+      { id: 'm', icon: <ClipboardList className="text-orange-400 h-3 w-3 md:h-6 md:w-6" />, val: formatNumber(stats?.totalMocks, "8+"), label: "Mocks" },
+      { id: 'e', icon: <ShieldCheck className="text-blue-500 h-3 w-3 md:h-6 md:w-6" />, val: formatNumber(stats?.totalBoards, "92+"), label: "Exams" },
+      { id: 'u', icon: <Users className="text-emerald-400 h-3 w-3 md:h-6 md:w-6" />, val: formatNumber(stats?.totalUsers, "5+"), label: "Aspirants" }
     ];
   }, [stats]);
 
@@ -76,10 +77,10 @@ export default function Hero() {
             <motion.div
                initial={{ opacity: 0, y: 5 }}
                animate={{ opacity: 1, y: 0 }}
-               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-2"
+               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-2"
             >
-               <Star className="h-4 w-4 text-[#F97316] fill-current animate-pulse" />
-               <span className="text-[10px] md:text-xs font-black text-white tracking-[0.2em] uppercase">#1 PUNJAB PREP PLATFORM</span>
+               <Star className="h-3 w-3 md:h-4 md:w-4 text-[#F97316] fill-current animate-pulse" />
+               <span className="text-[9px] md:text-xs font-black text-white tracking-[0.2em] uppercase">#1 PUNJAB PREP PLATFORM</span>
             </motion.div>
 
             <motion.div
@@ -88,10 +89,10 @@ export default function Hero() {
                transition={{ delay: 0.1 }}
                className="space-y-1 md:space-y-2"
             >
-               <h1 className="text-[28px] xs:text-[36px] sm:text-5xl md:text-7xl lg:text-8xl font-headline font-black text-white leading-[1.05] tracking-tight uppercase">
+               <h1 className="text-[26px] xs:text-[32px] sm:text-5xl md:text-7xl lg:text-8xl font-headline font-black text-white leading-[1.05] tracking-tight uppercase">
                   Prepare smarter.
                </h1>
-               <h1 className="text-[28px] xs:text-[36px] sm:text-5xl md:text-7xl lg:text-8xl font-headline font-black text-[#F97316] leading-[1.05] tracking-tight uppercase">
+               <h1 className="text-[26px] xs:text-[32px] sm:text-5xl md:text-7xl lg:text-8xl font-headline font-black text-[#F97316] leading-[1.05] tracking-tight uppercase">
                   Score higher.
                </h1>
             </motion.div>
@@ -100,7 +101,7 @@ export default function Hero() {
                initial={{ opacity: 0, y: 10 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.2 }}
-               className="text-sm md:text-xl lg:text-2xl text-slate-300 font-medium max-w-2xl leading-relaxed antialiased"
+               className="text-xs md:text-xl lg:text-2xl text-slate-300 font-medium max-w-2xl leading-relaxed antialiased"
             >
                Punjab Government Exams di Complete Preparation <br className="hidden sm:block" />
                ik hi Hub te, Latest Official Patterns de Naal.
@@ -110,14 +111,14 @@ export default function Hero() {
                initial={{ opacity: 0, y: 10 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.3 }}
-               className="flex flex-col sm:flex-row gap-4 pt-6 md:pt-12"
+               className="flex flex-col sm:flex-row gap-3 pt-6 md:pt-12"
             >
-               <Button asChild className="h-14 md:h-18 px-10 md:px-16 bg-[#F97316] hover:bg-orange-600 text-white font-black text-[12px] md:sm lg:text-lg tracking-[0.1em] rounded-2xl md:rounded-[2.5rem] shadow-3xl transition-all border-none uppercase active:scale-95">
+               <Button asChild className="h-12 md:h-18 px-8 md:px-16 bg-[#F97316] hover:bg-orange-600 text-white font-black text-[10px] md:text-sm lg:text-lg tracking-[0.1em] rounded-xl md:rounded-[2.5rem] shadow-3xl transition-all border-none uppercase active:scale-95">
                   <Link href="/mocks" className="flex items-center gap-3">
-                     Free Mock <ArrowRight className="h-5 w-5" />
+                     Free Mock <ArrowRight className="h-4 w-4" />
                   </Link>
                </Button>
-               <Button asChild variant="outline" className="h-14 md:h-18 px-10 md:px-16 border-white/20 bg-white/5 text-white font-black text-[12px] md:sm lg:text-lg tracking-[0.1em] rounded-2xl md:rounded-[2.5rem] transition-all backdrop-blur-md hover:bg-white/10 uppercase active:scale-95">
+               <Button asChild variant="outline" className="h-12 md:h-18 px-8 md:px-16 border-white/20 bg-white/5 text-white font-black text-[10px] md:text-sm lg:text-lg tracking-[0.1em] rounded-xl md:rounded-[2.5rem] transition-all backdrop-blur-md hover:bg-white/10 uppercase active:scale-95">
                   <Link href="/exams">
                      Explore Exams
                   </Link>
@@ -136,15 +137,15 @@ export default function Hero() {
                      initial={{ opacity: 0, y: 5 }}
                      animate={{ opacity: 1, y: 0 }}
                      transition={{ delay: 0.4 + (idx * 0.1) }}
-                     className="shrink-0 flex-1 md:flex-none min-w-[150px] md:min-w-0 snap-center"
+                     className="shrink-0 flex-1 md:flex-none min-w-[130px] md:min-w-0 snap-center"
                   >
-                     <Card className="bg-[#0B1528]/70 backdrop-blur-3xl border border-white/10 p-4 md:p-6 lg:p-8 rounded-[2rem] md:rounded-[3rem] text-left flex items-center gap-4 md:gap-6 group hover:bg-[#0B1528] transition-all duration-300 shadow-2xl overflow-hidden h-20 md:h-28 lg:h-36 w-full">
-                        <div className="shrink-0 h-11 w-11 md:h-16 md:w-16 lg:h-20 lg:w-20 rounded-2xl md:rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner">
+                     <Card className="bg-[#0B1528]/70 backdrop-blur-3xl border border-white/10 p-3 md:p-6 lg:p-8 rounded-[1.5rem] md:rounded-[3rem] text-left flex items-center gap-3 md:gap-6 group hover:bg-[#0B1528] transition-all duration-300 shadow-2xl overflow-hidden h-16 md:h-28 lg:h-36 w-full">
+                        <div className="shrink-0 h-8 w-8 md:h-16 md:w-16 lg:h-20 lg:w-20 rounded-xl md:rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner">
                            {stat.icon}
                         </div>
                         <div className="min-w-0 flex flex-col justify-center leading-tight">
-                           <p className="text-xl md:text-4xl lg:text-5xl font-headline font-black text-white tabular-nums leading-none mb-1">{stat.val}</p>
-                           <p className="text-[9px] md:text-[11px] lg:text-[13px] font-black text-slate-500 uppercase tracking-widest truncate">
+                           <p className="text-base md:text-4xl lg:text-5xl font-headline font-black text-white tabular-nums leading-none mb-0.5 md:mb-1">{stat.val}</p>
+                           <p className="text-[7px] md:text-[11px] lg:text-[13px] font-black text-slate-500 uppercase tracking-widest truncate">
                               {stat.label}
                            </p>
                         </div>
