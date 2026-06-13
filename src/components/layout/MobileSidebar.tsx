@@ -26,10 +26,11 @@ import { cn } from "@/lib/utils";
 import React, { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import Logo from "@/components/brand/Logo";
 
 /**
- * @fileOverview Hardened Production Sidebar Hub v51.0.
- * UPDATED: Precise PWA ergonomics and robust installation trigger.
+ * @fileOverview Hardened Production Sidebar Hub v52.0.
+ * UPDATED: Integrated large Logo component at the top of the sidebar.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -85,10 +86,15 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#0B1528] text-white overflow-y-auto no-scrollbar font-body select-none">
+    <div className="flex flex-col h-full bg-[#0B1528] text-white overflow-y-auto no-scrollbar font-body select-none text-left">
       
+      {/* BRAND LOGO */}
+      <div className="px-6 pt-10 pb-4 flex justify-start shrink-0 overflow-visible pt-safe">
+         <Logo imgClassName="h-28 origin-left" />
+      </div>
+
       {/* IDENTITY HEADER */}
-      <div className="px-6 pt-12 pb-6 flex flex-col gap-5 relative overflow-hidden shrink-0 pt-safe">
+      <div className="px-6 pt-8 pb-6 flex flex-col gap-5 relative overflow-hidden shrink-0">
         <Shield className="absolute top-10 right-4 h-40 w-40 text-white/[0.03] pointer-events-none" />
         
         <div className="relative z-10 flex items-center gap-4">

@@ -39,8 +39,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Mobile-First Admin Layout v185.0.
- * UPDATED: Responsive Sidebar with safe-area support and PWA optimization.
+ * @fileOverview Hardened Mobile-First Admin Layout v186.0.
+ * UPDATED: Increased Logo size to h-24 and enabled unified sidebar scrolling.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -85,11 +85,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!user || !isAdmin) return null
 
   const SideNavContent = () => (
-    <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none overflow-hidden">
-       <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden pb-20 pt-safe">
+    <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none overflow-y-auto custom-scrollbar pt-safe">
+       <div className="flex-1 pb-10">
           
-          <div className="px-6 pt-8 pb-8 flex justify-start shrink-0">
-             <Logo href="/admin" imgClassName="h-10 origin-left" />
+          <div className="px-6 pt-8 pb-12 flex justify-start shrink-0 overflow-visible">
+             <Logo href="/admin" imgClassName="h-24 origin-left" />
           </div>
 
           <SidebarGroup className="pt-0">
@@ -132,7 +132,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </SidebarGroup>
        </div>
 
-       <div className="p-6 border-t border-white/5 bg-black/20 shrink-0 pb-safe">
+       <div className="p-6 border-t border-white/5 bg-black/20 shrink-0 mb-safe">
           <div className="flex items-center gap-4">
              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                 <User className="h-5 w-5" />
@@ -148,7 +148,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-white font-body overflow-x-hidden pointer-events-auto">
+      <div className="flex min-h-screen w-full bg-white font-body overflow-x-hidden pointer-events-auto text-left">
         <Sidebar className="border-r border-white/5 bg-[#0F172A] z-[50]">
            <SideNavContent />
         </Sidebar>
