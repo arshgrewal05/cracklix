@@ -25,8 +25,8 @@ import PWAInstallButton from "@/components/PWAInstallButton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Final Screenshot-Matched Navbar v250.0.
- * RESTORED: Home Page icon styling and Navbar Install button.
+ * @fileOverview Final Screenshot-Matched Navbar v251.0 (Fixed Logout).
+ * FIXED: Defined handleLogout function to prevent ReferenceError.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -39,6 +39,15 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("[NAVBAR_LOGOUT_FAILURE]:", error);
+    }
+  };
 
   const isAdmin = useMemo(() => {
     if (!user) return false;
