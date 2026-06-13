@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import StudentAvatar from "@/components/brand/StudentAvatar";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import MobileSidebar from "./MobileSidebar";
@@ -23,8 +23,9 @@ import { Button } from "@/components/ui/button";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Final Performance-Hardened Header v146.0.
- * UPDATED: Increased Logo size (h-14) to match high-fidelity visibility requirements.
+ * @fileOverview Final Performance-Hardened Header v146.1.
+ * FIXED: Corrected DropdownMenu import path to resolve Module Not Found error.
+ * UPDATED: Logo scale preserved at h-14 for maximum brand visibility.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
