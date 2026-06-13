@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Optimized Institutional PWA Manifest v21.0 (Hardened).
- * UPDATED: Optimized theme settings and display modes for premium PWA feel.
+ * @fileOverview Optimized Institutional PWA Manifest v22.0 (Hardened).
+ * UPDATED: Strictly verified fields for production installability.
  */
 export default function manifest(): MetadataRoute.Manifest {
   const brandIcon = 'https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png';

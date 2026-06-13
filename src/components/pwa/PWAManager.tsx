@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Hardened Institutional PWA Lifecycle Manager v30.0.
- * UPDATED: Persistent event capture with immediate mount check for deferredPrompt.
+ * @fileOverview Hardened Institutional PWA Lifecycle Manager v31.0.
+ * UPDATED: Optimized detection logic using display-mode media query and custom events.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -24,7 +24,14 @@ export default function PWAManager() {
     const isExcluded = pathname?.includes('/attempt') || pathname?.startsWith('/admin');
     const hasPrompt = !!(window as any).deferredPrompt;
     
-    if (!isExcluded && !isStandalone && !sessionDismissed && hasPrompt) {
+    // Explicitly update isInstalled state
+    if (isStandalone) {
+      setIsInstalled(true);
+      setShowPrompt(false);
+      return;
+    }
+
+    if (!isExcluded && !sessionDismissed && hasPrompt) {
       setShowPrompt(true);
     } else {
       setShowPrompt(false);
@@ -34,31 +41,18 @@ export default function PWAManager() {
   useEffect(() => {
     setMounted(true);
 
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(err => 
-        console.error('[PWA] SW Registration Failed:', err)
-      );
-    }
-
-    // Immediate check on mount
+    // Initial check
     checkInstallability();
 
-    // Listen for future availability
+    // Listen for availability events dispatched from layout.tsx
     window.addEventListener('pwa-installable', checkInstallability);
-    window.addEventListener('beforeinstallprompt', checkInstallability);
-    
-    const handleAppInstalled = () => {
-      setShowPrompt(false);
+    window.addEventListener('pwa-installed', () => {
       setIsInstalled(true);
-      (window as any).deferredPrompt = null;
-    };
-
-    window.addEventListener('appinstalled', handleAppInstalled);
+      setShowPrompt(false);
+    });
 
     return () => {
       window.removeEventListener('pwa-installable', checkInstallability);
-      window.removeEventListener('beforeinstallprompt', checkInstallability);
-      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, [checkInstallability]);
 
@@ -99,8 +93,8 @@ export default function PWAManager() {
              <Zap className="h-4 w-4 text-[#F97316] fill-current" />
           </div>
           <div className="flex-1 min-w-0 text-left">
-             <h4 className="text-[11px] font-black uppercase tracking-tight leading-none mb-1">Install Hub</h4>
-             <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest leading-tight truncate">Quick access for exams</p>
+             <h4 className="text-[11px] font-black uppercase tracking-tight leading-none mb-1">Install App</h4>
+             <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest leading-tight truncate">Direct access to exams</p>
           </div>
           <div className="flex items-center gap-1.5">
              <Button 

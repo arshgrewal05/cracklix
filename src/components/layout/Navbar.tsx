@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from "next/link";
-import { Menu, Search, User, Gem, LogOut, Newspaper, Download, Zap, Home, ShieldCheck, Award } from "lucide-react";
+import { Menu, Search, User, Gem, LogOut, Newspaper, Download, Zap, Home, ShieldCheck, Smartphone } from "lucide-react";
 import Logo from "@/components/brand/Logo";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
@@ -24,13 +24,13 @@ import { useToast } from "@/hooks/use-toast";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview High-Fidelity Mobile-First Navbar v197.1.
- * ACCESSIBILITY: Added SheetDescription for ARIA compliance in mobile sidebar.
+ * @fileOverview High-Fidelity Mobile-First Navbar v198.0.
+ * UPDATED: Integrated PWA Install button for desktop and tablet users.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [hasPrompt, setHasPrompt] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
   const { user, profile, loading } = useUser();
   const auth = useAuth();
   const pathname = usePathname();
@@ -40,14 +40,36 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
     
-    if (typeof window !== 'undefined' && (window as any).deferredPrompt) {
-      setHasPrompt(true);
-    }
+    const checkInstallability = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      if (window.deferredPrompt && !isStandalone) {
+        setCanInstall(true);
+      } else {
+        setCanInstall(false);
+      }
+    };
 
-    const handleInstallable = () => setHasPrompt(true);
-    window.addEventListener('pwa-installable', handleInstallable);
-    return () => window.removeEventListener('pwa-installable', handleInstallable);
+    checkInstallability();
+    window.addEventListener('pwa-installable', checkInstallability);
+    window.addEventListener('pwa-installed', checkInstallability);
+    
+    return () => {
+      window.removeEventListener('pwa-installable', checkInstallability);
+      window.removeEventListener('pwa-installed', checkInstallability);
+    };
   }, []);
+
+  const handleInstall = async () => {
+    const prompt = (window as any).deferredPrompt;
+    if (prompt) {
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      if (outcome === 'accepted') {
+        (window as any).deferredPrompt = null;
+        setCanInstall(false);
+      }
+    }
+  };
 
   const isAdmin = useMemo(() => {
     if (!user) return false;
@@ -134,6 +156,16 @@ export default function Navbar() {
 
           {/* ACTIONS & USER */}
           <div className="flex items-center gap-2 md:gap-4 lg:gap-6 shrink-0 h-full">
+             {/* PWA INSTALL BUTTON (DESKTOP) */}
+             {canInstall && (
+               <Button 
+                onClick={handleInstall}
+                className="hidden md:flex h-[44px] px-6 rounded-xl bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-xl border-none transition-all active:scale-95"
+               >
+                  <Download className="h-4 w-4" /> Install App
+               </Button>
+             )}
+
              {user && (
                 <div 
                   onClick={() => router.push('/pass')}
@@ -179,14 +211,14 @@ export default function Navbar() {
                      </DropdownMenuItem>
                      <DropdownMenuItem asChild className="flex items-center gap-4 px-4 py-3.5 cursor-pointer rounded-xl transition-all focus:bg-white/5 focus:text-white group">
                        <Link href="/my-exams" className="w-full flex items-center gap-4">
-                         <Award className="h-5 w-5 text-emerald-400" />
+                         <ShieldCheck className="h-5 w-5 text-emerald-400" />
                          <span className="font-bold text-[14px] tracking-tight uppercase">MY RESULTS</span>
                        </Link>
                      </DropdownMenuItem>
                      {isAdmin && (
                        <DropdownMenuItem asChild className="flex items-center gap-4 px-4 py-3.5 cursor-pointer rounded-xl transition-all bg-white/5 focus:bg-white/10 group mt-1 border border-white/5">
                          <Link href="/admin" className="w-full flex items-center gap-4">
-                           <ShieldCheck className="h-5 w-5 text-rose-500" />
+                           <Smartphone className="h-5 w-5 text-rose-500" />
                            <span className="font-bold text-[14px] tracking-tight uppercase text-white">ADMIN HUB</span>
                          </Link>
                        </DropdownMenuItem>

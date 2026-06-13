@@ -71,17 +71,32 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               window.deferredPrompt = null;
+              
               const capturePrompt = (e) => {
                 e.preventDefault();
                 window.deferredPrompt = e;
+                console.log('[PWA] beforeinstallprompt captured.');
                 window.dispatchEvent(new CustomEvent('pwa-installable'));
-                console.log('[PWA] Installation prompt captured.');
               };
+
               window.addEventListener('beforeinstallprompt', capturePrompt);
+
               window.addEventListener('appinstalled', (e) => {
                 console.log('[PWA] App successfully installed.');
                 window.deferredPrompt = null;
+                window.dispatchEvent(new CustomEvent('pwa-installed'));
               });
+
+              // Service Worker Registration Node
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('[PWA] Service Worker Active:', reg.scope);
+                  }).catch(err => {
+                    console.error('[PWA] SW Registration Failed:', err);
+                  });
+                });
+              }
             `,
           }}
         />
