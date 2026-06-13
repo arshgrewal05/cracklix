@@ -22,9 +22,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final Viewport-Calibrated Hero v13.0.
- * FIXED: Background image visibility on mobile by using a more reliable asset and tuning overlays.
- * FIXED: Mobile height preserved at 230px.
+ * @fileOverview Final Viewport-Calibrated Hero v14.0.
+ * FIXED: Mobile height set to exactly 200px as requested.
+ * FIXED: Background image position tuned to object-top/center to show temple fully in 200px window.
  */
 
 export default function Hero() {
@@ -57,34 +57,34 @@ export default function Hero() {
 
   return (
     <section className="relative w-full bg-[#020817] overflow-hidden flex flex-col items-center">
-      {/* 1. BACKGROUND LAYER - Compact 230px Fit */}
-      <div className="w-full relative min-h-[230px] md:min-h-0 md:aspect-[21/9] bg-[#020817]">
+      {/* 1. BACKGROUND LAYER - Compact 200px Fit */}
+      <div className="w-full relative min-h-[200px] md:min-h-0 md:aspect-[21/9] bg-[#020817]">
         <motion.img 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
           src="https://images.unsplash.com/photo-1596404351662-386f63456770?q=80&w=2070&auto=format&fit=crop" 
           alt="Golden Temple Night" 
-          className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
+          className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
           referrerPolicy="no-referrer"
         />
         
         {/* PAIRED OVERLAYS - Balanced for mobile visibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020817] via-[#020817]/40 md:via-[#020817]/60 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#020817] via-[#020817]/30 md:via-[#020817]/60 to-transparent z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#020817] via-transparent to-transparent z-10" />
         
         {/* TEXT CONTENT HUB */}
         <div className="absolute inset-0 z-20 flex items-center">
            <div className="container mx-auto px-4 md:px-12 max-w-7xl">
-              <div className="max-w-[90vw] md:max-w-2xl space-y-3 md:space-y-6 text-left">
+              <div className="max-w-[90vw] md:max-w-2xl space-y-2 md:space-y-6 text-left">
                  
                  <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="inline-flex items-center gap-1.5 px-2 md:px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl"
+                    className="inline-flex items-center gap-1 md:gap-3 py-0.5 md:py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl px-2 md:px-3"
                  >
                     <Star className="h-2 w-2 md:h-3 md:w-3 text-orange-500 fill-current" />
-                    <span className="text-[7px] md:text-xs font-black text-white uppercase tracking-widest">
+                    <span className="text-[6px] md:text-xs font-black text-white uppercase tracking-widest">
                        #1 Punjab Exam Prep
                     </span>
                  </motion.div>
@@ -93,13 +93,13 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="space-y-1.5 md:space-y-4"
+                    className="space-y-1 md:space-y-4"
                  >
-                    <h1 className="text-sm sm:text-4xl md:text-6xl font-black text-white leading-[1.1] tracking-tighter uppercase break-words drop-shadow-2xl">
+                    <h1 className="text-[14px] sm:text-4xl md:text-6xl font-black text-white leading-[1.1] tracking-tighter uppercase break-words drop-shadow-2xl">
                        Prepare Smarter.<br/>
                        <span className="text-primary italic">Score Higher.</span>
                     </h1>
-                    <p className="text-[9px] md:text-lg text-slate-200 font-medium max-w-xs md:max-w-lg leading-relaxed drop-shadow-lg opacity-90 truncate-mobile">
+                    <p className="text-[8px] md:text-lg text-slate-200 font-medium max-w-xs md:max-w-lg leading-relaxed drop-shadow-lg opacity-90 truncate-mobile">
                        Punjab Government Exams di Complete Preparation.
                     </p>
                  </motion.div>
@@ -108,14 +108,14 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="flex flex-row gap-2 md:gap-4"
+                    className="flex flex-row gap-2 md:gap-4 pt-1"
                  >
-                    <Button asChild className="h-8 md:h-16 px-4 md:px-10 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[7px] md:text-xs tracking-[0.1em] rounded-md md:rounded-2xl shadow-4xl gap-1 md:gap-2 transition-all active:scale-95 border-none">
+                    <Button asChild className="h-7 md:h-16 px-3 md:px-10 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[6px] md:text-xs tracking-[0.1em] rounded-sm md:rounded-2xl shadow-4xl gap-1 md:gap-2 transition-all active:scale-95 border-none">
                        <Link href="/mocks">
-                          Free Mock <ArrowRight className="h-2.5 w-2.5 md:h-4 md:w-4" />
+                          Free Mock <ArrowRight className="h-2 w-2 md:h-4 md:w-4" />
                        </Link>
                     </Button>
-                    <Button asChild variant="outline" className="h-8 md:h-16 px-4 md:px-10 border-white/40 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[7px] md:text-xs tracking-[0.1em] rounded-md md:rounded-2xl transition-all backdrop-blur-md">
+                    <Button asChild variant="outline" className="h-7 md:h-16 px-3 md:px-10 border-white/40 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[6px] md:text-xs tracking-[0.1em] rounded-sm md:rounded-2xl transition-all backdrop-blur-md">
                        <Link href="/exams">
                           Explore Hub
                        </Link>
@@ -127,7 +127,7 @@ export default function Hero() {
       </div>
 
       {/* 2. BOTTOM STATS BAR HUB */}
-      <div className="w-full bg-[#020817] pt-0 pb-12 md:pb-16 -mt-2 md:-mt-20 relative z-30">
+      <div className="w-full bg-[#020817] pt-0 pb-12 md:pb-16 -mt-1 md:-mt-20 relative z-30">
          <div className="container mx-auto px-4 md:px-12 max-w-7xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6">
                <HeroStatCard 
