@@ -5,19 +5,19 @@ import { cn } from "@/lib/utils";
 
 /**
  * @fileOverview Official Cracklix Master Logo Hub.
- * HARDENED: Strict dimensions and CSS-driven sizing to prevent giant logo issues and hydration mismatches.
+ * RESTORED: Standardized premium dimensions for high visibility across all platforms.
  */
 export function LogoIcon({ className = "" }: { className?: string }) {
   return (
-    <div className={cn("relative shrink-0 flex items-center justify-center h-8 md:h-10 w-auto", className)}>
+    <div className={cn("relative shrink-0 flex items-center justify-center h-10 md:h-16 w-auto", className)}>
       <img 
         src="https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png" 
         alt="Cracklix" 
         className="h-full w-auto object-contain"
         referrerPolicy="no-referrer"
-        width={180}
-        height={40}
-        style={{ maxHeight: '40px', width: 'auto' }}
+        width={220}
+        height={64}
+        style={{ maxHeight: '64px', width: 'auto' }}
       />
     </div>
   );

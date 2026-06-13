@@ -22,10 +22,9 @@ import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Definitive Hero Hub v60.0.
- * FIXED: Resolved 'S' character clipping by adjusting tracking and adding right padding to the italic span.
- * DESIGN: Pure visual dashboard (zero text overlays) with a 3D cinematic frame.
- * STABILITY: Verified all icon imports to prevent ReferenceErrors.
+ * @fileOverview Definitive Hero Hub v65.0.
+ * FIXED: Precise padding guard (pr-10) for the italic heading to prevent 'S' clipping.
+ * DESIGN: Pure visual dashboard with cinematic framing and restored registry stats.
  */
 
 export default function Hero() {
@@ -64,7 +63,7 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center bg-[#070D19] overflow-hidden text-left pt-24 pb-16">
-      {/* Dynamic Background Atmosphere */}
+      {/* Background Glows */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-b from-primary/10 to-transparent blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -92,7 +91,7 @@ export default function Hero() {
             >
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tight uppercase">
                 CRACK PUNJAB <br />
-                <span className="bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent italic pr-6 inline-block">GOVT EXAMS</span>
+                <span className="bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent italic pr-10 inline-block">GOVT EXAMS</span>
               </h1>
               <p className="text-base md:text-xl text-slate-400 font-medium max-w-xl leading-relaxed antialiased">
                 Prepare for PSSSB, Punjab Police, PPSC and other major state recruitments with pattern-based mocks and official PYQs.
@@ -131,7 +130,7 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* 2. COMMAND CENTER VISUAL (PURE DESIGNED IMAGE) */}
+          {/* 2. COMMAND CENTER VISUAL */}
           <div className="lg:col-span-5 relative justify-self-center w-full max-w-[550px]">
              <motion.div 
                initial={{ opacity: 0, x: 50 }}
@@ -139,35 +138,21 @@ export default function Hero() {
                transition={{ duration: 1, ease: "easeOut" }}
                className="relative w-full"
              >
-                {/* Advanced Light System */}
                 <div className="absolute -inset-2 bg-gradient-to-tr from-primary/30 via-white/5 to-blue-500/20 rounded-[4rem] blur-md opacity-40" />
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 blur-[80px] rounded-full animate-pulse" />
                 
-                {/* High-Fidelity Tech Frame */}
                 <div className="relative aspect-[4/5] rounded-[3.8rem] bg-[#0F172A] border-[16px] border-white/[0.02] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] ring-1 ring-white/10 group">
                    <img 
                      src="https://i.ibb.co/gZCGMQNJ/IMG-20260612-WA0010.jpg" 
-                     alt="Punjab Exam Hub Dashboard"
+                     alt="Dashboard"
                      className="w-full h-full object-cover opacity-90 transition-all duration-1000 group-hover:scale-105 group-hover:opacity-100"
                      referrerPolicy="no-referrer"
                    />
-                   
-                   {/* Cinematic Overlay */}
                    <div className="absolute inset-0 bg-gradient-to-t from-[#070D19] via-transparent to-transparent opacity-70" />
                    
-                   {/* Industrial Accents */}
                    <div className="absolute top-10 left-10 w-16 h-16 border-t-[3px] border-l-[3px] border-primary/40 rounded-tl-2xl" />
                    <div className="absolute bottom-10 right-10 w-16 h-16 border-b-[3px] border-r-[3px] border-primary/40 rounded-br-2xl" />
-                   
-                   {/* Scanning Glow Line */}
-                   <motion.div 
-                      animate={{ top: ['0%', '100%', '0%'] }}
-                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                      className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-50 z-20 pointer-events-none"
-                   />
                 </div>
 
-                {/* Sub-Image Glow Orbs */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-primary/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
              </motion.div>
           </div>
@@ -196,4 +181,3 @@ export default function Hero() {
     </section>
   );
 }
-
