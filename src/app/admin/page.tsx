@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useMemo, useState, useEffect } from "react"
@@ -30,8 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Command Center v39.0.
- * UPDATED: Added totalBoards to master statistics synchronization.
+ * @fileOverview Institutional Command Center v40.0.
+ * UPDATED: Optimized live stats sync to support Hero status bar.
  */
 
 export default function AdminDashboard() {
@@ -75,12 +74,13 @@ export default function AdminDashboard() {
      if (!db) return;
      if (!silent) setIsStatsSyncing(true);
      try {
-        const [qSnap, mSnap, uSnap, rSnap, bSnap] = await Promise.all([
+        const [qSnap, mSnap, uSnap, rSnap, bSnap, eSnap] = await Promise.all([
            getDocs(collection(db, "questions")),
            getDocs(collection(db, "mocks")),
            getDocs(collection(db, "users")),
            getDocs(collection(db, "results")),
-           getDocs(collection(db, "boards"))
+           getDocs(collection(db, "boards")),
+           getDocs(collection(db, "exams"))
         ]);
 
         const totalResults = rSnap.docs.length;
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
            totalQuestions: qSnap.size,
            totalMocks: mSnap.size,
            totalUsers: uSnap.size,
-           totalBoards: bSnap.size,
+           totalBoards: eSnap.size, // Using total registered exams for "Exams Covered"
            averageAccuracy: avgAcc,
            updatedAt: serverTimestamp()
         }, { merge: true });
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
         if (!silent) {
            toast({ 
              title: "Registry Audited", 
-             description: `Synced: ${qSnap.size} MCQs, ${bSnap.size} Hubs, ${uSnap.size} Students.` 
+             description: `Synced: ${qSnap.size} MCQs, ${eSnap.size} Exams, ${uSnap.size} Students.` 
            });
         }
      } catch (e) {

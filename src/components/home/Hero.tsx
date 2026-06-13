@@ -22,8 +22,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final Screenshot-Matched Hero v6.0.
+ * @fileOverview Final Screenshot-Matched Hero v7.0.
  * UPDATED: Live Data Integration & High-Visibility Icons with optimized backgrounds.
+ * MATCHED: 1:1 styling with provided screenshot for bottom stats bar.
  */
 
 export default function Hero() {
@@ -45,9 +46,9 @@ export default function Hero() {
     };
 
     return {
-      questions: formatNumber(stats?.totalQuestions, "10k+"),
-      mocks: formatNumber(stats?.totalMocks, "500+"),
-      exams: formatNumber(stats?.totalBoards, "50+"),
+      questions: formatNumber(stats?.totalQuestions, "439+"),
+      mocks: formatNumber(stats?.totalMocks, "8+"),
+      exams: formatNumber(stats?.totalBoards, "31+"),
       analytics: "Detailed"
     };
   }, [stats]);
@@ -122,33 +123,33 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* 3. BOTTOM STATS BAR HUB (High-Visibility Icons) */}
-      <div className="w-full bg-[#020817] pt-0 pb-12 md:pb-16 -mt-10 md:-mt-24 relative z-30">
+      {/* 3. BOTTOM STATS BAR HUB (Screenshot Matched Layout) */}
+      <div className="w-full bg-[#020817] pt-0 pb-12 md:pb-16 -mt-12 md:-mt-24 relative z-30">
          <div className="container mx-auto px-4 md:px-12 max-w-7xl">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                <HeroStatCard 
-                 icon={<BookOpen className="text-blue-400 h-5 w-5 md:h-7 md:w-7" />} 
-                 iconBg="bg-blue-400/10 border border-blue-400/20"
+                 icon={<BookOpen className="text-blue-500 h-5 w-5 md:h-6 md:w-6" />} 
+                 iconBg="bg-blue-500/10 border border-blue-500/20"
                  val={liveStats.questions} 
-                 label="Practice Questions" 
+                 label="PRACTICE QUESTIONS" 
                />
                <HeroStatCard 
-                 icon={<ClipboardList className="text-orange-400 h-5 w-5 md:h-7 md:w-7" />} 
-                 iconBg="bg-orange-400/10 border border-orange-400/20"
+                 icon={<ClipboardList className="text-[#F97316] h-5 w-5 md:h-6 md:w-6" />} 
+                 iconBg="bg-[#F97316]/10 border border-[#F97316]/20"
                  val={liveStats.mocks} 
-                 label="Mock Tests" 
+                 label="MOCK TESTS" 
                />
                <HeroStatCard 
-                 icon={<ShieldCheck className="text-blue-400 h-5 w-5 md:h-7 md:w-7" />} 
+                 icon={<ShieldCheck className="text-blue-400 h-5 w-5 md:h-6 md:w-6" />} 
                  iconBg="bg-blue-400/10 border border-blue-400/20"
                  val={liveStats.exams} 
-                 label="Exams Covered" 
+                 label="EXAMS COVERED" 
                />
                <HeroStatCard 
-                 icon={<BarChart3 className="text-emerald-400 h-5 w-5 md:h-7 md:w-7" />} 
+                 icon={<BarChart3 className="text-emerald-400 h-5 w-5 md:h-6 md:w-6" />} 
                  iconBg="bg-emerald-400/10 border border-emerald-400/20"
                  val={liveStats.analytics} 
-                 label="Analytics" 
+                 label="ANALYTICS" 
                />
             </div>
          </div>
@@ -159,13 +160,13 @@ export default function Hero() {
 
 function HeroStatCard({ icon, val, label, iconBg }: { icon: React.ReactNode, val: string, label: string, iconBg: string }) {
   return (
-    <Card className="bg-[#0B1528]/80 backdrop-blur-2xl border border-white/10 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] text-left flex items-center gap-4 md:gap-6 group hover:bg-[#0B1528] transition-all duration-500 shadow-2xl">
-       <div className={cn("h-10 w-10 md:h-14 md:w-14 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform", iconBg)}>
+    <Card className="bg-[#0B1528]/60 backdrop-blur-2xl border border-white/5 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] text-left flex items-center gap-6 group hover:bg-[#0B1528]/80 transition-all duration-500 shadow-2xl">
+       <div className={cn("h-12 w-12 md:h-14 md:w-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform", iconBg)}>
           {icon}
        </div>
-       <div className="min-w-0">
-          <p className="text-lg md:text-3xl font-black text-white leading-none mb-1 md:mb-2">{val}</p>
-          <p className="text-[7px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest truncate">{label}</p>
+       <div className="min-w-0 space-y-1">
+          <p className="text-2xl md:text-4xl font-black text-white leading-none tracking-tight tabular-nums">{val}</p>
+          <p className="text-[8px] md:text-[9px] font-black uppercase text-slate-500 tracking-[0.1em] truncate">{label}</p>
        </div>
     </Card>
   )
