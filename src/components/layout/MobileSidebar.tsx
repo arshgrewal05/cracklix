@@ -25,8 +25,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 /**
- * @fileOverview Final Sidebar Hub v47.0 (Compact Mobile Optimization).
- * UPDATED: Reduced sizes for text, icons, and item heights for a discrete look.
+ * @fileOverview Final Sidebar Hub v48.0 (Ultra-Compact).
+ * UPDATED: Further decreased student name, avatar size, and header padding for maximum efficiency.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -87,22 +87,22 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col h-full bg-[#0B1528] text-white overflow-y-auto no-scrollbar font-body select-none">
       
-      {/* 1. USER IDENTITY HEADER (REDUCED) */}
-      <div className="px-6 pt-10 pb-5 flex flex-col gap-4 relative overflow-hidden shrink-0">
-        <Shield className="absolute top-10 right-4 h-40 w-40 text-white/[0.02] pointer-events-none" />
+      {/* 1. USER IDENTITY HEADER (ULTRA-COMPACT) */}
+      <div className="px-6 pt-8 pb-4 flex flex-col gap-3 relative overflow-hidden shrink-0">
+        <Shield className="absolute top-8 right-4 h-32 w-32 text-white/[0.02] pointer-events-none" />
         
-        <div className="relative z-10 flex items-center gap-4">
+        <div className="relative z-10 flex items-center gap-3.5">
            <div className="relative">
-              <div className="h-14 w-14 rounded-2xl border-[2px] border-white/20 flex items-center justify-center bg-[#1E293B] shadow-2xl overflow-hidden">
-                 <User className="h-7 w-7 text-slate-400" />
+              <div className="h-12 w-12 rounded-xl border-[2px] border-white/20 flex items-center justify-center bg-[#1E293B] shadow-2xl overflow-hidden">
+                 <User className="h-6 w-6 text-slate-400" />
               </div>
-              <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-[#10B981] rounded-md border-[2px] border-[#0B1528] flex items-center justify-center text-white">
+              <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-[#10B981] rounded-md border-[2px] border-[#0B1528] flex items-center justify-center text-white">
                  <ShieldCheck className="h-2 w-2" />
               </div>
            </div>
 
            <div className="space-y-0.5 text-left">
-              <h2 className="text-lg font-black text-white leading-none uppercase tracking-tight">
+              <h2 className="text-[15px] font-black text-white leading-none uppercase tracking-tight">
                  {profile?.name || "STUDENT"}
               </h2>
               <div className="flex flex-col items-start gap-1">
@@ -115,11 +115,11 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
 
         <button 
            onClick={() => { router.push('/profile'); onClose(); }}
-           className="w-full h-10 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-between px-4 group active:scale-95 transition-all relative z-10"
+           className="w-full h-9 rounded-lg border border-white/10 bg-white/[0.03] flex items-center justify-between px-4 group active:scale-95 transition-all relative z-10"
         >
            <div className="flex items-center gap-3">
-              <User className="h-3.5 w-3.5 text-[#F97316]" />
-              <span className="text-[9px] font-[900] uppercase tracking-[0.2em] text-slate-200">PROFILE HUB</span>
+              <User className="h-3 w-3 text-[#F97316]" />
+              <span className="text-[8px] font-[900] uppercase tracking-[0.2em] text-slate-200">PROFILE HUB</span>
            </div>
            <ChevronRight className="h-3 w-3 text-slate-600" />
         </button>
@@ -135,15 +135,15 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
       >
          <div className="flex items-center gap-4">
             <div className={cn(
-              "h-9 w-9 rounded-lg flex items-center justify-center shadow-lg transition-colors",
+              "h-8 w-8 rounded-lg flex items-center justify-center shadow-lg transition-colors",
               hasPrompt ? "bg-[#10B981] text-white shadow-emerald-500/20" : "bg-white/5 text-slate-500"
             )}>
-               <Download className="h-4 w-4" />
+               <Download className="h-3.5 w-3.5" />
             </div>
             <div className="text-left leading-none">
-               <span className="text-[11px] uppercase tracking-tight font-black text-white block mb-0.5">DOWNLOAD APP</span>
+               <span className="text-[10px] uppercase tracking-tight font-black text-white block mb-0.5">DOWNLOAD APP</span>
                <p className={cn(
-                 "text-[7px] font-black uppercase tracking-widest",
+                 "text-[6px] font-black uppercase tracking-widest",
                  hasPrompt ? "text-[#10B981]" : "text-slate-500"
                )}>
                  {hasPrompt ? "FAST ACCESS" : "INSTALLED"}
@@ -151,7 +151,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
             </div>
          </div>
          <button className={cn(
-           "text-white px-3 py-1.5 rounded-full font-black text-[7px] uppercase tracking-tighter shadow-xl border-none transition-all",
+           "text-white px-2.5 py-1 rounded-full font-black text-[7px] uppercase tracking-tighter shadow-xl border-none transition-all",
            hasPrompt ? "bg-[#10B981]" : "bg-white/10 text-slate-600"
          )}>
             INSTALL
