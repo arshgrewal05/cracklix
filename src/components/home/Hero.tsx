@@ -18,10 +18,10 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview FINAL TOP-ALIGNED HERO v180.0 (High Density).
- * FIXED: Shifted content to top to resolve overlap.
+ * @fileOverview FINAL CALIBRATED HERO v190.0 (High Density).
+ * FIXED: Balanced vertical alignment (Down on mobile, Up on desktop).
  * FIXED: Mandatory Sentence case for all text.
- * SCALE: Aggressively reduced text and box sizes for a professional match.
+ * SCALE: Compact high-fidelity interface with zero overlap.
  */
 
 export default function Hero() {
@@ -74,8 +74,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* 2. TOP-ALIGNED CONTENT HUB */}
-      <div className="container mx-auto px-4 md:px-12 max-w-7xl relative z-20 pt-4 md:pt-24">
+      {/* 2. CALIBRATED CONTENT HUB */}
+      <div className="container mx-auto px-4 md:px-12 max-w-7xl relative z-20 pt-10 md:pt-14">
          <div className="max-w-2xl space-y-1 md:space-y-4">
             
             {/* TOP PILL BADGE */}
@@ -134,7 +134,7 @@ export default function Hero() {
          </div>
       </div>
 
-      {/* 3. INTEGRATED BOTTOM DATA BAR (TIGHTER FOOTER) */}
+      {/* 3. INTEGRATED BOTTOM DATA BAR */}
       <div className="absolute bottom-1 md:bottom-8 left-0 right-0 z-30">
          <div className="container mx-auto px-4 md:px-12 max-w-7xl">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 md:gap-4">
