@@ -24,8 +24,8 @@ import { useToast } from "@/hooks/use-toast";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Header v179.0 (Logo h-40 Overhaul).
- * UPDATED: Set logo height to h-40 (160px) as requested.
+ * @fileOverview Professional Header v180.0 (Logo 80px Calibration).
+ * UPDATED: Set logo height to h-20 (80px) to match refined header geometry.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -132,7 +132,7 @@ export default function Navbar() {
             
             <div className="flex items-center shrink-0 h-full py-0.5 md:py-1">
                <Logo 
-                 imgClassName="h-40 origin-left" 
+                 imgClassName="h-20 origin-left" 
                  className="active:scale-95 transition-transform" 
                />
             </div>
@@ -162,7 +162,7 @@ export default function Navbar() {
                )}>
                   <div className={cn(
                     "h-7 w-7 rounded-lg flex items-center justify-center border",
-                    hasPrompt ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-white/5 border-white/10 text-slate-400"
+                    hasPrompt ? "bg-emerald-50/10 border-emerald-500/30 text-emerald-400" : "bg-white/5 border-white/10 text-slate-400"
                   )}>
                      <Download className="h-3 w-3" />
                   </div>
