@@ -24,8 +24,8 @@ import { useToast } from "@/hooks/use-toast";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Header v190.0.
- * FIXED: Logo height set to exactly 120px as requested, creating an overlap brand effect.
+ * @fileOverview Professional Header v191.0.
+ * FIXED: Logo height set to exactly 140px to create a bold overlap brand effect.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -126,7 +126,7 @@ export default function Navbar() {
             
             <div className="flex items-center shrink-0 h-full">
                <Logo 
-                 imgClassName="h-[120px] origin-left translate-y-2" 
+                 imgClassName="h-[140px] origin-left translate-y-4" 
                  className="active:scale-95 transition-transform" 
                />
             </div>

@@ -25,7 +25,7 @@
     --ring: 24 95% 53%;
     --radius: 0.75rem;
 
-    /* Global Geometry Node - Calibrated for 80px logo */
+    /* Global Geometry Node - Calibrated for 140px logo overlap */
     --header-height: 90px;
   }
 
