@@ -14,7 +14,9 @@ import {
   Star,
   FileText,
   Newspaper,
-  Info
+  Info,
+  Stethoscope,
+  ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -26,34 +28,21 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Popular Exams Hub v32.0.
- * STABILITY: Hoisted all helper logic to the top to resolve runtime ReferenceErrors.
- * FIXED: Ensured helper components are defined before the main component initialization.
+ * @fileOverview Screenshot Matched Popular Hubs v40.0.
+ * MATCHED: Clean white cards with left-aligned branding and dual stat footer.
  */
-
-function PrepNode({ label, icon, href }: { label: string, icon: React.ReactNode, href: string }) {
-   return (
-      <Link href={href} className="flex items-center gap-2 px-3 py-2.5 bg-slate-50 rounded-xl hover:bg-primary/5 transition-all group/node border border-slate-100/50">
-         <span className="text-slate-300 group-hover/node:text-primary shrink-0">
-            {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement, { className: "h-3.5 w-3.5" }) : icon}
-         </span>
-         <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter truncate group-hover/node:text-[#0F172A]">{label}</span>
-      </Link>
-   )
-}
 
 function getBoardIcon(id: string, abbrev: string) {
   const key = (abbrev || id || "").toLowerCase();
-  
-  if (key.includes('psssb')) return <Landmark className="h-full w-full p-4" />;
-  if (key.includes('police')) return <Shield className="h-full w-full p-4" />;
-  if (key.includes('ppsc')) return <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR8W5eTBPdzztA7cziqnMmtWk9InL1yflUD_xb4vAsLw&s=10" className="h-full w-full object-contain p-4" />;
-  if (key.includes('pstet') || key.includes('ctet')) return <BookOpen className="h-full w-full p-4" />;
-  if (key.includes('pspcl') || key.includes('pstcl')) return <Zap className="h-full w-full p-4" />;
-  if (key.includes('court')) return <Scale className="h-full w-full p-4" />;
-  if (key.includes('army') || key.includes('cadre') || key.includes('ett')) return <GraduationCap className="h-full w-full p-4" />;
-  
-  return <Landmark className="h-full w-full p-4" />;
+  if (key.includes('psssb')) return <img src="https://sssb.punjab.gov.in/wp-content/themes/ssbtheme/images/punjab-gov.svg" className="h-full w-full object-contain" />;
+  if (key.includes('police')) return <img src="https://www.punjabpolice.gov.in/media/images/Logo_of_Punjab_Police_India.original.png" className="h-full w-full object-contain" />;
+  if (key.includes('ppsc')) return <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR8W5eTBPdzztA7cziqnMmtWk9InL1yflUD_xb4vAsLw&s=10" className="h-full w-full object-contain" />;
+  if (key.includes('teaching')) return <GraduationCap className="h-full w-full text-orange-500" />;
+  if (key.includes('court')) return <Scale className="h-full w-full text-slate-600" />;
+  if (key.includes('pspcl')) return <Zap className="h-full w-full text-blue-500" />;
+  if (key.includes('bfuhs')) return <Stethoscope className="h-full w-full text-emerald-600" />;
+  if (key.includes('banking')) return <Landmark className="h-full w-full text-[#0B1F3A]" />;
+  return <Landmark className="h-full w-full text-slate-300" />;
 }
 
 export default function PopularExams() {
@@ -66,87 +55,65 @@ export default function PopularExams() {
 
   const boardsQuery = useMemo(() => (db ? query(collection(db, "boards"), orderBy("displayOrder", "asc")) : null), [db]);
   const { data: boards, loading } = useCollection<any>(boardsQuery);
+  const { data: allExams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]));
+  const { data: mocks } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]));
 
   const filteredBoards = useMemo(() => {
     if (!boards || !mounted) return [];
-    // Target high-impact Punjab recruitment boards
-    const targetAbbrevs = ['PSSSB', 'POLICE', 'PPSC', 'PSPCL', 'PSTET', 'CTET', 'ETT', 'MASTER CADRE'];
-    return boards.filter((b: any) => targetAbbrevs.includes(b.abbreviation?.toUpperCase()));
+    // Force specific boards from screenshot if they exist, or just take first 8
+    return boards.slice(0, 8);
   }, [boards, mounted]);
 
-  if (!mounted) {
-     return (
-        <section className="py-12 bg-white flex items-center justify-center">
-           <Skeleton className="h-80 w-full max-w-7xl rounded-[3.5rem]" />
-        </section>
-     );
-  }
+  if (!mounted) return null;
 
   return (
-    <section className="py-12 md:py-24 bg-slate-50/50 border-y border-slate-100/50">
+    <section className="py-16 md:py-24 bg-white">
       <div className="container mx-auto px-4 max-w-7xl">
-         <div className="text-left mb-12 md:mb-20 space-y-4">
-            <div className="flex items-center gap-4">
-               <div className="h-10 w-10 md:h-12 md:w-12 bg-orange-50 rounded-2xl flex items-center justify-center text-primary shadow-inner">
-                  <Star className="h-5 w-5 md:h-6 md:w-6 fill-current" />
-               </div>
-               <h2 className="text-2xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-none">
-                  Popular Hubs
-               </h2>
+         
+         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 text-left">
+            <div className="space-y-2">
+               <h2 className="text-3xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Popular Exams</h2>
+               <p className="text-slate-500 font-medium text-sm md:text-lg">Complete preparation for all major Punjab government exams</p>
             </div>
-            <p className="text-slate-500 font-medium text-sm md:text-xl max-w-2xl">
-               Browse official recruitment hubs and select your target vertical to start high-fidelity mock practice.
-            </p>
+            <Link href="/exams" className="flex items-center gap-1.5 text-orange-500 font-bold uppercase text-[10px] md:text-sm hover:underline">
+               View All Exams <ChevronRight className="h-4 w-4" />
+            </Link>
          </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {loading ? (
-               Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[400px] w-full rounded-[3.5rem]" />)
-            ) : filteredBoards.length > 0 ? filteredBoards.map((board, idx) => (
-              <motion.div 
-                 key={board.id}
-                 initial={{ opacity: 0, y: 20 }}
-                 whileInView={{ opacity: 1, y: 0 }}
-                 transition={{ delay: idx * 0.05 }}
-                 viewport={{ once: true }}
-              >
-                 <Card className="border-none shadow-xl hover:shadow-5xl hover:translate-y-[-8px] transition-all duration-700 rounded-[3rem] bg-white group overflow-hidden h-full flex flex-col border border-slate-100 p-8 md:p-10 text-left">
-                    <div className="flex justify-between items-start mb-10">
-                       <div className="h-16 w-16 md:h-20 md:w-20 rounded-[1.8rem] bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-primary transition-all duration-500 shrink-0 shadow-inner relative overflow-hidden">
-                          {board.iconUrl ? (
-                             <img src={board.iconUrl} className="h-full w-full object-contain p-4" alt="Hub Logo" referrerPolicy="no-referrer" />
-                          ) : getBoardIcon(board.id, board.abbreviation)}
-                       </div>
-                       <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest border-slate-100 text-slate-400 px-3 py-1 rounded-lg">OFFICIAL HUB</Badge>
-                    </div>
-                    
-                    <div className="space-y-3 flex-1">
-                       <h3 className="text-2xl md:text-3xl font-black text-[#0F172A] uppercase tracking-tight leading-none group-hover:text-primary transition-colors">{board.abbreviation} Hub</h3>
-                       <p className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest truncate">{board.name}</p>
-                    </div>
+               Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-2xl" />)
+            ) : filteredBoards.map((board) => {
+               const examCount = allExams?.filter(e => e.boardId === board.id || e.boardId === board.abbreviation).length || 0;
+               const mockCount = mocks?.filter(m => (m.boardIds && m.boardIds.includes(board.id)) || m.boardId === board.id).length || 0;
+               
+               return (
+                  <Link key={board.id} href={`/exams/hub/${board.id}`}>
+                     <Card className="border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 rounded-2xl md:rounded-[1.8rem] bg-white group p-6 text-left">
+                        <div className="flex items-center gap-5">
+                           <div className="h-16 w-16 md:h-18 md:w-18 rounded-xl bg-slate-50 flex items-center justify-center p-3 shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                              {getBoardIcon(board.id, board.abbreviation)}
+                           </div>
+                           <div className="min-w-0">
+                              <h3 className="text-lg md:text-xl font-black text-[#0F172A] uppercase leading-tight group-hover:text-primary transition-colors">{board.abbreviation}</h3>
+                              <p className="text-[10px] font-bold text-slate-400 mt-1 truncate">{board.name}</p>
+                           </div>
+                        </div>
 
-                    <div className="grid grid-cols-2 gap-2.5 mt-10">
-                       <PrepNode label="Full Mocks" icon={<Zap />} href={`/exams/hub/${board.id}`} />
-                       <PrepNode label="Subject" icon={<BookOpen />} href={`/exams/hub/${board.id}`} />
-                       <PrepNode label="PYQs" icon={<FileText />} href={`/exams/hub/${board.id}`} />
-                       <PrepNode label="Updates" icon={<Newspaper />} href={`/current-affairs`} />
-                    </div>
-
-                    <div className="mt-10 pt-8 border-t border-slate-50">
-                       <Button asChild className="w-full h-14 md:h-16 rounded-2xl bg-slate-900 text-white hover:bg-primary transition-all font-black uppercase text-[10px] tracking-[0.2em] gap-3 border-none shadow-xl">
-                          <Link href={`/exams/hub/${board.id}`}>
-                             Explore Hub <ChevronRight className="h-4 w-4" />
-                          </Link>
-                       </Button>
-                    </div>
-                 </Card>
-              </motion.div>
-            )) : (
-              <div className="col-span-full py-24 text-center opacity-20 flex flex-col items-center">
-                 <Info className="h-16 w-16 mb-6" />
-                 <p className="font-headline font-black text-2xl uppercase tracking-widest">No Hub Found in Registry</p>
-              </div>
-            )}
+                        <div className="mt-8 pt-4 border-t border-slate-50 grid grid-cols-2 gap-4">
+                           <div className="flex items-center gap-2">
+                              <BookOpen className="h-3.5 w-3.5 text-blue-500" />
+                              <span className="text-[10px] font-bold text-slate-600 uppercase">{examCount} Exams</span>
+                           </div>
+                           <div className="flex items-center gap-2">
+                              <Zap className="h-3.5 w-3.5 text-orange-500" />
+                              <span className="text-[10px] font-bold text-slate-600 uppercase">{mockCount} Mocks</span>
+                           </div>
+                        </div>
+                     </Card>
+                  </Link>
+               )
+            })}
          </div>
       </div>
     </section>

@@ -10,9 +10,8 @@ import Footer from "@/components/layout/Footer";
 import PopularExams from "@/components/home/PopularExams";
 
 /**
- * @fileOverview Official Home Hub v160.0 (Definitive Resolution).
+ * @fileOverview Official Home Hub v165.0.
  * PERFORMANCE: Strict server component root with high-fidelity client sub-modules.
- * FIXED: Sanitized module map to resolve 'Cannot read properties of undefined (reading call)' runtime error.
  */
 
 export default function HomePage() {
@@ -24,10 +23,11 @@ export default function HomePage() {
 
       <PopularExams />
 
+      <LatestMocks />
+
       <div className="container mx-auto px-4 py-12 md:py-24 max-w-7xl space-y-16 md:space-y-32">
          <ContinueLearning />
          <FeaturedCategories />
-         <LatestMocks />
       </div>
 
       <AppPreview />
