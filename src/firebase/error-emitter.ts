@@ -1,8 +1,8 @@
 import { FirestorePermissionError } from './errors';
 
 /**
- * @fileOverview Pure TypeScript Error Dispatcher.
- * REMOVED: Node.js 'events' dependency to resolve Webpack 'call' runtime errors in browser.
+ * @fileOverview Pure TypeScript Error Dispatcher v2.0.
+ * UPDATED: Explicit class definition order and manual listener registry.
  */
 
 type PermissionListener = (error: FirestorePermissionError) => void;

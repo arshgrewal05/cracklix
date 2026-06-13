@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { Cashfree } from 'cashfree-pg';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/app';
 import { doc, getDoc } from 'firebase/firestore';
 
 /**
- * @fileOverview Hardened Production Order Node v7.0.
- * UPDATED: Enhanced logging and origin fallback for development workstations.
+ * @fileOverview Hardened Production Order Node v7.1.
+ * UPDATED: Isolated Firebase import to bypass client-side barrel failure.
  */
 
 export async function POST(req: Request) {
@@ -25,7 +25,6 @@ export async function POST(req: Request) {
       }, { status: 500 });
     }
 
-    // Initialize SDK with environment detection
     Cashfree.XClientId = clientId;
     Cashfree.XClientSecret = clientSecret;
     
@@ -50,7 +49,6 @@ export async function POST(req: Request) {
     const userSnap = await getDoc(doc(db, "users", userId));
     const userData = userSnap.data();
 
-    // Workstation/Dev friendly origin detection
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || clientOrigin || new URL(req.url).origin;
     const baseOrigin = siteUrl.replace('http://', 'https://');
     const orderId = `order_${Date.now()}_${userId.slice(-4)}`;

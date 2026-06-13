@@ -3,14 +3,11 @@
 import { create } from 'zustand';
 import { AttemptState, ExamLanguage, QuestionStatus, Question, LanguageDisplayMode } from '@/types';
 import { doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { initializeFirebase } from '@/firebase/app';
 
 /**
- * @fileOverview Elite CBT Global Store v48.0 (Production Hardened).
- * FIXED: Forced state reset on initExam to prevent stale test data leaking across sessions.
- * FIXED: Synchronized start/end times with attempt status to ensure auto-submit reliability.
+ * @fileOverview Elite CBT Global Store v48.5 (Hardened).
+ * UPDATED: Corrected import to point to isolated initialization node.
  */
 
 interface ExamStore extends AttemptState {
@@ -25,7 +22,6 @@ interface ExamStore extends AttemptState {
   isPaletteVisible: boolean;
   isSyncing: boolean;
 
-  // Actions
   initExam: (mockId: string, mockTitle: string, userId: string, questions: Question[], duration: number, savedState?: any, languageMode?: LanguageDisplayMode) => void;
   setLanguage: (lang: ExamLanguage | LanguageDisplayMode) => void;
   setPaused: (val: boolean) => void;
@@ -65,7 +61,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     const now = Date.now();
     const state = get();
     
-    // 1. FRESHNESS AUDIT: If IDs don't match, force a clean state reset.
     const isCompleted = savedState?.status === 'COMPLETED';
     const isTimedOut = savedState?.endTime && now >= savedState.endTime;
     const isNewMock = state.mockId !== mockId && state.mockId !== '';
@@ -79,7 +74,6 @@ export const useExamStore = create<ExamStore>((set, get) => ({
 
     let initialLang = (state.language && state.language !== '' && !forceReset) ? (state.language as string) : finalBaseMode;
     
-    // Safety check for cross-language test types
     if (finalBaseMode === 'ENGLISH_PUNJABI' && initialLang.includes('HINDI')) initialLang = 'ENGLISH_PUNJABI';
     if (finalBaseMode === 'ENGLISH_HINDI' && initialLang.includes('PUNJABI')) initialLang = 'ENGLISH_HINDI';
 

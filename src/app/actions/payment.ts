@@ -1,7 +1,6 @@
-
 'use server';
 
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/app';
 import { 
   collection, 
   doc, 
@@ -12,8 +11,8 @@ import {
 } from 'firebase/firestore';
 
 /**
- * @fileOverview Hardened Manual Payment Actions v2.0.
- * Handles the submission and approval of manual UPI transaction nodes.
+ * @fileOverview Hardened Manual Payment Actions v2.1.
+ * UPDATED: Direct import from isolated Firebase initialization node.
  */
 
 export async function submitManualPayment(data: {
@@ -65,11 +64,9 @@ export async function approvePaymentRequest(requestId: string, adminId: string) 
     if (!planSnap.exists()) throw new Error("Pass node missing in registry.");
     const planData = planSnap.data();
 
-    // 1. Calculate Expiry
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + (planData.durationDays || 30));
 
-    // 2. Update User Registry
     const userRef = doc(db, 'users', data.userId);
     await updateDoc(userRef, { 
       pass: {
@@ -83,7 +80,6 @@ export async function approvePaymentRequest(requestId: string, adminId: string) 
       updatedAt: serverTimestamp()
     });
 
-    // 3. Mark Request as APPROVED
     await updateDoc(reqRef, {
       status: 'APPROVED',
       approvedBy: adminId,
