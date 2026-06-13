@@ -59,17 +59,15 @@ export default function RootLayout({
             __html: `
               window.deferredPrompt = null;
               
-              console.log('[PWA_INIT] Setting up capture nodes');
-
               window.addEventListener('beforeinstallprompt', (e) => {
-                console.log('[PWA_INIT] beforeinstallprompt event captured');
+                console.log('[PWA] beforeinstallprompt fired');
                 e.preventDefault();
                 window.deferredPrompt = e;
                 window.dispatchEvent(new CustomEvent('pwa-installable'));
               });
 
               window.addEventListener('appinstalled', (e) => {
-                console.log('[PWA_INIT] appinstalled event captured');
+                console.log('[PWA] appinstalled fired');
                 window.deferredPrompt = null;
                 window.dispatchEvent(new CustomEvent('pwa-installed'));
               });
@@ -77,9 +75,9 @@ export default function RootLayout({
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                   navigator.serviceWorker.register('/sw.js').then(reg => {
-                    console.log('[PWA_INIT] Service Worker registered scope:', reg.scope);
+                    // Logs handled inside sw.js for registration/controlling audit
                   }).catch(err => {
-                    console.error('[PWA_INIT] Service Worker registration failed:', err);
+                    console.error('[PWA] SW registration failed:', err);
                   });
                 });
               }
