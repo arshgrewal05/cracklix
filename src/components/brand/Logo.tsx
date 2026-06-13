@@ -12,8 +12,8 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Official Master Logo Hub v19.0.
- * UPDATED: Removed max-h-full to allow the logo to gracefully overflow the header for a bold brand presence.
+ * @fileOverview Official Master Logo Hub v20.0 (Screenshot Restored).
+ * FIXED: Explicit logo source and height calibration for high-density navigation.
  */
 export function LogoIcon({ className = "", imgClassName = "" }: { className?: string, imgClassName?: string }) {
   return (
@@ -21,7 +21,7 @@ export function LogoIcon({ className = "", imgClassName = "" }: { className?: st
       <img 
         src="https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png" 
         alt="Cracklix Logo" 
-        className={cn("w-auto object-contain block select-none", imgClassName)}
+        className={cn("w-auto object-contain block select-none pointer-events-none", imgClassName)}
         referrerPolicy="no-referrer"
       />
     </div>
@@ -30,7 +30,7 @@ export function LogoIcon({ className = "", imgClassName = "" }: { className?: st
 
 export default function Logo({ className = "", href = "/", imgClassName = "" }: LogoProps) {
   return (
-    <Link href={href} className={cn("flex items-center group pointer-events-auto select-none shrink-0 h-full", className)}>
+    <Link href={href} className={cn("flex items-center group pointer-events-auto select-none shrink-0 h-full overflow-visible", className)}>
       <LogoIcon imgClassName={imgClassName} />
     </Link>
   );
