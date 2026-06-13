@@ -1,34 +1,21 @@
 /**
- * @fileOverview Cracklix Service Worker v1.0.
- * Required for PWA installation criteria.
+ * @fileOverview Official Cracklix Service Worker v2.0.
+ * Required for PWA Installability on Chrome/Android.
  */
 
 const CACHE_NAME = 'cracklix-v1';
-const urlsToCache = [
-  '/',
-  '/manifest.webmanifest'
-];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+self.addEventListener('install', (event) => {
+  console.log('[PWA] Service Worker: Installing...');
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim());
+self.addEventListener('activate', (event) => {
+  console.log('[PWA] Service Worker: Activated');
 });
 
-self.addEventListener('fetch', event => {
-  // Functional fetch handler is required for Chrome PWA Installability
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
-  );
+// Fetch event handler is MANDATORY for PWA installability
+self.addEventListener('fetch', (event) => {
+  // Pass-through strategy to ensure the app works online
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
 });

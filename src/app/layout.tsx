@@ -72,13 +72,17 @@ export default function RootLayout({
             __html: `
               window.deferredPrompt = null;
               
+              console.log('[PWA] Lifecycle listener initialized');
+
               window.addEventListener('beforeinstallprompt', (e) => {
+                console.log('[PWA] beforeinstallprompt fired');
                 e.preventDefault();
                 window.deferredPrompt = e;
                 window.dispatchEvent(new CustomEvent('pwa-installable'));
               });
 
               window.addEventListener('appinstalled', (e) => {
+                console.log('[PWA] appinstalled successfully');
                 window.deferredPrompt = null;
                 window.dispatchEvent(new CustomEvent('pwa-installed'));
               });
@@ -86,7 +90,7 @@ export default function RootLayout({
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                   navigator.serviceWorker.register('/sw.js').then(reg => {
-                    console.log('[PWA] Service Worker Active');
+                    console.log('[PWA] Service Worker registered and active');
                   }).catch(err => {
                     console.error('[PWA] SW Registration Failed:', err);
                   });

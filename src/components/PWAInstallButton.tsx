@@ -13,8 +13,8 @@ interface PWAInstallButtonProps {
 }
 
 /**
- * @fileOverview Universal PWA Installation Trigger v2.0 (Hardened).
- * UPDATED: Replaced conditional "How to install" text with strict "Install App" label.
+ * @fileOverview Universal PWA Installation Trigger v3.0 (Native Optimized).
+ * FIXED: Reliable native prompt execution and display detection.
  */
 export default function PWAInstallButton({ 
   className, 
@@ -29,35 +29,33 @@ export default function PWAInstallButton({
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      console.log('[PWA] beforeinstallprompt captured');
+      console.log('[PWA] Button: beforeinstallprompt captured');
     };
 
     const handleAppInstalled = () => {
       setDeferredPrompt(null);
       setIsInstalled(true);
-      console.log('[PWA] App installed successfully');
+      console.log('[PWA] Button: Application installed');
     };
 
     const checkInstalled = () => {
-      if (window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone) {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+      if (isStandalone) {
         setIsInstalled(true);
+        console.log('[PWA] Button: Standalone mode detected');
       }
     };
 
-    // Sync with global script in layout.tsx
     if (typeof window !== 'undefined') {
+      // Pick up prompt if layout.tsx already captured it
       if ((window as any).deferredPrompt) {
         setDeferredPrompt((window as any).deferredPrompt);
       }
       
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.addEventListener('appinstalled', handleAppInstalled);
-      
-      // Listen for the custom event dispatched by layout.tsx script
       window.addEventListener('pwa-installable', () => {
-        if ((window as any).deferredPrompt) {
-          setDeferredPrompt((window as any).deferredPrompt);
-        }
+        setDeferredPrompt((window as any).deferredPrompt);
       });
       
       checkInstalled();
@@ -74,27 +72,30 @@ export default function PWAInstallButton({
     e.stopPropagation();
 
     if (!deferredPrompt) {
+      console.log('[PWA] Button: Install clicked but no deferredPrompt available');
       toast({
-        title: "Browser Menu",
-        description: "To install: Tap the 3-dots (Android) or Share button (iOS) and select 'Add to Home Screen'.",
+        title: "Installation Tip",
+        description: "To install: Tap the browser's menu (3 dots or Share) and select 'Add to Home Screen'.",
       });
       return;
     }
 
     try {
+      console.log('[PWA] Button: Triggering native prompt');
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
+      console.log(`[PWA] Button: User response to install: ${outcome}`);
       
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
         (window as any).deferredPrompt = null;
       }
     } catch (err) {
-      console.error('[PWA] Installation prompt failed:', err);
+      console.error('[PWA] Button: Installation prompt failed:', err);
     }
   };
 
-  // Hide button if already installed
+  // Hide if already installed
   if (isInstalled) return null;
 
   return (
