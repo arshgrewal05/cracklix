@@ -42,9 +42,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Admin Layout v140.0.
- * UPDATED: Header logo container "cropped" to horizontal rectangle for elite branding.
- * UPDATED: Sidebar spacing expanded (gap-3) for a cleaner hierarchical flow.
+ * @fileOverview Institutional Admin Layout v141.0.
+ * UPDATED: Logo sizing refined for "Small and Full Visibility" to prevent clipping seen in audit.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -92,7 +91,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none">
        <div className="p-8 flex justify-center">
           <div className="bg-[#0B1528] w-full h-32 md:h-40 rounded-[2.5rem] shadow-2xl flex items-center justify-center py-6 px-6 border border-white/5 group hover:bg-[#081121] transition-all duration-500 overflow-hidden">
-            <Logo href="/admin" imgClassName="scale-110 md:scale-125" />
+            <Logo href="/admin" imgClassName="scale-100" />
           </div>
        </div>
 
