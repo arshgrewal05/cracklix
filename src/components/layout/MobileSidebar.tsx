@@ -28,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import Logo from "@/components/brand/Logo";
 
 /**
- * @fileOverview Hardened Production Sidebar Center v61.0.
+ * @fileOverview Hardened Production Sidebar Center v62.0.
  * UPDATED: Optimized logo-to-label spacing and tightened label-to-item gaps to match user screenshot.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
@@ -87,8 +87,8 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col h-full bg-[#0B1528] text-white overflow-y-auto no-scrollbar font-body select-none text-left">
       
-      {/* BRAND LOGO - MAXIMIZED & SPACED */}
-      <div className="px-6 py-6 flex justify-start shrink-0 overflow-visible mb-4">
+      {/* BRAND LOGO - TIGHTENED */}
+      <div className="px-6 py-2 flex justify-start shrink-0 overflow-visible">
          <Logo imgClassName="h-48 origin-left" />
       </div>
 
@@ -133,7 +133,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
         </button>
       </div>
 
-      <div className="px-6 py-0 mb-1">
+      <div className="px-6 py-0 mb-0">
          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">MANAGEMENT CENTER</p>
       </div>
 
