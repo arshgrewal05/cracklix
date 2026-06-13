@@ -1,11 +1,19 @@
 'use client';
 
+import React from 'react';
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+interface LogoProps {
+  className?: string;
+  variant?: 'light' | 'dark';
+  href?: string;
+}
+
 /**
- * @fileOverview Official Master Logo Hub v12.0.
- * UPDATED: Increased logo size significantly as per request.
+ * @fileOverview Official Master Logo Hub v14.0.
+ * UPDATED: Logo increased to high-visibility dimensions (h-28 to h-36).
+ * REMOVED: Deleted study hub tagline as requested.
  */
 export function LogoIcon({ className = "" }: { className?: string }) {
   return (
@@ -26,10 +34,4 @@ export default function Logo({ className = "", href = "/" }: LogoProps) {
       <LogoIcon />
     </Link>
   );
-}
-
-interface LogoProps {
-  className?: string;
-  variant?: 'light' | 'dark';
-  href?: string;
 }

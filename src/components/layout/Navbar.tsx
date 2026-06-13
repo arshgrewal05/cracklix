@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from "next/link";
 import { Menu, Search, User, Gem, LogOut, Target, Newspaper, Download, Zap } from "lucide-react";
 import Logo from "@/components/brand/Logo";
@@ -21,9 +22,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Definitive Header Restoration v126.0.
- * UPDATED: Practice Tests now has an icon. 
- * UPDATED: Added section-active indicators and "click-feel" scaling.
+ * @fileOverview Definitive Header Restoration v128.0.
+ * FIXED: Positioned Logo immediately next to Menu button (gap-2).
+ * FIXED: Added icons to all navigation blocks and enabled active section tracking.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -62,8 +63,8 @@ export default function Navbar() {
       <nav className="w-full h-16 md:h-20 flex items-center bg-[#0B1528] border-b border-white/5 px-4 md:px-8 shadow-2xl overflow-hidden">
         <div className="container mx-auto max-w-[1440px] flex items-center justify-between h-full gap-4">
           
-          {/* 1. LEFT SECTION: MENU & LOGO */}
-          <div className="flex items-center gap-2 md:gap-4 shrink-0">
+          {/* 1. LEFT SECTION: MENU & LOGO (IMMEDIATE PROXIMITY) */}
+          <div className="flex items-center gap-2 shrink-0">
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
               <SheetTrigger asChild>
                 <button className="w-10 h-10 md:w-12 md:h-12 bg-white/5 text-white rounded-xl border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center cursor-pointer active:scale-90 outline-none">
@@ -136,7 +137,12 @@ export default function Navbar() {
               "flex items-center gap-2.5 group transition-all active:scale-95",
               pathname === "/current-affairs" ? "opacity-100" : "opacity-70 hover:opacity-100"
             )}>
-              <Newspaper className={cn("h-5 w-5 transition-all", pathname === "/current-affairs" ? "text-[#F97316]" : "text-slate-400 group-hover:text-[#F97316]")} />
+              <div className={cn(
+                "h-7 w-7 rounded-full flex items-center justify-center shadow-sm transition-all",
+                pathname === "/current-affairs" ? "bg-[#F97316] text-white" : "bg-[#F97316]/10 text-[#F97316]"
+              )}>
+                <Newspaper className="h-4 w-4" />
+              </div>
               <div className="flex flex-col text-left leading-tight">
                 <span className={cn("text-[10px] font-black uppercase tracking-tight", pathname === "/current-affairs" ? "text-[#F97316]" : "text-white")}>CURRENT</span>
                 <span className={cn("text-[10px] font-black uppercase tracking-tight", pathname === "/current-affairs" ? "text-[#F97316]" : "text-white")}>AFFAIRS</span>
@@ -189,7 +195,7 @@ export default function Navbar() {
                 </div>
              )}
 
-             {/* SEARCH BUTTON (SCALED DOWN) */}
+             {/* SEARCH BUTTON */}
              <Link href="/search" className={cn(
                "w-9 h-9 md:h-10 md:w-10 rounded-xl border border-white/10 transition-all flex items-center justify-center shadow-lg active:scale-90",
                pathname === "/search" ? "bg-white/10 text-white border-white/30" : "bg-white/5 text-slate-400 hover:text-white"
@@ -197,7 +203,7 @@ export default function Navbar() {
                 <Search className="h-4 w-4" />
              </Link>
 
-             {/* USER PROFILE (SCALED DOWN) */}
+             {/* USER PROFILE */}
              <div className="relative">
                 {!mounted || loading ? (
                   <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-white/5 animate-pulse" />
