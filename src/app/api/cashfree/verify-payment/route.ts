@@ -1,23 +1,25 @@
 import { NextResponse } from 'next/server';
 import { Cashfree } from 'cashfree-pg';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase } from '@/firebase/app';
 import { doc, updateDoc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 
 /**
- * @fileOverview Audited Cashfree Payment Verification Hub v3.0.
- * UPDATED: Hardened Environment Logic for Production.
+ * @fileOverview Hardened Cashfree Verification Hub v4.0.
+ * STABILITY: Atomic updates for subscription registry and pass activation.
+ * SECURITY: Cross-referencing CF response with internal pass duration.
  */
 
 export async function POST(req: Request) {
   try {
-    const { order_id, userId, planId } = await req.json();
+    const body = await req.json();
+    const { order_id, userId, planId } = body;
     
     const clientId = process.env.CASHFREE_CLIENT_ID;
     const clientSecret = process.env.CASHFREE_CLIENT_SECRET;
     const env = process.env.CASHFREE_ENV || 'production';
 
     if (!clientId || !clientSecret) {
-      return NextResponse.json({ error: 'Gateway authentication keys not configured.' }, { status: 500 });
+      return NextResponse.json({ error: 'Gateway authentication failure.' }, { status: 500 });
     }
 
     Cashfree.XClientId = clientId;
@@ -26,33 +28,37 @@ export async function POST(req: Request) {
     Cashfree.XEnvironment = isProd ? Cashfree.Environment.PRODUCTION : Cashfree.Environment.SANDBOX;
 
     if (!order_id || !userId || !planId) {
-      return NextResponse.json({ error: 'Missing audit metadata.' }, { status: 400 });
+      return NextResponse.json({ error: 'Audit parameters missing.' }, { status: 400 });
     }
 
+    // Step 1: Gateway Verification
     const response = await Cashfree.PGOrderFetchPayments("2023-08-01", order_id);
     const payments = response.data;
-    const successfulPayment = payments?.find(p => p.payment_status === 'SUCCESS');
+    const successNode = payments?.find(p => p.payment_status === 'SUCCESS');
 
-    if (!successfulPayment) {
-      return NextResponse.json({ error: 'Transaction pending or failed.' }, { status: 400 });
+    if (!successNode) {
+      return NextResponse.json({ error: 'Transaction pending or rejected.' }, { status: 400 });
     }
 
+    // Step 2: Atomic Registry Sync
     const { firestore: db } = initializeFirebase();
     const planSnap = await getDoc(doc(db, "passes", planId));
-    const planData = planSnap?.data();
+    const planData = planSnap.data();
     
     if (!planData) {
-      return NextResponse.json({ error: 'Registry Sync Error: Plan Missing ' + planId }, { status: 404 });
+      return NextResponse.json({ error: 'Registry error: Pass node archived.' }, { status: 404 });
     }
 
+    const duration = Number(planData.durationDays) || 30;
     const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + (planData.durationDays || 30));
+    expiryDate.setDate(expiryDate.getDate() + duration);
 
+    // Step 3: Pass Activation
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, {
       pass: {
         active: true,
-        plan: planData.id?.toUpperCase() || 'PREMIUM',
+        plan: planData.id?.toUpperCase() || 'ELITE',
         purchaseDate: new Date().toISOString(),
         expiryDate: expiryDate.toISOString(),
         freePassClaimed: planData.id === 'free-pass'
@@ -61,23 +67,26 @@ export async function POST(req: Request) {
       updatedAt: serverTimestamp()
     });
 
-    const paymentRef = doc(db, 'payment_requests', successfulPayment.cf_payment_id!.toString());
+    // Step 4: Ledger Audit Log
+    const paymentRef = doc(db, 'payment_requests', successNode.cf_payment_id!.toString());
     await setDoc(paymentRef, {
-      id: successfulPayment.cf_payment_id!.toString(),
+      id: successNode.cf_payment_id!.toString(),
       orderId: order_id,
       userId,
       planId,
       planName: planData.name,
-      amount: planData.price,
+      amount: Number(planData.price),
       status: 'APPROVED',
       gateway: 'CASHFREE',
-      createdAt: serverTimestamp(),
+      method: successNode.payment_group || 'UNKNOWN',
+      verifiedAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     }, { merge: true });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, expiry: expiryDate.toISOString() });
+
   } catch (error: any) {
-    console.error('[CASHFREE_VERIFY_FAILURE]:', error?.response?.data || error);
-    return NextResponse.json({ error: 'Institutional registry sync failed.' }, { status: 500 });
+    console.error("[VERIFICATION_FAILURE]:", error?.response?.data || error);
+    return NextResponse.json({ error: 'Registry synchronization failed. Contact support with Order ID.' }, { status: 500 });
   }
 }

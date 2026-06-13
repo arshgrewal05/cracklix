@@ -6,8 +6,8 @@ import { doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase/app';
 
 /**
- * @fileOverview Elite CBT Global Store v48.5 (Hardened).
- * UPDATED: Corrected import to point to isolated initialization node.
+ * @fileOverview Elite CBT Global Store v50.0 (Hardened Production).
+ * STABILITY: Corrected state reset logic and added defensive Firestore update handlers.
  */
 
 interface ExamStore extends AttemptState {
@@ -32,9 +32,24 @@ interface ExamStore extends AttemptState {
   saveAndNext: (db: any) => void;
   tick: () => void;
   addViolation: (db: any) => void;
+  resetStore: () => void;
 }
 
+const initialState: AttemptState = {
+  answers: {},
+  status: {},
+  visited: [0],
+  bookmarks: [],
+  timeLeft: 0,
+  currentIdx: 0,
+  currentSectionId: '',
+  violations: 0,
+  startTime: 0,
+  endTime: 0,
+};
+
 export const useExamStore = create<ExamStore>((set, get) => ({
+  ...initialState,
   questions: [],
   mockId: '',
   mockTitle: '',
@@ -46,34 +61,27 @@ export const useExamStore = create<ExamStore>((set, get) => ({
   isPaletteVisible: true,
   isSyncing: false,
 
-  answers: {},
-  status: {},
-  visited: [0],
-  bookmarks: [],
-  timeLeft: 0,
-  currentIdx: 0,
-  currentSectionId: '',
-  violations: 0,
-  startTime: 0,
-  endTime: 0,
+  resetStore: () => set({ ...initialState, questions: [], mockId: '', mockTitle: '', userId: '' }),
 
   initExam: (mockId, mockTitle, userId, questions, duration, savedState, languageMode) => {
     const now = Date.now();
     const state = get();
     
+    // Safety check for stale state from previous test session
     const isCompleted = savedState?.status === 'COMPLETED';
     const isTimedOut = savedState?.endTime && now >= savedState.endTime;
     const isNewMock = state.mockId !== mockId && state.mockId !== '';
     const forceReset = isCompleted || isTimedOut || isNewMock;
 
-    const actualStartTime = (forceReset || !savedState?.startTime) ? now : savedState.startTime;
     const finalDuration = duration || 120;
+    const actualStartTime = (forceReset || !savedState?.startTime) ? now : savedState.startTime;
     const finalEndTime = (forceReset || !savedState?.endTime) ? (now + (finalDuration * 60 * 1000)) : savedState.endTime;
     const initialTimeLeft = Math.max(0, Math.floor((finalEndTime - now) / 1000));
     const finalBaseMode = languageMode || 'ENGLISH_PUNJABI';
 
     let initialLang = (state.language && state.language !== '' && !forceReset) ? (state.language as string) : finalBaseMode;
     
+    // Normalize language based on available data
     if (finalBaseMode === 'ENGLISH_PUNJABI' && initialLang.includes('HINDI')) initialLang = 'ENGLISH_PUNJABI';
     if (finalBaseMode === 'ENGLISH_HINDI' && initialLang.includes('PUNJABI')) initialLang = 'ENGLISH_HINDI';
 
@@ -99,22 +107,16 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       isSyncing: false
     });
 
+    // Background registry sync
     if (userId && mockId && (forceReset || !savedState)) {
       const { firestore: dbInstance } = initializeFirebase();
-      const attemptRef = doc(dbInstance, 'attempts', `${userId}_${mockId}`);
-      
-      setDoc(attemptRef, {
-        userId, 
-        mockId, 
-        startTime: actualStartTime, 
-        endTime: finalEndTime,
+      setDoc(doc(dbInstance, 'attempts', `${userId}_${mockId}`), {
+        userId, mockId, 
+        startTime: actualStartTime, endTime: finalEndTime,
         status: 'IN_PROGRESS', 
         updatedAt: serverTimestamp(),
-        answers: {},
-        status: {},
-        currentIdx: 0,
-        visited: [0]
-      }, { merge: true }).catch(() => {});
+        answers: {}, status: {}, currentIdx: 0, visited: [0]
+      }, { merge: true }).catch(e => console.error("[STORE_INIT_SYNC_FAIL]:", e));
     }
   },
 
@@ -129,7 +131,10 @@ export const useExamStore = create<ExamStore>((set, get) => ({
        set({ isPaused: false, endTime: newEndTime });
        if (userId && mockId) {
           const { firestore: dbInstance } = initializeFirebase();
-          updateDoc(doc(dbInstance, 'attempts', `${userId}_${mockId}`), { endTime: newEndTime, updatedAt: serverTimestamp() }).catch(() => {});
+          updateDoc(doc(dbInstance, 'attempts', `${userId}_${mockId}`), { 
+             endTime: newEndTime, 
+             updatedAt: serverTimestamp() 
+          }).catch(() => {});
        }
     } else {
        set({ isPaused: true });
@@ -143,7 +148,11 @@ export const useExamStore = create<ExamStore>((set, get) => ({
     set({ currentIdx: idx, visited: newVisited, currentSectionId: questions[idx]?.sectionId || '' });
     if (userId && mockId) {
       const { firestore: dbInstance } = initializeFirebase();
-      updateDoc(doc(dbInstance, 'attempts', `${userId}_${mockId}`), { currentIdx: idx, visited: newVisited, updatedAt: serverTimestamp() }).catch(() => {});
+      updateDoc(doc(dbInstance, 'attempts', `${userId}_${mockId}`), { 
+         currentIdx: idx, 
+         visited: newVisited, 
+         updatedAt: serverTimestamp() 
+      }).catch(() => {});
     }
   },
 
@@ -167,7 +176,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
       [`answers.${idx}`]: optionIdx, 
       [`status.${idx}`]: newStatus[idx], 
       updatedAt: serverTimestamp() 
-    }).then(() => set({ isSyncing: false })).catch(() => set({ isSyncing: false }));
+    }).finally(() => set({ isSyncing: false }));
   },
 
   clearAnswer: (idx, dbInstance) => {
@@ -185,7 +194,7 @@ export const useExamStore = create<ExamStore>((set, get) => ({
        [`answers.${idx}`]: null, 
        [`status.${idx}`]: 'not-answered', 
        updatedAt: serverTimestamp() 
-    }).then(() => set({ isSyncing: false })).catch(() => set({ isSyncing: false }));
+    }).finally(() => set({ isSyncing: false }));
   },
 
   markForReview: (idx, dbInstance) => {
@@ -202,9 +211,8 @@ export const useExamStore = create<ExamStore>((set, get) => ({
        [`status.${idx}`]: newStatus[idx], 
        updatedAt: serverTimestamp() 
     }).then(() => {
-       set({ isSyncing: false });
        get().saveAndNext(dbInstance);
-    }).catch(() => set({ isSyncing: false }));
+    }).finally(() => set({ isSyncing: false }));
   },
 
   saveAndNext: (dbInstance) => {

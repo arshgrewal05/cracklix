@@ -30,9 +30,9 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import StudentAvatar from "@/components/brand/StudentAvatar"
 
 /**
- * @fileOverview Test Results Hub v28.1 (Stability Hardened).
- * UPDATED: Optimized ID fetching logic to handle both Session IDs and Mock IDs correctly.
- * FIXED: Added null safety for sessionData property accessors.
+ * @fileOverview Test Results Hub v30.0 (Production Hardened).
+ * DEFENSIVE: Robust handling for missing results and malformed session data.
+ * STABILITY: Prevents white-screen crashes via multi-layer null guards.
  */
 
 export default function ResultPage() {
@@ -57,7 +57,7 @@ function ResultContent() {
   const [activeReviewFilter, setActiveReviewFilter] = useState<'ALL' | 'CORRECT' | 'WRONG' | 'SKIPPED'>('ALL')
   const [sessionData, setSessionData] = useState<any>(null);
 
-  // 1. HARDENED RESULT FETCHING (Tries Doc ID, then Mock ID)
+  // 1. Hardened Result Node Fetching
   useEffect(() => {
     async function fetchResult() {
       if (!db || !user || !resultId) return;
@@ -70,6 +70,7 @@ function ResultContent() {
         if (docSnap.exists()) {
            setSessionData(docSnap.data());
         } else {
+           // Fallback: Check for {userId}_{mockId} composite or search by mockId
            const q = query(collection(db, "results"), where("userId", "==", user.uid), where("mockId", "==", resultId), limit(1));
            const snap = await getDocs(q);
            if (!snap.empty) {
@@ -77,70 +78,72 @@ function ResultContent() {
            }
         }
       } catch (e) {
-        console.error("Result Fetch Error:", e);
+        console.error("[RESULT_FETCH_ERROR]:", e);
       }
     }
     fetchResult();
   }, [db, user, resultId]);
 
-  // 2. FETCH GLOBAL BENCHMARKS (once sessionData is loaded)
+  // 2. Fetch Global Benchmarks
   const mockIdForRank = sessionData?.mockId || resultId;
   const globalResultsQuery = useMemo(() => {
     if (!db || !mockIdForRank) return null
-    return query(collection(db, "results"), where("mockId", "==", mockIdForRank), limit(200))
+    return query(collection(db, "results"), where("mockId", "==", mockIdForRank), limit(300))
   }, [db, mockIdForRank])
 
   const { data: rawGlobalResults } = useCollection<any>(globalResultsQuery)
 
-  const meritList = useMemo(() => {
-     if (!rawGlobalResults) return [];
+  const merit = useMemo(() => {
+     if (!rawGlobalResults || !sessionData) return { rank: '?', total: 0, percentile: 0 };
+     
      const uniqueMap = new Map();
      [...rawGlobalResults].sort((a, b) => (b.score || 0) - (a.score || 0)).forEach(r => {
         if (!uniqueMap.has(r.userId) || uniqueMap.get(r.userId).score < r.score) {
            uniqueMap.set(r.userId, r);
         }
      });
-     return Array.from(uniqueMap.values()).sort((a,b) => b.score - a.score);
-  }, [rawGlobalResults]);
-
-  const merit = useMemo(() => {
-     if (!meritList || meritList.length === 0 || !sessionData) {
-        return { rank: '?', total: 0, percentile: 0 };
-     }
+     const meritList = Array.from(uniqueMap.values()).sort((a,b) => b.score - a.score);
+     
      const rank = meritList.findIndex((r: any) => r.userId === user?.uid) + 1;
      const actualRank = rank > 0 ? rank : 1;
      const total = meritList.length;
      const percentile = total > 0 ? Math.round(((total - actualRank + 1) / (total || 1)) * 1000) / 10 : 0;
+     
      return { rank: actualRank, total, percentile };
-  }, [meritList, sessionData, user]);
+  }, [rawGlobalResults, sessionData, user]);
 
-  // 3. FETCH QUESTIONS AND MOCK DATA
+  // 3. Question Node Hydration
   useEffect(() => {
     async function loadQuestions() {
-      if (!db || !sessionData) return;
-      const mockId = sessionData.mockId;
+      if (!db || !sessionData?.mockId) return;
       try {
-        const mockSnap = await getDoc(doc(db, "mocks", mockId))
+        const mockSnap = await getDoc(doc(db, "mocks", sessionData.mockId))
         if (mockSnap.exists()) {
           const mData = mockSnap.data();
           setMockData(mData);
           const questionIds = mData.questionIds || []
-          const fetchedQuestions: any[] = []
-          const chunks = []
-          for (let i = 0; i < questionIds.length; i += 30) { chunks.push(questionIds.slice(i, i + 30)) }
-          const chunkSnaps = await Promise.all(chunks.map(chunk => getDocs(query(collection(db, "questions"), where(documentId(), "in", chunk)))))
-          const allFetched: any[] = []
-          chunkSnaps.forEach(snap => snap.docs.forEach(d => allFetched.push({ ...d.data(), id: d.id })))
-          setQuestions(questionIds.map(id => allFetched.find(q => q.id === id)).filter(Boolean))
+          if (questionIds.length > 0) {
+            const fetched: any[] = []
+            const chunks = []
+            for (let i = 0; i < questionIds.length; i += 30) { chunks.push(questionIds.slice(i, i + 30)) }
+            const chunkSnaps = await Promise.all(chunks.map(chunk => getDocs(query(collection(db, "questions"), where(documentId(), "in", chunk)))))
+            chunkSnaps.forEach(snap => snap.docs.forEach(d => fetched.push({ ...d.data(), id: d.id })))
+            setQuestions(questionIds.map(id => fetched.find(q => q.id === id)).filter(Boolean))
+          }
         }
-      } finally { setLoadingContent(false) }
+      } catch (e) {
+        console.error("[QUESTION_HYDRATION_ERROR]:", e);
+      } finally { 
+        setLoadingContent(false) 
+      }
     }
     loadQuestions()
   }, [db, sessionData]);
 
   const filteredQuestions = useMemo(() => {
+     if (!sessionData) return [];
      return questions.map((q, i) => ({ ...q, index: i })).filter((q) => {
-        const ans = sessionData?.answers?.[q.index];
+        const ans = sessionData.answers?.[q.index];
         const isCorrect = ans !== undefined && ['A','B','C','D'][ans] === q.correctAnswer;
         if (activeReviewFilter === 'ALL') return true;
         if (activeReviewFilter === 'CORRECT') return isCorrect;
@@ -150,13 +153,21 @@ function ResultContent() {
      });
   }, [questions, sessionData, activeReviewFilter]);
 
-  if (loadingContent) return <div className="h-screen flex items-center justify-center bg-white"><Loader2 className="h-10 w-10 text-primary animate-spin" /></div>
+  if (loadingContent && !sessionData) return (
+     <div className="h-screen w-full flex flex-col items-center justify-center bg-white space-y-6">
+        <Loader2 className="h-10 w-10 text-primary animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Auditing Session Node...</p>
+     </div>
+  );
 
   if (!sessionData) return (
      <div className="h-screen flex flex-col items-center justify-center text-center bg-white p-6 space-y-6">
         <AlertCircle className="h-12 w-12 text-slate-200" />
-        <h2 className="text-2xl font-headline font-black uppercase">Result Not Found</h2>
-        <Button asChild className="bg-[#0F172A] text-white rounded-xl h-12 px-8"><Link href="/dashboard">Return Home</Link></Button>
+        <div className="space-y-2">
+           <h2 className="text-2xl font-headline font-black uppercase text-[#0F172A]">Registry Node Missing</h2>
+           <p className="text-slate-400 font-medium max-w-xs mx-auto">The requested attempt data could not be verified in the master repository.</p>
+        </div>
+        <Button asChild className="bg-[#0F172A] hover:bg-black text-white rounded-xl h-12 px-10 font-black uppercase text-[10px]"><Link href="/dashboard">Return Dashboard</Link></Button>
      </div>
   );
 
@@ -165,39 +176,40 @@ function ResultContent() {
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-6 md:py-10 max-w-7xl space-y-6">
         
-        <div className="bg-[#0B1528] rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between p-4 md:px-8 md:py-5 gap-4">
-           <div className="flex items-center gap-4 min-w-0 flex-1">
-              <div className="h-10 w-10 bg-primary/20 rounded-lg flex items-center justify-center text-primary shrink-0">
-                 <Trophy className="h-5 w-5" />
+        {/* SCORE BANNER */}
+        <div className="bg-[#0B1528] rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between p-6 md:px-10 md:py-6 gap-6">
+           <div className="flex items-center gap-6 min-w-0 flex-1">
+              <div className="h-12 w-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary shrink-0">
+                 <Trophy className="h-6 w-6" />
               </div>
               <div className="min-w-0 truncate">
-                 <h1 className="text-sm md:text-lg font-black text-white uppercase tracking-tight truncate">{sessionData.mockTitle || "Exam Result"}</h1>
-                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{sessionData.timestamp ? new Date(sessionData.timestamp).toLocaleDateString() : 'N/A'}</p>
+                 <h1 className="text-base md:text-xl font-black text-white uppercase tracking-tight truncate">{sessionData.mockTitle}</h1>
+                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Audit Score Index</p>
               </div>
            </div>
 
-           <div className="flex items-center gap-6 md:gap-10 shrink-0">
+           <div className="flex items-center gap-8 md:gap-14 shrink-0">
               <ResultPill label="SCORE" val={(sessionData.score || 0).toFixed(1)} color={(sessionData.score || 0) < 0 ? "text-rose-400" : "text-primary"} />
-              <div className="w-px h-8 bg-white/10" />
+              <div className="w-px h-10 bg-white/10" />
               <ResultPill label="RANK" val={`#${merit.rank}`} color="text-white" />
-              <div className="w-px h-8 bg-white/10" />
+              <div className="w-px h-10 bg-white/10" />
               <ResultPill label="ACCURACY" val={`${sessionData.accuracy || 0}%`} color="text-emerald-400" />
-              <div className="w-px h-8 bg-white/10 hidden sm:block" />
-              <ResultPill label="LEVEL" val={`${merit.percentile}%`} color="text-blue-400" className="hidden sm:flex" />
+              <div className="w-px h-10 bg-white/10 hidden sm:block" />
+              <ResultPill label="PERCENTILE" val={`${merit.percentile}%`} color="text-blue-400" className="hidden sm:flex" />
            </div>
 
-           <div className="flex gap-2 shrink-0 ml-0 md:ml-4">
-              <Button asChild className="h-9 px-4 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[8px] tracking-widest rounded-lg shadow-lg border-none">
-                 <Link href={`/mocks/${sessionData.mockId}/instructions`}><RefreshCw className="h-3 w-3 mr-1" /> RE-TAKE</Link>
+           <div className="flex gap-3 shrink-0 ml-0 md:ml-6">
+              <Button asChild className="h-11 px-6 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest rounded-xl shadow-lg border-none active:scale-95 transition-all">
+                 <Link href={`/mocks/${sessionData.mockId}/instructions`}><RefreshCw className="h-4 w-4 mr-2" /> RE-AUDIT</Link>
               </Button>
            </div>
         </div>
 
         <Tabs defaultValue="SOLUTIONS" className="space-y-6">
-           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <TabsList className="bg-white border border-slate-100 p-1 h-12 rounded-xl shadow-sm inline-flex">
-                 <TabsTrigger value="SOLUTIONS" className="rounded-lg px-6 font-black uppercase text-[9px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white">Explanation</TabsTrigger>
-                 <TabsTrigger value="TOPPER" className="rounded-lg px-6 font-black uppercase text-[9px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white">State Rank</TabsTrigger>
+           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <TabsList className="bg-white border border-slate-100 p-1.5 h-14 rounded-2xl shadow-sm inline-flex">
+                 <TabsTrigger value="SOLUTIONS" className="rounded-xl px-8 font-black uppercase text-[10px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white transition-all">Logic Hub</TabsTrigger>
+                 <TabsTrigger value="TOPPER" className="rounded-xl px-8 font-black uppercase text-[10px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white transition-all">State Merit</TabsTrigger>
               </TabsList>
               
               <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
@@ -207,47 +219,78 @@ function ResultContent() {
               </div>
            </div>
 
-           <TabsContent value="SOLUTIONS" className="space-y-4">
-              {filteredQuestions.map((q) => {
+           <TabsContent value="SOLUTIONS" className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+              {filteredQuestions.length > 0 ? filteredQuestions.map((q) => {
                  const ans = sessionData.answers?.[q.index];
                  const isCorrect = ans !== undefined && ['A','B','C','D'][ans] === q.correctAnswer;
                  const isSkipped = ans === undefined || ans === null;
                  return (
-                    <Card key={q.id} className="border-none shadow-md rounded-2xl overflow-hidden bg-white text-left relative">
-                       <div className={cn("absolute top-0 left-0 w-1.5 h-full", isCorrect ? 'bg-emerald-500' : isSkipped ? 'bg-slate-200' : 'bg-rose-500')} />
-                       <CardContent className="p-6 md:p-8">
-                          <div className="flex items-center justify-between mb-4">
+                    <Card key={q.id} className="border-none shadow-md rounded-[2.5rem] overflow-hidden bg-white text-left relative group">
+                       <div className={cn("absolute top-0 left-0 w-2 h-full transition-all group-hover:w-3", isCorrect ? 'bg-emerald-500' : isSkipped ? 'bg-slate-200' : 'bg-rose-500')} />
+                       <CardContent className="p-8 md:p-12">
+                          <div className="flex items-center justify-between mb-8">
                              <div className="flex items-center gap-4">
-                                <span className={cn("h-10 w-10 rounded-lg flex items-center justify-center font-black text-lg shadow-inner", isCorrect ? "bg-emerald-50 text-emerald-600" : isSkipped ? "bg-slate-50 text-slate-400" : "bg-rose-50 text-rose-600")}>{q.index + 1}</span>
-                                <Badge variant="outline" className="border-slate-100 text-slate-400 uppercase text-[8px] font-black">{q.subjectId || "GK"}</Badge>
+                                <span className={cn("h-12 w-12 rounded-xl flex items-center justify-center font-black text-xl shadow-inner", isCorrect ? "bg-emerald-50 text-emerald-600" : isSkipped ? "bg-slate-50 text-slate-400" : "bg-rose-50 text-rose-600")}>{q.index + 1}</span>
+                                <Badge variant="outline" className="border-slate-100 text-slate-400 uppercase text-[9px] font-black px-3 py-1 rounded-lg">{(q.subjectId || "GK").toUpperCase()}</Badge>
                              </div>
+                             {isCorrect ? (
+                                <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[10px] uppercase px-4 py-1.5 rounded-full">VERIFIED ACCURATE</Badge>
+                             ) : isSkipped ? (
+                                <Badge className="bg-slate-100 text-slate-400 border-none font-black text-[10px] uppercase px-4 py-1.5 rounded-full">NOT ATTEMPTED</Badge>
+                             ) : (
+                                <Badge className="bg-rose-50 text-rose-600 border-none font-black text-[10px] uppercase px-4 py-1.5 rounded-full">LOGIC MISMATCH</Badge>
+                             )}
                           </div>
-                          <QuestionRenderer question={q} language={mockData?.languageMode || 'ENGLISH_PUNJABI'} showSolution={true} selectedAnswer={ans} className="p-0 border-none shadow-none" />
+                          <QuestionRenderer 
+                            question={q} 
+                            language={mockData?.languageMode || 'ENGLISH_PUNJABI'} 
+                            showSolution={true} 
+                            selectedAnswer={ans} 
+                            className="p-0 border-none shadow-none" 
+                          />
                        </CardContent>
                     </Card>
                  )
-              })}
+              }) : (
+                 <div className="py-32 text-center opacity-20 flex flex-col items-center gap-6">
+                    <AlertCircle className="h-16 w-16" />
+                    <p className="font-headline font-black text-xl uppercase tracking-widest">No nodes match filter</p>
+                 </div>
+              )}
            </TabsContent>
 
-           <TabsContent value="TOPPER" className="space-y-4">
-              <Card className="border-none shadow-md rounded-2xl bg-white p-6">
-                 <div className="space-y-3">
-                    {meritList.slice(0, 50).map((r: any, i: number) => {
-                       const name = (r.userName && r.userName !== 'Student' && !r.userName.includes('@')) ? r.userName : (r.userEmail || "Student");
-                       return (
-                        <div key={r.id} className="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl border border-slate-50">
-                           <div className="flex items-center gap-3">
-                              <span className="font-black text-slate-300 w-5 text-xs">#{i+1}</span>
-                              <StudentAvatar profile={{ name, gender: r.gender }} className="h-6 w-6 rounded-lg" />
-                              <p className="font-bold text-[#0F172A] text-xs uppercase truncate max-w-[200px]">{name}</p>
+           <TabsContent value="TOPPER" className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+              <Card className="border-none shadow-xl rounded-[3rem] bg-white p-8 md:p-12">
+                 <div className="space-y-4">
+                    <div className="p-4 md:p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between mb-8">
+                       <div className="flex items-center gap-4">
+                          <Users className="h-6 w-6 text-slate-400" />
+                          <p className="text-[11px] font-black uppercase text-slate-500">Live Aspirant Density: <span className="text-[#0F172A]">{merit.total} Verified Nodes</span></p>
+                       </div>
+                    </div>
+
+                    <div className="divide-y divide-slate-50">
+                       {meritList.slice(0, 100).map((r: any, i: number) => {
+                          const name = (r.userName && r.userName !== 'Aspirant' && !r.userName.includes('@')) ? r.userName : (r.userEmail?.split('@')[0] || "Student");
+                          const isCurrentUser = r.userId === user?.uid;
+                          
+                          return (
+                           <div key={r.id} className={cn("flex items-center justify-between py-5 md:px-6 rounded-2xl transition-all", isCurrentUser ? "bg-primary/5 ring-1 ring-primary/10" : "hover:bg-slate-50/50")}>
+                              <div className="flex items-center gap-6 flex-1 min-w-0">
+                                 <span className={cn("font-black w-10 text-lg md:text-2xl", i < 3 ? "text-primary" : "text-slate-300")}>#{i+1}</span>
+                                 <StudentAvatar profile={{ name, gender: r.gender }} className="h-10 w-10 md:h-12 md:w-12 rounded-xl" />
+                                 <div className="min-w-0">
+                                    <p className={cn("font-black text-sm md:text-lg uppercase truncate", isCurrentUser ? "text-primary" : "text-[#0F172A]")}>{name} {isCurrentUser && "(You)"}</p>
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Score Index: {(r.score || 0).toFixed(1)}</p>
+                                 </div>
+                              </div>
+                              <div className="flex gap-6 items-center shrink-0">
+                                 <Badge className={cn("border-none text-[10px] md:text-xs font-black px-4 py-1.5 rounded-xl shadow-sm", r.accuracy > 85 ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500")}>{r.accuracy}%</Badge>
+                              </div>
                            </div>
-                           <div className="flex gap-4 items-center">
-                              <span className="text-[10px] font-black text-primary">{(r.score || 0).toFixed(1)} Pts</span>
-                              <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[7px]">{r.accuracy || 0}%</Badge>
-                           </div>
-                        </div>
-                       );
-                    })}
+                          );
+                       })}
+                    </div>
                  </div>
               </Card>
            </TabsContent>
@@ -260,17 +303,17 @@ function ResultContent() {
 
 function ResultPill({ label, val, color, className }: any) {
    return (
-      <div className={cn("flex flex-col items-start gap-0.5", className)}>
-         <span className="text-[6px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">{label}</span>
-         <span className={cn("text-sm md:text-xl font-headline font-black leading-none", color)}>{val}</span>
+      <div className={cn("flex flex-col items-center md:items-start gap-1", className)}>
+         <span className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none">{label}</span>
+         <span className={cn("text-base md:text-3xl font-headline font-black leading-none tabular-nums", color)}>{val}</span>
       </div>
    )
 }
 
 function FilterBtn({ active, onClick, label, count, icon, activeColor }: any) {
    return (
-      <button onClick={onClick} className={cn("px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border-2 transition-all flex items-center gap-2 whitespace-nowrap", active ? `${activeColor} text-white shadow-md` : "bg-white border-slate-100 text-slate-400 hover:border-slate-200")}>
-         {icon} {label} <span>({count})</span>
+      <button onClick={onClick} className={cn("px-5 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border-2 transition-all flex items-center gap-3 whitespace-nowrap active:scale-95", active ? `${activeColor} text-white shadow-xl scale-105` : "bg-white border-slate-100 text-slate-400 hover:border-slate-300")}>
+         {icon} {label} <span className="opacity-60">({count})</span>
       </button>
    )
 }

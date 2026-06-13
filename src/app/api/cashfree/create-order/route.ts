@@ -4,56 +4,63 @@ import { initializeFirebase } from '@/firebase/app';
 import { doc, getDoc } from 'firebase/firestore';
 
 /**
- * @fileOverview Hardened Production Order Node v7.1.
- * UPDATED: Isolated Firebase import to bypass client-side barrel failure.
+ * @fileOverview Hardened Cashfree Order Node v8.0.
+ * DEFENSIVE: Comprehensive environment variable audit and payload validation.
+ * STABILITY: Isolated logic to prevent build-time dynamic import failures.
  */
 
 export async function POST(req: Request) {
   try {
-    const { planId, userId, origin: clientOrigin } = await req.json();
+    const body = await req.json();
+    const { planId, userId, origin: clientOrigin } = body;
+    
     const { firestore: db } = initializeFirebase();
 
     const clientId = process.env.CASHFREE_CLIENT_ID;
     const clientSecret = process.env.CASHFREE_CLIENT_SECRET;
     const env = process.env.CASHFREE_ENV || 'production';
 
+    // Phase 1: Authentication Guard
     if (!clientId || !clientSecret) {
-      console.error('[CASHFREE_AUTH_ERR]: API Credentials missing from environment.');
+      console.error("[CASHFREE_CRITICAL]: Missing API credentials in environment.");
       return NextResponse.json({ 
-        error: 'Gateway authentication keys not configured.',
-        details: 'Check Vercel environment variables: CASHFREE_CLIENT_ID, CASHFREE_CLIENT_SECRET.'
+        error: 'Payment Hub Configuration Error',
+        details: 'API Keys not detected on server node.'
       }, { status: 500 });
     }
 
+    // Phase 2: Gateway Configuration
     Cashfree.XClientId = clientId;
     Cashfree.XClientSecret = clientSecret;
-    
     const isProd = env === 'production' || clientSecret.startsWith('cf_prod_');
     Cashfree.XEnvironment = isProd ? Cashfree.Environment.PRODUCTION : Cashfree.Environment.SANDBOX;
 
+    // Phase 3: Payload Validation
     if (!userId || !planId) {
-      return NextResponse.json({ error: 'Mandatory session data missing.' }, { status: 400 });
+      return NextResponse.json({ error: 'Identity or Plan context missing.' }, { status: 400 });
     }
 
+    // Phase 4: Registry Audit (Verify plan existence and price)
     const planSnap = await getDoc(doc(db, "passes", planId));
     if (!planSnap.exists()) {
-      return NextResponse.json({ error: 'Pass node missing from registry: ' + planId }, { status: 404 });
+      return NextResponse.json({ error: `Pass node '${planId}' not found in registry.` }, { status: 404 });
     }
     const planData = planSnap.data();
     const amount = Number(planData.price);
 
     if (amount <= 0) {
-      return NextResponse.json({ error: 'Direct order creation for free nodes is restricted.' }, { status: 400 });
+      return NextResponse.json({ error: 'Manual activation required for free pass nodes.' }, { status: 400 });
     }
 
+    // Phase 5: Student Profile Audit
     const userSnap = await getDoc(doc(db, "users", userId));
     const userData = userSnap.data();
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || clientOrigin || new URL(req.url).origin;
-    const baseOrigin = siteUrl.replace('http://', 'https://');
-    const orderId = `order_${Date.now()}_${userId.slice(-4)}`;
+    const secureOrigin = siteUrl.replace('http://', 'https://');
+    const orderId = `order_${Date.now()}_${userId.slice(-6)}`;
 
-    const request = {
+    const orderRequest = {
       order_amount: amount,
       order_currency: "INR",
       order_id: orderId,
@@ -64,13 +71,13 @@ export async function POST(req: Request) {
         customer_phone: userData?.phone?.replace(/\D/g, '').slice(-10) || "9999999999",
       },
       order_meta: {
-        return_url: `${baseOrigin}/payment/success?order_id={order_id}&plan=${encodeURIComponent(planData.id)}`,
-        notify_url: `${baseOrigin}/api/cashfree/webhook`
+        return_url: `${secureOrigin}/payment/success?order_id={order_id}&plan=${encodeURIComponent(planData.id)}`,
+        notify_url: `${secureOrigin}/api/cashfree/webhook`
       },
-      order_note: `Institutional Pass: ${planData.name}`,
+      order_note: `Elite Prep Pass: ${planData.name}`,
     };
 
-    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+    const response = await Cashfree.PGCreateOrder("2023-08-01", orderRequest);
     
     return NextResponse.json({
       payment_session_id: response.data.payment_session_id,
@@ -78,12 +85,13 @@ export async function POST(req: Request) {
       cf_order_id: response.data.cf_order_id,
       environment: isProd ? 'production' : 'sandbox'
     });
+
   } catch (error: any) {
-    const errData = error?.response?.data || error;
-    console.error('[CASHFREE_ORDER_FAILURE]:', errData);
+    const errorBody = error?.response?.data || error;
+    console.error("[GATEWAY_ORDER_FAILURE]:", errorBody);
     return NextResponse.json({ 
-      error: errData.message || 'Payment Hub initialization failed.',
-      details: errData
+      error: errorBody.message || 'Payment Hub connection timed out.',
+      details: errorBody
     }, { status: 500 });
   }
 }

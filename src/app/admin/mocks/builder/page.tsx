@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useEffect, Suspense } from "react"
+import React, { useState, useMemo, useEffect, Suspense, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -51,9 +51,9 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview FINAL HIGH-FIDELITY Mock Architect v90.1.
- * FIXED: Potential undefined access in hydrated sections logic.
- * FIXED: Optimized selection mapping for massive question banks.
+ * @fileOverview Hardened Mock Architect v95.0.
+ * STABILITY: Atomic hydration of massive question banks and multi-board targeting.
+ * DEFENSIVE: Ensures zero data loss during complex assembly sessions.
  */
 
 export default function MockBuilderPage() {
@@ -87,7 +87,6 @@ function MockBuilderContent() {
   const [isPublishing, setIsPublishing] = useState(false)
   const [activeRightTab, setActiveRightTab] = useState<'BANK' | 'ASSEMBLY'>('BANK')
   
-  // Question Bank Filters
   const [filterBoard, setFilterBoard] = useState("all")
   const [filterExam, setFilterExam] = useState("all")
   const [filterSubject, setSubjectFilter] = useState("all")
@@ -96,10 +95,8 @@ function MockBuilderContent() {
   const [bankSelection, setBankSelection] = useState<string[]>([])
   const [displayLimit, setDisplayLimit] = useState(100)
   
-  // Subject Picker State
   const [subjectSearch, setSubjectSearch] = useState("")
 
-  // Mock Metadata & Architecture
   const [mockData, setMockData] = useState<any>({
     title: "", 
     assignmentMode: "MULTIPLE" as MockAssignmentMode,
@@ -117,63 +114,59 @@ function MockBuilderContent() {
     attemptLimit: 0,
   })
 
-  // Assembly State
   const [sections, setSections] = useState<any[]>([
     { id: 'sec-1', name: 'GENERAL HUB', questions: [] }
   ])
   const [activeSectionId, setActiveSectionId] = useState('sec-1')
 
-  // --- DATA SYNC ---
-  const fetchBank = async () => {
+  // --- DATA SYNC & HYDRATION ---
+  const fetchBank = useCallback(async () => {
     if (!db) return
     setBankLoading(true)
     try {
-      const q = query(collection(db, "questions"), limit(2000))
+      const q = query(collection(db, "questions"), limit(3000))
       const snap = await getDocs(q)
       setQuestionBank(snap.docs.map(d => ({ ...d.data(), id: d.id })))
     } finally {
       setBankLoading(false)
     }
-  }
+  }, [db]);
 
   useEffect(() => {
     fetchBank()
-  }, [db])
+  }, [fetchBank])
 
   useEffect(() => {
-    async function loadInitialState() {
-      if (!db) return;
-      if (!mockId) {
-        setIsInitializing(false);
-        return;
-      }
-      if (existingMock && questionBank.length > 0) {
-        setMockData({ 
-          ...existingMock,
-          assignmentMode: existingMock.assignmentMode || "MULTIPLE",
-          boardIds: existingMock.boardIds || (existingMock.boardId ? [existingMock.boardId] : []),
-          examIds: existingMock.examIds || (existingMock.examId ? [existingMock.examId] : [])
-        });
-        if (existingMock.questionIds) {
-          let currentIndex = 0;
-          const hydratedSections = (existingMock.sections || [{ name: 'GENERAL HUB', count: existingMock.questionIds.length }]).map((s: any, idx: number) => {
-            const count = parseInt(s.count) || 0;
-            const sectionQIds = existingMock.questionIds.slice(currentIndex, currentIndex + count);
-            currentIndex += count;
-            return { 
-              id: `sec-${idx + 1}`, 
-              name: s.name, 
-              questions: sectionQIds.map(id => questionBank.find(q => q.id === id)).filter(Boolean) 
-            };
-          });
-          setSections(hydratedSections.length > 0 ? hydratedSections : [{ id: 'sec-1', name: 'GENERAL HUB', questions: [] }]);
-        }
-        setIsInitializing(false);
-      }
+    if (!db || !isEditing || !existingMock || questionBank.length === 0) {
+       if (!isEditing) setIsInitializing(false);
+       return;
     }
-    loadInitialState();
-  }, [db, existingMock, questionBank, mockId]);
 
+    setMockData({ 
+      ...existingMock,
+      assignmentMode: existingMock.assignmentMode || "MULTIPLE",
+      boardIds: existingMock.boardIds || (existingMock.boardId ? [existingMock.boardId] : []),
+      examIds: existingMock.examIds || (existingMock.examId ? [existingMock.examId] : [])
+    });
+
+    if (existingMock.questionIds) {
+      let currentIndex = 0;
+      const hydratedSections = (existingMock.sections || [{ name: 'GENERAL HUB', count: existingMock.questionIds.length }]).map((s: any, idx: number) => {
+        const count = Number(s.count) || 0;
+        const sectionQIds = existingMock.questionIds.slice(currentIndex, currentIndex + count);
+        currentIndex += count;
+        return { 
+          id: `sec-${idx + 1}`, 
+          name: s.name, 
+          questions: sectionQIds.map(id => questionBank.find(q => q.id === id)).filter(Boolean) 
+        };
+      });
+      setSections(hydratedSections.length > 0 ? hydratedSections : [{ id: 'sec-1', name: 'GENERAL HUB', questions: [] }]);
+    }
+    setIsInitializing(false);
+  }, [db, existingMock, questionBank, isEditing]);
+
+  // --- FILTER ENGINE ---
   const bankExams = useMemo(() => {
     if (!rawExams) return [];
     if (filterBoard === "all") return rawExams;
@@ -183,12 +176,13 @@ function MockBuilderContent() {
   const uniqueExams = useMemo(() => {
     if (!rawExams) return [];
     const seen = new Set();
-    const filtered = rawExams.filter((e: any) => {
-      const key = e.name?.toLowerCase().trim();
+    const sorted = [...rawExams].sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+    const filtered = sorted.filter((e: any) => {
+      const key = (e.name || "").toLowerCase().trim();
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
-    }).sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
+    });
     if (mockData.boardIds?.length > 0) {
        return filtered.filter(e => mockData.boardIds.includes(e.boardId));
     }
@@ -207,19 +201,11 @@ function MockBuilderContent() {
     })
   }, [questionBank, filterBoard, filterExam, filterSubject, hideUsed, blockDuplicates, sections])
 
-  const visibleBank = useMemo(() => {
-     return filteredBank.slice(0, displayLimit);
-  }, [filteredBank, displayLimit]);
+  const visibleBank = useMemo(() => filteredBank.slice(0, displayLimit), [filteredBank, displayLimit]);
 
   const filteredSubjectsForPicking = useMemo(() => {
     if (!subjects) return [];
-    const seen = new Set();
-    return subjects.filter((s: any) => {
-      const key = s.name?.toLowerCase().trim();
-      if (!key || seen.has(key)) return false;
-      seen.add(key);
-      return s.name?.toLowerCase().includes(subjectSearch.toLowerCase());
-    }).sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
+    return subjects.filter((s: any) => s.name?.toLowerCase().includes(subjectSearch.toLowerCase())).sort((a: any, b: any) => a.name.localeCompare(b.name));
   }, [subjects, subjectSearch]);
 
   const toggleBoardId = (id: string) => {
@@ -245,40 +231,35 @@ function MockBuilderContent() {
     toast({ title: `Linked ${toAdd.length} Questions` });
   }
 
-  const handleSelectAllInBank = () => {
-    if (bankSelection.length === filteredBank.length) {
-      setBankSelection([]);
-    } else {
-      setBankSelection(filteredBank.map(q => q.id));
-    }
-  }
-
   const handlePublish = async () => {
     if (!db || isPublishing) return
-    if (!mockData.title) {
+    if (!mockData.title?.trim()) {
       toast({ variant: "destructive", title: "Audit Blocked", description: "Series Title is mandatory." })
       return
     }
     const flatQuestionIds = sections.flatMap(s => (s.questions || []).map(q => q.id));
     if (flatQuestionIds.length === 0) {
-       toast({ variant: "destructive", title: "Link Blocked", description: "Add questions to assembly hub." });
+       toast({ variant: "destructive", title: "Link Blocked", description: "Please add questions to the hub." });
        return;
     }
+
     setIsPublishing(true)
     const finalId = mockId || `mock-${Date.now()}`
     const mockRef = doc(db, "mocks", finalId)
     const sectionMetadata = sections.map(s => ({ name: s.name, count: s.questions?.length || 0 })).filter(s => s.count > 0);
+    
     const payload = {
       ...mockData,
       id: finalId,
-      boardId: mockData.boardIds[0] || "",
+      boardId: mockData.boardIds[0] || "GENERAL",
       totalQuestions: flatQuestionIds.length,
       questionIds: flatQuestionIds,
       sections: sectionMetadata,
-      totalMarks: flatQuestionIds.length * (mockData.positiveMarks || 1),
+      totalMarks: flatQuestionIds.length * (Number(mockData.positiveMarks) || 1),
       updatedAt: serverTimestamp(),
-      createdAt: existingMock?.createdAt || serverTimestamp(),
+      createdAt: isEditing ? (existingMock?.createdAt || serverTimestamp()) : serverTimestamp(),
     };
+
     try {
       await setDoc(mockRef, payload, { merge: true });
       const batch = writeBatch(db);
@@ -286,539 +267,323 @@ function MockBuilderContent() {
         batch.update(doc(db, "questions", id), { status: 'USED', updatedAt: serverTimestamp() });
       });
       await batch.commit();
-      toast({ title: "Series Deployed", description: "Mock series is now live in the registry." });
+      toast({ title: "Series Deployed", description: "Registry synchronized successfully." });
       router.push("/admin/mocks")
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Sync Failed" })
+      toast({ variant: "destructive", title: "Sync Failed", description: e.message })
     } finally {
       setIsPublishing(false)
     }
   }
 
-  const handleSelectAllBoards = () => {
-     if (mockData.boardIds?.length === boards?.length) {
-        setMockData({ ...mockData, boardIds: [] });
-     } else {
-        setMockData({ ...mockData, boardIds: boards?.map(b => b.id) || [] });
-     }
-  };
-
-  const handleSelectAllExams = () => {
-     if (mockData.examIds?.length === uniqueExams.length) {
-        setMockData({ ...mockData, examIds: [] });
-     } else {
-        setMockData({ ...mockData, examIds: uniqueExams.map(e => e.id) });
-     }
-  };
-
-  const addNewSection = (name: string) => {
-    const newId = `sec-${Date.now()}`;
-    setSections([...sections, { id: newId, name: name.toUpperCase(), questions: [] }]);
-    setSubjectSearch("");
-    setActiveSectionId(newId);
-  }
-
-  if (isInitializing) return <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0B1528] space-y-8"><Zap className="h-16 w-16 text-primary animate-pulse" /><p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Synchronizing Access Registry...</p></div>;
+  if (isInitializing) return (
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0B1528] space-y-8">
+       <Zap className="h-16 w-16 text-primary animate-pulse" />
+       <p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Hydrating Assembly Hub...</p>
+    </div>
+  );
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6 pb-40 text-left pt-2 md:pt-4 px-2 md:px-6">
+    <div className="max-w-[1600px] mx-auto space-y-6 pb-40 text-left pt-4 px-4 md:px-8">
       
-      {/* TOP HEADER */}
-      <div className="flex flex-wrap items-center justify-between gap-6">
+      {/* HEADER NODES */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl border bg-white h-12 w-12 md:h-14 md:w-14 shadow-sm active:scale-95">
-             <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
+             <ChevronLeft className="h-6 w-6" />
           </Button>
           <div className="text-left">
             <h1 className="text-2xl md:text-5xl font-headline font-black uppercase tracking-tight text-[#0F172A] leading-none">{isEditing ? "Modify Series" : "Mock Architect"}</h1>
-            <p className="text-[10px] md:text-xs uppercase font-black tracking-widest text-slate-400 mt-2 tracking-[0.3em]">Institutional Assembly Hub</p>
+            <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mt-2">Institutional Component Registry</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-           <Button onClick={handlePublish} disabled={isPublishing} className="bg-[#0F172A] hover:bg-black text-white font-black px-8 md:px-12 h-14 md:h-16 rounded-xl md:rounded-2xl uppercase text-[11px] tracking-[0.2em] gap-3 shadow-3xl active:scale-95">
-            {isPublishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ClipboardCheck className="h-6 w-6" />} Deploy Series
-           </Button>
-        </div>
+        <Button onClick={handlePublish} disabled={isPublishing} className="w-full md:w-auto bg-[#0F172A] hover:bg-black text-white font-black px-12 h-16 rounded-2xl uppercase text-[11px] tracking-[0.2em] gap-3 shadow-3xl active:scale-95">
+          {isPublishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-6 w-6" />} Commit to Registry
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
         
-        {/* LEFT COLUMN: ASSIGNMENT HUB */}
+        {/* CONFIGURATION COLUMN */}
         <div className="lg:col-span-4 space-y-8">
            <Card className="border-none shadow-2xl rounded-[3rem] bg-white p-6 md:p-10 space-y-8 border border-slate-100">
               
               <div className="space-y-3">
-                 <div className="flex items-center justify-between ml-1">
-                    <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight leading-none">SERIES TITLE</Label>
-                    <Badge variant="outline" className="border-primary/20 text-primary text-[8px] font-black uppercase">Institutional</Badge>
-                 </div>
+                 <Label className="text-[12px] font-black uppercase text-slate-500 tracking-tight ml-1">Series Headline</Label>
                  <Input 
                    value={mockData.title} 
                    onChange={e => setMockData({...mockData, title: e.target.value})}
-                   className="h-14 md:h-16 rounded-2xl bg-slate-50/50 border-none font-black text-lg md:text-xl px-6 shadow-inner focus-visible:ring-primary text-[#0F172A]" 
-                   placeholder="e.g. Patwari High Fidelity Mock 1"
+                   className="h-14 md:h-16 rounded-2xl bg-slate-50/50 border-none font-black text-lg px-6 shadow-inner focus-visible:ring-primary text-[#0F172A]" 
+                   placeholder="Patwari Mock Series 01"
                  />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-3">
-                    <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">SERIES TYPE</Label>
+                    <Label className="text-[12px] font-black uppercase text-slate-500 ml-1">Mock Type</Label>
                     <Select value={mockData.mockType} onValueChange={(v: MockType) => setMockData({...mockData, mockType: v})}>
-                       <SelectTrigger className="h-12 md:h-14 rounded-xl bg-slate-50/50 border-none font-black text-[12px] uppercase px-4">
+                       <SelectTrigger className="h-12 md:h-14 rounded-xl bg-slate-50/50 border-none font-black text-[12px] uppercase">
                           <SelectValue />
                        </SelectTrigger>
-                       <SelectContent className="rounded-xl">
-                          <SelectItem value="FULL" className="font-bold">Full Length Mock</SelectItem>
-                          <SelectItem value="SUBJECT" className="font-bold">Subject-Wise Test</SelectItem>
-                          <SelectItem value="SECTIONAL" className="font-bold">Sectional Test</SelectItem>
-                          <SelectItem value="PYQ" className="font-bold">PYQ Paper</SelectItem>
+                       <SelectContent>
+                          <SelectItem value="FULL">Full Length</SelectItem>
+                          <SelectItem value="SUBJECT">Subject-Wise</SelectItem>
+                          <SelectItem value="SECTIONAL">Sectional</SelectItem>
+                          <SelectItem value="PYQ">Official PYQ</SelectItem>
                        </SelectContent>
                     </Select>
                  </div>
                  <div className="space-y-3">
-                    <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">ACCESS LEVEL</Label>
+                    <Label className="text-[12px] font-black uppercase text-slate-500 ml-1">Access Level</Label>
                     <Select value={mockData.accessLevel} onValueChange={(v: AccessLevel) => setMockData({...mockData, accessLevel: v})}>
-                       <SelectTrigger className="h-12 md:h-14 rounded-xl bg-slate-50/50 border-none font-black text-[12px] uppercase px-4">
+                       <SelectTrigger className="h-12 md:h-14 rounded-xl bg-slate-50/50 border-none font-black text-[12px] uppercase">
                           <SelectValue />
                        </SelectTrigger>
-                       <SelectContent className="rounded-xl">
-                          <SelectItem value="FREE">Public (FREE)</SelectItem>
-                          <SelectItem value="PREMIUM">Elite (PREMIUM)</SelectItem>
+                       <SelectContent>
+                          <SelectItem value="FREE">FREE HUB</SelectItem>
+                          <SelectItem value="PREMIUM">ELITE HUB</SelectItem>
                        </SelectContent>
                     </Select>
                  </div>
               </div>
 
-              <div className="space-y-4 text-left">
-                <div className="flex items-center justify-between px-1">
-                   <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight leading-none">TARGET BOARDS</Label>
-                   <button onClick={handleSelectAllBoards} className="text-[9px] font-black uppercase text-primary hover:underline">Select All</button>
-                </div>
+              <div className="space-y-4">
+                <Label className="text-[12px] font-black uppercase text-slate-500 ml-1">Assigned Authorities</Label>
                 <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
                    {boards?.map((b: any) => (
                       <div 
                          key={b.id} 
                          onClick={() => toggleBoardId(b.id)}
-                         className="flex items-center space-x-3 p-3 md:p-4 bg-slate-50/50 rounded-xl hover:bg-slate-100 transition-all cursor-pointer group"
+                         className="flex items-center space-x-3 p-3 bg-slate-50/50 rounded-xl hover:bg-slate-100 transition-all cursor-pointer group"
                       >
                          <div className={cn(
                             "h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all",
-                            mockData.boardIds?.includes(b.id) ? "border-[#F97316] bg-[#F97316]" : "border-slate-300 bg-white"
+                            mockData.boardIds?.includes(b.id) ? "border-primary bg-primary" : "border-slate-300 bg-white"
                          )}>
                             {mockData.boardIds?.includes(b.id) && <Check className="h-3 w-3 text-white stroke-[3px]" />}
                          </div>
-                         <span className="text-[12px] font-black text-[#0F172A] uppercase truncate">{b.abbreviation} HUB</span>
+                         <span className="text-[11px] font-black text-[#0F172A] uppercase">{b.abbreviation} HUB</span>
                       </div>
                    ))}
                 </div>
               </div>
 
-              <div className="space-y-4 text-left">
-                <div className="flex items-center justify-between px-1">
-                   <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight leading-none">TARGET VERTICALS</Label>
-                   <button onClick={handleSelectAllExams} className="text-[9px] font-black uppercase text-primary hover:underline">Select All</button>
-                </div>
+              <div className="space-y-4">
+                <Label className="text-[12px] font-black uppercase text-slate-500 ml-1">Target Verticals</Label>
                 <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
-                   {uniqueExams.map((e: any) => {
-                      const isSelected = mockData.examIds?.includes(e.id);
-                      return (
+                   {uniqueExams.map((e: any) => (
                         <div 
                            key={e.id} 
                            onClick={() => toggleExamId(e.id)}
-                           className="flex items-center space-x-3 p-3 md:p-4 bg-slate-50/50 rounded-xl hover:bg-slate-100 transition-all cursor-pointer group"
+                           className="flex items-center space-x-3 p-3 bg-slate-50/50 rounded-xl hover:bg-slate-100 transition-all cursor-pointer group"
                         >
                            <div className={cn(
                               "h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all",
-                              isSelected ? "border-[#F97316] bg-[#F97316]" : "border-slate-300 bg-white"
+                              mockData.examIds?.includes(e.id) ? "border-primary bg-primary" : "border-slate-300 bg-white"
                            )}>
-                              {isSelected && <Check className="h-3 w-3 text-white stroke-[4px]" />}
+                              {mockData.examIds?.includes(e.id) && <Check className="h-3 w-3 text-white stroke-[3px]" />}
                            </div>
-                           <span className="text-[12px] font-black text-[#0F172A] uppercase truncate">{e.name}</span>
+                           <span className="text-[11px] font-black text-[#0F172A] uppercase truncate">{e.name}</span>
                         </div>
-                      )
-                   })}
+                   ))}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-3">
-                    <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1 flex items-center gap-2">
-                       <Clock className="h-3.5 w-3.5" /> MINS
-                    </Label>
+                    <Label className="text-[12px] font-black uppercase text-slate-500 ml-1">Duration (Min)</Label>
                     <Input 
                        type="number" 
-                       value={isNaN(mockData.duration) ? "" : mockData.duration} 
-                       onChange={e => setMockData({...mockData, duration: parseInt(e.target.value) || 0})} 
-                       className="h-12 md:h-14 rounded-xl bg-slate-50/50 border-none font-black text-center text-xl shadow-inner focus-visible:ring-primary" 
+                       value={mockData.duration} 
+                       onChange={e => setMockData({...mockData, duration: parseInt(e.target.value) || 120})} 
+                       className="h-12 md:h-14 rounded-xl bg-slate-50/50 border-none font-black text-center" 
                     />
                  </div>
                  <div className="space-y-3">
-                    <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1 flex items-center gap-2">
-                       <Lock className="h-3.5 w-3.5" /> LIMIT
-                    </Label>
-                    <Select 
-                       value={mockData.attemptLimit?.toString()} 
-                       onValueChange={v => setMockData({...mockData, attemptLimit: parseInt(v) || 0})}
-                    >
-                       <SelectTrigger className="h-12 md:h-14 rounded-xl bg-white border-2 border-[#F97316] font-black text-[12px] uppercase px-4 shadow-xl focus:ring-0">
-                          <SelectValue placeholder="UNLIMITED" />
-                       </SelectTrigger>
-                       <SelectContent className="rounded-xl">
-                          <SelectItem value="0" className="py-2 font-bold">UNLIMITED</SelectItem>
-                          <SelectItem value="1" className="py-2 font-bold">1 ATTEMPT</SelectItem>
-                          <SelectItem value="2" className="py-2 font-bold">2 ATTEMPTS</SelectItem>
-                          <SelectItem value="3" className="py-2 font-bold">3 ATTEMPTS</SelectItem>
-                       </SelectContent>
-                    </Select>
+                    <Label className="text-[12px] font-black uppercase text-slate-500 ml-1">Attempt Limit</Label>
+                    <Input 
+                       type="number" 
+                       value={mockData.attemptLimit} 
+                       onChange={e => setMockData({...mockData, attemptLimit: parseInt(e.target.value) || 0})} 
+                       className="h-12 md:h-14 rounded-xl bg-slate-50/50 border-none font-black text-center" 
+                    />
                  </div>
               </div>
 
-              {/* REFINED MARKING HUB: SQUARE BOX POS/NEG (STRICT 12PX) */}
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                 <div className="bg-[#F0FDF4] p-4 md:p-6 rounded-[3rem] border border-[#DCFCE7] text-center flex flex-col items-center justify-start h-[180px] md:h-[220px] shadow-inner group transition-all hover:border-[#10B981]/30">
-                    <div className="pt-2">
-                       <p className="text-[10px] md:text-[12px] font-black text-[#10B981] uppercase tracking-widest leading-none">POS</p>
-                       <p className="text-[10px] md:text-[12px] font-black text-[#10B981] uppercase tracking-widest leading-none mt-1">(+)</p>
-                    </div>
-                    <div className="mt-auto mb-4 w-full flex justify-center">
-                       <Input 
-                          type="number" 
-                          step="0.1"
-                          value={isNaN(mockData.positiveMarks) ? "" : mockData.positiveMarks} 
-                          onChange={e => setMockData({...mockData, positiveMarks: parseFloat(e.target.value) || 0})}
-                          className="w-14 h-12 md:w-16 md:h-14 bg-white border-2 border-[#DCFCE7] rounded-lg text-center font-black text-[12px] p-0 focus-visible:ring-primary shadow-sm" 
-                       />
-                    </div>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                 <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-emerald-600 ml-1">POS (+)</Label>
+                    <Input 
+                       type="number" 
+                       step="0.1"
+                       value={mockData.positiveMarks} 
+                       onChange={e => setMockData({...mockData, positiveMarks: parseFloat(e.target.value) || 1})}
+                       className="h-12 bg-emerald-50/50 border-emerald-100 text-center font-black rounded-xl" 
+                    />
                  </div>
-                 <div className="bg-[#FEF2F2] p-4 md:p-6 rounded-[3rem] border border-[#FEE2E2] text-center flex flex-col items-center justify-start h-[180px] md:h-[220px] shadow-inner group transition-all hover:border-[#F43F5E]/30">
-                    <div className="pt-2">
-                       <p className="text-[10px] md:text-[12px] font-black text-[#F43F5E] uppercase tracking-widest leading-none">NEG</p>
-                       <p className="text-[10px] md:text-[12px] font-black text-[#F43F5E] uppercase tracking-widest leading-none mt-1">(-)</p>
-                    </div>
-                    <div className="mt-auto mb-4 w-full flex justify-center">
-                       <Input 
-                          type="number" 
-                          step="0.01"
-                          value={isNaN(mockData.negativeMarks) ? "" : mockData.negativeMarks} 
-                          onChange={e => setMockData({...mockData, negativeMarks: parseFloat(e.target.value) || 0})}
-                          className="w-14 h-12 md:w-16 md:h-14 bg-white border-2 border-[#FEE2E2] rounded-lg text-center font-black text-[12px] p-0 focus-visible:ring-primary shadow-sm" 
-                       />
-                    </div>
+                 <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-rose-600 ml-1">NEG (-)</Label>
+                    <Input 
+                       type="number" 
+                       step="0.01"
+                       value={mockData.negativeMarks} 
+                       onChange={e => setMockData({...mockData, negativeMarks: parseFloat(e.target.value) || 0.25})}
+                       className="h-12 bg-rose-50/50 border-rose-100 text-center font-black rounded-xl" 
+                    />
                  </div>
               </div>
            </Card>
         </div>
 
-        {/* RIGHT COLUMN: TACTICAL HUB */}
-        <div className="lg:col-span-8 flex flex-col space-y-6 min-w-0">
+        {/* COMPONENT ASSEMBLY HUB */}
+        <div className="lg:col-span-8 space-y-6">
            
-           <div className="flex items-center gap-4 bg-white p-1.5 rounded-xl border border-slate-100 shadow-sm w-fit animate-in fade-in slide-in-from-left-4 duration-500">
-              <button 
-                onClick={() => setActiveRightTab('BANK')}
-                className={cn(
-                  "px-6 md:px-10 py-3 rounded-lg font-black uppercase text-[14px] tracking-tight transition-all flex items-center gap-2.5",
-                  activeRightTab === 'BANK' ? "bg-[#0B1528] text-white shadow-2xl" : "text-slate-400 hover:text-[#0B1528] hover:bg-slate-50"
-                )}
-              >
-                 <Database className="h-4 w-4" /> Global Bank
-              </button>
-              <button 
-                onClick={() => setActiveRightTab('ASSEMBLY')}
-                className={cn(
-                  "px-6 md:px-10 py-3 rounded-lg font-black uppercase text-[14px] tracking-tight transition-all flex items-center gap-2.5",
-                  activeRightTab === 'ASSEMBLY' ? "bg-[#0B1528] text-white shadow-2xl" : "text-slate-400 hover:text-[#0B1528] hover:bg-slate-50"
-                )}
-              >
-                 <Layers className="h-4 w-4" /> Assembly Hub
-              </button>
+           <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm w-fit">
+              <button onClick={() => setActiveRightTab('BANK')} className={cn("px-8 py-3 rounded-xl font-black uppercase text-xs tracking-tight transition-all", activeRightTab === 'BANK' ? "bg-[#0B1528] text-white shadow-xl" : "text-slate-400 hover:bg-slate-50")}>Registry Bank</button>
+              <button onClick={() => setActiveRightTab('ASSEMBLY')} className={cn("px-8 py-3 rounded-xl font-black uppercase text-xs tracking-tight transition-all", activeRightTab === 'ASSEMBLY' ? "bg-[#0B1528] text-white shadow-xl" : "text-slate-400 hover:bg-slate-50")}>Assembly Hub</button>
            </div>
 
-           <div className="flex-1 flex flex-col space-y-8 min-w-0">
-              {activeRightTab === 'BANK' ? (
-                <>
-                  <div className="bg-[#0B1528] rounded-[2.5rem] p-6 md:p-10 text-white space-y-8 shadow-5xl relative overflow-hidden flex flex-col animate-in zoom-in-95 duration-500">
-                    <div className="absolute top-0 right-0 p-12 opacity-5"><Zap className="h-64 w-64" /></div>
-                    
-                    <div className="relative z-10 flex flex-col space-y-8">
-                        {/* 1. TOP STATS NODES */}
-                        <div className="flex items-center justify-between gap-4 pb-6 border-b border-white/5">
-                           <div className="flex gap-4">
-                              <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 flex flex-col items-start gap-1 shadow-inner min-w-[110px]">
-                                 <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">REGISTRY FILTERED</span>
-                                 <span className="text-[14px] font-black text-primary tabular-nums">{filteredBank.length} Q</span>
-                              </div>
-                              <div className="bg-white/5 px-4 py-2 rounded-lg border border-white/10 flex flex-col items-start gap-1 shadow-inner min-w-[110px]">
-                                 <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">TOTAL BANK</span>
-                                 <span className="text-[14px] font-black text-white tabular-nums">{questionBank.length} Q</span>
-                              </div>
-                           </div>
-                        </div>
+           {activeRightTab === 'BANK' ? (
+             <div className="space-y-8 animate-in zoom-in-95 duration-500">
+                <Card className="bg-[#0B1528] rounded-[3rem] p-8 md:p-12 text-white space-y-10 shadow-5xl border border-white/5 relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-12 opacity-5"><Database className="h-64 w-64" /></div>
+                   <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div className="space-y-3">
+                         <Label className="text-[11px] font-black uppercase text-slate-500 tracking-widest ml-1">Authority Hub</Label>
+                         <select value={filterBoard} onChange={e => setFilterBoard(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 outline-none font-bold uppercase text-[11px]">
+                            <option value="all" className="bg-[#0B1528]">All Boards</option>
+                            {boards?.map((b: any) => <option key={b.id} value={b.id} className="bg-[#0B1528]">{b.abbreviation}</option>)}
+                         </select>
+                      </div>
+                      <div className="space-y-3">
+                         <Label className="text-[11px] font-black uppercase text-slate-500 tracking-widest ml-1">Subject Node</Label>
+                         <select value={filterSubject} onChange={e => setSubjectFilter(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 outline-none font-bold uppercase text-[11px]">
+                            <option value="all" className="bg-[#0B1528]">All Nodes</option>
+                            {subjects?.map((s: any) => <option key={s.id} value={s.id} className="bg-[#0B1528]">{s.name}</option>)}
+                         </select>
+                      </div>
+                      <div className="flex flex-col justify-end space-y-3">
+                         <div className="flex items-center justify-between bg-white/5 px-5 py-3 rounded-xl border border-white/10 h-12">
+                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-300">UNUSED ONLY</span>
+                            <Switch checked={hideUsed} onCheckedChange={setHideUsed} />
+                         </div>
+                      </div>
+                   </div>
 
-                        {/* 2. THREE COLUMN FILTER */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                           <div className="space-y-2">
-                              <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">BOARD HUB</Label>
-                              <Select value={filterBoard} onValueChange={(v) => { setFilterBoard(v); setFilterExam("all"); }}>
-                                 <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-xl font-black text-[14px] text-white px-4 focus:ring-0"><SelectValue placeholder="All Boards" /></SelectTrigger>
-                                 <SelectContent className="bg-[#0B1528] text-white border-white/10 rounded-xl">
-                                    <SelectItem value="all" className="font-bold uppercase text-[12px]">All Boards</SelectItem>
-                                    {boards?.map(b => <SelectItem key={b.id} value={b.id} className="font-bold uppercase text-[12px]">{b.abbreviation}</SelectItem>)}
-                                 </SelectContent>
-                              </Select>
-                           </div>
-                           <div className="space-y-2">
-                              <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">VERTICAL</Label>
-                              <Select value={filterExam} onValueChange={setFilterExam}>
-                                 <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-xl font-black text-[14px] text-white px-4 focus:ring-0"><SelectValue placeholder="All Verticals" /></SelectTrigger>
-                                 <SelectContent className="bg-[#0B1528] text-white border-white/10 rounded-xl max-h-[350px]">
-                                    <SelectItem value="all" className="font-bold uppercase text-[12px]">All Verticals</SelectItem>
-                                    {bankExams.map(e => <SelectItem key={e.id} value={e.id} className="font-bold uppercase text-[12px]">{e.name}</SelectItem>)}
-                                 </SelectContent>
-                              </Select>
-                           </div>
-                           <div className="space-y-2">
-                              <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">NODE</Label>
-                              <Select value={filterSubject} onValueChange={setSubjectFilter}>
-                                 <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-xl font-black text-[14px] text-white px-4 focus:ring-0"><SelectValue placeholder="All Nodes" /></SelectTrigger>
-                                 <SelectContent className="bg-[#0B1528] text-white border-white/10 rounded-xl max-h-[350px]">
-                                    <SelectItem value="all" className="font-bold uppercase text-[12px]">All Nodes</SelectItem>
-                                    {subjects?.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
-                                 </SelectContent>
-                              </Select>
-                           </div>
-                        </div>
+                   <div className="relative z-10 flex flex-col md:flex-row items-center gap-4 pt-6 border-t border-white/10">
+                      <div className="flex-1 text-left">
+                         <p className="text-[10px] font-black uppercase text-primary tracking-[0.3em]">Selection Queue</p>
+                         <p className="text-xl md:text-3xl font-headline font-black tabular-nums">{bankSelection.length} <span className="text-sm text-slate-500">Nodes Staged</span></p>
+                      </div>
+                      <Button 
+                         onClick={handleLinkQuestions}
+                         disabled={bankSelection.length === 0}
+                         className="w-full md:w-auto h-16 px-12 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-3xl gap-3 transition-all"
+                      >
+                         Link Staged Assets <CheckCircle2 className="h-5 w-5" />
+                      </Button>
+                   </div>
+                </Card>
 
-                        <div className="h-px w-full bg-white/10" />
-
-                        {/* 3. TACTICAL COMMAND BAR */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-                           <div className="md:col-span-4 space-y-2 text-left">
-                              <Label className="text-[14px] font-black uppercase text-slate-500 tracking-tight ml-1">TARGET SECTION</Label>
-                              <Popover>
-                                 <PopoverTrigger asChild>
-                                    <button className="w-full h-14 bg-[#F97316] hover:bg-orange-600 text-white rounded-xl font-black uppercase text-[14px] shadow-5xl tracking-tight transition-all flex items-center justify-center px-6 truncate">
-                                       {sections.find(s => s.id === activeSectionId)?.name || "GENERAL HUB"}
-                                    </button>
-                                 </PopoverTrigger>
-                                 <PopoverContent className="w-[320px] md:w-[400px] bg-[#0F172A] border-white/10 p-0 rounded-[2rem] shadow-5xl z-[1001] overflow-hidden text-left">
-                                    <div className="p-8 pb-4 border-b border-white/5 flex items-center justify-between">
-                                       <p className="text-[12px] font-black uppercase text-slate-500 tracking-widest">SELECT HUB</p>
-                                       <Badge className="bg-primary/20 text-primary border-none text-[10px] font-black">{sections.length} NODES</Badge>
-                                    </div>
-                                    <ScrollArea className="h-72">
-                                       <div className="space-y-1.5 p-4">
-                                          {sections.map(s => (
-                                             <button 
-                                                key={s.id} 
-                                                onClick={() => setActiveSectionId(s.id)}
-                                                className={cn(
-                                                   "w-full p-4 rounded-xl text-left font-black uppercase text-[14px] tracking-tight transition-all",
-                                                   activeSectionId === s.id ? "bg-[#F97316] text-white shadow-xl" : "text-slate-400 hover:bg-white/5 hover:text-white"
-                                                )}
-                                             >
-                                                {s.name}
-                                             </button>
-                                          ))}
-                                       </div>
-                                    </ScrollArea>
-                                 </PopoverContent>
-                              </Popover>
-                           </div>
-
-                           <div className="md:col-span-8 grid grid-cols-2 gap-4">
-                              <div className="flex items-center justify-between bg-white/5 px-5 py-3 rounded-xl border border-white/10 h-14 group hover:bg-white/10 transition-all cursor-pointer shadow-inner">
-                                 <div className="flex flex-col text-left">
-                                    <span className="text-[11px] font-black uppercase text-slate-300 leading-none">UNUSED</span>
-                                    <span className="text-[11px] font-black uppercase text-slate-300 leading-none mt-1">ONLY</span>
-                                 </div>
-                                 <Switch checked={hideUsed} onCheckedChange={setHideUsed} className="data-[state=checked]:bg-[#F97316]" />
-                              </div>
-                              <div className="flex items-center justify-between bg-white/5 px-5 py-3 rounded-xl border border-white/10 h-14 group hover:bg-white/10 transition-all cursor-pointer shadow-inner">
-                                 <div className="flex flex-col text-left">
-                                    <span className="text-[11px] font-black uppercase text-slate-300 leading-none">BLOCK</span>
-                                    <span className="text-[11px] font-black uppercase text-slate-300 leading-none mt-1">REPEATS</span>
-                                 </div>
-                                 <Switch checked={blockDuplicates} onCheckedChange={setBlockDuplicates} className="data-[state=checked]:bg-[#10B981]" />
-                              </div>
-                           </div>
-                        </div>
-
-                        {/* 4. PRIMARY ACTIONS BAR */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                           <div className="md:col-span-4">
-                              <Button 
-                                 onClick={handleSelectAllInBank} 
-                                 variant="outline"
-                                 className="h-16 w-full border-white/10 bg-white/5 hover:bg-white/10 text-white font-black uppercase text-[8px] tracking-tight rounded-xl shadow-xl active:scale-95 px-1 whitespace-nowrap"
-                              >
-                                 SELECT ALL
-                              </Button>
-                           </div>
-                           <div className="md:col-span-8">
-                              <Button 
-                                 onClick={handleLinkQuestions}
-                                 disabled={bankSelection.length === 0}
-                                 className="h-16 w-full bg-[#10B981] hover:bg-[#0E946A] text-white font-black uppercase text-[14px] tracking-[0.2em] rounded-xl shadow-5xl border-none transition-all active:scale-95 gap-3"
-                              >
-                                 LINK {bankSelection.length} ASSETS <Zap className="h-6 w-6 fill-current" />
-                              </Button>
-                           </div>
-                        </div>
-                    </div>
-                  </div>
-
-                  {/* QUESTION LIST HUB: HIGH DENSITY CARDS */}
-                  <div className="space-y-3 animate-in fade-in slide-in-from-bottom-6 duration-700">
-                    {bankLoading ? (
-                      Array.from({length: 4}).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-[1rem] bg-slate-50" />)
-                    ) : visibleBank.map((q) => {
+                <div className="grid grid-cols-1 gap-3">
+                   {bankLoading ? (
+                      Array.from({length: 5}).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-2xl bg-white" />)
+                   ) : visibleBank.map((q) => {
                       const isSelected = bankSelection.includes(q.id);
-                      const board = boards?.find(b => b.id === q.boardId);
-                      const sub = subjects?.find(s => s.id === q.subjectId);
                       return (
                         <Card 
-                          key={q.id} 
-                          onClick={() => setBankSelection(prev => isSelected ? prev.filter(id => id !== q.id) : [...prev, q.id])}
-                          className={cn(
-                            "border-none shadow-sm rounded-[1rem] bg-white py-3 px-4 md:px-6 flex items-center gap-4 cursor-pointer transition-all duration-300 hover:shadow-md border border-slate-100 group overflow-hidden relative",
-                            isSelected && "ring-2 ring-primary/20 bg-primary/5 shadow-inner"
-                          )}
+                           key={q.id} 
+                           onClick={() => setBankSelection(p => isSelected ? p.filter(id => id !== q.id) : [...p, q.id])}
+                           className={cn("border-none shadow-sm rounded-2xl p-5 md:px-8 flex items-center justify-between cursor-pointer transition-all border-2", isSelected ? "bg-primary/5 border-primary shadow-lg scale-[1.01]" : "bg-white border-transparent hover:border-slate-100")}
                         >
-                           {/* MINIMALIST SELECTION CIRCLE */}
-                           <div className={cn(
-                              "h-5 w-5 md:h-6 md:w-6 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-all duration-300",
-                              isSelected ? "border-[#F97316] bg-[#F97316] shadow-md" : "border-slate-200 bg-white"
-                           )}>
-                              {isSelected && <Check className="h-2.5 w-2.5 md:h-3 md:w-3 text-white stroke-[4px]" />}
-                           </div>
-                           
-                           <div className="flex-1 min-w-0 space-y-1.5 text-left">
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                 <Badge className="bg-[#0B1528] text-white border-none font-black text-[7px] px-1.5 py-0.5 rounded shadow-sm uppercase">{board?.abbreviation || 'PSSSB'}</Badge>
-                                 <Badge variant="outline" className="text-slate-400 border-slate-100 text-[7px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-50">{sub?.name || 'GK'}</Badge>
-                                 {q.status === 'USED' && <Badge className="bg-emerald-50 text-emerald-600 border-none text-[7px] font-black uppercase px-1.5 py-0.5">USED</Badge>}
+                           <div className="flex items-center gap-6 min-w-0">
+                              <div className={cn("h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0", isSelected ? "bg-primary border-primary" : "bg-white border-slate-200")}>
+                                 {isSelected && <Check className="h-3 w-3 text-white stroke-[4px]" />}
                               </div>
-                              <p className="font-bold text-xs md:text-sm text-[#0F172A] leading-tight antialiased truncate group-hover:text-primary transition-colors">
-                                {q.englishQuestion}
-                              </p>
+                              <div className="min-w-0 text-left">
+                                 <p className="font-bold text-[#0F172A] truncate text-sm md:text-base">{q.englishQuestion}</p>
+                                 <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mt-1.5">{q.subjectId} • {q.difficulty}</p>
+                              </div>
                            </div>
                         </Card>
                       )
-                    })}
-                    {filteredBank.length > displayLimit && (
-                      <div className="flex justify-center pt-4">
-                        <Button 
-                          onClick={() => setDisplayLimit(prev => prev + 100)}
-                          className="h-10 px-8 rounded-xl bg-white border border-slate-200 text-[#0F172A] font-black uppercase tracking-widest text-[9px] hover:bg-slate-50 shadow-sm"
-                        >
-                          Load More ({filteredBank.length - displayLimit} Remaining)
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-8 flex-1 flex flex-col animate-in fade-in duration-500 min-w-0">
-                    <div className="flex items-center justify-between px-2 md:px-6">
-                      <h3 className="text-[12px] md:text-[14px] font-headline font-black text-[#0F172A] uppercase flex items-center gap-4">
-                          <Layers className="h-5 w-5 md:h-7 md:w-7 text-primary" /> Active Assembly Hub
-                      </h3>
-                      <Badge className="bg-[#0F172A] text-white border-none px-4 md:px-6 py-2 rounded-xl font-black uppercase text-[10px] md:text-[14px] tracking-widest shadow-xl">
-                         {sections.reduce((acc,s) => acc + (s.questions?.length || 0), 0)} Q LINKED
-                      </Badge>
-                    </div>
-
-                    <ScrollArea className="h-[800px] pr-2 md:pr-6 flex-1">
-                      <div className="space-y-6 md:space-y-8">
-                          {sections.map((sec, sIdx) => (
-                            <Card key={sec.id} className="border-none shadow-3xl rounded-[2.5rem] bg-white overflow-hidden border border-slate-100 group/sec">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between p-6 md:p-8 bg-slate-50/50 border-b border-slate-50 gap-4">
-                                  <div className="flex items-center gap-4 md:gap-6 text-left">
-                                      <div className="h-10 w-10 md:h-12 md:w-12 bg-[#0F172A] text-white rounded-xl flex items-center justify-center font-black text-lg md:text-xl shadow-2xl shrink-0 group-hover/sec:bg-primary transition-colors">
-                                         {sIdx + 1}
-                                      </div>
-                                      <div className="min-w-0 flex-1">
-                                        <Input 
-                                            value={sec.name} 
-                                            onChange={e => setSections(p => p.map(s => s.id === sec.id ? { ...s, name: e.target.value.toUpperCase() } : s))} 
-                                            className="h-10 w-full bg-transparent border-none font-black uppercase text-lg md:text-2xl focus-visible:ring-0 p-0 text-[#0F172A] truncate" 
-                                        />
-                                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{(sec.questions?.length || 0)} Linked Prep Nodes</p>
-                                      </div>
-                                  </div>
-                                  <button onClick={() => setSections(p => p.filter(s => s.id !== sec.id))} className="h-10 w-10 md:h-12 md:w-12 text-rose-500 hover:bg-rose-50 rounded-xl transition-all flex items-center justify-center border-none bg-transparent active:scale-90"><Trash2 className="h-5 w-5 md:h-6 md:w-6" /></button>
-                                </div>
-                                <div className="p-6 md:p-8 space-y-3 md:space-y-4">
-                                  {sec.questions?.map((q: any, qIdx: number) => (
-                                      <div key={q.id} className="flex items-center justify-between p-3 md:p-4 bg-slate-50/50 border border-slate-100 rounded-xl md:rounded-2xl group/item hover:bg-white hover:shadow-2xl transition-all duration-300">
-                                        <div className="flex items-center gap-4 md:gap-6 min-w-0 flex-1">
-                                            <span className="text-sm md:text-lg font-black text-slate-300 w-6 shrink-0">#{qIdx + 1}</span>
-                                            <p className="text-xs md:text-sm font-bold text-slate-600 truncate text-left">{q.englishQuestion}</p>
-                                        </div>
-                                        <button 
-                                            className="text-slate-300 hover:text-rose-600 p-2 shrink-0 transition-colors bg-transparent border-none"
-                                            onClick={() => setSections(p => p.map(s => s.id === sec.id ? { ...s, questions: s.questions?.filter((item: any) => item.id !== q.id) || [] } : s))} 
-                                        >
-                                            <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
-                                        </button>
-                                      </div>
-                                  ))}
-                                  {(!sec.questions || sec.questions.length === 0) && (
-                                      <div className="py-16 md:py-20 text-center opacity-20 italic font-black uppercase text-[10px] md:text-[12px] tracking-widest flex flex-col items-center justify-center gap-4 w-full">
-                                         <Zap className="h-8 w-8 md:h-10 md:w-10" />
-                                         <span>Awaiting link node synchronization...</span>
-                                      </div>
-                                  )}
-                                </div>
-                            </Card>
-                          ))}
-
-                          <Popover>
-                            <PopoverTrigger asChild>
-                                <Button className="h-16 md:h-24 w-full bg-white border-dashed border-[3px] md:border-4 border-slate-200 rounded-[1.5rem] md:rounded-[2.5rem] shadow-xl hover:border-primary hover:shadow-2xl transition-all flex items-center justify-center gap-3 md:gap-4 text-slate-300 hover:text-primary font-black uppercase text-[11px] md:text-[14px] tracking-widest group active:scale-[0.98]">
-                                  <Plus className="h-5 w-5 md:h-6 md:w-6 group-hover:rotate-90 transition-transform" /> ADD NEW SUBJECT HUB
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[300px] md:w-[450px] p-0 rounded-[2rem] md:rounded-[2.5rem] bg-[#0F172A] text-white border-white/10 shadow-5xl overflow-hidden z-[1001] text-left">
-                                <div className="p-6 md:p-8 border-b border-white/5 space-y-4">
-                                  <p className="text-[11px] md:text-[12px] font-black uppercase text-[#F97316] tracking-widest leading-none text-center">SELECT SUBJECT HUB</p>
-                                  <div className="relative">
-                                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                                      <Input 
-                                        placeholder="Search master registry..." 
-                                        value={subjectSearch}
-                                        onChange={(e) => setSubjectSearch(e.target.value)}
-                                        className="h-11 md:h-12 pl-12 bg-white/5 border-white/10 rounded-xl font-bold text-sm focus-visible:ring-[#F97316] text-white placeholder:text-slate-600" 
-                                      />
-                                  </div>
-                                </div>
-                                <ScrollArea className="h-[300px] md:h-[400px]">
-                                  <div className="p-3 md:p-4 space-y-1">
-                                      {filteredSubjectsForPicking.map((s: any) => (
-                                        <button 
-                                            key={s.id}
-                                            onClick={() => addNewSection(s.name)}
-                                            className="w-full flex items-center justify-between p-3 md:p-4 rounded-xl hover:bg-white/5 transition-all text-left group border-none bg-transparent"
-                                        >
-                                            <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                                              <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-[#F97316] transition-colors shrink-0">
-                                                 <SearchCode className="h-4 w-4" />
-                                              </div>
-                                              <span className="text-[12px] md:text-[14px] font-black uppercase tracking-tight text-slate-300 group-hover:text-white transition-colors truncate">{s.name}</span>
-                                            </div>
-                                            <Plus className="h-4 w-4 text-slate-700 opacity-0 group-hover:opacity-100 transition-all shrink-0" />
-                                        </button>
-                                      ))}
-                                  </div>
-                                  <ScrollBar className="bg-white/10" />
-                                </ScrollArea>
-                            </PopoverContent>
-                          </Popover>
-                      </div>
-                    </ScrollArea>
+                   })}
+                   {filteredBank.length > displayLimit && (
+                      <Button variant="ghost" onClick={() => setDisplayLimit(d => d + 100)} className="w-full h-14 font-black uppercase tracking-widest text-[10px] text-slate-400">Load Next Block ({filteredBank.length - displayLimit} Remaining)</Button>
+                   )}
                 </div>
-              )}
-           </div>
+             </div>
+           ) : (
+             <div className="space-y-8 animate-in fade-in duration-500">
+                <div className="flex flex-col md:flex-row items-center justify-between px-2 gap-4">
+                   <div className="text-left">
+                      <h3 className="text-xl font-headline font-black uppercase text-[#0F172A] flex items-center gap-3"><Layers className="h-6 w-6 text-primary" /> Active Composition</h3>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{sections.reduce((a,s) => a + (s.questions?.length || 0), 0)} Total Verified Nodes</p>
+                   </div>
+                   <Popover>
+                      <PopoverTrigger asChild>
+                         <Button className="h-12 px-8 bg-[#0F172A] hover:bg-black text-white rounded-xl font-black uppercase text-[10px] tracking-widest gap-3 shadow-xl">
+                            <Plus className="h-4 w-4" /> Add Section Node
+                         </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[320px] p-6 bg-[#0F172A] text-white rounded-[2rem] border-white/10 shadow-5xl z-[1001]">
+                         <div className="space-y-4">
+                            <Label className="text-[10px] font-black uppercase text-primary ml-1">Section Hub Name</Label>
+                            <Input placeholder="e.g. PUNJAB GK" className="h-12 bg-white/5 border-white/10 text-white rounded-xl font-bold" onKeyDown={(e) => {
+                               if(e.key === 'Enter') {
+                                  const val = (e.target as HTMLInputElement).value;
+                                  if(val.trim()) {
+                                     setSections([...sections, { id: `sec-${Date.now()}`, name: val.trim().toUpperCase(), questions: [] }]);
+                                     (e.target as HTMLInputElement).value = "";
+                                  }
+                               }
+                            }} />
+                            <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest text-center">Press Enter to Create Hub</p>
+                         </div>
+                      </PopoverContent>
+                   </Popover>
+                </div>
+
+                <div className="grid grid-cols-1 gap-8">
+                   {sections.map((sec, sIdx) => (
+                      <Card key={sec.id} className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden border border-slate-100 group/sec">
+                         <div className="flex items-center justify-between p-8 bg-slate-50/50 border-b border-slate-50">
+                            <div className="flex items-center gap-6">
+                               <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-xl transition-colors", activeSectionId === sec.id ? "bg-primary text-white" : "bg-[#0F172A] text-white")}>
+                                  {sIdx + 1}
+                               </div>
+                               <div className="text-left">
+                                  <Input value={sec.name} onChange={e => setSections(p => p.map(s => s.id === sec.id ? { ...s, name: e.target.value.toUpperCase() } : s))} className="h-8 p-0 bg-transparent border-none font-black uppercase text-xl md:text-2xl focus-visible:ring-0 text-[#0F172A]" />
+                                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{(sec.questions?.length || 0)} Linked Preparation Nodes</p>
+                               </div>
+                            </div>
+                            <div className="flex gap-2">
+                               <Button onClick={() => setActiveSectionId(sec.id)} variant="ghost" className={cn("h-10 px-6 rounded-xl font-black uppercase text-[9px] tracking-widest", activeSectionId === sec.id ? "bg-primary text-white" : "text-slate-400")}>{activeSectionId === sec.id ? "ACTIVE" : "FOCUS"}</Button>
+                               <button onClick={() => setSections(p => p.filter(s => s.id !== sec.id))} className="h-10 w-10 text-rose-500 hover:bg-rose-50 rounded-xl transition-all flex items-center justify-center"><Trash2 className="h-5 w-5" /></button>
+                            </div>
+                         </div>
+                         <div className="p-8 space-y-4">
+                            {sec.questions?.map((q: any, qIdx: number) => (
+                               <div key={q.id} className="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl hover:bg-white hover:shadow-xl transition-all duration-300">
+                                  <div className="flex items-center gap-6 min-w-0">
+                                     <span className="text-lg font-black text-slate-300 w-6">#{qIdx + 1}</span>
+                                     <p className="text-sm font-bold text-slate-600 truncate">{q.englishQuestion}</p>
+                                  </div>
+                                  <button onClick={() => setSections(p => p.map(s => s.id === sec.id ? { ...s, questions: s.questions?.filter((item: any) => item.id !== q.id) || [] } : s))} className="text-slate-300 hover:text-rose-500 transition-colors"><X className="h-4 w-4" /></button>
+                               </div>
+                            ))}
+                            {(!sec.questions || sec.questions.length === 0) && (
+                               <div className="py-20 text-center opacity-10 flex flex-col items-center gap-4">
+                                  <RefreshCw className="h-10 w-10 animate-spin-slow" />
+                                  <p className="font-black uppercase tracking-widest text-[10px]">Awaiting node link synchronization...</p>
+                               </div>
+                            )}
+                         </div>
+                      </Card>
+                   ))}
+                </div>
+             </div>
+           )}
         </div>
       </div>
     </div>

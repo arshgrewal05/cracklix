@@ -5,8 +5,8 @@ import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { firebaseConfig } from './config';
 
 /**
- * @fileOverview Environment-Agnostic Firebase Initialization Singleton.
- * Separated from hooks to prevent circular dependencies in Server/Client boundary nodes.
+ * @fileOverview Hardened Firebase Initialization Singleton.
+ * Prevents multiple app instance errors and ensures stable service resolution.
  */
 
 let app: FirebaseApp;
@@ -15,15 +15,20 @@ let auth: Auth;
 let storage: FirebaseStorage;
 
 export function initializeFirebase(): { app: FirebaseApp; firestore: Firestore; auth: Auth; storage: FirebaseStorage } {
-  if (getApps().length === 0) {
-    app = initializeApp(firebaseConfig);
-  } else {
-    app = getApp();
+  try {
+    if (getApps().length === 0) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApp();
+    }
+
+    firestore = getFirestore(app);
+    auth = getAuth(app);
+    storage = getStorage(app);
+
+    return { app, firestore, auth, storage };
+  } catch (error) {
+    console.error("[FIREBASE_INIT_CRITICAL]:", error);
+    throw new Error("Cloud infrastructure failed to initialize.");
   }
-
-  firestore = getFirestore(app);
-  auth = getAuth(app);
-  storage = getStorage(app);
-
-  return { app, firestore, auth, storage };
 }
