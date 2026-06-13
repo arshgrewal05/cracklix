@@ -39,8 +39,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Institutional Admin Layout v174.0.
- * UPDATED: Increased sidebar logo size to h-40 for massive brand presence.
+ * @fileOverview Hardened Institutional Admin Layout v175.0.
+ * UPDATED: Cropped sidebar branding section to remove excessive whitespace.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -88,10 +88,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none">
        <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden pb-10">
           
-          <div className="px-4 pt-4 pb-2 flex justify-center shrink-0">
-             <div className="h-44 flex items-center justify-center">
-               <Logo href="/admin" imgClassName="h-40" />
-             </div>
+          {/* BRANDING SECTION: CROPPED WHITESPACE */}
+          <div className="px-6 pt-10 pb-6 flex justify-center shrink-0">
+             <Logo href="/admin" imgClassName="h-28" />
           </div>
 
           <SidebarGroup className="pt-0">
@@ -125,7 +124,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <SidebarGroupLabel className="px-6 py-0 h-6 text-[10px] font-black uppercase tracking-widest text-white/20 text-left">Users & Revenue</SidebarGroupLabel>
             <SidebarMenu className="gap-2 mt-2">
               <AdminNavItem icon={<Users className="text-blue-400" />} label="STUDENT LIST" href="/admin/users" active={pathname === "/admin/users"} />
-              <AdminNavItem icon={<DollarSign className="text-emerald-400" />} label="REVENUE HUB" href="/admin/payments" active={pathname === "/admin/payments"} />
+              <AdminNavItem icon={<DollarSign className="text-emerald-400" />} label="REVENUE HUB" href="/admin/payments" active={pathname === "/admin"} />
               <AdminNavItem icon={<ShieldCheck className="text-primary" />} label="MANUAL VERIFY" href="/admin/payments/verify" active={pathname === "/admin/payments/verify"} />
               <AdminNavItem icon={<Gem className="text-amber-400" />} label="PASS MANAGER" href="/admin/passes" active={pathname === "/admin/passes"} />
             </SidebarMenu>
