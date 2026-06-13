@@ -18,10 +18,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview FINAL CALIBRATED HERO v207.0.
- * FIXED: Shifted bottom stats bar even higher for better visual balance.
- * FIXED: Added end-padding to the stats container to prevent last card corner clipping.
- * FIXED: Targeted masking to cover the Gemini star artifact.
+ * @fileOverview FINAL CALIBRATED HERO v208.0.
+ * FIXED: Reduced background shading to make Golden Temple clearly visible.
+ * FIXED: Shifted bottom stats bar for better visual balance.
  */
 
 export default function Hero() {
@@ -66,12 +65,12 @@ export default function Hero() {
           className="w-full h-full object-cover object-right"
           referrerPolicy="no-referrer"
         />
-        {/* Deep navy mask for high-fidelity readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050B19] via-[#050B19]/90 to-transparent z-[10]" />
+        {/* Lighter navy mask to keep Golden Temple visible on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050B19] via-[#050B19]/40 to-transparent z-[10]" />
         
-        {/* TARGETED ARTIFACT MASK - Erasing the Gemini star sparkle */}
-        <div className="absolute top-[20%] right-[30%] w-[120px] h-[120px] bg-[#050B19] blur-[50px] z-[11] opacity-95 rounded-full pointer-events-none" />
-        <div className="absolute top-[40%] left-[20%] w-[150px] h-[100px] bg-[#050B19] blur-[40px] z-[11] opacity-90 rounded-full pointer-events-none" />
+        {/* TARGETED ARTIFACT MASK - Subtler star removal */}
+        <div className="absolute top-[20%] right-[30%] w-[100px] h-[100px] bg-[#050B19] blur-[60px] z-[11] opacity-70 rounded-full pointer-events-none" />
+        <div className="absolute top-[40%] left-[20%] w-[120px] h-[80px] bg-[#050B19] blur-[50px] z-[11] opacity-60 rounded-full pointer-events-none" />
 
         {/* PUNJAB MAP WATERMARK */}
         <div className="absolute inset-0 z-[12] pointer-events-none opacity-[0.03]">
