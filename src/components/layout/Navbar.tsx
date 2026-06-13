@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from "next/link";
-import { Menu, Search, User, Gem, LogOut, Target, Newspaper, Download, Zap, RefreshCw } from "lucide-react";
+import { Menu, Search, User, Gem, LogOut, Target, Newspaper, Download, Zap, RefreshCw, ShieldCheck } from "lucide-react";
 import Logo from "@/components/brand/Logo";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
@@ -21,9 +21,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Final Performance-Hardened Header v130.0.
+ * @fileOverview Final Performance-Hardened Header v135.0.
+ * RESTORED: Precise sequence [Menu] [Logo] [Nav Strip] [Pass Hub] [Search] [User].
+ * UPDATED: Replaced legacy blocks with INSTALL APP and ACTIVE PASS nodes.
  * FIXED: Hydration Mismatch via mounted state guards.
- * FIXED: Precise 82px/72px dimensions and 1024px responsive collapse.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -55,20 +56,27 @@ export default function Navbar() {
     router.push('/');
   };
 
+  const handleInstallClick = () => {
+    const prompt = (window as any).deferredPrompt;
+    if (prompt) {
+      prompt.prompt();
+    }
+  };
+
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN';
 
-  // Base styles for the Header
+  // Base height specs: Desktop 82px, Mobile 72px
   const headerHeight = "h-[72px] lg:h-[82px]";
 
   return (
     <div className="sticky top-0 z-[1000] w-full pointer-events-auto font-body">
       <nav className={cn(
-        "w-full flex items-center bg-gradient-to-r from-[#0B1528] to-[#13233F] border-b border-white/5 px-4 lg:px-8 shadow-2xl overflow-hidden backdrop-blur-[12px]",
+        "w-full flex items-center bg-[#0B1528] border-b border-white/5 px-4 lg:px-8 shadow-2xl overflow-hidden backdrop-blur-xl",
         headerHeight
       )}>
-        <div className="container mx-auto max-w-[1440px] flex items-center justify-between h-full gap-4">
+        <div className="container mx-auto max-w-[1536px] flex items-center justify-between h-full gap-2">
           
-          {/* 1. LEFT SECTION: MENU & LOGO */}
+          {/* 1. LEFT SECTION: MENU & LOGO PROXIMITY */}
           <div className="flex items-center gap-2 shrink-0">
             {mounted ? (
               <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
@@ -88,9 +96,8 @@ export default function Navbar() {
             <Logo className="!gap-0 active:scale-95 transition-transform" />
           </div>
 
-          {/* 2. CENTER SECTION: THE NAVIGATION BLOCKS */}
-          <div className="hidden lg:flex flex-1 items-center justify-center gap-6 xl:gap-12">
-            
+          {/* 2. CENTER SECTION: NAVIGATION BLOCKS */}
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-4 xl:gap-8">
             <NavLink icon={<Target />} label1="MY" label2="EXAMS" href="/my-exams" active={pathname === "/my-exams"} />
             <NavLink icon={<Zap />} label1="PRACTICE" label2="TESTS" href="/mocks" active={pathname.startsWith("/mocks")} />
             <NavLink icon={<Newspaper />} label1="CURRENT" label2="AFFAIRS" href="/current-affairs" active={pathname === "/current-affairs"} />
@@ -98,18 +105,28 @@ export default function Navbar() {
             {/* GET PASS CTA */}
             <Link href="/pass" className="transition-all active:scale-95 group">
               <div className={cn(
-                "w-[180px] h-[56px] rounded-[18px] border flex items-center justify-center gap-3 transition-all",
+                "w-[170px] h-[52px] rounded-[18px] border flex items-center justify-center gap-3 transition-all",
                 pathname === "/pass" 
                   ? "bg-[#F97316]/20 border-[#F97316] shadow-[0_0_20px_rgba(249,115,22,0.15)]" 
-                  : "bg-[#F97316]/12 border-[#F97316]/30 hover:bg-[#F97316]/20 hover:border-[#F97316]"
+                  : "bg-[#F97316]/10 border-[#F97316]/30 hover:bg-[#F97316]/20 hover:border-[#F97316]"
               )}>
                 <Gem className={cn("h-4 w-4 transition-all", pathname === "/pass" ? "text-white fill-[#F97316]" : "text-[#F97316]")} />
-                <span className={cn("text-[13px] font-black uppercase tracking-[0.18em] text-white")}>GET PASS</span>
+                <span className="text-[12px] font-black uppercase tracking-[0.15em] text-white">GET PASS</span>
               </div>
             </Link>
 
-            <NavLink icon={<Zap className="text-emerald-400" />} label1="CHECK" label2="RESULTS" href="/dashboard" active={pathname.startsWith("/results")} />
-            <NavLink icon={<Gem className="text-primary" />} label1="OUR" label2="PRICING" href="/pricing" active={pathname === "/pricing"} />
+            {/* INSTALL APP NODE */}
+            <div onClick={handleInstallClick} className="cursor-pointer transition-all active:scale-95 group">
+               <div className="flex items-center gap-3 opacity-80 hover:opacity-100 group-hover:translate-y-[-1px] transition-all">
+                  <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                     <Download className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col leading-tight">
+                     <span className="text-[12px] font-black uppercase tracking-widest text-white">INSTALL</span>
+                     <span className="text-[12px] font-black uppercase tracking-widest text-white">APP</span>
+                  </div>
+               </div>
+            </div>
           </div>
 
           {/* 3. RIGHT SECTION: PASS HUB, SEARCH, USER */}
@@ -135,21 +152,21 @@ export default function Navbar() {
                 </div>
              )}
 
-             {/* SEARCH BUTTON */}
+             {/* SEARCH TRIGGER */}
              <Link href="/search" className={cn(
-               "w-[44px] h-[44px] rounded-xl border border-white/10 transition-all flex items-center justify-center shadow-lg active:scale-90",
+               "w-[42px] h-[42px] rounded-xl border border-white/10 transition-all flex items-center justify-center shadow-lg active:scale-90",
                pathname === "/search" ? "bg-white/10 text-white border-white/30" : "bg-white/5 text-slate-400 hover:text-white"
              )}>
-                <Search className="h-[22px] w-[22px]" />
+                <Search className="h-[20px] w-[22px]" />
              </Link>
 
-             {/* USER PROFILE */}
+             {/* USER PROFILE HUB */}
              {mounted ? (
                 <div className="relative">
                   {user ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="w-[48px] h-[48px] rounded-full overflow-hidden border-[3px] border-white/10 hover:border-primary transition-all bg-white shadow-2xl focus:outline-none flex items-center justify-center active:scale-90 cursor-pointer">
+                        <button className="w-[44px] h-[44px] rounded-full overflow-hidden border-[3px] border-white/10 hover:border-primary transition-all bg-white shadow-2xl focus:outline-none flex items-center justify-center active:scale-90 cursor-pointer">
                           <StudentAvatar profile={profile} className="h-full w-full border-none" iconClassName="text-[#0B1528]" />
                         </button>
                       </DropdownMenuTrigger>
@@ -162,35 +179,35 @@ export default function Navbar() {
                            </div>
                         </div>
                         <DropdownMenuSeparator className="bg-white/5" />
-                        <DropdownMenuItem asChild className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-white/5">
+                        <DropdownMenuItem asChild className="flex items-center gap-4 px-5 py-4 cursor-pointer rounded-xl transition-all focus:bg-white/5">
                           <Link href="/profile" className="w-full flex items-center gap-4">
                             <User className="h-5 w-5 text-primary" />
                             <span className="font-bold text-[14px] tracking-tight uppercase">Profile Hub</span>
                           </Link>
                         </DropdownMenuItem>
                         {isAdmin && (
-                          <DropdownMenuItem asChild className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-white/5">
-                            <Link href="/admin" className="w-full flex items-center gap-4 text-primary">
-                              <Gem className="h-5 w-5 fill-current" />
+                          <DropdownMenuItem asChild className="flex items-center gap-4 px-5 py-4 cursor-pointer rounded-xl transition-all focus:bg-white/5 text-primary">
+                            <Link href="/admin" className="w-full flex items-center gap-4">
+                              <ShieldCheck className="h-5 w-5 fill-current" />
                               <span className="font-bold text-[14px] tracking-tight uppercase">Master Admin</span>
                             </Link>
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator className="bg-white/5" />
-                        <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-rose-500/10 focus:text-rose-500 text-rose-500/80">
+                        <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-4 px-5 py-4 cursor-pointer rounded-xl transition-all focus:bg-rose-500/10 focus:text-rose-500 text-rose-500/80">
                           <LogOut className="h-5 w-5 shrink-0" />
-                          <span className="font-bold text-[14px] tracking-tight uppercase">Logout Registry</span>
+                          <span className="font-bold text-[14px] tracking-tight uppercase">Logout Session</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-6 h-11 uppercase text-[11px] tracking-widest shadow-xl border-none transition-all active:scale-95">
+                    <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-6 h-10 uppercase text-[11px] tracking-widest shadow-xl border-none transition-all active:scale-95">
                       <Link href="/login">Login Hub</Link>
                     </Button>
                   )}
                 </div>
              ) : (
-                <div className="w-[48px] h-[48px] rounded-full bg-white/5 animate-pulse" />
+                <div className="w-[44px] h-[44px] rounded-full bg-white/5 animate-pulse" />
              )}
           </div>
         </div>
@@ -212,8 +229,8 @@ function NavLink({ icon, label1, label2, href, active }: { icon: React.ReactNode
         {React.cloneElement(icon as React.ReactElement, { className: "h-4 w-4" })}
       </div>
       <div className="flex flex-col text-left leading-tight">
-        <span className={cn("text-[13px] font-black uppercase tracking-[0.18em]", active ? "text-[#F97316]" : "text-white")}>{label1}</span>
-        <span className={cn("text-[13px] font-black uppercase tracking-[0.18em]", active ? "text-[#F97316]" : "text-white")}>{label2}</span>
+        <span className={cn("text-[12px] font-black uppercase tracking-[0.15em]", active ? "text-[#F97316]" : "text-white")}>{label1}</span>
+        <span className={cn("text-[12px] font-black uppercase tracking-[0.15em]", active ? "text-[#F97316]" : "text-white")}>{label2}</span>
       </div>
     </Link>
   )
