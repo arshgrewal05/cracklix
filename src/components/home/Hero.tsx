@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
@@ -25,7 +25,11 @@ import {
   Newspaper,
   LayoutGrid,
   Star,
-  BarChart3
+  BarChart3,
+  Flame,
+  Globe,
+  TrendingUp,
+  Smartphone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,8 +39,8 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 /**
- * @fileOverview Official CRACKLIX Punjab Government Exam Hero v16.0.
- * VERIFICATION MODE: Heading replaced with "CRACKLIX TEST 999".
+ * @fileOverview Institutional Punjab Government Exam Hero v20.0.
+ * RECONSTRUCTED: Clean-slate implementation with premium SaaS design.
  */
 
 export default function Hero() {
@@ -47,35 +51,34 @@ export default function Hero() {
     <div className="flex flex-col w-full bg-white font-body">
       
       {/* 1. SELECTION HUB (MAIN HERO) */}
-      <section className="relative min-h-screen flex items-center pt-10 pb-20 md:pt-0 md:pb-0 bg-[#0B1528] overflow-hidden text-left">
+      <section className="relative min-h-[90vh] flex items-center pt-12 pb-20 md:pt-0 md:pb-0 bg-[#0B1528] overflow-hidden text-left">
         {/* Background Visual Nodes */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/10 blur-[120px] rounded-full pointer-events-none opacity-50" />
         <div className="absolute bottom-0 left-0 w-1/4 h-full bg-blue-500/10 blur-[120px] rounded-full pointer-events-none opacity-50" />
         
         <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center min-h-[85vh]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center min-h-[80vh]">
             
             {/* LEFT COLUMN: BRANDING & CTAs */}
             <div className="lg:col-span-7 space-y-8 md:space-y-10">
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
                 className="space-y-6 md:space-y-8"
               >
                 <div className="inline-flex items-center gap-3 bg-primary/10 border border-primary/20 px-5 py-2 rounded-full shadow-2xl">
-                  <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                  <Flame className="h-4 w-4 text-primary animate-pulse" />
                   <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-primary">
-                    🔥 Punjab's Most Trusted Mock Test Platform
+                    Punjab's Most Trusted Mock Test Platform
                   </span>
                 </div>
 
-                <h1 className="text-4xl md:text-8xl font-headline font-black leading-[0.9] tracking-tighter text-white uppercase">
-                  CRACKLIX TEST 999
+                <h1 className="text-4xl md:text-7xl font-headline font-black leading-[0.95] tracking-tighter text-white uppercase">
+                  Crack <span className="text-primary underline decoration-primary/30 underline-offset-8">Punjab Government Exams</span> Before The Real Exam
                 </h1>
 
-                <p className="text-slate-400 text-base md:text-2xl font-medium max-w-2xl leading-relaxed antialiased border-l-4 border-primary/30 pl-6">
-                  Prepare for PSSSB, Punjab Police, PPSC, PSPCL, PSTET, CTET, ETT, Master Cadre, High Court and other Punjab Government recruitment exams through real exam-level mock tests, PYQs, current affairs and detailed solutions.
+                <p className="text-slate-400 text-base md:text-xl font-medium max-w-2xl leading-relaxed antialiased border-l-4 border-primary/30 pl-6">
+                  Prepare for PSSSB, Punjab Police, PPSC, PSPCL, PSTET, CTET, ETT, Master Cadre, High Court and other Punjab Government Exams through real exam-level mock tests, PYQs, current affairs and detailed solutions.
                 </p>
 
                 {/* TRUST CHIPS */}
@@ -93,18 +96,18 @@ export default function Hero() {
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
+                transition={{ delay: 0.3 }}
                 className="flex flex-col sm:flex-row items-center gap-5 pt-4"
               >
                 <Button 
                   onClick={() => router.push('/mocks')}
-                  className="w-full sm:w-auto h-16 md:h-20 px-12 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[12px] md:text-[15px] tracking-[0.2em] shadow-3xl shadow-primary/20 border-none transition-all active:scale-95 gap-4 rounded-2xl"
+                  className="w-full sm:w-auto h-16 md:h-18 px-12 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] shadow-3xl shadow-primary/20 border-none transition-all active:scale-95 gap-4 rounded-2xl"
                 >
                   🚀 Start Free Mock
                 </Button>
                 <Button 
                   onClick={() => router.push('/exams')}
-                  className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-2xl bg-white/5 text-white hover:bg-white/10 font-black uppercase text-[12px] md:text-[15px] tracking-[0.2em] transition-all active:scale-95 gap-4 border border-white/10 backdrop-blur-xl"
+                  className="w-full sm:w-auto h-16 md:h-18 px-12 rounded-2xl bg-white/5 text-white hover:bg-white/10 font-black uppercase text-[12px] md:text-[14px] tracking-[0.2em] transition-all active:scale-95 gap-4 border border-white/10 backdrop-blur-xl"
                 >
                   📚 Explore Exams
                 </Button>
@@ -114,30 +117,30 @@ export default function Hero() {
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.5 }}
                 className="pt-10 border-t border-white/5 space-y-5"
               >
-                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Official Recruitment Registry</p>
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Recruitment Registry</p>
                  <div className="flex flex-wrap gap-3">
-                    <ExamChip icon={<Landmark className="h-4 w-4" />} label="PSSSB" />
-                    <ExamChip icon={<ShieldCheck className="h-4 w-4" />} label="Punjab Police" />
-                    <ExamChip icon={<Scale className="h-4 w-4" />} label="PPSC" />
-                    <ExamChip icon={<Zap className="h-4 w-4" />} label="PSPCL" />
-                    <ExamChip icon={<BookOpen className="h-4 w-4" />} label="PSTET" />
-                    <ExamChip icon={<FileText className="h-4 w-4" />} label="CTET" />
-                    <ExamChip icon={<GraduationCap className="h-4 w-4" />} label="ETT" />
-                    <ExamChip icon={<Users className="h-4 w-4" />} label="Master Cadre" />
+                    <ExamChip icon={<Landmark className="h-3.5 w-3.5" />} label="PSSSB" />
+                    <ExamChip icon={<ShieldCheck className="h-3.5 w-3.5" />} label="Punjab Police" />
+                    <ExamChip icon={<Scale className="h-3.5 w-3.5" />} label="PPSC" />
+                    <ExamChip icon={<Zap className="h-3.5 w-3.5" />} label="PSPCL" />
+                    <ExamChip icon={<BookOpen className="h-3.5 w-3.5" />} label="PSTET" />
+                    <ExamChip icon={<FileText className="h-3.5 w-3.5" />} label="CTET" />
+                    <ExamChip icon={<GraduationCap className="h-3.5 w-3.5" />} label="ETT" />
+                    <ExamChip icon={<Users className="h-3.5 w-3.5" />} label="Master Cadre" />
                  </div>
               </motion.div>
             </div>
 
             {/* RIGHT COLUMN: VISUAL DASHBOARD */}
-            <div className="lg:col-span-5 relative hidden lg:block h-full">
+            <div className="lg:col-span-5 relative hidden lg:block h-full min-h-[600px]">
                <motion.div 
-                 initial={{ opacity: 0, scale: 0.9 }}
+                 initial={{ opacity: 0, scale: 0.95 }}
                  animate={{ opacity: 1, scale: 1 }}
                  transition={{ duration: 1 }}
-                 className="relative h-[80%] rounded-[4rem] overflow-hidden border-[12px] border-white/5 shadow-5xl bg-[#0B1528] group top-1/2 -translate-y-1/2"
+                 className="absolute inset-0 rounded-[4rem] overflow-hidden border-[12px] border-white/5 shadow-5xl bg-[#0B1528] group"
                >
                   <Image 
                     src={heroImage} 
@@ -183,10 +186,10 @@ export default function Hero() {
                         <div className="absolute inset-0 bg-primary/5 -translate-x-full group-hover/readiness:translate-x-0 transition-transform duration-700" />
                         <div className="flex items-center gap-5 relative z-10">
                            <div className="h-14 w-14 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl">
-                              <Zap className="h-7 w-7 fill-current" />
+                              <Flame className="h-7 w-7 fill-current" />
                            </div>
                            <div className="text-left">
-                              <p className="text-[10px] font-black uppercase text-white/50 tracking-widest">Selection Forecast</p>
+                              <p className="text-[10px] font-black uppercase text-white/50 tracking-widest leading-none mb-1">Selection Forecast</p>
                               <p className="text-2xl font-black text-white uppercase tracking-tight">Readiness Score</p>
                            </div>
                         </div>
@@ -233,7 +236,7 @@ export default function Hero() {
       </section>
 
       {/* 4. FREE VS PREMIUM COMPARISON */}
-      <section className="py-24 md:py-32 bg-slate-50/50">
+      <section className="py-24 md:py-32 bg-slate-50/50 border-t border-slate-100">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl md:text-5xl font-headline font-black text-[#0F172A] uppercase">Choose Your Prep Path</h2>
@@ -248,7 +251,7 @@ export default function Hero() {
                   <h3 className="text-2xl font-black text-[#0F172A] uppercase">FREE</h3>
                   <Badge variant="outline" className="border-slate-200 text-slate-400 font-black uppercase text-[10px]">Basic Access</Badge>
                 </div>
-                <ul className="space-y-4">
+                <ul className="space-y-4 text-left">
                   <ComparisonItem text="Limited Practice Mocks" active={true} />
                   <ComparisonItem text="Basic Performance Results" active={true} />
                   <ComparisonItem text="Subject-Wise Mastery" active={false} />
@@ -269,7 +272,7 @@ export default function Hero() {
                   <h3 className="text-2xl font-black text-primary uppercase">PREMIUM</h3>
                   <Badge className="bg-primary text-white border-none font-black uppercase text-[10px]">Elite Hub</Badge>
                 </div>
-                <ul className="space-y-4">
+                <ul className="space-y-4 text-left">
                   <ComparisonItem text="Full Mock Test Series" active={true} premium />
                   <ComparisonItem text="All Subject-Wise Tests" active={true} premium />
                   <ComparisonItem text="All Sectional & Chapter Tests" active={true} premium />
@@ -340,7 +343,7 @@ function PlatformStat({ val, label, icon }: any) {
 
 function FeatureCard({ icon, title, desc, bgColor }: any) {
    return (
-      <Card className="border-none shadow-xl rounded-[2.5rem] p-8 md:p-10 group hover:translate-y-[-4px] transition-all bg-slate-50/50 border border-slate-100">
+      <Card className="border-none shadow-xl rounded-[2.5rem] p-8 md:p-10 group hover:translate-y-[-4px] transition-all bg-slate-50/50 border border-slate-100 h-full flex flex-col text-left">
          <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform", bgColor)}>
            {React.cloneElement(icon, { className: "h-7 w-7" })}
          </div>
