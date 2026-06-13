@@ -20,19 +20,19 @@ import {
   BarChart3,
   Newspaper,
   Check,
-  X
+  X,
+  ClipboardList
 } from "lucide-react";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview High-Converting Institutional Hero Hub v251.0.
- * FIXED: Imported Card component to resolve ReferenceError.
- * DESIGN: Premium SaaS style for PSSSB, Punjab Police, PPSC, and Teaching Exams.
+ * @fileOverview High-Converting Institutional Hero Hub v252.0.
+ * FIXED: Added missing Card component imports to resolve runtime ReferenceError.
  */
 
 export default function Hero() {
@@ -183,7 +183,7 @@ export default function Hero() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left">
                <PlatformStat val="50,000+" label="Questions" icon={<Layers className="text-primary" />} />
                <PlatformStat val="500+" label="Mock Tests" icon={<Zap className="text-blue-500" />} />
-               <PlatformStat val="15,000+" label="Aspirants" icon={<Users className="text-emerald-500" />} />
+               <PlatformStat val="15,000+" label="Aspirants" icon={<UsersIcon className="text-emerald-500" />} />
                <PlatformStat val="94%" label="Accuracy" icon={<Target className="text-rose-500" />} />
             </div>
          </div>
@@ -335,25 +335,13 @@ function TierItem({ text, icon, strike = false }: { text: string, icon: React.Re
    );
 }
 
-function Users({ className }: { className?: string }) {
+function UsersIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function ClipboardList({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      <path d="M9 12h6" />
-      <path d="M9 16h6" />
-      <path d="M9 8h6" />
     </svg>
   );
 }
