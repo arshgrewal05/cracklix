@@ -24,8 +24,8 @@ import { useToast } from "@/hooks/use-toast";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview High-Fidelity Mobile-First Navbar v196.0.
- * UPDATED: Responsive scaling for 100px logo on small viewports.
+ * @fileOverview High-Fidelity Mobile-First Navbar v197.0.
+ * UPDATED: Increased Logo size to 140px (Desktop) / 120px (Mobile) with overflow enabled.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -107,7 +107,7 @@ export default function Navbar() {
             
             <div className="flex items-center shrink-0 h-full overflow-visible">
                <Logo 
-                 imgClassName="h-[80px] md:h-[100px] origin-left transition-all" 
+                 imgClassName="h-[120px] md:h-[140px] origin-left transition-all" 
                  className="active:scale-95 transition-transform" 
                />
             </div>

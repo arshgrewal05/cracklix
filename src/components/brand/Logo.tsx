@@ -12,8 +12,8 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Official Master Logo Hub v18.0.
- * UPDATED: Removed default h-full from img to allow specific height classes to take precedence.
+ * @fileOverview Official Master Logo Hub v19.0.
+ * UPDATED: Removed max-h-full to allow the logo to gracefully overflow the header for a bold brand presence.
  */
 export function LogoIcon({ className = "", imgClassName = "" }: { className?: string, imgClassName?: string }) {
   return (
@@ -21,7 +21,7 @@ export function LogoIcon({ className = "", imgClassName = "" }: { className?: st
       <img 
         src="https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png" 
         alt="Cracklix Logo" 
-        className={cn("w-auto object-contain max-h-full block select-none", imgClassName)}
+        className={cn("w-auto object-contain block select-none", imgClassName)}
         referrerPolicy="no-referrer"
       />
     </div>
