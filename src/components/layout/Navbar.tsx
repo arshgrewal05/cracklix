@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { Menu, Search, Zap, LogOut, Download, User, Target, Newspaper, Gem, ChevronRight } from "lucide-react";
+import { Menu, Search, Zap, LogOut, Download, User, Target, Newspaper, Gem, ChevronRight, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/brand/Logo";
 import { useState, useMemo, useEffect } from "react";
@@ -22,27 +22,20 @@ import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Final High-Fidelity Header Spec v100.0.
- * MATCHED: 82px Height, Dark Navy Gradient, Glass Effect, and specific Node sizes.
+ * @fileOverview Original High-Fidelity Header v105.0.
+ * RESTORED: All original functional nodes, sequence, and typography from the user screenshot.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [announcement, setAnnouncement] = useState<any>(null);
   const { user, profile, loading } = useUser();
   const auth = useAuth();
-  const db = useFirestore();
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-    if (db) {
-       return onSnapshot(doc(db, 'settings', 'global'), (snap) => {
-          if (snap.exists()) setAnnouncement(snap.data());
-       });
-    }
-  }, [db]);
+  }, []);
 
   const passStatus = useMemo(() => {
     if (!profile?.pass) return { active: false, label: "FREE PASS", expiry: "N/A" };
@@ -66,33 +59,28 @@ export default function Navbar() {
 
   return (
     <div className="sticky top-0 z-[1000] w-full pointer-events-auto">
-      {/* 1. ANNOUNCEMENT BAR */}
-      {announcement?.showAnnouncement && (
-        <div className="bg-[#F97316] text-white py-2 flex items-center overflow-hidden relative shadow-lg h-9">
-          <div className="flex items-center gap-3 animate-marquee whitespace-nowrap min-w-full">
-            <Zap className="h-3.5 w-3.5 shrink-0 ml-4 fill-current" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em]">{announcement.announcement}</p>
-            <span className="mx-40 md:mx-80" />
-            <Zap className="h-3.5 w-3.5 shrink-0 fill-current" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em]">{announcement.announcement}</p>
-            <span className="mx-40 md:mx-80" />
-          </div>
+      {/* 1. ORIGINAL ANNOUNCEMENT BAR */}
+      <div className="bg-[#F97316] text-white py-2 flex items-center overflow-hidden relative shadow-lg h-9">
+        <div className="flex items-center gap-3 animate-marquee whitespace-nowrap min-w-full">
+          <Zap className="h-3.5 w-3.5 shrink-0 ml-4 fill-current" />
+          <p className="text-[10px] font-black uppercase tracking-[0.3em]">🔥 OFFICIAL PUNJAB 2026 RECRUITMENT CALENDAR LIVE.</p>
+          <span className="mx-40 md:mx-80" />
+          <Zap className="h-3.5 w-3.5 shrink-0 fill-current" />
+          <p className="text-[10px] font-black uppercase tracking-[0.3em]">🔥 OFFICIAL PUNJAB 2026 RECRUITMENT CALENDAR LIVE.</p>
+          <span className="mx-40 md:mx-80" />
         </div>
-      )}
+      </div>
 
-      {/* 2. MAIN HEADER (82px Desktop / 72px Mobile) */}
-      <nav className={cn(
-        "w-full h-[72px] lg:h-[82px] flex items-center transition-all duration-300",
-        "bg-gradient-to-r from-[#0B1528] to-[#13233F] backdrop-blur-[12px] border-b border-white/[0.08]"
-      )}>
-        <div className="container mx-auto max-w-[1440px] flex items-center justify-between px-4 lg:px-6">
+      {/* 2. MAIN HEADER (REPLICATED ORIGINAL) */}
+      <nav className="w-full h-16 md:h-24 flex items-center bg-[#0B1528] border-b border-white/5 px-2 md:px-6 shadow-2xl">
+        <div className="w-full flex items-center justify-between gap-2 md:gap-4 overflow-x-auto no-scrollbar">
           
           {/* LEFT: MENU & LOGO */}
-          <div className="flex items-center gap-4 lg:gap-[16px] shrink-0">
+          <div className="flex items-center gap-2 md:gap-6 shrink-0">
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
               <SheetTrigger asChild>
-                <button className="w-[40px] h-[40px] bg-white/[0.05] text-white rounded-[14px] border border-white/[0.08] hover:bg-white/[0.1] transition-all flex items-center justify-center cursor-pointer active:scale-95">
-                  <Menu className="h-6 w-6" />
+                <button className="w-10 h-10 md:w-12 md:h-12 bg-white/5 text-white rounded-xl border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center cursor-pointer active:scale-95">
+                  <Menu className="h-5 w-5 md:h-6 md:w-6" />
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 border-none w-[300px] bg-[#0F172A] z-[2001]">
@@ -100,126 +88,131 @@ export default function Navbar() {
                 <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
               </SheetContent>
             </Sheet>
-            <Logo className="h-[36px] lg:h-[42px] transition-transform hover:scale-[1.03]" />
+            <Logo className="scale-90 md:scale-100 origin-left" />
           </div>
 
-          {/* CENTER: DESKTOP NAVIGATION */}
-          <div className="hidden lg:flex items-center gap-[48px]">
-             <NavMenuItem label="My Exams" href="/my-exams" />
-             <NavMenuItem label="Practice Tests" href="/mocks" />
-             <NavMenuItem label="Current Affairs" href="/current-affairs" />
-             <NavMenuItem label="Results" href="/dashboard" />
-             <NavMenuItem label="Pricing" href="/pricing" />
-          </div>
-
-          {/* RIGHT: CTAs & PROFILE */}
-          <div className="flex items-center gap-3 lg:gap-5 shrink-0">
+          {/* CENTER: ORIGINAL FUNCTIONAL NODES */}
+          <div className="hidden xl:flex items-center gap-6 shrink-0">
              
-             {/* GET PASS (Desktop Primary CTA) */}
-             <Link href="/pass" className="hidden lg:flex">
-                <Button className="w-[180px] h-[56px] bg-[#F97316]/10 border border-[#F97316]/30 rounded-[18px] text-[#F97316] font-extrabold uppercase text-[13px] tracking-[0.18em] hover:bg-[#F97316]/20 transition-all hover:scale-[1.03] active:scale-95">
-                   GET PASS
-                </Button>
+             {/* MY EXAMS */}
+             <Link href="/my-exams" className="flex items-center gap-3 group px-4 py-2 hover:bg-white/5 rounded-xl transition-all">
+                <Target className="h-5 w-5 text-primary" />
+                <div className="flex flex-col text-left leading-none">
+                   <span className="text-[10px] font-black text-white uppercase tracking-tighter">MY</span>
+                   <span className="text-[11px] font-black text-white uppercase tracking-widest">EXAMS</span>
+                </div>
              </Link>
 
-             {/* INSTALL APP (High-Fidelity Badge) */}
+             {/* PRACTICE TESTS */}
+             <Link href="/mocks" className="flex items-center gap-3 group px-4 py-2 hover:bg-white/5 rounded-xl transition-all">
+                <Zap className="h-5 w-5 text-primary fill-current" />
+                <div className="flex flex-col text-left leading-none">
+                   <span className="text-[10px] font-black text-white uppercase tracking-tighter">PRACTICE</span>
+                   <span className="text-[11px] font-black text-white uppercase tracking-widest">TESTS</span>
+                </div>
+             </Link>
+
+             {/* GET PASS BUTTON */}
+             <Link href="/pass">
+                <button className="h-12 px-5 bg-white/5 border border-primary/40 rounded-xl flex items-center gap-3 group hover:bg-primary/10 transition-all">
+                   <Gem className="h-4 w-4 text-primary" />
+                   <span className="text-[10px] font-black text-primary uppercase tracking-widest">GET PASS</span>
+                </button>
+             </Link>
+
+             {/* CURRENT AFFAIRS */}
+             <Link href="/current-affairs" className="flex items-center gap-3 group px-4 py-2 hover:bg-white/5 rounded-xl transition-all">
+                <Newspaper className="h-5 w-5 text-primary" />
+                <div className="flex flex-col text-left leading-none">
+                   <span className="text-[10px] font-black text-primary uppercase tracking-tighter">CURRENT</span>
+                   <span className="text-[11px] font-black text-primary uppercase tracking-widest">AFFAIRS</span>
+                </div>
+             </Link>
+
+             {/* INSTALL APP */}
              <button 
                 onClick={() => (window as any).deferredPrompt?.prompt()}
-                className="hidden lg:flex w-[170px] h-[52px] items-center justify-center gap-3 bg-white/[0.03] border border-[#10B981]/30 rounded-xl hover:bg-[#10B981]/10 transition-all hover:scale-[1.03] active:scale-95 group"
+                className="h-12 px-5 bg-white/5 border border-emerald-500/40 rounded-xl flex items-center gap-3 group hover:bg-emerald-500/10 transition-all"
              >
-                <Download className="h-[22px] w-[22px] text-[#10B981]" />
-                <span className="text-[11px] font-black text-[#10B981] uppercase tracking-[0.15em]">INSTALL APP</span>
+                <Download className="h-4 w-4 text-emerald-500" />
+                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">INSTALL APP</span>
              </button>
 
-             {/* SUBSCRIPTION BADGE */}
+             {/* PASS ACTIVE BOX */}
              {mounted && user && (
-                <div className="hidden md:flex w-[160px] h-[52px] items-center gap-3 px-4 bg-white/[0.03] border border-white/10 rounded-xl transition-all">
-                   <Gem className="h-[22px] w-[22px] text-[#10B981] shrink-0 fill-current opacity-40" />
-                   <div className="flex flex-col items-start min-w-0">
+                <div className="h-12 px-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center gap-3">
+                   <Gem className="h-5 w-5 text-emerald-500 fill-current opacity-40" />
+                   <div className="flex flex-col items-start leading-none">
                       <span className={cn(
-                        "text-[10px] font-black uppercase tracking-tight leading-none",
-                        passStatus.active ? "text-[#10B981]" : "text-rose-500"
+                        "text-[10px] font-black uppercase tracking-tight",
+                        passStatus.active ? "text-emerald-500" : "text-rose-500"
                       )}>
                          {passStatus.label}
                       </span>
-                      <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-1 truncate">
+                      <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-1">
                          EXP: {passStatus.expiry}
                       </span>
                    </div>
                 </div>
              )}
+          </div>
 
-             {/* SEARCH & USER */}
-             <div className="flex items-center gap-2 lg:gap-4">
-                <Link 
-                   href="/search" 
-                   className="w-[44px] h-[44px] bg-white/[0.05] text-slate-400 hover:text-white rounded-xl border border-white/10 transition-all flex items-center justify-center hover:scale-[1.05]"
-                >
-                  <Search className="h-[22px] w-[22px]" />
-                </Link>
+          {/* RIGHT: SEARCH & USER */}
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
+             <Link href="/search" className="w-10 h-10 md:w-12 md:h-12 bg-white/5 text-slate-400 hover:text-white rounded-xl border border-white/10 transition-all flex items-center justify-center">
+                <Search className="h-5 w-5" />
+             </Link>
 
-                <div className="relative shrink-0">
-                  {!mounted || loading ? (
-                    <div className="h-[48px] w-[48px] rounded-full bg-white/5 animate-pulse" />
-                  ) : user ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="h-[48px] w-[48px] rounded-full overflow-hidden border-2 border-white/10 hover:border-primary transition-all bg-[#0F172A] shadow-2xl focus:outline-none hover:scale-[1.05]">
-                          <StudentAvatar profile={profile} className="h-full w-full border-none" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-72 bg-[#0F172A] border-white/10 text-white rounded-[2.5rem] p-3 shadow-5xl z-[2001]" align="end">
-                        <div className="px-5 py-6 flex items-center gap-4">
-                           <StudentAvatar profile={profile} className="h-12 w-12" />
-                           <div className="min-w-0">
-                              <p className="text-[12px] font-black uppercase tracking-tight truncate leading-none mb-1.5">{profile?.name || "Aspirant"}</p>
-                              <p className="text-[9px] font-bold text-slate-500 truncate">{user.email}</p>
-                           </div>
-                        </div>
-                        
-                        <DropdownMenuSeparator className="bg-white/5" />
+             <div className="relative">
+                {!mounted || loading ? (
+                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/5 animate-pulse" />
+                ) : user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="h-10 w-10 md:h-12 md:w-12 rounded-full overflow-hidden border-2 border-white/10 hover:border-primary transition-all bg-[#0F172A] shadow-2xl focus:outline-none">
+                        <StudentAvatar profile={profile} className="h-full w-full border-none" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-72 bg-[#0F172A] border-white/10 text-white rounded-[2.5rem] p-3 shadow-5xl z-[2001]" align="end">
+                      <div className="px-5 py-6 flex items-center gap-4">
+                         <StudentAvatar profile={profile} className="h-12 w-12" />
+                         <div className="min-w-0">
+                            <p className="text-[12px] font-black uppercase tracking-tight truncate leading-none mb-1.5">{profile?.name || "Aspirant"}</p>
+                            <p className="text-[9px] font-bold text-slate-500 truncate">{user.email}</p>
+                         </div>
+                      </div>
+                      
+                      <DropdownMenuSeparator className="bg-white/5" />
+                      <DropdownMenuItem asChild className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-white/5">
+                        <Link href="/profile" className="w-full flex items-center gap-4">
+                          <User className="h-5 w-5 text-primary" />
+                          <span className="font-bold text-[14px] tracking-tight uppercase">My Profile Hub</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      {isAdmin && (
                         <DropdownMenuItem asChild className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-white/5">
-                          <Link href="/profile" className="w-full flex items-center gap-4">
-                            <User className="h-5 w-5 text-primary" />
-                            <span className="font-bold text-[14px] tracking-tight uppercase">My Profile Hub</span>
+                          <Link href="/admin" className="w-full flex items-center gap-4 text-primary">
+                            <Zap className="h-5 w-5 fill-current" />
+                            <span className="font-bold text-[14px] tracking-tight uppercase">Master Admin</span>
                           </Link>
                         </DropdownMenuItem>
-                        {isAdmin && (
-                          <DropdownMenuItem asChild className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-white/5">
-                            <Link href="/admin" className="w-full flex items-center gap-4 text-primary">
-                              <Zap className="h-5 w-5 fill-current" />
-                              <span className="font-bold text-[14px] tracking-tight uppercase">Master Admin</span>
-                            </Link>
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator className="bg-white/5" />
-                        <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-rose-500/10 focus:text-rose-500 text-rose-500/80">
-                          <LogOut className="h-5 w-5 shrink-0" />
-                          <span className="font-bold text-[14px] tracking-tight uppercase">Logout Registry</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : (
-                    <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-6 h-11 uppercase text-[12px] tracking-widest shadow-xl border-none transition-all active:scale-95">
-                      <Link href="/login">Login Hub</Link>
-                    </Button>
-                  )}
-                </div>
+                      )}
+                      <DropdownMenuSeparator className="bg-white/5" />
+                      <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-4 px-5 py-5 cursor-pointer rounded-xl transition-all focus:bg-rose-500/10 focus:text-rose-500 text-rose-500/80">
+                        <LogOut className="h-5 w-5 shrink-0" />
+                        <span className="font-bold text-[14px] tracking-tight uppercase">Logout Registry</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button asChild className="bg-primary hover:bg-orange-600 text-white font-black px-6 h-11 uppercase text-[12px] tracking-widest shadow-xl border-none transition-all active:scale-95">
+                    <Link href="/login">Login Hub</Link>
+                  </Button>
+                )}
              </div>
           </div>
         </div>
       </nav>
     </div>
   );
-}
-
-function NavMenuItem({ label, href }: { label: string; href: string }) {
-   return (
-      <Link 
-        href={href} 
-        className="text-white/70 text-[13px] font-bold uppercase tracking-[0.18em] hover:text-[#F97316] transition-all duration-300 hover:scale-[1.03]"
-      >
-         {label}
-      </Link>
-   );
 }

@@ -4,23 +4,24 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Master Logo Hub v7.0.
- * UPDATED: Increased size and refined typography to match specifications.
+ * @fileOverview Official Master Logo Hub v8.0.
+ * RESTORED: Full asset with text and tagline as per original screenshot.
  */
 export function LogoIcon({ className = "" }: { className?: string }) {
   return (
-    <div className={cn("relative shrink-0 flex items-center gap-4", className)}>
+    <div className={cn("relative shrink-0 flex flex-col items-center gap-0", className)}>
       <img 
         src="https://i.ibb.co/5WjGyLhn/1000110132-removebg-preview.png" 
         alt="Cracklix Logo" 
-        className="h-full w-auto object-contain"
+        className="h-10 md:h-14 w-auto object-contain"
         referrerPolicy="no-referrer"
       />
-      <div className="flex flex-col items-start leading-none">
-         <span className="text-[16px] lg:text-[18px] font-[700] text-white tracking-tight">Cracklix</span>
-         <span className="text-[8px] lg:text-[10px] font-black uppercase text-primary tracking-[0.15em] mt-1">
-            Punjab's Mock Test Platform
+      <div className="flex items-center gap-2 mt-[-4px]">
+         <div className="h-[1px] w-4 bg-primary/40" />
+         <span className="text-[7px] md:text-[9px] font-black uppercase text-primary tracking-[0.2em] whitespace-nowrap">
+            Punjab's No.1 Study Hub
          </span>
+         <div className="h-[1px] w-4 bg-primary/40" />
       </div>
     </div>
   );
