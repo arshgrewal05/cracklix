@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { Menu, Search, User, Gem, LogOut } from "lucide-react";
+import { Menu, Search, User, Gem, LogOut, Target, Newspaper, Download } from "lucide-react";
 import Logo from "@/components/brand/Logo";
 import { useState, useMemo, useEffect } from "react";
 import { useUser, useAuth } from "@/firebase";
@@ -21,8 +21,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Definitive Header Restoration v115.0.
- * UPDATED: Transformed Pass Status into a compact square shape as requested.
+ * @fileOverview Definitive Header Restoration v120.0.
+ * UPDATED: Integrated 5 functional navigation blocks exactly as per screenshot.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -57,12 +57,12 @@ export default function Navbar() {
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN';
 
   return (
-    <div className="sticky top-0 z-[1000] w-full pointer-events-auto">
+    <div className="sticky top-0 z-[1000] w-full pointer-events-auto font-body">
       <nav className="w-full h-16 md:h-20 flex items-center bg-[#0B1528] border-b border-white/5 px-4 md:px-8 shadow-2xl overflow-hidden">
-        <div className="container mx-auto max-w-7xl flex items-center justify-between h-full gap-2">
+        <div className="container mx-auto max-w-[1440px] flex items-center justify-between h-full gap-4">
           
           {/* 1. LEFT SECTION: MENU & LOGO */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
               <SheetTrigger asChild>
                 <button className="w-10 h-10 md:w-12 md:h-12 bg-white/5 text-white rounded-xl border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center cursor-pointer active:scale-95 outline-none">
@@ -77,8 +77,59 @@ export default function Navbar() {
             <Logo className="!gap-0" />
           </div>
 
-          {/* 2. SPACER */}
-          <div className="flex-1" />
+          {/* 2. CENTER SECTION: THE 5 NAVIGATION BLOCKS (SCREENSHOT MATCHED) */}
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-6 xl:gap-10">
+            
+            {/* Block 1: My Exams */}
+            <Link href="/my-exams" className="flex items-center gap-2.5 group">
+              <div className="h-6 w-6 rounded-full bg-[#F97316]/10 flex items-center justify-center text-[#F97316] shadow-sm">
+                <Target className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col text-left leading-tight">
+                <span className="text-[10px] font-black text-white uppercase tracking-tight">MY</span>
+                <span className="text-[10px] font-black text-white uppercase tracking-tight">EXAMS</span>
+              </div>
+            </Link>
+
+            {/* Block 2: Practice Tests */}
+            <Link href="/mocks" className="flex flex-col text-left leading-tight group">
+              <span className="text-[10px] font-black text-white uppercase tracking-tight">PRACTICE</span>
+              <span className="text-[10px] font-black text-white uppercase tracking-tight">TESTS</span>
+            </Link>
+
+            {/* Block 3: Get Pass (Orange Box) */}
+            <Link href="/pass">
+              <div className="px-5 py-2.5 rounded-xl border border-[#F97316]/30 bg-[#F97316]/5 flex items-center gap-3 group hover:bg-[#F97316]/10 transition-all">
+                <Gem className="h-4 w-4 text-[#F97316]" />
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="text-[10px] font-black text-[#F97316] uppercase tracking-tight">GET</span>
+                  <span className="text-[10px] font-black text-[#F97316] uppercase tracking-tight">PASS</span>
+                </div>
+              </div>
+            </Link>
+
+            {/* Block 4: Current Affairs */}
+            <Link href="/current-affairs" className="flex items-center gap-2.5 group">
+              <Newspaper className="h-5 w-5 text-[#F97316]" />
+              <div className="flex flex-col text-left leading-tight">
+                <span className="text-[10px] font-black text-white uppercase tracking-tight">CURRENT</span>
+                <span className="text-[10px] font-black text-white uppercase tracking-tight">AFFAIRS</span>
+              </div>
+            </Link>
+
+            {/* Block 5: Install App (Emerald Box) */}
+            <button 
+              onClick={() => {
+                const prompt = (window as any).deferredPrompt;
+                if (prompt) prompt.prompt();
+              }}
+              className="px-5 py-2.5 rounded-xl border border-[#10B981]/30 bg-[#10B981]/5 flex items-center gap-3 group hover:bg-[#10B981]/10 transition-all outline-none"
+            >
+              <Download className="h-4 w-4 text-[#10B981]" />
+              <span className="text-[10px] font-black text-[#10B981] uppercase tracking-wider">INSTALL APP</span>
+            </button>
+
+          </div>
 
           {/* 3. RIGHT SECTION: PASS HUB, SEARCH, USER */}
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
@@ -97,7 +148,7 @@ export default function Navbar() {
              )}
 
              {/* SEARCH BUTTON */}
-             <Link href="/search" className="w-10 h-10 md:w-12 md:h-12 bg-white/5 text-slate-400 hover:text-white rounded-xl border border-white/10 transition-all flex items-center justify-center shadow-lg">
+             <Link href="/search" className="w-10 h-10 md:h-12 md:w-12 bg-white/5 text-slate-400 hover:text-white rounded-xl border border-white/10 transition-all flex items-center justify-center shadow-lg">
                 <Search className="h-5 w-5" />
              </Link>
 
