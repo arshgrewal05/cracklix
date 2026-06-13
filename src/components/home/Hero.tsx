@@ -18,8 +18,8 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final Calibrated Mobile-First Hero v226.0.
- * UPDATED: Responsive headings and fluid layout for 320px screens.
+ * @fileOverview Final Calibrated Mobile-First Hero v227.0.
+ * UPDATED: Background image height restricted to 200px on mobile.
  */
 
 export default function Hero() {
@@ -53,8 +53,8 @@ export default function Hero() {
   return (
     <section className="relative w-full bg-[#050B19] overflow-hidden min-h-[450px] md:h-[650px] lg:h-[750px] flex flex-col justify-start text-left border-b border-white/5 pb-16 md:pb-24">
       
-      {/* 1. BACKGROUND ENGINE */}
-      <div className="absolute inset-0 z-0">
+      {/* 1. BACKGROUND ENGINE - Restricted to 200px on mobile */}
+      <div className="absolute top-0 left-0 right-0 h-[200px] md:h-full z-0 overflow-hidden">
         <motion.img 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -64,7 +64,8 @@ export default function Hero() {
           className="w-full h-full object-cover object-right md:object-center"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050B19] via-[#050B19]/80 to-transparent z-[10]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#050B19] md:hidden z-[10]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050B19] via-[#050B19]/80 to-transparent z-[10] hidden md:block" />
         <div className="absolute top-[15%] left-[35%] w-[150px] h-[150px] bg-[#050B19] blur-[100px] z-[11] opacity-90 rounded-full pointer-events-none" />
       </div>
 
