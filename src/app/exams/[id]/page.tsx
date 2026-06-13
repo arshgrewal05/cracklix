@@ -1,10 +1,11 @@
+
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useDoc, useCollection, useFirestore, useUser } from "@/firebase"
-import { doc, collection, query, where, limit, orderBy } from "firebase/firestore"
+import { doc, collection, query, where, limit, orderBy, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -25,17 +26,19 @@ import {
   RefreshCw,
   Play,
   BarChart3,
-  Newspaper
+  Newspaper,
+  Star
 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Institutional Exam Hub v32.0 (Premium Restore).
- * RESTORED: Unlock button for premium preparation nodes is now restored permanently.
+ * @fileOverview Institutional Exam Hub v33.0 (Pinning Enabled).
+ * UPDATED: Added Star icon to header for pinning exams to student interests.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -44,6 +47,7 @@ export default function ExamHubPage() {
   const params = useParams()
   const router = useRouter()
   const db = useFirestore()
+  const { toast } = useToast()
   const { user, profile, loading: userLoading } = useUser()
   const examId = params.id as string
 
@@ -60,6 +64,33 @@ export default function ExamHubPage() {
   const { data: userResults, loading: resultsLoading } = useCollection<any>(resultsQuery)
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
   const { data: caHub, loading: caLoading } = useCollection<any>(hubQuery);
+
+  const [isPinning, setIsPinning] = useState(false);
+
+  // INTEREST AUDIT
+  const isPinned = useMemo(() => {
+    return profile?.pinnedExams?.includes(examId) || false;
+  }, [profile, examId]);
+
+  // PIN TOGGLE NODE
+  const togglePin = async () => {
+    if (!db || !user || isPinning) return;
+    setIsPinning(true);
+    const userRef = doc(db, "users", user.uid);
+    try {
+      if (isPinned) {
+        await updateDoc(userRef, { pinnedExams: arrayRemove(examId), updatedAt: serverTimestamp() });
+        toast({ title: "Unpinned", description: "Removed from My Exams." });
+      } else {
+        await updateDoc(userRef, { pinnedExams: arrayUnion(examId), updatedAt: serverTimestamp() });
+        toast({ title: "Pinned!", description: "Added to your interest hub." });
+      }
+    } catch (e) {
+      toast({ variant: "destructive", title: "Action Failed" });
+    } finally {
+      setIsPinning(false);
+    }
+  };
 
   // PASS ACCESS FIREWALL
   const isPassActive = useMemo(() => {
@@ -135,18 +166,30 @@ export default function ExamHubPage() {
       <Navbar />
       
       {/* HEADER */}
-      <section className="bg-white border-b border-slate-100 py-6 md:py-16 text-left">
-         <div className="container mx-auto px-4 max-w-7xl">
+      <section className="bg-white border-b border-slate-100 py-6 md:py-16 text-left relative overflow-hidden">
+         <div className="absolute top-0 right-0 p-12 opacity-5"><GraduationCap className="h-48 w-48" /></div>
+         <div className="container mx-auto px-4 max-w-7xl relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
                <div className="flex items-center gap-4 flex-1">
-                  <button onClick={() => router.back()} className="h-10 w-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 shrink-0">
+                  <button onClick={() => router.back()} className="h-10 w-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 shrink-0 hover:bg-slate-50">
                      <ChevronLeft className="h-5 w-5" />
                   </button>
                   <div className="min-w-0 space-y-2">
-                     <div className="flex items-center gap-2">
+                     <div className="flex items-center gap-3">
                         <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase px-2 py-0.5 rounded shadow-sm">
                            {activeBoard?.abbreviation || 'OFFICIAL'} HUB
                         </Badge>
+                        <button 
+                           onClick={togglePin} 
+                           disabled={isPinning}
+                           className={cn(
+                              "flex items-center gap-2 px-3 py-1 rounded-full border transition-all active:scale-90",
+                              isPinned ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-slate-200 text-slate-400 hover:border-primary/40 hover:text-primary"
+                           )}
+                        >
+                           {isPinning ? <RefreshCw className="h-3 w-3 animate-spin" /> : <Star className={cn("h-3 w-3", isPinned && "fill-current")} />}
+                           <span className="text-[8px] font-black uppercase tracking-widest">{isPinned ? 'PINNED' : 'PIN TO MY EXAMS'}</span>
+                        </button>
                      </div>
                      <h1 className="text-xl md:text-5xl font-black text-[#0F172A] uppercase leading-tight tracking-tight truncate">
                         {exam.name}
@@ -154,7 +197,7 @@ export default function ExamHubPage() {
                   </div>
                </div>
                
-               <div className="flex items-center gap-6 bg-slate-50/50 px-6 py-4 rounded-2xl border border-slate-100 w-full md:w-auto">
+               <div className="flex items-center gap-6 bg-slate-50/50 px-6 py-4 rounded-2xl border border-slate-100 w-full md:w-auto shadow-inner">
                   <div className="text-center min-w-[70px] space-y-0.5">
                      <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">ACCURACY</p>
                      <p className="text-xl md:text-4xl font-headline font-black text-primary tabular-nums">{examPerformance.avgAcc}%</p>
@@ -278,8 +321,8 @@ function MockList({ data, results, isPassActive, user, loading }: any) {
                   </h3>
 
                   <div className="flex items-center gap-6 pt-4 border-t border-slate-50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                     <span className="flex items-center gap-2"><Clock className="h-3 w-3 text-primary" /> {mock.duration}m</span>
-                     <span className="flex items-center gap-2"><BookOpen className="h-3 w-3 text-primary" /> {mock.totalQuestions} Qs</span>
+                     <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-primary" /> {mock.duration}m</span>
+                     <span className="flex items-center gap-2"><BookOpen className="h-3.5 w-3.5 text-primary" /> {mock.totalQuestions} Qs</span>
                   </div>
 
                   <div className="mt-8">

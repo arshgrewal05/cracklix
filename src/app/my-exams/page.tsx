@@ -88,7 +88,7 @@ export default function MyExamsPage() {
   )
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50/50 font-body pb-32">
+    <div className="flex flex-col min-h-screen bg-slate-50/50 font-body pb-safe">
       <Navbar />
       
       <main className="container mx-auto px-4 py-6 md:py-12 max-w-6xl space-y-12">
@@ -178,7 +178,7 @@ export default function MyExamsPage() {
            </h3>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {attemptsLoading ? (
-                 Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-32 w-full rounded-[2.5rem]" />)
+                 Array.from({ length: 2 }).map((_, i) => <Skeleton className="h-32 w-full rounded-[2.5rem]" />)
               ) : recentAttempts.length > 0 ? recentAttempts.map((r: any) => (
                  <Link key={r.id} href={`/results/${r.mockId}`}>
                     <Card className="border-none shadow-xl hover:shadow-4xl transition-all duration-300 rounded-[2.5rem] bg-white p-6 md:p-10 flex items-center justify-between group overflow-hidden relative">
