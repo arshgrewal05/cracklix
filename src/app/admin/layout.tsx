@@ -39,8 +39,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Institutional Admin Layout v175.0.
- * UPDATED: Cropped sidebar branding section to remove excessive whitespace.
+ * @fileOverview Hardened Institutional Admin Layout v176.0.
+ * UPDATED: Set logo to h-40 and removed all unnecessary vertical padding for a tight fit.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -88,9 +88,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none">
        <div className="flex-1 custom-scrollbar overflow-y-auto overflow-x-hidden pb-10">
           
-          {/* BRANDING SECTION: CROPPED WHITESPACE */}
-          <div className="px-6 pt-10 pb-6 flex justify-center shrink-0">
-             <Logo href="/admin" imgClassName="h-28" />
+          {/* BRANDING SECTION: CROP & SCALE */}
+          <div className="px-6 pt-4 pb-2 flex justify-center shrink-0">
+             <Logo href="/admin" imgClassName="h-40" />
           </div>
 
           <SidebarGroup className="pt-0">
