@@ -40,8 +40,8 @@ import { cn } from "@/lib/utils"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 
 /**
- * @fileOverview Hardened Mobile-First Admin Layout v191.0.
- * UPDATED: Strictly eliminated all vertical spacing between logo, labels, and items.
+ * @fileOverview Hardened Mobile-First Admin Layout v192.0.
+ * UPDATED: Increased Logo size and strictly removed all vertical gaps.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -89,8 +89,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none overflow-y-auto no-scrollbar">
        <div className="flex-1">
           
-          <div className="px-6 py-0 flex justify-start shrink-0 overflow-visible -mb-8">
-             <Logo href="/admin" imgClassName="h-24 origin-left" />
+          <div className="px-6 py-0 flex justify-start shrink-0 overflow-visible -mb-10">
+             <Logo href="/admin" imgClassName="h-32 origin-left" />
           </div>
 
           <SidebarGroup className="p-0 m-0 border-none">
@@ -106,7 +106,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className="p-0 m-0 border-none mt-2">
+          <SidebarGroup className="p-0 m-0 border-none mt-0">
             <SidebarGroupLabel className="px-6 py-0 h-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 text-left mt-0 mb-0">CONTENT PULSE</SidebarGroupLabel>
             <SidebarMenu className="gap-0 mt-0 p-0">
               <AdminNavItem icon={<Wand2 />} label="BRAND MAGIC" href="/admin/brand-magic" active={pathname === "/admin/brand-magic"} />
@@ -119,7 +119,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </SidebarMenu>
           </SidebarGroup>
 
-          <SidebarGroup className="p-0 m-0 border-none mt-2">
+          <SidebarGroup className="p-0 m-0 border-none mt-0">
             <SidebarGroupLabel className="px-6 py-0 h-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 text-left mt-0 mb-0">GOVERNANCE</SidebarGroupLabel>
             <SidebarMenu className="gap-0 mt-0 p-0">
               <AdminNavItem icon={<Users />} label="STUDENT LIST" href="/admin/users" active={pathname === "/admin/users"} />

@@ -28,8 +28,8 @@ import { Badge } from "@/components/ui/badge";
 import Logo from "@/components/brand/Logo";
 
 /**
- * @fileOverview Hardened Production Sidebar Center v59.0.
- * UPDATED: Zero vertical spacing between identity, install and menu nodes.
+ * @fileOverview Hardened Production Sidebar Center v60.0.
+ * UPDATED: Significantly increased Logo size and eliminated all gaps.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -87,12 +87,12 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col h-full bg-[#0B1528] text-white overflow-y-auto no-scrollbar font-body select-none text-left">
       
-      {/* BRAND LOGO */}
-      <div className="px-6 py-0 flex justify-start shrink-0 overflow-visible -mb-10">
-         <Logo imgClassName="h-32 origin-left" />
+      {/* BRAND LOGO - MAXIMIZED */}
+      <div className="px-6 py-0 flex justify-start shrink-0 overflow-visible -mb-12">
+         <Logo imgClassName="h-40 origin-left" />
       </div>
 
-      {/* IDENTITY HEADER */}
+      {/* IDENTITY HEADER - COMPACT */}
       <div className="px-6 py-0 flex flex-col gap-0 relative overflow-hidden shrink-0">
         <Shield className="absolute top-0 right-4 h-40 w-40 text-white/[0.03] pointer-events-none" />
         
@@ -158,7 +158,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
          {hasPrompt && <Badge className="bg-primary text-white border-none animate-pulse h-4 text-[6px]">GET</Badge>}
       </div>
 
-      {/* NAV MENU */}
+      {/* NAV MENU - HIGH DENSITY */}
       <div className="flex flex-col py-0">
         {menuItems.map((item) => {
           const isActive = mounted && pathname === item.href;
