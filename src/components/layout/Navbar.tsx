@@ -23,8 +23,8 @@ import { Button } from "@/components/ui/button";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Header v161.0.
- * UPDATED: Increased header height to h-24 and logo scaling to h-22 for massive visibility.
+ * @fileOverview Professional Header v162.0.
+ * UPDATED: Increased header height to h-28 and logo scaling to h-24 for maximum visibility.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -70,7 +70,7 @@ export default function Navbar() {
     }
   };
 
-  const headerHeight = "h-24";
+  const headerHeight = "h-28";
 
   if (!mounted) {
     return (
@@ -105,8 +105,8 @@ export default function Navbar() {
               </SheetContent>
             </Sheet>
             
-            <div className="h-24 flex items-center shrink-0">
-               <Logo imgClassName="h-22" className="active:scale-95 transition-transform" />
+            <div className="h-28 flex items-center shrink-0">
+               <Logo imgClassName="h-24" className="active:scale-95 transition-transform" />
             </div>
           </div>
 
