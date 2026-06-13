@@ -42,8 +42,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Admin Layout v136.0.
- * MATCHED: Replicated the large white logo square and "Admin Hub" header from user screenshot.
+ * @fileOverview Institutional Admin Layout v137.0.
+ * UPDATED: Sidebar logo background changed to student-side Navy (#0B1528) to match the brand identity perfectly.
+ * FIXED: Size and scale matched to student navbar logo for consistency.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -89,10 +90,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const SideNavContent = () => (
     <div className="flex flex-col h-full bg-[#0F172A] pointer-events-auto select-none">
-       {/* 1. SCREENSHOT MATCH: LARGE WHITE LOGO BOX */}
+       {/* UPDATED: LOGO BOX MATCHES STUDENT SIDE NAV BACKGROUND AND SIZE */}
        <div className="p-8 flex justify-center">
-          <div className="bg-white aspect-square w-full rounded-[2rem] shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 group hover:scale-[1.02] transition-transform duration-500">
-            <Logo variant="dark" className="scale-125 md:scale-150" href="/admin" />
+          <div className="bg-[#0B1528] w-full rounded-[2.5rem] shadow-2xl flex items-center justify-center py-10 px-6 border border-white/5 group hover:bg-[#081121] transition-all duration-500">
+            <Logo href="/admin" className="scale-110 md:scale-125" />
           </div>
        </div>
 
@@ -167,7 +168,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </Sidebar>
         
         <SidebarInset className="flex flex-col bg-white min-w-0 max-w-full relative">
-          {/* 2. SCREENSHOT MATCH: HEADER BRANDING */}
           <header className="h-16 md:h-20 border-b border-slate-100 flex items-center px-4 md:px-8 justify-between bg-white sticky top-0 z-[100] shrink-0">
             <div className="flex items-center gap-4 overflow-hidden">
               <SidebarTrigger className="text-[#0F172A] hover:bg-slate-50 cursor-pointer" />
