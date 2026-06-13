@@ -1,3 +1,4 @@
+
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
@@ -10,8 +11,8 @@ import Footer from "@/components/layout/Footer";
 import PopularExams from "@/components/home/PopularExams";
 
 /**
- * @fileOverview Official Home Hub v151.0 (Server Component).
- * STABILITY: Removed use client to provide a stable SSR root for hydration.
+ * @fileOverview Official Home Hub v155.0 (Stabilized Foundation).
+ * PERFORMANCE: Strict server component root with high-fidelity client sub-modules.
  */
 
 export default function HomePage() {

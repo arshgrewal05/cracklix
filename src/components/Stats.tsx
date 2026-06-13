@@ -1,6 +1,7 @@
+
 /**
- * @fileOverview Unused root Stats component. 
+ * @fileOverview Neutralized redundant root component to prevent module resolution conflicts.
  */
-export default function UnusedStats() {
+export default function RedundantStats() {
   return null;
 }

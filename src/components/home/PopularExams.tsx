@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useState, useEffect } from "react"
@@ -25,8 +26,8 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Popular Exams Hub v25.0.
- * HARDENED: Defined helpers before main component to resolve 'call' TypeErrors.
+ * @fileOverview Institutional Popular Exams Hub v26.0 (Stabilized).
+ * FIXED: Definitions moved to top to prevent 'call' resolution errors.
  */
 
 function PrepNode({ label, icon, href }: { label: string, icon: React.ReactNode, href: string }) {
