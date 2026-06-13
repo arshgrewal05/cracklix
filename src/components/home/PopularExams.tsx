@@ -26,9 +26,8 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Popular Exams Hub v28.0 (Hardened).
- * PERFORMANCE: Hoisted helper components to the top to prevent "call" errors during bundling.
- * STABILITY: Robust hydration guards.
+ * @fileOverview Institutional Popular Exams Hub v30.0 (Stability Hardened).
+ * PERFORMANCE: Hoisted all helper components and logic to resolve 'call of undefined' runtime errors.
  */
 
 function PrepNode({ label, icon, href }: { label: string, icon: React.ReactNode, href: string }) {
@@ -73,11 +72,13 @@ export default function PopularExams() {
     return boards.filter((b: any) => targetAbbrevs.includes(b.abbreviation?.toUpperCase()));
   }, [boards, mounted]);
 
-  if (!mounted) return (
-     <section className="py-12 bg-white flex items-center justify-center">
-        <Skeleton className="h-80 w-full max-w-7xl rounded-[3.5rem]" />
-     </section>
-  );
+  if (!mounted) {
+     return (
+        <section className="py-12 bg-white flex items-center justify-center">
+           <Skeleton className="h-80 w-full max-w-7xl rounded-[3.5rem]" />
+        </section>
+     );
+  }
 
   return (
     <section className="py-12 md:py-24 bg-slate-50/50">

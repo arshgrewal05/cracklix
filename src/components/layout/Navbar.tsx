@@ -26,8 +26,9 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Navbar v38.0.
+ * @fileOverview Institutional Navbar v40.0 (Hydration Hardened).
  * FIXED: Mobile overlap fix for Install App button via responsive text and sizing.
+ * FIXED: Synchronized initial render state to resolve hydration mismatches.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -129,7 +130,7 @@ export default function Navbar() {
 
             <div className="relative">
               {!mounted || loading ? (
-                <Skeleton className="h-8 w-8 md:h-11 md:w-11 rounded-lg md:rounded-xl bg-white/5" />
+                <div className="h-8 w-8 md:h-11 md:w-11 rounded-lg md:rounded-xl bg-white/5 animate-pulse" />
               ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

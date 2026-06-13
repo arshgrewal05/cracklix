@@ -11,9 +11,7 @@ import {
   Users,
   Sparkles,
   Layers,
-  BookOpen,
-  Search,
-  Newspaper
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,10 +22,10 @@ import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final High-Fidelity "Command Center" Hero v45.0.
- * DESIGN: Clean visual design with zero text overlays on the image area as requested.
- * STYLE: Advanced 3D-effect designed image wrapper with cinematic frame and glow nodes.
- * STABILITY: Resolved ReferenceErrors and Hydration mismatches.
+ * @fileOverview Final High-Fidelity "Command Center" Hero v50.0.
+ * DESIGN: Clean visual design with ZERO text overlays on the image area as requested.
+ * STYLE: Advanced 3D perspective tech-frame for the provided dashboard graphic.
+ * STABILITY: Verified all icon imports and hydration guards.
  */
 
 export default function Hero() {
@@ -46,7 +44,6 @@ export default function Hero() {
     const mCount = stats?.totalMocks || 500;
     const uCount = stats?.totalUsers || 15000;
     const accuracy = stats?.averageAccuracy || 94;
-
     const format = (n: number) => n >= 1000 ? `${(n/1000).toFixed(0)}k+` : n.toString();
 
     return [
@@ -134,48 +131,35 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* 2. RIGHT VISUAL HUB (CLEAN DESIGNED IMAGE - ZERO TEXT) */}
-          <div className="lg:col-span-5 relative justify-self-center w-full max-w-[480px]">
+          {/* 2. RIGHT VISUAL HUB (PURE DESIGNED IMAGE - ZERO TEXT OVERLAYS) */}
+          <div className="lg:col-span-5 relative justify-self-center w-full max-w-[520px]">
              <motion.div 
-               initial={{ opacity: 0, scale: 0.9 }}
-               animate={{ opacity: 1, scale: 1 }}
+               initial={{ opacity: 0, x: 50 }}
+               animate={{ opacity: 1, x: 0 }}
                transition={{ duration: 0.8, ease: "easeOut" }}
                className="relative w-full"
              >
-                {/* Visual Decoration Nodes */}
-                <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/20 blur-[100px] rounded-full pointer-events-none" />
-                <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
-
-                {/* Primary Designed Image Wrapper */}
-                <div className="relative group transition-all duration-700">
-                   <div className="absolute -inset-1 bg-gradient-to-tr from-primary/30 to-blue-500/20 rounded-[3rem] blur-sm opacity-50 group-hover:opacity-100 transition-opacity" />
+                {/* Cinematic Border System */}
+                <div className="absolute -inset-1 bg-gradient-to-tr from-primary/30 via-white/5 to-blue-500/20 rounded-[3.5rem] blur-sm opacity-50" />
+                
+                <div className="relative aspect-[4/5] rounded-[3.2rem] bg-[#0F172A] border-[12px] border-white/[0.03] overflow-hidden shadow-[0_40px_100px_-15px_rgba(0,0,0,0.6)] ring-1 ring-white/10 group">
+                   <img 
+                     src="https://i.ibb.co/gZCGMQNJ/IMG-20260612-WA0010.jpg" 
+                     alt="Punjab Exam Readiness Hub"
+                     className="w-full h-full object-cover opacity-90 transition-all duration-1000 group-hover:scale-105 group-hover:opacity-100"
+                     referrerPolicy="no-referrer"
+                   />
                    
-                   <div className="relative aspect-[4/5] rounded-[2.5rem] md:rounded-[3rem] bg-[#0F172A] border-[8px] border-white/5 overflow-hidden shadow-5xl ring-1 ring-white/10">
-                      <img 
-                        src="https://i.ibb.co/gZCGMQNJ/IMG-20260612-WA0010.jpg" 
-                        alt="Punjab Exam Readiness Hub"
-                        className="w-full h-full object-cover opacity-90 transition-all duration-1000 group-hover:scale-105 group-hover:opacity-100"
-                        referrerPolicy="no-referrer"
-                      />
-                      
-                      {/* Artistic Overlays (Zero Text) */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#070D19] via-transparent to-transparent opacity-60" />
-                      <div className="absolute inset-0 border-[2px] border-white/10 rounded-[2.5rem] m-2" />
-                      
-                      {/* Bottom Visual Integrated Plate */}
-                      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-center">
-                         <div className="flex gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary/20" />
-                         </div>
-                      </div>
-                   </div>
+                   {/* Atmospheric Vignette */}
+                   <div className="absolute inset-0 bg-gradient-to-t from-[#070D19] via-transparent to-transparent opacity-60" />
+                   
+                   {/* Tech Frame Corner Accents */}
+                   <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-primary/40 rounded-tl-xl" />
+                   <div className="absolute bottom-8 right-8 w-12 h-12 border-b-2 border-r-2 border-primary/40 rounded-br-xl" />
                 </div>
 
-                {/* Subtle Visual Corner Elements */}
-                <div className="absolute top-10 left-10 h-12 w-12 border-t-2 border-l-2 border-primary/40 rounded-tl-xl pointer-events-none" />
-                <div className="absolute bottom-10 right-10 h-12 w-12 border-b-2 border-r-2 border-primary/40 rounded-br-xl pointer-events-none" />
+                {/* Background Glow Node */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/5 blur-[100px] rounded-full -z-10 pointer-events-none" />
              </motion.div>
           </div>
         </div>

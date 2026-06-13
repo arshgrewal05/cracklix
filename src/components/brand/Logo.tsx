@@ -17,7 +17,7 @@ export function LogoIcon({ className = "" }: { className?: string }) {
         referrerPolicy="no-referrer"
         width={180}
         height={40}
-        style={{ maxHeight: '40px' }}
+        style={{ maxHeight: '40px', width: 'auto' }}
       />
     </div>
   );
