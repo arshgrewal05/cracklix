@@ -26,12 +26,12 @@
     --radius: 0.75rem;
 
     /* Global Geometry Node - Fixed for h-40 logo */
-    --header-height: 80px;
+    --header-height: 60px;
   }
 
   @media (min-width: 1024px) {
     :root {
-      --header-height: 145px;
+      --header-height: 75px;
     }
   }
 }
@@ -51,10 +51,10 @@
     pointer-events: auto;
   }
   
-  h1 { @apply text-xl md:text-5xl font-black uppercase tracking-tight leading-tight; }
-  h2 { @apply text-lg md:text-3xl font-black uppercase tracking-tight; }
-  h3 { @apply text-base md:text-2xl font-black uppercase tracking-tight; }
-  p { @apply text-[11px] md:text-base text-slate-500 font-medium; }
+  h1 { @apply text-xl md:text-3xl font-black uppercase tracking-tight leading-tight; }
+  h2 { @apply text-lg md:text-2xl font-black uppercase tracking-tight; }
+  h3 { @apply text-base md:text-xl font-black uppercase tracking-tight; }
+  p { @apply text-[11px] md:text-[13px] text-slate-500 font-medium; }
 }
 
 .mobile-app-shell {
