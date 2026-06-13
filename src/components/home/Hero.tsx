@@ -18,9 +18,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Final Calibrated Hero v229.0 (Desktop & Mobile Optimized).
- * UPDATED: Background height restricted for better focus.
- * UPDATED: Reduced typography and stat card scale for professional balance.
+ * @fileOverview Final Calibrated Hero v230.0 (High-Fidelity Grid Fix).
+ * UPDATED: Replaced scrolling row with 2x2 grid on mobile for full visibility.
+ * UPDATED: Uppercased stat labels and refined typography scaling.
  */
 
 export default function Hero() {
@@ -42,20 +42,20 @@ export default function Hero() {
     };
 
     return [
-      { id: 'q', icon: <BookOpen className="text-blue-400 h-3.5 w-3.5 md:h-5 md:w-5" />, val: formatNumber(stats?.totalQuestions, "439+"), label: "Questions" },
-      { id: 'm', icon: <ClipboardList className="text-orange-400 h-3.5 w-3.5 md:h-5 md:w-5" />, val: formatNumber(stats?.totalMocks, "8+"), label: "Mocks" },
-      { id: 'e', icon: <ShieldCheck className="text-blue-500 h-3.5 w-3.5 md:h-5 md:w-5" />, val: formatNumber(stats?.totalBoards, "92+"), label: "Exams" },
-      { id: 'u', icon: <Users className="text-emerald-400 h-3.5 w-3.5 md:h-5 md:w-5" />, val: formatNumber(stats?.totalUsers, "5+"), label: "Aspirants" }
+      { id: 'q', icon: <BookOpen className="text-blue-400 h-4 w-4 md:h-5 md:w-5" />, val: formatNumber(stats?.totalQuestions, "439+"), label: "QUESTIONS" },
+      { id: 'm', icon: <ClipboardList className="text-orange-400 h-4 w-4 md:h-5 md:w-5" />, val: formatNumber(stats?.totalMocks, "8+"), label: "MOCKS" },
+      { id: 'e', icon: <ShieldCheck className="text-blue-500 h-4 w-4 md:h-5 md:w-5" />, val: formatNumber(stats?.totalBoards, "92+"), label: "EXAMS" },
+      { id: 'u', icon: <Users className="text-emerald-400 h-4 w-4 md:h-5 md:w-5" />, val: formatNumber(stats?.totalUsers, "5+"), label: "ASPIRANTS" }
     ];
   }, [stats]);
 
   if (!mounted) return null;
 
   return (
-    <section className="relative w-full bg-[#050B19] overflow-hidden min-h-[450px] md:min-h-[550px] lg:h-[650px] flex flex-col justify-start text-left border-b border-white/5 pb-16 md:pb-20">
+    <section className="relative w-full bg-[#050B19] overflow-hidden min-h-[500px] md:min-h-[550px] lg:h-[650px] flex flex-col justify-start text-left border-b border-white/5 pb-16 md:pb-20">
       
-      {/* 1. BACKGROUND ENGINE - Calibrated for high-fidelity focus */}
-      <div className="absolute top-0 left-0 right-0 h-[200px] md:h-[500px] lg:h-[600px] z-0 overflow-hidden">
+      {/* 1. BACKGROUND ENGINE */}
+      <div className="absolute top-0 left-0 right-0 h-[220px] md:h-[500px] lg:h-[600px] z-0 overflow-hidden">
         <motion.img 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -65,12 +65,12 @@ export default function Hero() {
           className="w-full h-full object-cover object-right md:object-center"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050B19]/20 to-[#050B19] z-[10]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050B19]/40 to-[#050B19] z-[10]" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#050B19] via-[#050B19]/80 to-transparent z-[10] hidden md:block" />
       </div>
 
       {/* 2. CONTENT HUB */}
-      <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl relative z-[30] pt-10 md:pt-20">
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl relative z-[30] pt-12 md:pt-20">
          <div className="max-w-3xl space-y-4 md:space-y-6">
             
             <motion.div
@@ -88,10 +88,10 @@ export default function Hero() {
                transition={{ delay: 0.1 }}
                className="space-y-1 md:space-y-2"
             >
-               <h1 className="text-[28px] xs:text-[36px] sm:text-5xl md:text-6xl lg:text-7xl font-headline font-black text-white leading-[1.05] tracking-tighter uppercase">
+               <h1 className="text-[32px] xs:text-[40px] sm:text-5xl md:text-6xl lg:text-7xl font-headline font-black text-white leading-[1.05] tracking-tighter uppercase">
                   Prepare smarter.
                </h1>
-               <h1 className="text-[28px] xs:text-[36px] sm:text-5xl md:text-6xl lg:text-7xl font-headline font-black text-[#F97316] leading-[1.05] tracking-tighter uppercase">
+               <h1 className="text-[32px] xs:text-[40px] sm:text-5xl md:text-6xl lg:text-7xl font-headline font-black text-[#F97316] leading-[1.05] tracking-tighter uppercase">
                   Score higher.
                </h1>
             </motion.div>
@@ -100,7 +100,7 @@ export default function Hero() {
                initial={{ opacity: 0, y: 10 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.2 }}
-               className="text-xs md:text-lg lg:text-xl text-slate-300 font-medium max-w-2xl leading-relaxed antialiased"
+               className="text-sm md:text-lg lg:text-xl text-slate-300 font-medium max-w-2xl leading-relaxed antialiased"
             >
                Punjab Government Exams di Complete Preparation <br className="hidden sm:block" />
                ik hi Hub te, Latest Official Patterns de Naal.
@@ -110,14 +110,14 @@ export default function Hero() {
                initial={{ opacity: 0, y: 10 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.3 }}
-               className="flex flex-col sm:flex-row gap-3 pt-4 md:pt-8"
+               className="flex flex-col sm:flex-row gap-3 pt-6 md:pt-8"
             >
-               <Button asChild className="h-12 md:h-14 px-8 md:px-12 bg-[#F97316] hover:bg-orange-600 text-white font-black text-[10px] md:text-sm tracking-[0.1em] rounded-xl md:rounded-2xl shadow-3xl transition-all border-none uppercase active:scale-95">
+               <Button asChild className="h-14 md:h-16 px-8 md:px-12 bg-[#F97316] hover:bg-orange-600 text-white font-black text-[11px] md:text-sm tracking-[0.1em] rounded-xl md:rounded-2xl shadow-3xl transition-all border-none uppercase active:scale-95">
                   <Link href="/mocks" className="flex items-center gap-3">
                      Free Mock <ArrowRight className="h-4 w-4" />
                   </Link>
                </Button>
-               <Button asChild variant="outline" className="h-12 md:h-14 px-8 md:px-12 border-white/20 bg-white/5 text-white font-black text-[10px] md:text-sm tracking-[0.1em] rounded-xl md:rounded-2xl transition-all backdrop-blur-md hover:bg-white/10 uppercase active:scale-95">
+               <Button asChild variant="outline" className="h-14 md:h-16 px-8 md:px-12 border-white/20 bg-white/5 text-white font-black text-[11px] md:text-sm tracking-[0.1em] rounded-xl md:rounded-2xl transition-all backdrop-blur-md hover:bg-white/10 uppercase active:scale-95">
                   <Link href="/exams">
                      Explore Exams
                   </Link>
@@ -126,25 +126,24 @@ export default function Hero() {
          </div>
       </div>
 
-      {/* 3. TIGHTENED STATS BAR */}
+      {/* 3. TIGHTENED STATS GRID (FIXED FOR MOBILE) */}
       <div className="mt-12 md:mt-20 z-[40]">
          <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
-            <div className="flex flex-row md:grid md:grid-cols-4 gap-3 md:gap-5 lg:gap-8 overflow-x-auto no-scrollbar pb-6 md:pb-0 snap-x">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 lg:gap-8">
                {liveStats.map((stat, idx) => (
                   <motion.div
                      key={stat.id}
-                     initial={{ opacity: 0, y: 5 }}
+                     initial={{ opacity: 0, y: 10 }}
                      animate={{ opacity: 1, y: 0 }}
                      transition={{ delay: 0.4 + (idx * 0.1) }}
-                     className="shrink-0 flex-1 md:flex-none min-w-[140px] md:min-w-0 snap-center"
                   >
-                     <Card className="bg-[#0B1528]/80 backdrop-blur-3xl border border-white/10 p-3 md:p-5 lg:p-6 rounded-[1.5rem] md:rounded-[2rem] text-left flex items-center gap-3 md:gap-4 group hover:bg-[#0B1528] transition-all duration-300 shadow-2xl overflow-hidden h-16 md:h-24 lg:h-28 w-full">
-                        <div className="shrink-0 h-8 w-8 md:h-12 md:w-12 lg:h-14 lg:w-14 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner">
+                     <Card className="bg-[#0B1528]/80 backdrop-blur-3xl border border-white/10 p-4 md:p-6 lg:p-7 rounded-[1.5rem] md:rounded-[2rem] text-left flex items-center gap-3 md:gap-5 group hover:bg-[#0B1528] transition-all duration-300 shadow-2xl overflow-hidden h-20 md:h-24 lg:h-32 w-full">
+                        <div className="shrink-0 h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner">
                            {stat.icon}
                         </div>
                         <div className="min-w-0 flex flex-col justify-center leading-tight">
-                           <p className="text-base md:text-2xl lg:text-3xl font-headline font-black text-white tabular-nums leading-none mb-0.5 md:mb-1">{stat.val}</p>
-                           <p className="text-[7px] md:text-[9px] lg:text-[10px] font-black text-slate-500 uppercase tracking-widest truncate">
+                           <p className="text-xl md:text-2xl lg:text-4xl font-headline font-black text-white tabular-nums leading-none mb-1">{stat.val}</p>
+                           <p className="text-[8px] md:text-[9px] lg:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate">
                               {stat.label}
                            </p>
                         </div>
