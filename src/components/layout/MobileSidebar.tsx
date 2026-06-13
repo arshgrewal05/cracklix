@@ -13,7 +13,8 @@ import {
   Newspaper,
   Download,
   User,
-  Shield
+  Shield,
+  Landmark
 } from "lucide-react";
 import Link from "next/link";
 import { useUser, useAuth } from "@/firebase";
@@ -24,8 +25,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 /**
- * @fileOverview Final Screenshot Replica Sidebar v43.0.
- * UPDATED: Simplified 'OFFICIAL LIST' to 'EXAM LIST'.
+ * @fileOverview Final Screenshot Replica Sidebar v44.0.
+ * UPDATED: Integrated MY EXAMS node and refined EXAM LIST icon.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -56,7 +57,8 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
 
   const menuItems = [
     { label: "HOME PAGE", href: "/", icon: Home },
-    { label: "EXAM LIST", href: "/exams", icon: Target },
+    { label: "MY EXAMS", href: "/my-exams", icon: Target },
+    { label: "EXAM LIST", href: "/exams", icon: Landmark },
     { label: "ELITE PASS", href: "/pass", icon: Gem, hasPro: true },
     { label: "PRACTICE TESTS", href: "/mocks", icon: Zap },
     { label: "UPDATES HUB", href: "/current-affairs", icon: Newspaper },
