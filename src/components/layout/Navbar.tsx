@@ -24,8 +24,8 @@ import { useToast } from "@/hooks/use-toast";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Header v189.0.
- * FIXED: Logo height set to exactly 100px as requested.
+ * @fileOverview Professional Header v190.0.
+ * FIXED: Logo height set to exactly 120px as requested, creating an overlap brand effect.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -111,27 +111,22 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-[1000] w-full pointer-events-auto font-body text-left">
       <nav className={cn(
-        "w-full flex items-center bg-[#0B1528] border-b border-white/5 px-2 md:px-4 lg:px-8 shadow-2xl overflow-hidden backdrop-blur-xl",
+        "w-full flex items-center bg-[#0B1528] border-b border-white/5 px-2 md:px-4 lg:px-8 shadow-2xl overflow-visible backdrop-blur-xl",
         headerHeightClass
       )}>
         <div className="container mx-auto max-w-[1536px] flex items-center justify-between h-full gap-1 md:gap-2">
           
           <div className="flex items-center gap-1 md:gap-2 shrink-0 h-full">
-            <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-              <SheetTrigger asChild>
-                <button className="w-8 h-8 md:w-9 md:h-9 bg-white/5 text-white rounded-[10px] border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center cursor-pointer active:scale-90 outline-none">
-                  <Menu className="h-4 w-4 md:h-5 md:w-5" />
-                </button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0 border-none w-[280px] bg-[#0F172A] z-[2001]">
-                <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle></SheetHeader>
-                <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
-              </SheetContent>
-            </Sheet>
+            <button 
+              onClick={() => setIsSidebarOpen(true)} 
+              className="w-8 h-8 md:w-9 md:h-9 bg-white/5 text-white rounded-[10px] border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center cursor-pointer active:scale-90 outline-none"
+            >
+              <Menu className="h-4 w-4 md:h-5 md:w-5" />
+            </button>
             
             <div className="flex items-center shrink-0 h-full">
                <Logo 
-                 imgClassName="h-[100px] origin-left" 
+                 imgClassName="h-[120px] origin-left translate-y-2" 
                  className="active:scale-95 transition-transform" 
                />
             </div>
@@ -247,6 +242,13 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+
+      <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <SheetContent side="left" className="p-0 border-none w-[280px] bg-[#0F172A] z-[2001]">
+          <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle></SheetHeader>
+          <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
@@ -261,7 +263,7 @@ function NavLink({ icon, label1, label2, href, active }: { icon: React.ReactNode
         "h-7 w-7 rounded-lg flex items-center justify-center shadow-sm transition-all",
         active ? "bg-[#F97316] text-white" : "bg-white/5 text-slate-400 group-hover:text-[#F97316]"
       )}>
-        {React.cloneElement(icon as React.ReactElement, { className: "h-3.5 w-3.5" })}
+        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement, { className: "h-3.5 w-3.5" }) : icon}
       </div>
       <div className="flex flex-col text-left leading-tight">
         <span className={cn("text-[10px] font-black uppercase tracking-widest leading-none", active ? "text-[#F97316]" : "text-white")}>{label1}</span>
