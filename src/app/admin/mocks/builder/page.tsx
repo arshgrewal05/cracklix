@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect, Suspense } from "react"
@@ -52,8 +51,9 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview FINAL HIGH-FIDELITY Mock Architect v85.1.
- * FIXED: Defined toggleExamId to resolve unresponsive vertical selector.
+ * @fileOverview FINAL HIGH-FIDELITY Mock Architect v86.0.
+ * FIXED: Refined Marking Cards (POS/NEG) into vertical capsules for better visibility.
+ * FIXED: Improved layout and centering of marking inputs.
  */
 
 export default function MockBuilderPage() {
@@ -473,30 +473,37 @@ function MockBuilderContent() {
                  </div>
               </div>
 
+              {/* REFINED MARKING HUB: POS/NEG CAPSULES */}
               <div className="grid grid-cols-2 gap-4 pt-4">
-                 <div className="bg-[#F0FDF4] p-6 md:p-8 rounded-full border-2 border-[#DCFCE7] text-center space-y-2 flex flex-col items-center justify-center h-40 md:h-56 shadow-inner group transition-all hover:border-[#10B981]/30">
-                    <div className="space-y-0.5">
-                       <p className="text-[12px] font-black text-[#10B981] uppercase tracking-widest leading-none">POS (+)</p>
+                 <div className="bg-[#F0FDF4] p-4 md:p-6 rounded-[2.5rem] md:rounded-[4rem] border-2 border-[#DCFCE7] text-center space-y-4 flex flex-col items-center justify-start h-[240px] md:h-[320px] shadow-inner group transition-all hover:border-[#10B981]/30">
+                    <div className="pt-4">
+                       <p className="text-[14px] md:text-[18px] font-black text-[#10B981] uppercase tracking-widest leading-none">POS</p>
+                       <p className="text-[14px] md:text-[18px] font-black text-[#10B981] uppercase tracking-widest leading-none mt-1">(+)</p>
                     </div>
-                    <Input 
-                       type="number" 
-                       step="0.1"
-                       value={isNaN(mockData.positiveMarks) ? "" : mockData.positiveMarks} 
-                       onChange={e => setMockData({...mockData, positiveMarks: parseFloat(e.target.value) || 0})}
-                       className="h-14 md:h-16 bg-transparent border-none text-center font-black text-4xl md:text-6xl text-[#10B981] p-0 focus-visible:ring-0 tabular-nums" 
-                    />
+                    <div className="flex-1 flex items-center justify-center w-full">
+                       <Input 
+                          type="number" 
+                          step="0.1"
+                          value={isNaN(mockData.positiveMarks) ? "" : mockData.positiveMarks} 
+                          onChange={e => setMockData({...mockData, positiveMarks: parseFloat(e.target.value) || 0})}
+                          className="h-20 w-full bg-transparent border-none text-center font-black text-4xl md:text-6xl text-[#10B981] p-0 focus-visible:ring-0 tabular-nums" 
+                       />
+                    </div>
                  </div>
-                 <div className="bg-[#FEF2F2] p-6 md:p-8 rounded-full border-2 border-[#FEE2E2] text-center space-y-2 flex flex-col items-center justify-center h-40 md:h-56 shadow-inner group transition-all hover:border-[#F43F5E]/30">
-                    <div className="space-y-0.5">
-                       <p className="text-[12px] font-black text-[#F43F5E] uppercase tracking-widest leading-none">NEG (-)</p>
+                 <div className="bg-[#FEF2F2] p-4 md:p-6 rounded-[2.5rem] md:rounded-[4rem] border-2 border-[#FEE2E2] text-center space-y-4 flex flex-col items-center justify-start h-[240px] md:h-[320px] shadow-inner group transition-all hover:border-[#F43F5E]/30">
+                    <div className="pt-4">
+                       <p className="text-[14px] md:text-[18px] font-black text-[#F43F5E] uppercase tracking-widest leading-none">NEG</p>
+                       <p className="text-[14px] md:text-[18px] font-black text-[#F43F5E] uppercase tracking-widest leading-none mt-1">(-)</p>
                     </div>
-                    <Input 
-                       type="number" 
-                       step="0.01"
-                       value={isNaN(mockData.negativeMarks) ? "" : mockData.negativeMarks} 
-                       onChange={e => setMockData({...mockData, negativeMarks: parseFloat(e.target.value) || 0})}
-                       className="h-14 md:h-16 bg-transparent border-none text-center font-black text-4xl md:text-6xl text-[#F43F5E] p-0 focus-visible:ring-0 tabular-nums" 
-                    />
+                    <div className="flex-1 flex items-center justify-center w-full">
+                       <Input 
+                          type="number" 
+                          step="0.01"
+                          value={isNaN(mockData.negativeMarks) ? "" : mockData.negativeMarks} 
+                          onChange={e => setMockData({...mockData, negativeMarks: parseFloat(e.target.value) || 0})}
+                          className="h-20 w-full bg-transparent border-none text-center font-black text-4xl md:text-6xl text-[#F43F5E] p-0 focus-visible:ring-0 tabular-nums" 
+                       />
+                    </div>
                  </div>
               </div>
            </Card>
