@@ -2,24 +2,20 @@
 
 import { useEffect } from 'react';
 import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * @fileOverview Hardened Error Bridge.
- * Ensures Firestore permission errors trigger a clean Next.js error boundary without [object Event] crashes.
+ * Fixed: Updated to match the custom EventEmitter implementation for runtime stability.
  */
 export function FirebaseErrorListener() {
   useEffect(() => {
-    const handlePermissionError = (error: unknown) => {
-      // 1. Audit Error Identity - Strictly only throw Error objects
-      if (error instanceof Error) {
-        // Use setTimeout to ensure the throw happens outside the event emitter call stack
-        setTimeout(() => {
-          throw error;
-        }, 0);
-      } else {
-        // 2. Fallback for non-standard events (prevents nextjs [object Event] crash)
-        console.error("[CBT SECURITY EVENT]:", error);
-      }
+    const handlePermissionError = (error: FirestorePermissionError) => {
+      // Use setTimeout to ensure the throw happens outside the event emitter call stack
+      // and triggers the Next.js Error Boundary correctly.
+      setTimeout(() => {
+        throw error;
+      }, 0);
     };
 
     errorEmitter.on('permission-error', handlePermissionError);

@@ -5,7 +5,6 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth } from 'firebase/auth';
 import { FirebaseStorage } from 'firebase/storage';
-import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 interface FirebaseContextValue {
   app: FirebaseApp | null;
@@ -21,6 +20,10 @@ const FirebaseContext = createContext<FirebaseContextValue>({
   storage: null,
 });
 
+/**
+ * @fileOverview Hardened Context Node.
+ * DECOUPLED: Removed FirebaseErrorListener to prevent circular dependency with the index registry.
+ */
 export function FirebaseProvider({
   children,
   app,
@@ -36,7 +39,6 @@ export function FirebaseProvider({
 }) {
   return (
     <FirebaseContext.Provider value={{ app, firestore, auth, storage }}>
-      <FirebaseErrorListener />
       {children}
     </FirebaseContext.Provider>
   );
