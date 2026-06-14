@@ -31,9 +31,9 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import StudentAvatar from "@/components/brand/StudentAvatar"
 
 /**
- * @fileOverview Test Results Hub v31.0 (Production Hardened).
- * UPDATED: Uses useDoc for real-time result reactivity to prevent race conditions with attempt completion.
- * FIXED: Accurate student identification in merit list.
+ * @fileOverview Test Results Hub v32.0 (High Density Calibration).
+ * UPDATED: Renamed tabs to 'Check Answers' and 'State Ranking'.
+ * FIXED: Scoreboard layout and overlap issues.
  */
 
 export default function ResultPage() {
@@ -152,31 +152,33 @@ function ResultContent() {
       <Navbar />
       <main className="container mx-auto px-4 md:px-6 py-6 md:py-10 max-w-7xl space-y-6">
         
-        {/* SCORE BANNER */}
-        <div className="bg-[#0B1528] rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between p-6 md:px-10 md:py-6 gap-6">
-           <div className="flex items-center gap-6 min-w-0 flex-1">
-              <div className="h-12 w-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary shrink-0">
-                 <Trophy className="h-6 w-6" />
+        {/* SCORE BANNER - REFINED FOR VISIBILITY */}
+        <div className="bg-[#0B1528] rounded-2xl shadow-2xl overflow-hidden flex flex-col lg:flex-row items-center justify-between p-4 md:p-8 lg:px-10 lg:py-6 gap-6">
+           <div className="flex items-center gap-4 md:gap-6 min-w-0 flex-1 w-full lg:w-auto">
+              <div className="h-10 w-10 md:h-12 md:w-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary shrink-0 shadow-lg">
+                 <Trophy className="h-5 w-5 md:h-6 md:w-6" />
               </div>
-              <div className="min-w-0 truncate">
-                 <h1 className="text-base md:text-xl font-black text-white uppercase tracking-tight truncate">{sessionData.mockTitle}</h1>
-                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Audit Score Index</p>
+              <div className="min-w-0 flex-1">
+                 <h1 className="text-sm md:text-xl font-black text-white uppercase tracking-tight truncate">{sessionData.mockTitle}</h1>
+                 <p className="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 md:mt-1">Official Audit Score Index</p>
               </div>
            </div>
 
-           <div className="flex items-center gap-8 md:gap-14 shrink-0">
+           <div className="flex items-center justify-center gap-6 md:gap-10 lg:gap-14 shrink-0 w-full lg:w-auto px-2">
               <ResultPill label="SCORE" val={(sessionData.score || 0).toFixed(1)} color={(sessionData.score || 0) < 0 ? "text-rose-400" : "text-primary"} />
-              <div className="w-px h-10 bg-white/10" />
+              <div className="w-px h-8 md:h-10 bg-white/10" />
               <ResultPill label="RANK" val={`#${merit.rank}`} color="text-white" />
-              <div className="w-px h-10 bg-white/10" />
+              <div className="w-px h-8 md:h-10 bg-white/10" />
               <ResultPill label="ACCURACY" val={`${sessionData.accuracy || 0}%`} color="text-emerald-400" />
-              <div className="w-px h-10 bg-white/10 hidden sm:block" />
-              <ResultPill label="PERCENTILE" val={`${merit.percentile}%`} color="text-blue-400" className="hidden sm:flex" />
+              <div className="w-px h-8 md:h-10 bg-white/10 hidden xs:block" />
+              <ResultPill label="PERCENTILE" val={`${merit.percentile}%`} color="text-blue-400" className="hidden xs:flex" />
            </div>
 
-           <div className="flex gap-3 shrink-0 ml-0 md:ml-6">
-              <Button asChild className="h-11 px-6 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest rounded-xl shadow-lg border-none active:scale-95 transition-all">
-                 <Link href={`/mocks/${sessionData.mockId}/instructions`}><RefreshCw className="h-4 w-4 mr-2" /> RE-AUDIT</Link>
+           <div className="flex gap-3 shrink-0 w-full lg:w-auto">
+              <Button asChild className="w-full lg:w-auto h-11 px-6 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] tracking-widest rounded-xl shadow-lg border-none active:scale-95 transition-all">
+                 <Link href={`/mocks/${sessionData.mockId}/instructions`} className="flex items-center justify-center gap-2">
+                    <RefreshCw className="h-4 w-4" /> RE-AUDIT
+                 </Link>
               </Button>
            </div>
         </div>
@@ -184,8 +186,8 @@ function ResultContent() {
         <Tabs defaultValue="SOLUTIONS" className="space-y-6">
            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
               <TabsList className="bg-white border border-slate-100 p-1.5 h-14 rounded-2xl shadow-sm inline-flex">
-                 <TabsTrigger value="SOLUTIONS" className="rounded-xl px-8 font-black uppercase text-[10px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white transition-all">Logic Hub</TabsTrigger>
-                 <TabsTrigger value="TOPPER" className="rounded-xl px-8 font-black uppercase text-[10px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white transition-all">State Merit</TabsTrigger>
+                 <TabsTrigger value="SOLUTIONS" className="rounded-xl px-8 font-black uppercase text-[10px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white transition-all whitespace-nowrap">Check Answers</TabsTrigger>
+                 <TabsTrigger value="TOPPER" className="rounded-xl px-8 font-black uppercase text-[10px] h-full data-[state=active]:bg-[#0B1528] data-[state=active]:text-white transition-all whitespace-nowrap">State Ranking</TabsTrigger>
               </TabsList>
               
               <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
@@ -236,7 +238,7 @@ function ResultContent() {
            </TabsContent>
 
            <TabsContent value="TOPPER" className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
-              <Card className="border-none shadow-xl rounded-[3rem] bg-white p-8 md:p-12">
+              <Card className="border-none shadow-xl rounded-[3rem] bg-white p-8 md:p-12 text-left">
                  <div className="space-y-4">
                     <div className="p-4 md:p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between mb-8">
                        <div className="flex items-center gap-4">
@@ -279,9 +281,9 @@ function ResultContent() {
 
 function ResultPill({ label, val, color, className }: any) {
    return (
-      <div className={cn("flex flex-col items-center md:items-start gap-1", className)}>
+      <div className={cn("flex flex-col items-center md:items-start gap-0.5 md:gap-1", className)}>
          <span className="text-[7px] md:text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none">{label}</span>
-         <span className={cn("text-base md:text-3xl font-headline font-black leading-none tabular-nums", color)}>{val}</span>
+         <span className={cn("text-sm md:text-3xl font-headline font-black leading-none tabular-nums", color)}>{val}</span>
       </div>
    )
 }
