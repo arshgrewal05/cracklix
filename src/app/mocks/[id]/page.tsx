@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useEffect, useState } from "react"
+import React, { useMemo, useEffect, useState } from "react"
 import { useParams, useRouter, usePathname } from "next/navigation"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
@@ -29,7 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Individual Mock Gateway v26.0 (Micro-Scale).
+ * @fileOverview Individual Mock Gateway v27.0 (Micro-Scale).
+ * FIXED: Added missing React import for cloneElement in FeatureNode.
  * UPDATED: Shrunken typography and padding for absolute minimum screen coverage on mobile.
  */
 
@@ -182,7 +183,7 @@ export default function MockOverviewPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-6">
                  <FeatureNode icon={<ShieldCheck className="text-emerald-500 h-4 w-4" />} title="Official" desc="Official Patterns" />
                  <FeatureNode icon={<Zap className="text-primary h-4 w-4" />} title="Solutions" desc="Logic Explained" />
-                 <FeatureNode icon={<Target className="text-blue-500 h-4 w-4" title="Rankings" desc="State Merit" className="col-span-2 md:col-span-1" />} />
+                 <FeatureNode icon={<Target className="text-blue-500 h-4 w-4" />} title="Rankings" desc="State Merit" className="col-span-2 md:col-span-1" />
               </div>
            </div>
         </section>
@@ -195,7 +196,9 @@ export default function MockOverviewPage() {
 function FeatureNode({ icon, title, desc, className }: { icon: React.ReactNode, title: string, desc: string, className?: string }) {
   return (
     <div className={cn("p-2.5 md:p-5 rounded-lg md:rounded-xl bg-slate-50 border border-slate-100 space-y-1 text-center group hover:bg-white hover:shadow-lg transition-all", className)}>
-      <div className="h-6 w-6 md:h-9 md:w-9 bg-white rounded-lg flex items-center justify-center mx-auto shadow-sm group-hover:scale-110 transition-transform">{React.cloneElement(icon as React.ReactElement, { className: "h-3 w-3 md:h-4 md:w-4" })}</div>
+      <div className="h-6 w-6 md:h-9 md:w-9 bg-white rounded-lg flex items-center justify-center mx-auto shadow-sm group-hover:scale-110 transition-transform">
+        {React.cloneElement(icon as React.ReactElement, { className: "h-3 w-3 md:h-4 md:w-4" })}
+      </div>
       <h3 className="text-[9px] md:text-xs font-black text-[#0F172A] uppercase tracking-tight">{title}</h3>
       <p className="text-slate-400 font-bold uppercase text-[6px] md:text-[8px] tracking-widest">{desc}</p>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -16,8 +16,9 @@ import { LanguageDisplayMode } from "@/types";
 import Link from "next/link";
 
 /**
- * @fileOverview Hardened Instructions Hub v8.0 (Micro-Scale).
- * UPDATED: Drastically reduced font sizes and padding to ensure full page visibility on mobile.
+ * @fileOverview Hardened Instructions Hub v9.0 (Micro-Scale).
+ * FIXED: Added missing React import for cloneElement.
+ * UPDATED: Absolute minimum typography and padding for mobile visibility.
  */
 export default function InstructionsPage() {
   const params = useParams();
