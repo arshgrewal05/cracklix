@@ -9,8 +9,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview High-Fidelity Unified Hero v700.0 (Screenshot Perfect).
- * MATCHED: 200px mobile height, specific typography scaling, and unified map watermark.
+ * @fileOverview High-Fidelity Unified Hero v701.0 (Fixed Clipping).
+ * FIXED: Background image set to object-top to prevent top-clipping of Golden Temple.
+ * SIZING: Strictly 200px height on mobile as requested.
  */
 
 export default function Hero() {
@@ -33,11 +34,11 @@ export default function Hero() {
             <img 
               src="https://i.ibb.co/LXgcLVVq/Gemini-Generated-Image-n1so6on1so6on1so.png" 
               alt="Golden Temple" 
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-top"
               referrerPolicy="no-referrer"
             />
             {/* GRADIENT OVERLAY FOR TEXT BLENDING */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050B19] via-[#050B19]/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050B19] via-[#050B19]/10 to-transparent" />
          </div>
 
          {/* PUNJAB MAP WATERMARK - CONTINUOUS OVERLAY */}
@@ -80,7 +81,7 @@ export default function Hero() {
                <motion.h1 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-[40px] sm:text-6xl md:text-8xl lg:text-[100px] font-headline font-black text-white leading-[0.95] tracking-tighter uppercase"
+                  className="text-[32px] sm:text-5xl md:text-7xl lg:text-[100px] font-headline font-black text-white leading-[0.95] tracking-tighter uppercase"
                >
                   Prepare Smarter.
                </motion.h1>
@@ -88,7 +89,7 @@ export default function Hero() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="text-[40px] sm:text-6xl md:text-8xl lg:text-[100px] font-headline font-black text-primary leading-[0.95] tracking-tighter uppercase"
+                  className="text-[32px] sm:text-5xl md:text-7xl lg:text-[100px] font-headline font-black text-primary leading-[0.95] tracking-tighter uppercase"
                >
                   Score Higher.
                </motion.h1>
