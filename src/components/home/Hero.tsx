@@ -2,16 +2,15 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, ArrowRight, Download } from "lucide-react";
+import { Star, ArrowRight, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Final Screenshot-Matched Hero Hub v62.0.
- * UPDATED: Moved whole content block up (pt-16 md:pt-24).
- * UPDATED: Shrunken background image size on desktop (w-[60%]).
- * FIXED: Added the brand bubble "N" to the primary button.
+ * @fileOverview Final Screenshot-Matched Hero Hub v63.0.
+ * UPDATED: Replaced INSTALL APP with EXAMS button.
+ * UPDATED: Removed redundant INSTALL APP button.
  */
 
 export default function Hero() {
@@ -53,7 +52,7 @@ export default function Hero() {
               </span>
            </motion.div>
 
-           {/* HEADLINES - SHRUNKEN BY HALF */}
+           {/* HEADLINES */}
            <motion.div 
              initial={{ opacity: 0, x: -20 }}
              animate={{ opacity: 1, x: 0 }}
@@ -79,7 +78,7 @@ export default function Hero() {
               ik hi Center te, Latest Official Patterns de Naal.
            </motion.p>
 
-           {/* ACTIONS - SCREENSHOT MATCHED WITH BRAND BUBBLE */}
+           {/* ACTIONS - UPDATED TO REPLACE INSTALL WITH EXAMS */}
            <motion.div 
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
@@ -95,12 +94,9 @@ export default function Hero() {
                  </Link>
               </Button>
               <Button asChild className="h-12 md:h-14 px-8 bg-white hover:bg-slate-50 text-[#0F172A] font-black uppercase text-[10px] md:text-[11px] tracking-[0.2em] rounded-xl transition-all active:scale-95 border-none gap-3 shadow-xl">
-                 <Link href="/pwa-install">
-                    <Download className="h-4 w-4" /> INSTALL APP
+                 <Link href="/exams">
+                    <LayoutGrid className="h-4 w-4" /> EXAMS
                  </Link>
-              </Button>
-              <Button asChild variant="outline" className="h-12 md:h-14 px-8 border-white/20 bg-white/5 backdrop-blur-md text-white hover:bg-white/10 font-black uppercase text-[10px] md:text-[11px] tracking-[0.2em] rounded-xl transition-all active:scale-95">
-                 <Link href="/exams">EXAMS</Link>
               </Button>
            </motion.div>
         </div>
