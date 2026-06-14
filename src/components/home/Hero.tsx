@@ -9,10 +9,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened Screenshot-Matched Hero Hub v88.0.
- * UPDATED: Content hub moved up (reduced pt).
- * UPDATED: Background width increased to 65% for better fill.
- * FIXED: Maintained object-contain for "Full Visibility" of the Golden Temple.
+ * @fileOverview Hardened Screenshot-Matched Hero Hub v90.0.
+ * UPDATED: Metrics row moved up and shifted right as per user request.
  */
 
 export default function Hero() {
@@ -107,36 +105,36 @@ export default function Hero() {
                  <Link href="/exams">EXAMS</Link>
               </Button>
            </motion.div>
-
-           {/* METRICS REGISTRY - 4-COLUMN GLASSMORPHISM */}
-           <motion.div 
-             initial={{ opacity: 0, y: 30 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.4 }}
-             className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-16 md:pt-24"
-           >
-              <MetricCard 
-                icon={<BookOpen className="text-blue-500 h-5 w-5" />} 
-                count="439+" 
-                label="QUESTIONS" 
-              />
-              <MetricCard 
-                icon={<ClipboardList className="text-orange-500 h-5 w-5" />} 
-                count="8+" 
-                label="MOCKS" 
-              />
-              <MetricCard 
-                icon={<ShieldCheck className="text-blue-500 h-5 w-5" />} 
-                count="92+" 
-                label="EXAMS" 
-              />
-              <MetricCard 
-                icon={<Users className="text-emerald-500 h-5 w-5" />} 
-                count="5+" 
-                label="ASPIRANTS" 
-              />
-           </motion.div>
         </div>
+
+        {/* METRICS REGISTRY - SHIFTED UP AND TO THE RIGHT */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 md:mt-12 md:translate-x-20 lg:translate-x-32 max-w-5xl"
+        >
+           <MetricCard 
+             icon={<BookOpen className="text-blue-500 h-5 w-5" />} 
+             count="439+" 
+             label="QUESTIONS" 
+           />
+           <MetricCard 
+             icon={<ClipboardList className="text-orange-500 h-5 w-5" />} 
+             count="8+" 
+             label="MOCKS" 
+           />
+           <MetricCard 
+             icon={<ShieldCheck className="text-blue-500 h-5 w-5" />} 
+             count="92+" 
+             label="EXAMS" 
+           />
+           <MetricCard 
+             icon={<Users className="text-emerald-500 h-5 w-5" />} 
+             count="5+" 
+             label="ASPIRANTS" 
+           />
+        </motion.div>
       </div>
     </section>
   );
