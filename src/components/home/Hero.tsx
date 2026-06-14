@@ -1,20 +1,40 @@
 'use client';
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap, GraduationCap, Landmark, ShieldCheck, Star, ChevronRight } from "lucide-react";
+import { Zap, GraduationCap, Landmark, ShieldCheck, Star, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useDoc, useFirestore } from "@/firebase";
+import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Official Rebuilt Hero Hub v110.0 (Background Removed).
- * UPDATED: Removed the Golden Temple background as requested.
- * FEATURES: 2-Column Desktop Grid with 4-card Portal Hub and radial theme.
+ * @fileOverview Official Live Hero Hub v120.0 (Background Removed).
+ * UPDATED: Integrated live Firestore stats for institutional trust and functional portal routing.
  */
 
 export default function Hero() {
+  const db = useFirestore();
+  const statsRef = useMemo(() => (db ? doc(db, "settings", "stats") : null), [db]);
+  const { data: stats } = useDoc<any>(statsRef);
+
+  // REGISTRY LIVE AUDIT
+  const liveStats = useMemo(() => {
+    const qCount = stats?.totalQuestions || 10000;
+    const boardCount = stats?.totalBoards || 50;
+
+    const format = (n: number) => n >= 1000 ? `${(n/1000).toFixed(0)}K+` : n.toString();
+
+    return {
+      portals: format(boardCount),
+      questions: format(qCount),
+      verified: "100%",
+      reports: "Live"
+    };
+  }, [stats]);
+
   return (
     <section className="relative w-full bg-[#0A0E1A] bg-radial-at-t from-gray-900 via-[#0A0E1A] to-[#0A0E1A] font-body text-left overflow-hidden min-h-[600px] lg:min-h-[800px] flex flex-col justify-center">
       
@@ -70,7 +90,6 @@ export default function Hero() {
 
           {/* RIGHT: INTERACTIVE EXAM PORTALS */}
           <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
-             {/* Subtle background branding behind cards */}
              <div className="absolute -inset-4 bg-orange-500/5 blur-3xl rounded-full pointer-events-none"></div>
 
              <ExamPortalCard 
@@ -111,10 +130,10 @@ export default function Hero() {
         {/* 2. TRUST REGISTRY STRIP */}
         <section className="mt-16 md:mt-24 w-full">
            <div className="w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 md:p-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center shadow-2xl backdrop-blur-md">
-              <TrustNode val="50+" label="Specialized Portals" />
-              <TrustNode val="10K+" label="State Level Questions" />
-              <TrustNode val="100%" label="Verified Solutions" />
-              <TrustNode val="Live" label="State Ranking Reports" />
+              <TrustNode val={liveStats.portals} label="Specialized Portals" />
+              <TrustNode val={liveStats.questions} label="State Level Questions" />
+              <TrustNode val={liveStats.verified} label="Verified Solutions" />
+              <TrustNode val={liveStats.reports} label="State Ranking Reports" />
            </div>
         </section>
       </div>
