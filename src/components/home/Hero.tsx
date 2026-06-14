@@ -9,8 +9,9 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened Screenshot-Matched Hero Hub v87.0.
- * UPDATED: Background image aligned to the TOP RIGHT (object-right-top) to sit flush with the header.
+ * @fileOverview Hardened Screenshot-Matched Hero Hub v88.0.
+ * UPDATED: Content hub moved up (reduced pt).
+ * UPDATED: Background width increased to 65% for better fill.
  * FIXED: Maintained object-contain for "Full Visibility" of the Golden Temple.
  */
 
@@ -20,8 +21,8 @@ export default function Hero() {
   return (
     <section className="relative w-full min-h-[600px] lg:min-h-[750px] bg-[#0B0F19] flex flex-col justify-start overflow-hidden font-body text-left">
       
-      {/* 1. BACKGROUND LAYERS - FULL VISIBILITY RIGHT SIDE, ALIGNED TO TOP */}
-      <div className="absolute top-0 right-0 w-full lg:w-[50%] h-[350px] lg:h-full z-0 pointer-events-none">
+      {/* 1. BACKGROUND LAYERS - EXPANDED RIGHT SIDE, ALIGNED TO TOP */}
+      <div className="absolute top-0 right-0 w-full lg:w-[65%] h-[350px] lg:h-full z-0 pointer-events-none">
         <img 
           src={templeImg} 
           alt="Golden Temple" 
@@ -29,13 +30,13 @@ export default function Hero() {
           referrerPolicy="no-referrer"
         />
         {/* Cinematic Gradient: Fades from solid navy on the left to transparent on the right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/40 to-transparent lg:block hidden" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/20 to-transparent lg:block hidden" />
         {/* Mobile Gradient: Fades bottom to top */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-transparent to-transparent lg:hidden" />
       </div>
 
-      {/* 2. MAIN CONTENT HUB - LEFT ANCHORED */}
-      <div className="container mx-auto px-6 relative z-10 max-w-7xl pt-12 md:pt-24 lg:pt-32">
+      {/* 2. MAIN CONTENT HUB - LEFT ANCHORED, MOVED UP */}
+      <div className="container mx-auto px-6 relative z-10 max-w-7xl pt-6 md:pt-12 lg:pt-10">
         <div className="max-w-3xl space-y-6 md:space-y-8 text-left">
           
            {/* BRAND BADGE */}
