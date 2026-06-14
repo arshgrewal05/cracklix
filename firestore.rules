@@ -3,8 +3,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     /**
-     * @fileOverview Hardened Institutional Security Protocol v5.0.
+     * @fileOverview Hardened Institutional Security Protocol v5.1.
      * PROTECTS: Student PII, Payment Requests, and Master Content Nodes.
+     * UPDATED: Allowed students to update their own results for re-take support.
      */
 
     function isAuthenticated() {
@@ -76,9 +77,10 @@ service cloud.firestore {
     }
 
     match /results/{resultId} {
+      // ID format: {userId}_{mockId}
       allow read: if isAuthenticated() && (resultId.split('_')[0] == request.auth.uid || isAdmin());
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAdmin();
+      allow create, update: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || resultId.split('_')[0] == request.auth.uid);
+      allow delete: if isAdmin();
     }
 
     match /bookmarks/{bId} {

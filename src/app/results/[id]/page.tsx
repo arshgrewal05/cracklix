@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect, Suspense } from "react"
@@ -21,7 +22,7 @@ import {
   AlertCircle,
   Users
 } from "lucide-react"
-import { useUser, useFirestore, useCollection } from "@/firebase"
+import { useUser, useFirestore, useCollection, useDoc } from "@/firebase"
 import { collection, query, where, doc, getDoc, documentId, getDocs, limit } from "firebase/firestore"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
@@ -30,9 +31,9 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import StudentAvatar from "@/components/brand/StudentAvatar"
 
 /**
- * @fileOverview Test Results Hub v30.1 (Production Hardened).
- * FIXED: ReferenceError resolved by exposing merit list from analytical memo.
- * DEFENSIVE: Robust handling for missing results and malformed session data.
+ * @fileOverview Test Results Hub v31.0 (Production Hardened).
+ * UPDATED: Uses useDoc for real-time result reactivity to prevent race conditions with attempt completion.
+ * FIXED: Accurate student identification in merit list.
  */
 
 export default function ResultPage() {
@@ -46,50 +47,25 @@ export default function ResultPage() {
 function ResultContent() {
   const params = useParams()
   const router = useRouter()
-  const resultId = params.id as string
+  const mockId = params.id as string
   const db = useFirestore()
   const { user, profile } = useUser()
   const { toast } = useToast()
 
   const [questions, setQuestions] = useState<any[]>([])
   const [mockData, setMockData] = useState<any>(null)
-  const [loadingContent, setLoadingContent] = useState(true)
+  const [loadingQuestions, setLoadingQuestions] = useState(true)
   const [activeReviewFilter, setActiveReviewFilter] = useState<'ALL' | 'CORRECT' | 'WRONG' | 'SKIPPED'>('ALL')
-  const [sessionData, setSessionData] = useState<any>(null);
 
-  // 1. Hardened Result Node Fetching
-  useEffect(() => {
-    async function fetchResult() {
-      if (!db || !user || !resultId) return;
-      setLoadingContent(true);
-      
-      try {
-        const docRef = doc(db, "results", resultId);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-           setSessionData(docSnap.data());
-        } else {
-           // Fallback: Check for {userId}_{mockId} composite or search by mockId
-           const q = query(collection(db, "results"), where("userId", "==", user.uid), where("mockId", "==", resultId), limit(1));
-           const snap = await getDocs(q);
-           if (!snap.empty) {
-              setSessionData(snap.docs[0].data());
-           }
-        }
-      } catch (e) {
-        console.error("[RESULT_FETCH_ERROR]:", e);
-      }
-    }
-    fetchResult();
-  }, [db, user, resultId]);
+  // 1. Reactive Result Node Fetching
+  const resultRef = useMemo(() => (db && user && mockId ? doc(db, "results", `${user.uid}_${mockId}`) : null), [db, user, mockId]);
+  const { data: sessionData, loading: resultLoading } = useDoc<any>(resultRef);
 
   // 2. Fetch Global Benchmarks
-  const mockIdForRank = sessionData?.mockId || resultId;
   const globalResultsQuery = useMemo(() => {
-    if (!db || !mockIdForRank) return null
-    return query(collection(db, "results"), where("mockId", "==", mockIdForRank), limit(300))
-  }, [db, mockIdForRank])
+    if (!db || !mockId) return null
+    return query(collection(db, "results"), where("mockId", "==", mockId), limit(300))
+  }, [db, mockId])
 
   const { data: rawGlobalResults } = useCollection<any>(globalResultsQuery)
 
@@ -115,9 +91,9 @@ function ResultContent() {
   // 3. Question Node Hydration
   useEffect(() => {
     async function loadQuestions() {
-      if (!db || !sessionData?.mockId) return;
+      if (!db || !mockId) return;
       try {
-        const mockSnap = await getDoc(doc(db, "mocks", sessionData.mockId))
+        const mockSnap = await getDoc(doc(db, "mocks", mockId))
         if (mockSnap.exists()) {
           const mData = mockSnap.data();
           setMockData(mData);
@@ -134,11 +110,11 @@ function ResultContent() {
       } catch (e) {
         console.error("[QUESTION_HYDRATION_ERROR]:", e);
       } finally { 
-        setLoadingContent(false) 
+        setLoadingQuestions(false) 
       }
     }
     loadQuestions()
-  }, [db, sessionData]);
+  }, [db, mockId]);
 
   const filteredQuestions = useMemo(() => {
      if (!sessionData) return [];
@@ -153,7 +129,7 @@ function ResultContent() {
      });
   }, [questions, sessionData, activeReviewFilter]);
 
-  if (loadingContent && !sessionData) return (
+  if (resultLoading || (loadingQuestions && questions.length === 0)) return (
      <div className="h-screen w-full flex flex-col items-center justify-center bg-white space-y-6">
         <Loader2 className="h-10 w-10 text-primary animate-spin" />
         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Auditing Session Node...</p>
