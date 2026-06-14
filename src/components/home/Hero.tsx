@@ -4,34 +4,21 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, GraduationCap, Landmark, ShieldCheck, Star, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Rebuilt Hero Hub v105.0 (High-Fidelity Desktop).
- * FEATURES: 2-Column Desktop Grid, Golden Temple Background (Right), 4-Card Portal Hub.
+ * @fileOverview Official Rebuilt Hero Hub v110.0 (Background Removed).
+ * UPDATED: Removed the Golden Temple background as requested.
+ * FEATURES: 2-Column Desktop Grid with 4-card Portal Hub and radial theme.
  */
 
 export default function Hero() {
-  const goldenTempleImg = "https://i.ibb.co/LXgcLVVq/Gemini-Generated-Image-n1so6on1so6on1so.png";
-
   return (
-    <section className="relative w-full bg-[#0A0E1A] font-body text-left overflow-hidden min-h-[600px] lg:min-h-[800px] flex flex-col justify-center">
+    <section className="relative w-full bg-[#0A0E1A] bg-radial-at-t from-gray-900 via-[#0A0E1A] to-[#0A0E1A] font-body text-left overflow-hidden min-h-[600px] lg:min-h-[800px] flex flex-col justify-center">
       
-      {/* 1. ATMOSPHERIC BACKGROUND NODE (RIGHT SIDE ANCHOR) */}
-      <div className="absolute top-0 right-0 w-full lg:w-[65%] h-full z-0 overflow-hidden pointer-events-none select-none">
-         <div className="absolute inset-0 bg-gradient-to-r from-[#0A0E1A] via-[#0A0E1A]/40 to-transparent z-10" />
-         <img 
-            src={goldenTempleImg} 
-            alt="Golden Temple Punjab" 
-            className="w-full h-full object-cover lg:object-contain lg:object-right-top opacity-60 lg:opacity-100"
-            referrerPolicy="no-referrer"
-         />
-      </div>
-
-      {/* 2. MAIN CONTENT HUB */}
+      {/* 1. MAIN CONTENT HUB */}
       <div className="container mx-auto px-4 md:px-6 max-w-7xl relative z-20 pt-10 lg:pt-0">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
@@ -42,7 +29,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] md:text-xs font-black uppercase tracking-wider mx-auto lg:mx-0 shadow-2xl"
             >
-              ★ #1 PUNJAB PREP PLATFORM
+              🎯 DEDICATED PUNJAB EXAMS PORTAL
             </motion.div>
 
             <motion.div 
@@ -53,7 +40,7 @@ export default function Hero() {
             >
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1] uppercase">
                 PREPARE SMARTER.<br />
-                <span className="bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent italic">SCORE HIGHER.</span>
+                <span className="bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent italic">ACHIEVE HIGHER.</span>
               </h1>
             </motion.div>
 
@@ -73,16 +60,19 @@ export default function Hero() {
               className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2"
             >
               <Button asChild className="w-full sm:w-auto h-14 md:h-16 px-8 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl shadow-2xl shadow-orange-500/20 transition-all border-none group">
-                <Link href="/exams" className="flex items-center gap-2">Choose Your Exam Hub <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></Link>
+                <Link href="/exams" className="flex items-center gap-2">Choose Your Exam Portal <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></Link>
               </Button>
-              <Button asChild className="w-full sm:w-auto h-14 md:h-16 px-8 bg-white text-[#0A0E1A] hover:bg-slate-100 font-black uppercase text-[10px] md:text-xs rounded-xl shadow-xl transition-all border-none">
-                <Link href="/mocks">Free Mock Tests</Link>
+              <Button asChild className="w-full sm:w-auto h-14 md:h-16 px-8 bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 font-black uppercase text-[10px] md:text-xs rounded-xl shadow-xl transition-all border-none">
+                <Link href="/mocks">Explore Free Mocks</Link>
               </Button>
             </motion.div>
           </div>
 
-          {/* RIGHT: INTERACTIVE EXAM PORTALS (OVER TEMPLE) */}
+          {/* RIGHT: INTERACTIVE EXAM PORTALS */}
           <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
+             {/* Subtle background branding behind cards */}
+             <div className="absolute -inset-4 bg-orange-500/5 blur-3xl rounded-full pointer-events-none"></div>
+
              <ExamPortalCard 
                emoji="📝" 
                tag="PSSSB" 
@@ -118,7 +108,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* 3. TRUST REGISTRY STRIP */}
+        {/* 2. TRUST REGISTRY STRIP */}
         <section className="mt-16 md:mt-24 w-full">
            <div className="w-full bg-white/5 border border-white/10 rounded-[2rem] p-6 md:p-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center shadow-2xl backdrop-blur-md">
               <TrustNode val="50+" label="Specialized Portals" />
@@ -157,7 +147,7 @@ function ExamPortalCard({ emoji, tag, title, desc, color, href }: any) {
           <h3 className="text-xl font-black text-white uppercase tracking-tight leading-tight">{title}</h3>
           <p className="text-xs text-slate-400 leading-relaxed font-medium line-clamp-2">{desc}</p>
        </div>
-       <Button asChild className="mt-8 w-full py-6 bg-white/5 border border-white/5 group-hover:bg-white text-slate-400 group-hover:text-black font-black uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-sm">
+       <Button asChild className="mt-8 w-full py-6 bg-white/5 border border-white/5 group-hover:bg-white text-slate-400 group-hover:text-black font-black uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-sm border-none">
           <Link href={href}>Start Practice</Link>
        </Button>
     </motion.div>
