@@ -8,9 +8,9 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened Unified Hero v12.0.
- * UPDATED: Reduced height and restored box text style for better legibility.
- * POSITIONING: Text in a dark box container at top-left. Map on left. Temple on right.
+ * @fileOverview Hardened Institutional Hero v15.0.
+ * UPDATED: Removed solid blue background; text box sits over Map (Left) and Temple (Right).
+ * SIZING: Focused 200px asset height for mobile.
  */
 
 export default function Hero() {
@@ -24,26 +24,26 @@ export default function Hero() {
   const punjabMap = "https://www.mapsofindia.com/maps/punjab/punjab-map.jpg";
 
   if (!mounted) {
-    return <section className="w-full bg-[#050B19] h-[400px]" />;
+    return <section className="w-full h-[400px] bg-white" />;
   }
 
   return (
-    <section className="relative w-full min-h-[450px] md:min-h-[600px] bg-[#050B19] overflow-hidden flex flex-col">
+    <section className="relative w-full overflow-hidden flex flex-col bg-white">
       
-      {/* 1. UNIFIED BACKGROUND LAYER - SPLIT MAP/TEMPLE */}
-      <div className="absolute inset-0 z-0 flex h-[200px] md:h-full">
-         {/* LEFT SIDE: MAP HUB */}
-         <div className="relative w-full md:w-1/2 h-full bg-[#050B19]">
+      {/* 1. UNIFIED BACKGROUND HUB - NO SOLID BLUE */}
+      <div className="absolute top-0 left-0 right-0 h-[200px] md:h-[450px] z-0 flex pointer-events-none">
+         {/* LEFT SIDE: PUNJAB MAP NODE */}
+         <div className="relative w-full md:w-1/2 h-full overflow-hidden bg-slate-50">
             <img 
               src={punjabMap} 
-              className="w-full h-full object-cover opacity-40 grayscale invert contrast-125" 
+              className="w-full h-full object-cover opacity-30 contrast-125 saturate-150 mix-blend-multiply" 
               alt="Punjab Map"
             />
-            {/* GRADIENT TO BLEND INTO BOX TEXT */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#050B19]/60 to-transparent" />
+            {/* SKY BLUE SHADING FOR TEXT CONTRAST */}
+            <div className="absolute inset-0 bg-gradient-to-r from-sky-100/40 via-transparent to-transparent" />
          </div>
          
-         {/* RIGHT SIDE: TEMPLE HUB - CLEAR AND UNIFORM */}
+         {/* RIGHT SIDE: GOLDEN TEMPLE NODE - CLEAR VISIBILITY */}
          <div className="relative w-full md:w-1/2 h-full">
             <img 
               src={goldenTempleImg} 
@@ -51,45 +51,43 @@ export default function Hero() {
               className="w-full h-full object-cover object-top"
               referrerPolicy="no-referrer"
             />
-            {/* SUBTLE BLEND TO MAP AREA */}
-            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050B19] to-transparent" />
          </div>
       </div>
 
-      {/* 2. CONTENT HUB - BOX TEXT RESTORED */}
-      <div className="container mx-auto px-4 md:px-16 max-w-7xl relative z-10 pt-6 md:pt-16 flex-1 flex flex-col">
+      {/* 2. CONTENT HUB - BOX TEXT OVER BACKGROUND */}
+      <div className="container mx-auto px-4 md:px-16 max-w-7xl relative z-10 pt-10 md:pt-16 flex-1 flex flex-col">
          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="max-w-2xl text-left space-y-6 md:space-y-8 bg-[#050B19]/80 backdrop-blur-md p-6 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border border-white/5 shadow-5xl"
+            className="max-w-xl text-left space-y-5 md:space-y-8 bg-[#050B19]/85 backdrop-blur-xl p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-white/10 shadow-5xl mt-[120px] md:mt-10"
          >
             {/* BRAND BADGE */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
                <Star className="h-3 w-3 text-primary fill-current" />
-               <span className="text-[8px] md:text-xs font-black text-white uppercase tracking-widest">#1 Punjab Exam Prep Node</span>
+               <span className="text-[8px] md:text-[10px] font-black text-white uppercase tracking-widest">#1 Punjab Exam Prep Node</span>
             </div>
 
             {/* HEADLINES */}
-            <div className="space-y-2 md:space-y-3">
-               <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-7xl font-headline font-black text-white leading-none tracking-tighter uppercase">
+            <div className="space-y-1.5 md:space-y-3">
+               <h1 className="text-[22px] sm:text-3xl md:text-5xl lg:text-6xl font-headline font-black text-white leading-none tracking-tighter uppercase">
                   PREPARE SMARTER.
                </h1>
-               <h1 className="text-[28px] sm:text-4xl md:text-6xl lg:text-7xl font-headline font-black text-primary leading-none tracking-tighter uppercase">
+               <h1 className="text-[22px] sm:text-3xl md:text-5xl lg:text-6xl font-headline font-black text-primary leading-none tracking-tighter uppercase">
                   SCORE HIGHER.
                </h1>
             </div>
 
-            <p className="text-slate-400 font-bold uppercase text-[9px] md:text-base tracking-[0.2em] max-w-lg leading-relaxed antialiased">
-               Punjab's most advanced CBT engine. <br className="hidden md:block" />
-               Verified by Arsh Grewal Management.
+            <p className="text-slate-400 font-bold uppercase text-[8px] md:text-sm tracking-[0.2em] max-w-md leading-relaxed antialiased">
+               Official CBT engine verified by <br className="hidden md:block" />
+               Arsh Grewal Management.
             </p>
 
             {/* ACTION BUTTONS */}
-            <div className="flex flex-wrap gap-4 pt-2">
-               <Button asChild className="h-12 md:h-16 px-8 md:px-10 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl shadow-3xl border-none transition-all active:scale-95">
-                  <Link href="/mocks">Start Free Mock <ArrowRight className="h-4 w-4" /></Link>
+            <div className="flex flex-wrap gap-3 pt-2">
+               <Button asChild className="h-11 md:h-16 px-6 md:px-10 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[9px] md:text-xs tracking-widest rounded-xl md:rounded-2xl shadow-3xl border-none transition-all active:scale-95">
+                  <Link href="/mocks">Start Free Mock <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
                </Button>
-               <Button asChild variant="outline" className="h-12 md:h-16 px-8 md:px-10 border-white/20 bg-white/5 text-white hover:bg-white/10 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-95">
+               <Button asChild variant="outline" className="h-11 md:h-16 px-6 md:px-10 border-white/20 bg-white/5 text-white hover:bg-white/10 font-black uppercase text-[9px] md:text-xs tracking-widest rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-95">
                   <Link href="/exams">Explore Exams</Link>
                </Button>
             </div>
@@ -97,7 +95,7 @@ export default function Hero() {
       </div>
 
       {/* 3. INSTITUTIONAL STATS HUB - BOTTOM ANCHORED */}
-      <div className="w-full bg-[#050B19] py-8 md:py-12 border-t border-white/5 mt-6">
+      <div className="w-full bg-white py-12 md:py-20 border-t border-slate-50 mt-10 md:mt-20">
          <div className="container mx-auto px-4 md:px-16 max-w-7xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                <StatCard icon={<BookOpen />} label="QUESTIONS" val="50k+" color="text-blue-500" />
@@ -113,13 +111,13 @@ export default function Hero() {
 
 function StatCard({ icon, label, val, color }: any) {
    return (
-      <div className="p-4 md:p-6 bg-white/[0.02] border border-white/5 rounded-[1.2rem] md:rounded-[2rem] space-y-2 shadow-inner group hover:bg-white/[0.04] transition-all text-left">
-         <div className={cn("h-7 w-7 md:h-10 md:w-10 rounded-lg bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform", color)}>
-            {React.cloneElement(icon, { className: "h-3.5 w-3.5 md:h-5 md:w-5" })}
+      <div className="p-4 md:p-8 bg-slate-50 border border-slate-100 rounded-[1.5rem] md:rounded-[2.5rem] space-y-3 shadow-inner group hover:bg-white hover:shadow-xl transition-all text-left">
+         <div className={cn("h-8 w-8 md:h-12 md:w-12 rounded-xl bg-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm", color)}>
+            {React.cloneElement(icon, { className: "h-4 w-4 md:h-6 md:w-6" })}
          </div>
          <div className="space-y-0.5">
-            <p className="text-lg md:text-3xl font-headline font-black text-white leading-none tracking-tighter">{val}</p>
-            <p className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">{label}</p>
+            <p className="text-xl md:text-4xl font-headline font-black text-[#0F172A] leading-none tracking-tighter">{val}</p>
+            <p className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
          </div>
       </div>
    )
