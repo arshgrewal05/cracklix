@@ -1,16 +1,17 @@
+
 'use client';
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, BookOpen, ClipboardList, ShieldCheck, BarChart3, ArrowRight } from "lucide-react";
+import { Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official High-Fidelity Hero Center v41.0.
- * UPDATED: Exact replica of the user-provided screenshot.
- * FEATURES: Multi-layer background (Temple + Map), High-density metrics, and exact typography.
+ * @fileOverview Official High-Fidelity Hero Center v42.0.
+ * UPDATED: Removed metric cards at the bottom to focus strictly on the map border identity as requested.
+ * FEATURES: Multi-layer background (Temple + Map), Precision typography.
  */
 
 export default function Hero() {
@@ -18,7 +19,7 @@ export default function Hero() {
   const punjabMap = "https://www.mapsofindia.com/maps/punjab/punjab-map.jpg";
 
   return (
-    <section className="relative w-full min-h-[650px] lg:min-h-[800px] bg-[#0B1528] flex flex-col justify-center overflow-hidden font-body">
+    <section className="relative w-full min-h-[600px] lg:min-h-[750px] bg-[#0B1528] flex flex-col justify-center overflow-hidden font-body">
       
       {/* 1. BACKGROUND LAYERS */}
       <div className="absolute inset-0 z-0">
@@ -30,7 +31,7 @@ export default function Hero() {
               className="w-full h-full object-cover object-center lg:object-right"
               referrerPolicy="no-referrer"
            />
-           {/* FADE OVERLAY FOR BLENDING (Matches Screenshot's deep navy left transition) */}
+           {/* FADE OVERLAY FOR BLENDING */}
            <div className="absolute inset-0 bg-gradient-to-r from-[#0B1528] via-[#0B1528]/85 to-transparent lg:block hidden" />
            <div className="absolute inset-0 bg-gradient-to-t from-[#0B1528] via-transparent to-transparent lg:hidden" />
         </div>
@@ -46,10 +47,10 @@ export default function Hero() {
       </div>
 
       {/* 2. MAIN CONTENT HUB */}
-      <div className="container mx-auto px-6 relative z-10 max-w-7xl pt-24 pb-12 lg:py-0">
+      <div className="container mx-auto px-6 relative z-10 max-w-7xl pt-24 pb-20">
         <div className="max-w-4xl space-y-6 md:space-y-8 text-left">
           
-           {/* BRAND BADGE (Replicated from Screenshot) */}
+           {/* BRAND BADGE */}
            <motion.div 
              initial={{ opacity: 0, y: 10 }}
              animate={{ opacity: 1, y: 0 }}
@@ -61,7 +62,7 @@ export default function Hero() {
               </span>
            </motion.div>
 
-           {/* HEADLINES (Heavy weight and exact orange match) */}
+           {/* HEADLINES */}
            <motion.div 
              initial={{ opacity: 0, x: -20 }}
              animate={{ opacity: 1, x: 0 }}
@@ -76,7 +77,7 @@ export default function Hero() {
               </h1>
            </motion.div>
 
-           {/* SUBTEXT (Exact phrasing from user image) */}
+           {/* SUBTEXT */}
            <motion.p 
              initial={{ opacity: 0 }}
              animate={{ opacity: 1 }}
@@ -87,7 +88,7 @@ export default function Hero() {
               ik hi Platform te.
            </motion.p>
 
-           {/* ACTIONS (Exact Button Styling) */}
+           {/* ACTIONS */}
            <motion.div 
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
@@ -104,52 +105,7 @@ export default function Hero() {
               </Button>
            </motion.div>
         </div>
-
-        {/* 3. METRIC CARDS GRID (Exact Replica of Bottom Cards) */}
-        <div className="mt-20 md:mt-32 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-           <MetricCard 
-             icon={<BookOpen />} 
-             value="10,000+" 
-             label="Practice Questions" 
-             iconColor="text-blue-400"
-           />
-           <MetricCard 
-             icon={<ClipboardList />} 
-             value="500+" 
-             label="Mock Tests" 
-             iconColor="text-[#F97316]"
-           />
-           <MetricCard 
-             icon={<ShieldCheck />} 
-             value="50+" 
-             label="Exams Covered" 
-             iconColor="text-emerald-400"
-           />
-           <MetricCard 
-             icon={<BarChart3 />} 
-             value="Detailed" 
-             label="Analytics" 
-             iconColor="text-indigo-400"
-           />
-        </div>
       </div>
     </section>
-  );
-}
-
-function MetricCard({ icon, value, label, iconColor }: { icon: React.ReactNode, value: string, label: string, iconColor: string }) {
-  return (
-    <motion.div 
-       whileHover={{ y: -5, backgroundColor: "rgba(255,255,255,0.08)" }}
-       className="bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-2xl p-5 md:p-8 flex items-center gap-4 md:gap-6 shadow-2xl transition-all"
-    >
-       <div className={cn("h-10 w-10 md:h-14 md:w-14 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0 shadow-inner", iconColor)}>
-          {React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 md:h-7 md:w-7" })}
-       </div>
-       <div className="text-left space-y-0.5">
-          <p className="text-lg md:text-2xl font-headline font-black text-white leading-none">{value}</p>
-          <p className="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-tight">{label}</p>
-       </div>
-    </motion.div>
   );
 }

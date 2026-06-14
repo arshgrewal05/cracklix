@@ -3,21 +3,20 @@
 
 import { useMemo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Smartphone, CheckCircle2, Map as MapIcon, Globe, ShieldCheck } from "lucide-react";
+import { Smartphone, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Apple, Play } from "lucide-react";
 import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Regional Hub Section v10.5.
- * UPDATED: Removed redundant PWA "INSTALL APP" button and Guide card ("delete karo").
+ * @fileOverview Regional Hub Section v11.0.
+ * UPDATED: Removed detail boxes and second map hub to focus only on the Punjab map visuals as requested.
  */
 
 export default function AppPreview() {
   const db = useFirestore();
   const punjabMap = "https://www.mapsofindia.com/maps/punjab/punjab-map.jpg";
-  const indiaMap = "https://www.mapsofindia.com/images2/india-map.jpg";
 
   const { data: settings } = useDoc<any>(useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]));
 
@@ -67,40 +66,20 @@ export default function AppPreview() {
           </motion.div>
 
           <div className="space-y-12 md:space-y-16 mt-12 lg:mt-0">
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 relative">
+             <div className="relative flex justify-center">
                 <motion.div 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  className="group flex flex-col items-center gap-4 md:gap-6"
+                  className="w-full max-w-[500px]"
                 >
-                   <div className="w-full h-auto min-h-[250px] md:min-h-[350px] relative rounded-3xl group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
-                      <img src={punjabMap} className="w-full h-full object-contain" referrerPolicy="no-referrer" alt="Punjab Hub" />
-                   </div>
-                   <div className="flex items-center gap-4 px-6 md:px-8 py-3 bg-white border border-slate-100 rounded-2xl shadow-xl transition-all hover:border-primary/20 w-full sm:w-auto">
-                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><MapIcon className="h-4 w-4" /></div>
-                      <div className="text-left">
-                         <p className="text-[10px] font-black uppercase text-[#0F172A] tracking-[0.2em] leading-none">Punjab Hub</p>
-                         <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">State Exams Covered</p>
-                      </div>
-                   </div>
-                </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="group flex flex-col items-center gap-4 md:gap-6 sm:mt-12"
-                >
-                   <div className="w-full h-auto min-h-[250px] md:min-h-[350px] relative rounded-3xl group-hover:scale-105 transition-transform duration-700 flex items-center justify-center">
-                      <img src={indiaMap} className="w-full h-full object-contain" referrerPolicy="no-referrer" alt="National Hub" />
-                   </div>
-                   <div className="flex items-center gap-4 px-6 md:px-8 py-3 bg-white border border-slate-100 rounded-2xl shadow-xl transition-all hover:border-blue-200 w-full sm:w-auto">
-                      <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500"><Globe className="h-4 w-4" /></div>
-                      <div className="text-left">
-                         <p className="text-[10px] font-black uppercase text-[#0F172A] tracking-[0.2em] leading-none">National Hub</p>
-                         <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">Central Exams Covered</p>
-                      </div>
+                   <div className="w-full h-auto min-h-[300px] md:min-h-[450px] relative rounded-[3rem] overflow-hidden flex items-center justify-center">
+                      <img 
+                        src={punjabMap} 
+                        className="w-full h-full object-contain grayscale-[0.2] contrast-[1.1] hover:scale-105 transition-transform duration-1000" 
+                        referrerPolicy="no-referrer" 
+                        alt="Punjab Hub Map" 
+                      />
                    </div>
                 </motion.div>
              </div>
