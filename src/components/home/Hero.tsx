@@ -9,9 +9,9 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened Screenshot-Matched Hero Hub v82.0.
- * UPDATED: Shrunken desktop background width to 45% for a refined institutional profile.
- * FIXED: Precise button sequence (Orange/White/Dark) and metric data (439+/8+/92+/5+).
+ * @fileOverview Hardened Screenshot-Matched Hero Hub v85.0.
+ * UPDATED: Background width set to 55% for "Full Visibility" of the Golden Temple on the right.
+ * FIXED: Institutional text anchored to the left with high-contrast buttons and metrics.
  */
 
 export default function Hero() {
@@ -20,21 +20,21 @@ export default function Hero() {
   return (
     <section className="relative w-full min-h-[600px] lg:min-h-[750px] bg-[#0B0F19] flex flex-col justify-start overflow-hidden font-body text-left">
       
-      {/* 1. BACKGROUND LAYERS - RIGHT ALIGNED & COMPRESSED ON DESKTOP */}
-      <div className="absolute top-0 right-0 w-full lg:w-[45%] h-[200px] lg:h-full z-0 pointer-events-none">
+      {/* 1. BACKGROUND LAYERS - FULL VISIBILITY RIGHT SIDE */}
+      <div className="absolute top-0 right-0 w-full lg:w-[55%] h-[200px] lg:h-full z-0 pointer-events-none">
         <img 
           src={templeImg} 
           alt="Golden Temple" 
-          className="w-full h-full object-cover object-right-bottom opacity-80"
+          className="w-full h-full object-cover object-right-bottom"
           referrerPolicy="no-referrer"
         />
-        {/* Gradient for desktop: Left edge of image container fades from navy to transparent */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/40 to-transparent lg:block hidden" />
-        {/* Gradient for mobile: Bottom edge fades into content area */}
+        {/* Cinematic Gradient: Fades from solid navy on the left to transparent on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/20 to-transparent lg:block hidden" />
+        {/* Mobile Gradient: Fades bottom to top */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-transparent to-transparent lg:hidden" />
       </div>
 
-      {/* 2. MAIN CONTENT HUB */}
+      {/* 2. MAIN CONTENT HUB - LEFT ANCHORED */}
       <div className="container mx-auto px-6 relative z-10 max-w-7xl pt-12 md:pt-24 lg:pt-32">
         <div className="max-w-3xl space-y-6 md:space-y-8 text-left">
           
@@ -52,17 +52,17 @@ export default function Hero() {
               </span>
            </motion.div>
 
-           {/* HEADLINES - MAINTAINING CURRENT SCALE */}
+           {/* HEADLINES */}
            <motion.div 
              initial={{ opacity: 0, x: -20 }}
              animate={{ opacity: 1, x: 0 }}
              transition={{ delay: 0.1 }}
              className="space-y-1"
            >
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-headline font-black text-white leading-none tracking-tighter uppercase">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-black text-white leading-none tracking-tighter uppercase">
                  PREPARE SMARTER.
               </h1>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-headline font-black text-[#F97316] leading-none tracking-tighter uppercase">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-black text-[#F97316] leading-none tracking-tighter uppercase">
                  SCORE HIGHER.
               </h1>
            </motion.div>
@@ -72,7 +72,7 @@ export default function Hero() {
              initial={{ opacity: 0 }}
              animate={{ opacity: 1 }}
              transition={{ delay: 0.2 }}
-             className="text-sm md:text-xl lg:text-2xl text-slate-300 font-medium max-w-xl leading-relaxed antialiased"
+             className="text-sm md:text-lg lg:text-xl text-slate-300 font-medium max-w-xl leading-relaxed antialiased"
            >
               Punjab Government Exams di Complete Preparation ik hi Center te, Latest Official Patterns de Naal.
            </motion.p>
@@ -107,7 +107,7 @@ export default function Hero() {
               </Button>
            </motion.div>
 
-           {/* METRICS REGISTRY - EXACT SCREENSHOT DATA (439+/8+/92+/5+) */}
+           {/* METRICS REGISTRY - 4-COLUMN GLASSMORPHISM */}
            <motion.div 
              initial={{ opacity: 0, y: 30 }}
              animate={{ opacity: 1, y: 0 }}
