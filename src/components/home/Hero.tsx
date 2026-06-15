@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useEffect, useState } from "react";
@@ -26,9 +27,9 @@ import { doc } from "firebase/firestore";
 import { Badge } from "@/components/ui/badge";
 
 /**
- * @fileOverview Majestic High-Fidelity Hero Hub v8.0.
- * FIXED: Hook order consistency to prevent "Rendered more hooks" error.
- * RECREATED: Exact match to image_0.png with floating cards and curvy dotted paths.
+ * @fileOverview Majestic High-Fidelity Hero Hub v9.0.
+ * FIXED: Resolved right-side clipping of floating cards.
+ * UPDATED: Reduced label text size and switched to sentence case for a modern look.
  */
 
 export default function Hero() {
@@ -50,14 +51,13 @@ export default function Hero() {
     };
 
     return [
-      { id: 'q', icon: <Zap className="text-white h-6 w-6" />, val: formatNumber(stats?.totalQuestions, "50K+"), label: "Questions", sub: "Verified Patterns", color: "bg-blue-600" },
-      { id: 'm', icon: <ClipboardList className="text-white h-6 w-6" />, val: formatNumber(stats?.totalMocks, "500+"), label: "Mock Tests", sub: "Bilingual Hub", color: "bg-purple-600" },
-      { id: 'e', icon: <CheckCircle2 className="text-white h-6 w-6" />, val: formatNumber(stats?.totalBoards, "50+"), label: "Exams", sub: "Punjab Verticals", color: "bg-green-600" },
-      { id: 'u', icon: <Users className="text-white h-6 w-6" />, val: formatNumber(stats?.totalUsers, "15K+"), label: "Aspirants", sub: "Trusted Network", color: "bg-orange-600" }
+      { id: 'q', icon: <Zap className="text-white h-5 w-5" />, val: formatNumber(stats?.totalQuestions, "50K+"), label: "Questions", sub: "Verified Patterns", color: "bg-blue-600" },
+      { id: 'm', icon: <ClipboardList className="text-white h-5 w-5" />, val: formatNumber(stats?.totalMocks, "500+"), label: "Mock Tests", sub: "Bilingual Hub", color: "bg-purple-600" },
+      { id: 'e', icon: <CheckCircle2 className="text-white h-5 w-5" />, val: formatNumber(stats?.totalBoards, "50+"), label: "Exams", sub: "Punjab Verticals", color: "bg-green-600" },
+      { id: 'u', icon: <Users className="text-white h-5 w-5" />, val: formatNumber(stats?.totalUsers, "15K+"), label: "Aspirants", sub: "Trusted Network", color: "bg-orange-600" }
     ];
   }, [stats]);
 
-  // Safety Return after all hooks are initialized
   if (!mounted) return <div className="min-h-[700px] bg-[#F8FAFC]" />;
 
   return (
@@ -69,7 +69,7 @@ export default function Hero() {
          <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[50%] bg-indigo-50/50 blur-[100px] rounded-full" />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           
           {/* LEFT COLUMN: BRANDING & CTA */}
@@ -147,7 +147,7 @@ export default function Hero() {
                 <path d="M450 150C500 200 500 300 450 350" stroke="#2563EB" strokeWidth="2" strokeDasharray="6 6" />
              </svg>
 
-             <div className="relative w-full">
+             <div className="relative w-full max-w-[500px]">
                 {/* GLOW EFFECT */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] bg-blue-500/5 blur-[80px] rounded-full" />
                 
@@ -158,44 +158,44 @@ export default function Hero() {
                   transition={{ duration: 0.8 }}
                   src="/images/hero-student.png"
                   alt="Cracklix Student"
-                  className="w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[520px] xl:max-w-[620px] mx-auto object-contain relative z-10 drop-shadow-2xl"
+                  className="w-full max-w-[320px] md:max-w-[420px] mx-auto object-contain relative z-10 drop-shadow-2xl"
                   onError={(e) => {
                      (e.target as HTMLImageElement).src = "https://picsum.photos/seed/student/800/800";
                   }}
                 />
 
-                {/* FLOATING ACTION CARDS */}
+                {/* FLOATING ACTION CARDS - RE-CALIBRATED POSITIONING */}
                 <FloatingCard 
-                   icon={<ClipboardList className="text-blue-600 h-5 w-5" />} 
-                   label="Mock Tests" 
-                   className="top-[10%] left-[0%] md:left-[-5%]" 
+                   icon={<ClipboardList className="text-blue-600 h-4 w-4" />} 
+                   label="Mock tests" 
+                   className="top-[15%] left-[5%] md:left-[-5%]" 
                    delay={0.5} 
                    href="/mocks"
                    iconColor="bg-blue-50"
                 />
                 
                 <FloatingCard 
-                   icon={<Target className="text-purple-600 h-5 w-5" />} 
-                   label="Daily Practice" 
-                   className="bottom-[35%] left-[-5%] md:left-[-10%]" 
+                   icon={<Target className="text-purple-600 h-4 w-4" />} 
+                   label="Daily practice" 
+                   className="bottom-[30%] left-[2%] md:left-[-10%]" 
                    delay={0.7} 
                    href="/current-affairs"
                    iconColor="bg-purple-50"
                 />
                 
                 <FloatingCard 
-                   icon={<FileStack className="text-green-600 h-5 w-5" />} 
-                   label="Previous Papers" 
-                   className="top-[15%] right-[0%] md:right-[-5%]" 
+                   icon={<FileStack className="text-green-600 h-4 w-4" />} 
+                   label="Previous papers" 
+                   className="top-[18%] right-[5%] md:right-[-5%]" 
                    delay={0.6} 
                    href="/pyqs"
                    iconColor="bg-green-50"
                 />
                 
                 <FloatingCard 
-                   icon={<Trophy className="text-orange-600 h-5 w-5" />} 
-                   label="Punjab Exams" 
-                   className="bottom-[30%] right-[-5%] md:right-[-10%]" 
+                   icon={<Trophy className="text-orange-600 h-4 w-4" />} 
+                   label="Punjab exams" 
+                   className="bottom-[35%] right-[2%] md:right-[-10%]" 
                    delay={0.8} 
                    href="/exams"
                    iconColor="bg-orange-50"
@@ -251,11 +251,11 @@ function FloatingCard({ icon, label, className, delay, href, iconColor }: { icon
          className={cn("absolute z-[20] hidden sm:block", className)}
       >
          <Link href={href}>
-            <div className="bg-white rounded-2xl shadow-[0_10px_40px_-5px_rgba(0,0,0,0.1)] p-3 md:p-4 flex flex-col items-center gap-2 border border-white/50 backdrop-blur-sm group active:scale-95 transition-transform min-w-[120px] md:min-w-[140px]">
-               <div className={cn("h-10 w-10 md:h-12 md:w-12 rounded-xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform", iconColor)}>
+            <div className="bg-white rounded-2xl shadow-[0_10px_40px_-5px_rgba(0,0,0,0.1)] p-2.5 md:p-3.5 flex flex-col items-center gap-1.5 border border-white/50 backdrop-blur-sm group active:scale-95 transition-transform min-w-[110px] md:min-w-[130px]">
+               <div className={cn("h-8 w-8 md:h-10 md:w-10 rounded-xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform", iconColor)}>
                   {icon}
                </div>
-               <span className="font-black text-[9px] md:text-[10px] uppercase text-[#0F172A] tracking-[0.1em] text-center">{label}</span>
+               <span className="font-bold text-[9px] md:text-[10px] text-[#0F172A] tracking-tight text-center">{label}</span>
             </div>
          </Link>
       </motion.div>
