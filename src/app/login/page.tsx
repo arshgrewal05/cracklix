@@ -24,8 +24,8 @@ import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 
 /**
- * @fileOverview Optimized Login Hub v10.2 (Hardened).
- * UPDATED: Logo height shrunken to h-20/h-28 for a balanced login screen.
+ * @fileOverview Optimized Login Hub v11.0 (Hardened).
+ * UPDATED: Calibrated logo scaling to h-12/h-16 for a balanced premium feel.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -154,7 +154,9 @@ function LoginContent() {
     <div className="min-h-screen bg-[#020817] flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden text-white">
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full" />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="z-10 w-full max-w-md">
-        <div className="flex flex-col items-center mb-6 h-20 md:h-28 w-full"><Logo variant="light" imgClassName="h-full scale-100" /></div>
+        <div className="flex flex-col items-center mb-8 h-12 md:h-16 w-full">
+          <Logo variant="light" imgClassName="h-full" />
+        </div>
         <Card className="border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl rounded-[2rem] md:rounded-[2.5rem] overflow-hidden">
           <div className="h-1 w-full bg-primary" />
           <CardHeader className="text-center pt-8 md:pt-10">

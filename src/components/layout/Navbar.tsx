@@ -33,8 +33,8 @@ import Logo from "@/components/brand/Logo";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview High-Density Master Navbar Hub v51.0.
- * UPDATED: Integrated blue-indigo palette to match new Hero branding.
+ * @fileOverview High-Density Master Navbar Hub v52.0.
+ * UPDATED: Calibrated logo scaling and integrated blue-indigo palette.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -78,7 +78,7 @@ export default function Navbar() {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <Logo imgClassName="h-10 md:h-12" />
+            <Logo imgClassName="h-8 md:h-10" />
           </div>
 
           <div className="hidden xl:flex items-center gap-2">

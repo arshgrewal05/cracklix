@@ -61,7 +61,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
     <div className="flex flex-col h-full bg-[#0B1528] text-white overflow-y-auto no-scrollbar font-body select-none text-left pt-0">
       
       <div className="px-6 py-8 flex justify-start shrink-0">
-         <Logo imgClassName="h-12 origin-left" />
+         <Logo imgClassName="h-10 origin-left" />
       </div>
 
       <div className="px-6 flex flex-col gap-0 relative overflow-hidden shrink-0">
