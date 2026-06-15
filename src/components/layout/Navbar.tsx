@@ -19,12 +19,13 @@ import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Logo from "@/components/brand/Logo";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
  * @fileOverview Official Master Navbar Hub (Restored).
- * FIXED: Restored official background color for the logo node and verified visibility.
+ * FIXED: Restored original logo node and institutional navigation registry.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -53,7 +54,7 @@ export default function Navbar() {
 
   return (
     <div className="w-full sticky top-0 z-[1000] font-body">
-      {/* 1. ANNOUNCEMENT TICKER */}
+      {/* 1. ANNOUNCEMENT TICKER (Exam Gazette) */}
       <div className="w-full bg-gradient-to-r from-orange-600 to-amber-600 py-2 px-4 text-center text-[10px] md:text-xs font-black uppercase tracking-wider text-white shadow-md">
           🔥 Live Now: PSSSB Patwari, Clerk, & PSTET 2026 Free Mega Mock Drills! <Link href="/exams" className="underline ml-2">Select Your Exam ↓</Link>
       </div>
@@ -62,32 +63,27 @@ export default function Navbar() {
       <nav className="w-full border-b border-white/5 bg-[#0A0E1A]/95 backdrop-blur-md h-16 md:h-20 px-4 md:px-8 shadow-2xl flex items-center">
         <div className="container mx-auto max-w-7xl flex items-center justify-between h-full gap-4">
           
-          {/* Brand Identity */}
-          <div className="flex items-center gap-3 lg:gap-4 shrink-0">
+          {/* Brand Identity - Original Logo Restoration */}
+          <div className="flex items-center gap-3 lg:gap-4 shrink-0 h-full">
             <button 
               onClick={() => setIsSidebarOpen(true)} 
-              className="lg:hidden w-8 h-8 bg-white/5 text-white rounded-lg border border-white/10 flex items-center justify-center"
+              className="lg:hidden w-8 h-8 bg-white/5 text-white rounded-lg border border-white/10 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
             >
               <Menu className="h-4 w-4" />
             </button>
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                <span className="text-base md:text-xl font-black text-white italic">C</span>
-              </div>
-              <span className="text-lg md:text-2xl font-black tracking-tight text-white">Cracklix<span className="text-orange-500">.</span></span>
-            </Link>
+            <Logo imgClassName="h-10 md:h-12" />
           </div>
 
           {/* Authentication Portal Gateway */}
           <div className="flex items-center gap-3">
-             <Link href="/search" className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all">
+             <Link href="/search" className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all shadow-inner">
                 <Search className="h-4 w-4" />
              </Link>
 
              {user ? (
                <DropdownMenu>
                  <DropdownMenuTrigger asChild>
-                   <button className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white/10 overflow-hidden shadow-xl cursor-pointer bg-white">
+                   <button className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white/10 overflow-hidden shadow-xl cursor-pointer bg-white active:scale-95 transition-transform">
                       <StudentAvatar profile={profile} className="h-full w-full border-none" />
                    </button>
                  </DropdownMenuTrigger>
@@ -95,21 +91,21 @@ export default function Navbar() {
                     <DropdownMenuItem asChild className="px-4 py-3 cursor-pointer rounded-xl focus:bg-white/5">
                        <Link href="/profile" className="flex items-center gap-4">
                           <User className="h-5 w-5 text-blue-400" />
-                          <span className="font-bold text-sm uppercase">My Profile</span>
+                          <span className="font-bold text-sm uppercase tracking-tight">My Profile</span>
                        </Link>
                     </DropdownMenuItem>
                     {isAdmin && (
                       <DropdownMenuItem asChild className="px-4 py-3 cursor-pointer rounded-xl focus:bg-white/10 mt-1 border border-white/5">
                         <Link href="/admin" className="flex items-center gap-4 text-white">
                           <User className="h-5 w-5 text-rose-500" />
-                          <span className="font-bold text-sm uppercase">Admin Hub</span>
+                          <span className="font-bold text-sm uppercase tracking-tight text-rose-500">Admin Hub</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator className="bg-white/5 my-2" />
                     <DropdownMenuItem onClick={handleLogout} className="px-4 py-3 cursor-pointer rounded-xl focus:bg-rose-50/10 text-rose-500">
                        <LogOut className="h-5 w-5 shrink-0" />
-                       <span className="font-bold text-sm uppercase">Log Out</span>
+                       <span className="font-bold text-sm uppercase tracking-tight">Log Out</span>
                     </DropdownMenuItem>
                  </DropdownMenuContent>
                </DropdownMenu>
@@ -126,7 +122,7 @@ export default function Navbar() {
         <SheetContent side="left" className="p-0 border-none w-[300px] bg-[#0A0E1A] z-[2001]">
           <SheetHeader className="sr-only">
              <SheetTitle>Navigation Sidebar</SheetTitle>
-             <SheetDescription>Access preparation resources.</SheetDescription>
+             <SheetDescription>Access institutional preparation resources and exam verticals.</SheetDescription>
           </SheetHeader>
           <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
         </SheetContent>
