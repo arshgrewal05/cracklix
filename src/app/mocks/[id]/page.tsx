@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useMemo, useEffect, useState } from "react"
@@ -22,15 +23,15 @@ import {
   AlertCircle,
   Home,
   Target,
-  RefreshCw
+  RefreshCw,
+  Smartphone
 } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Individual Mock Gateway v28.0 (Ultra-Compact).
- * UPDATED: Shrunken typography and padding for absolute minimum screen coverage on mobile.
+ * @fileOverview Individual Mock Gateway v29.0 (Device Aware).
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -40,7 +41,7 @@ export default function MockOverviewPage() {
   const router = useRouter()
   const pathname = usePathname()
   const db = useFirestore()
-  const { user, profile, loading: userLoading } = useUser()
+  const { user, profile, loading: userLoading, isDeviceAuthorized } = useUser()
   const mockId = params.id as string
   
   const { data: mock, loading: mockLoading } = useDoc<any>(useMemo(() => (db && mockId ? doc(db, "mocks", mockId) : null), [db, mockId]))
@@ -102,6 +103,10 @@ export default function MockOverviewPage() {
   const isLimitReached = attemptsLeft === 0 && (!activeAttempt || activeAttempt.status === 'COMPLETED');
   const isResumable = activeAttempt && activeAttempt.status === 'IN_PROGRESS';
 
+  // Device Block UI Check
+  const isPremiumMock = mock && (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase() === 'PREMIUM';
+  const showDeviceBlock = isPremiumMock && !isDeviceAuthorized;
+
   if (mockLoading || userLoading || (user && !accessChecked)) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-white space-y-6">
        <Zap className="h-12 w-12 text-primary animate-pulse" />
@@ -124,6 +129,27 @@ export default function MockOverviewPage() {
        <Button asChild className="h-14 px-10 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-xl gap-3">
           <Link href="/"><Home className="h-4 w-4" /> Return to Hub</Link>
        </Button>
+    </div>
+  );
+
+  if (showDeviceBlock) return (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+       <Navbar />
+       <div className="max-w-md w-full bg-white rounded-[3rem] p-12 shadow-5xl border border-slate-100 space-y-8 animate-in fade-in zoom-in-95">
+          <div className="h-20 w-20 bg-rose-50 rounded-[2rem] flex items-center justify-center mx-auto text-rose-500 shadow-xl border border-rose-100">
+             <Smartphone className="h-10 w-10" />
+          </div>
+          <div className="space-y-3 text-left">
+             <h2 className="text-2xl font-headline font-black text-[#0F172A] uppercase text-center">Security Lock</h2>
+             <p className="text-slate-500 font-medium leading-relaxed text-center">
+                This premium test is locked to your primary registered device. You are attempting to access it from an unauthorized device.
+             </p>
+          </div>
+          <Button asChild className="w-full h-16 bg-[#0F172A] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl border-none">
+             <Link href="/settings/device">Manage Registered Device</Link>
+          </Button>
+       </div>
+       <Footer />
     </div>
   );
 

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, Suspense, useEffect, useTransition } from "react"
@@ -20,13 +21,11 @@ import {
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { DeviceService } from "@/services/device-service"
 import { motion } from "framer-motion"
 
 /**
- * @fileOverview Optimized Login Hub v12.0 (Bug Fix).
- * FIXED: Resolved [object Object] error in input fields by updating onChange handlers.
- * UPDATED: Logo scaling calibrated for a high-fidelity institutional feel.
+ * @fileOverview Hardened Login Hub v13.0 (Device Aware).
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -69,6 +68,20 @@ function LoginContent() {
     }
   }, [user, authLoading, router, returnUrl]);
 
+  const onAuthSuccess = async (userId: string, userEmail: string) => {
+    if (!db) return;
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const profile = userSnap.data();
+      // Auto-bind device for premium users who don't have one set yet
+      if (profile.pass?.active && !profile.deviceLock?.deviceId) {
+        await DeviceService.bindCurrentDevice(db, userId, 3);
+      }
+    }
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     if (mode === 'register' && password !== confirmPassword) {
@@ -79,7 +92,8 @@ function LoginContent() {
     setLoading(true)
     try {
       if (mode === 'login') {
-        await signInWithEmailAndPassword(auth, email, password)
+        const creds = await signInWithEmailAndPassword(auth, email, password)
+        await onAuthSuccess(creds.user.uid, creds.user.email!);
         toast({ title: "Login Successful", description: "Welcome back!" })
         startTransition(() => { router.replace(returnUrl) })
       } else {
@@ -111,9 +125,11 @@ function LoginContent() {
       const result = await signInWithPopup(auth, provider)
       const user = result.user
       if (!user.email) throw new Error("Google account email is mandatory.");
+      
       const userRef = doc(db, 'users', user.uid)
       const userSnap = await getDoc(userRef)
       const isSuperAdmin = SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase());
+      
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           id: user.uid, name: user.displayName || "Aspirant",
@@ -121,7 +137,10 @@ function LoginContent() {
           state: "Punjab", createdAt: new Date().toISOString(),
           updatedAt: serverTimestamp(), status: 'Free', pinnedExams: [], phone: ""
         })
+      } else {
+        await onAuthSuccess(user.uid, user.email);
       }
+      
       toast({ title: "Welcome", description: `Signed in as ${user.displayName}` })
       startTransition(() => { router.replace(returnUrl) })
     } catch (error: any) {

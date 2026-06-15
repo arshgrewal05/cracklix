@@ -3,9 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     /**
-     * @fileOverview Hardened Institutional Security Protocol v5.1.
-     * PROTECTS: Student PII, Payment Requests, and Master Content Nodes.
-     * UPDATED: Allowed students to update their own results for re-take support.
+     * @fileOverview Hardened Institutional Security Protocol v6.0 (Device Locked).
      */
 
     function isAuthenticated() {
@@ -21,63 +19,34 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // --- 1. Master Content (Public Read, Admin Write Only) ---
-    match /boards/{boardId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /exams/{examId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /questions/{qId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /passes/{passId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /notes/{noteId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /subjects/{sId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /categories/{catId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /current_affairs_hub/{caId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /pyqs/{pyqId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    match /settings/{sId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
+    // --- 1. Master Content ---
+    match /boards/{boardId} { allow read: if true; allow write: if isAdmin(); }
+    match /exams/{examId} { allow read: if true; allow write: if isAdmin(); }
+    match /questions/{qId} { allow read: if true; allow write: if isAdmin(); }
+    match /passes/{passId} { allow read: if true; allow write: if isAdmin(); }
+    match /notes/{noteId} { allow read: if true; allow write: if isAdmin(); }
+    match /subjects/{sId} { allow read: if true; allow write: if isAdmin(); }
+    match /categories/{catId} { allow read: if true; allow write: if isAdmin(); }
+    match /current_affairs_hub/{caId} { allow read: if true; allow write: if isAdmin(); }
+    match /pyqs/{pyqId} { allow read: if true; allow write: if isAdmin(); }
+    match /settings/{sId} { allow read: if true; allow write: if isAdmin(); }
 
-    // --- 2. Student Data (Strictly Gated) ---
+    // --- 2. Student Data ---
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isOwner(userId) || isAdmin();
+      allow write: if isAdmin() || (isOwner(userId) && (
+        // Prevent users from manually resetting enforcementLevel or device cooldown logic via UI
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'pass'])
+      ));
     }
 
     match /attempts/{attemptId} {
-      // ID format: {userId}_{mockId}
       allow read: if isAuthenticated() && (attemptId.split('_')[0] == request.auth.uid || isAdmin());
       allow create, update: if isAuthenticated() && attemptId.split('_')[0] == request.auth.uid;
       allow delete: if isAdmin();
     }
 
     match /results/{resultId} {
-      // ID format: {userId}_{mockId}
       allow read: if isAuthenticated() && (resultId.split('_')[0] == request.auth.uid || isAdmin());
       allow create, update: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || resultId.split('_')[0] == request.auth.uid);
       allow delete: if isAdmin();
@@ -87,15 +56,13 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
     }
 
-    // --- 3. Monetization & Audit Trail ---
+    // --- 3. Monetization ---
     match /payment_requests/{reqId} {
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
       allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
       allow update, delete: if isAdmin();
     }
-    match /audit_logs/{logId} {
-      allow read, write: if isAdmin();
-    }
+    match /audit_logs/{logId} { allow read, write: if isAdmin(); }
     match /subscriptions/{sId} {
       allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
       allow write: if isAdmin();

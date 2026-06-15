@@ -17,6 +17,14 @@ export type CurrentAffairType = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUIZ' | 'SPECI
 
 export type MockAssignmentMode = 'SINGLE' | 'MULTIPLE' | 'AUTHORITY';
 
+export interface DeviceLock {
+  deviceId: string;
+  deviceName: string;
+  lastChangedAt: any;
+  enabled: boolean;
+  enforcementLevel: 0 | 1 | 2 | 3; // 0: Off, 1: Track, 2: Warning, 3: Block
+}
+
 export interface Category {
   id: string;
   title: string;
@@ -33,7 +41,7 @@ export interface Board {
   name: string;
   region: string;
   category: string;
-  categoryId: string; // RELATIONAL: Link to Category
+  categoryId: string; 
   iconUrl?: string;
   color?: string;
   updatedAt?: any;
@@ -128,6 +136,7 @@ export interface UserProfile {
   subscriptions?: string[];
   pinnedExams?: string[];
   unlockedMocks?: string[];
+  deviceLock?: DeviceLock;
   pass?: {
     active: boolean;
     plan: 'FREE_PASS' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
