@@ -23,10 +23,9 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Cracklix Majestic Hero v4.0 (Import Fix).
- * FIXED: Resolved 'motion/react' module resolution error by reverting to 'framer-motion'.
- * FIXED: Added missing Badge import.
- * LAYOUT: Framing the student illustration with uniform floating nodes.
+ * @fileOverview Official Cracklix Majestic Hero v4.5.
+ * FIXED: Removed text truncation to ensure labels are fully visible.
+ * FIXED: Standardized framing nodes to 18% Top / 2% Bottom alignment.
  */
 
 export default function Hero() {
@@ -123,6 +122,7 @@ export default function Hero() {
                ))}
             </div>
 
+            {/* MINI FEATURE CARDS - FIXED TRUNCATION */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                <HeroMiniCard icon={<Zap className="text-blue-600" />} title="Mock Tests" sub="Exam-focused tests" />
                <HeroMiniCard icon={<FileStack className="text-emerald-500" />} title="Previous Papers" sub="Latest official keys" />
@@ -142,7 +142,7 @@ export default function Hero() {
 
           {/* RIGHT: ILLUSTRATION HUB */}
           <div className="relative flex justify-center lg:pl-12">
-            {/* Prep Nodes - Framing the student illustration */}
+            {/* Prep Nodes - Framing the student illustration (Fixed Visibility) */}
             <FloatingNode icon={<Zap className="text-blue-600 h-5 w-5" />} label="MOCK TESTS" className="top-[18%] -left-10 md:left-0" />
             <FloatingNode icon={<Target className="text-purple-600 h-5 w-5" />} label="DAILY PRACTICE" className="bottom-[2%] -left-10 md:-left-5" />
             <FloatingNode icon={<FileStack className="text-emerald-500 h-5 w-5" />} label="PREVIOUS PAPERS" className="bottom-[2%] -right-10 md:right-0" />
@@ -184,13 +184,13 @@ export default function Hero() {
 
 function HeroMiniCard({ icon, title, sub }: { icon: React.ReactNode, title: string, sub: string }) {
   return (
-    <Card className="p-4 rounded-2xl bg-white border-slate-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-all group cursor-pointer text-left">
+    <Card className="p-4 rounded-2xl bg-white border-slate-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-all group cursor-pointer text-left h-full">
        <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
           {icon}
        </div>
        <div className="min-w-0">
-          <p className="text-xs font-black text-slate-900 truncate uppercase tracking-tight">{title}</p>
-          <p className="text-[9px] font-medium text-slate-400 leading-none mt-1 truncate">{sub}</p>
+          <p className="text-[11px] md:text-xs font-black text-slate-900 uppercase tracking-tight leading-tight mb-1">{title}</p>
+          <p className="text-[9px] font-medium text-slate-400 leading-tight">{sub}</p>
        </div>
     </Card>
   );
@@ -210,7 +210,7 @@ function FloatingNode({ icon, label, className }: { icon: React.ReactNode, label
        <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-slate-50 flex items-center justify-center shrink-0 shadow-inner">
           {icon}
        </div>
-       <span className="text-[9px] md:text-[10px] font-black text-[#0F172A] tracking-widest uppercase whitespace-nowrap">{label}</span>
+       <span className="text-[9px] md:text-[10px] font-black text-[#0F172A] tracking-widest uppercase text-center leading-tight">{label}</span>
     </motion.div>
   );
 }
