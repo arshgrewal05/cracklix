@@ -24,7 +24,8 @@ import {
   History,
   HeartPulse,
   Settings,
-  FileCode2
+  FileCode2,
+  NotebookPen
 } from "lucide-react"
 import Link from "next/link"
 import Logo from "@/components/brand/Logo"
@@ -36,9 +37,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Majestic Admin Sidebar Hub v3.0.
- * FIXED: Double logo overlapping resolved.
- * FIXED: Missing menu labels and truncation fixed with 300px width.
+ * @fileOverview Majestic Admin Sidebar Hub v3.1.
+ * FIXED: Missing NotebookPen import resolved.
  * THEME: bg-[#0F172A] with Blue-600 Active States.
  */
 
@@ -93,7 +93,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           <div className="flex flex-col h-full bg-gradient-to-b from-[#0F172A] to-[#111827]">
             
-            {/* 1. LOGO HUB - Redundant text removed to prevent double branding */}
+            {/* 1. LOGO HUB */}
             <div className="h-24 px-6 flex items-center shrink-0">
                <Logo href="/admin" variant="light" imgClassName="h-12 w-auto" />
             </div>
