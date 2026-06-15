@@ -6,8 +6,8 @@ import { ShieldAlert, RefreshCw, Home } from 'lucide-react';
 import Link from 'next/link';
 
 /**
- * @fileOverview Global Error Governance segment v2.0.
- * Ensures the application remains stable and recoverable during runtime failures.
+ * @fileOverview Global Error Governance segment v2.1.
+ * UPDATED: Switched orange button to Primary Blue.
  */
 export default function GlobalErrorBoundary({
   error,
@@ -38,7 +38,7 @@ export default function GlobalErrorBoundary({
         <div className="flex flex-col gap-3 pt-4">
           <Button 
             onClick={() => reset()}
-            className="h-14 bg-primary hover:bg-orange-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] gap-3 shadow-xl border-none"
+            className="h-14 bg-primary hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] gap-3 shadow-xl border-none"
           >
             <RefreshCw className="h-4 w-4" /> Re-sync Registry
           </Button>
