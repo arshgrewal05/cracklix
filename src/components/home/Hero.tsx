@@ -11,7 +11,10 @@ import {
   Users,
   Landmark,
   BookOpen,
-  Layers
+  Layers,
+  ClipboardList,
+  Files,
+  Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,8 +25,8 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Native-Scaled Elite Hero Hub v68.0.
- * DESIGN: Responsive typography (text-4xl to 7xl) and max-650px mobile height.
+ * @fileOverview Native-Scaled Elite Hero Hub v69.0.
+ * UPDATED: Restored feature grid with colors and content matching user screenshot.
  */
 
 export default function Hero() {
@@ -39,23 +42,41 @@ export default function Hero() {
 
   const heroImage = "/images/hero-student.png";
 
-  const liveStats = useMemo(() => {
-    const format = (n: number, fallback: string) => {
-      if (!n) return fallback;
-      return n >= 1000 ? `${(n/1000).toFixed(1)}K+` : n.toString() + "+";
-    };
-    return [
-      { label: "QUESTIONS", val: format(stats?.totalQuestions, "15,000+"), color: "text-blue-600", bgColor: "bg-blue-50", icon: <Zap className="h-5 w-5 fill-current" /> },
-      { label: "MOCK TESTS", val: format(stats?.totalMocks, "500+"), color: "text-indigo-600", bgColor: "bg-indigo-50", icon: <LayoutGrid className="h-5 w-5 fill-current" /> },
-      { label: "EXAMS", val: format(stats?.totalBoards, "92+"), color: "text-emerald-600", bgColor: "bg-emerald-50", icon: <ShieldCheck className="h-5 w-5 fill-current" /> },
-      { label: "ASPIRANTS", val: format(stats?.totalUsers, "15K+"), color: "text-orange-500", bgColor: "bg-orange-50", icon: <Users className="h-5 w-5 fill-current" /> }
-    ];
-  }, [stats]);
+  const featureStats = [
+    { 
+      label: "Mock Tests", 
+      desc: "Exam-focused mock tests", 
+      color: "text-blue-600", 
+      bgColor: "bg-blue-50", 
+      icon: <ClipboardList className="h-5 w-5 md:h-6 md:w-6" /> 
+    },
+    { 
+      label: "Previous Papers", 
+      desc: "Previous year question papers", 
+      color: "text-emerald-500", 
+      bgColor: "bg-emerald-50", 
+      icon: <Files className="h-5 w-5 md:h-6 md:w-6" /> 
+    },
+    { 
+      label: "Daily Practice", 
+      desc: "Practice daily & stay ahead", 
+      color: "text-purple-500", 
+      bgColor: "bg-purple-50", 
+      icon: <Target className="h-5 w-5 md:h-6 md:w-6" /> 
+    },
+    { 
+      label: "Punjab Exams", 
+      desc: "All major Punjab exams at one place", 
+      color: "text-orange-500", 
+      bgColor: "bg-orange-50", 
+      icon: <Landmark className="h-5 w-5 md:h-6 md:w-6" /> 
+    }
+  ];
 
   if (!mounted) return null;
 
   return (
-    <section className="relative overflow-hidden bg-white pt-6 pb-10 md:pt-20 md:pb-24 text-left w-full border-b border-slate-100 max-h-[650px] md:max-h-none">
+    <section className="relative overflow-hidden bg-white pt-6 pb-10 md:pt-20 md:pb-24 text-left w-full border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 lg:gap-16 items-center">
           
@@ -81,10 +102,10 @@ export default function Hero() {
 
             <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3">
               <Button asChild className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs tracking-widest rounded-2xl shadow-3xl shadow-blue-600/20 border-none transition-all active:scale-95">
-                <Link href="/mocks" className="flex items-center gap-2">Start Free Mock <ArrowRight className="h-4 w-4" /></Link>
+                <Link href="/mocks" className="flex items-center gap-2">Start Free Mock Test <ArrowRight className="h-4 w-4" /></Link>
               </Button>
               <Button asChild variant="outline" className="h-14 px-8 border-2 border-blue-600 bg-white text-blue-600 font-black text-xs tracking-widest rounded-2xl transition-all active:scale-95 hover:bg-blue-50">
-                <Link href="/exams">Browse Exam List</Link>
+                <Link href="/exams">Browse Exams <ArrowRight className="h-4 w-4" /></Link>
               </Button>
             </div>
           </div>
@@ -96,16 +117,17 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="mt-8 md:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
-           {liveStats.map((stat, idx) => (
+        {/* FEATURE GRID - RECOVERED FROM SCREENSHOT */}
+        <div className="mt-8 md:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+           {featureStats.map((stat, idx) => (
              <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} viewport={{ once: true }}>
-               <Card className="border-none shadow-xl rounded-[2rem] p-4 md:p-8 bg-white hover:translate-y-[-4px] transition-all border border-slate-100 flex items-center gap-3 md:gap-6">
-                 <div className={cn("h-10 w-10 md:h-14 md:w-14 rounded-xl flex items-center justify-center shrink-0 shadow-inner", stat.bgColor, stat.color)}>
+               <Card className="border-none shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 bg-white hover:translate-y-[-4px] transition-all border border-slate-100 flex items-center gap-4">
+                 <div className={cn("h-12 w-12 md:h-14 md:w-14 rounded-xl flex items-center justify-center shrink-0 shadow-inner", stat.bgColor, stat.color)}>
                     {stat.icon}
                  </div>
-                 <div className="min-w-0">
-                   {statsLoading ? <Skeleton className="h-6 w-16 bg-slate-50" /> : <p className="text-lg md:text-3xl font-black text-slate-900 tracking-tight leading-none tabular-nums">{stat.val}</p>}
-                   <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{stat.label}</p>
+                 <div className="min-w-0 text-left">
+                   <p className="text-sm md:text-lg font-black text-slate-900 tracking-tight leading-none">{stat.label}</p>
+                   <p className="text-[10px] md:text-[11px] font-medium text-slate-400 mt-1 leading-tight">{stat.desc}</p>
                  </div>
                </Card>
              </motion.div>
