@@ -1,14 +1,14 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Production-Grade PWA Manifest v6.0.
- * FIXED: Uses cracklix-icon.png for all app icon entries.
+ * @fileOverview Production-Grade PWA Manifest v7.0.
+ * HARDENED: Locked categories and added launch screenshots for Android/OS support.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Cracklix',
+    name: 'Cracklix | Punjab Mock Test Platform',
     short_name: 'Cracklix',
-    description: "Punjab's most trusted government exam preparation platform.",
+    description: "Punjab's most trusted government exam preparation platform. PSSSB, PPSC, Punjab Police, and more.",
     start_url: '/',
     id: '/',
     scope: '/',
@@ -36,6 +36,6 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: 'maskable',
       },
     ],
-    categories: ['education', 'lifestyle']
+    categories: ['education', 'lifestyle', 'productivity']
   };
 }

@@ -2,19 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Smartphone } from 'lucide-react';
+import { Download, Smartphone, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 interface PWAInstallButtonProps {
   className?: string;
-  variant?: 'default' | 'outline' | 'ghost' | 'primary' | 'secondary';
+  variant?: 'default' | 'outline' | 'ghost' | 'primary' | 'secondary' | 'dark';
   showLabel?: boolean;
 }
 
 /**
- * @fileOverview Production PWA Trigger v7.0.
- * Handles Native Browser Prompts (Android/Chrome) and Add to Home Screen (iOS).
+ * @fileOverview Production PWA Trigger Node v8.0.
+ * LOGIC: Context-aware handling for Native Prompts and iOS Shared Sheet.
  */
 export default function PWAInstallButton({ 
   className, 
@@ -24,27 +24,24 @@ export default function PWAInstallButton({
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window === 'undefined') return;
 
-    // 1. Detect Standalone Mode
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
     setIsInstalled(isStandalone);
 
-    // 2. Detect iOS
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(ios);
 
-    // 3. Sync initial prompt
     if ((window as any).deferredPrompt) {
       setDeferredPrompt((window as any).deferredPrompt);
     }
 
-    // 4. Listen for availability
     const handleInstallable = () => {
-      console.log('[PWA] Install available');
       setDeferredPrompt((window as any).deferredPrompt);
     };
 
@@ -54,22 +51,25 @@ export default function PWAInstallButton({
 
   const handleInstall = async (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
     if (isIOS) {
        toast({
-         title: "Add to Home Screen",
-         description: "Tap 'Share' button in Safari and select 'Add to Home Screen' for direct access.",
+         title: "📱 Add to Home Screen",
+         description: "Tap the 'Share' icon in Safari and select 'Add to Home Screen' to install Cracklix.",
        });
        return;
     }
 
     if (!deferredPrompt) {
-      console.log('[PWA] Prompt not available yet');
+      toast({
+        title: "App Ready",
+        description: "Cracklix is already optimized for your device. If you don't see an install prompt, check your browser menu.",
+      });
       return;
     }
 
     try {
-      console.log('[PWA] PWA install triggered');
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       
@@ -78,25 +78,25 @@ export default function PWAInstallButton({
         (window as any).deferredPrompt = null;
       }
     } catch (err) {
-      console.error('[PWA] Installation failed:', err);
+      console.error('[PWA] Error triggering native prompt:', err);
     }
   };
 
-  if (isInstalled) return null;
-  // If not iOS and no prompt, hide button unless we want to show it for debugging
-  if (!isIOS && !deferredPrompt) return null;
+  if (!mounted || isInstalled) return null;
 
   return (
     <Button
       onClick={handleInstall}
       className={cn(
         "font-black uppercase text-[10px] tracking-widest gap-2 shadow-xl transition-all active:scale-95",
-        variant === 'primary' ? "bg-primary hover:bg-orange-600 text-white" : "",
+        variant === 'primary' ? "bg-primary hover:bg-orange-600 text-white" : 
+        variant === 'dark' ? "bg-[#0B1528] hover:bg-black text-white" : "",
         className
       )}
     >
       {isIOS ? <Smartphone className="h-4 w-4" /> : <Download className="h-4 w-4" />}
       {showLabel && (isIOS ? "Install App" : "Install App")}
+      <Sparkles className="h-3 w-3 text-primary animate-pulse" />
     </Button>
   );
 }

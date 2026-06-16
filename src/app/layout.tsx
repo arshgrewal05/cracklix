@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Inter } from "next/font/google";
@@ -65,22 +64,20 @@ export default function RootLayout({
                 window.dispatchEvent(new CustomEvent('pwa-installed'));
               });
 
-              // 2. Service Worker Cleanup (Purge stale/custom workers for stability)
+              // 2. Service Worker Cleanup
               if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                   for (let registration of registrations) {
-                    // Only unregister if it's not the current managed one
-                    // or force unregister once during architectural migration
                     registration.unregister();
                   }
                 });
               }
               
-              // 3. Clear Stale Caches for Reliability
+              // 3. Clear Stale Caches
               if (typeof window !== 'undefined' && 'caches' in window) {
                 caches.keys().then(function(names) {
                   for (let name of names) {
-                    if (name.includes('cracklix-cache-v1')) continue; // keep current
+                    if (name.includes('cracklix-cache-v1')) continue;
                     caches.delete(name);
                   }
                 });
