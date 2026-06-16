@@ -9,11 +9,12 @@ import ContinueLearning from "@/components/home/ContinueLearning";
 import CurrentAffairsPreview from "@/components/home/CurrentAffairsPreview";
 import MeritPreview from "@/components/home/MeritPreview";
 import AppPreview from "@/components/home/AppPreview";
+import MeetFounder from "@/components/home/MeetFounder";
 import Footer from "@/components/layout/Footer";
 
 /**
- * @fileOverview Official Home Hub v174.0 (Scroll Fixed).
- * PERFORMANCE: Implements the 9-point hierarchical order with Global Search.
+ * @fileOverview Official Home Hub v175.0 (Optimized Order).
+ * FLOW: Discovery (Hero/Search) -> Categorization -> Specific Exams -> Practice -> Engagement.
  */
 
 export default function HomePage() {
@@ -21,34 +22,37 @@ export default function HomePage() {
     <main className="min-h-screen bg-white font-body pb-safe text-left">
       <Navbar />
       
-      {/* 1. Hero Section */}
+      {/* 1. Hero Section & Real-time Stats */}
       <Hero />
 
-      {/* 1.5 Global Search Bar */}
+      {/* 1.5 Global Search Engine */}
       <div className="md:-mt-10 relative z-40 pb-8 md:pb-0">
         <GlobalSearch />
       </div>
 
-      {/* 2. Exam Categories */}
+      {/* 2. Exam Categories (Broad Discovery) */}
       <FeaturedCategories />
 
-      {/* 3. Popular Exams (Exam Hub) */}
+      {/* 3. Popular Exams (Commission Nodes) */}
       <PopularExams />
 
-      {/* 4. Latest Mock Tests */}
+      {/* 4. Latest Mock Tests (Direct Practice) */}
       <LatestMocks />
 
-      {/* 5. Continue Learning (Logged-in User context) */}
+      {/* 5. Personal Prep (Logged-in context) */}
       <ContinueLearning />
 
-      {/* 6. Current Affairs / Study Updates */}
+      {/* 6. Knowledge Hub (Current Affairs) */}
       <CurrentAffairsPreview />
 
-      {/* 7. Punjab Merit / Top Rankers */}
+      {/* 7. Competitive Index (Merit List) */}
       <MeritPreview />
 
-      {/* 8. App Download / Mobile Hub */}
+      {/* 8. Hardware Hub (App Download) */}
       <AppPreview />
+
+      {/* 9. Leadership Node */}
+      <MeetFounder />
       
       <Footer />
     </main>

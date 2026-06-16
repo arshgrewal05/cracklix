@@ -16,47 +16,47 @@ import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Institutional Category Entry Nodes v6.2 (Hydration Fix).
- * FIXED: Added mounted state guard to ensure stable hydration across all devices.
+ * @fileOverview Elite Exam Categories Hub v8.0.
+ * DESIGN: Compact cards (320px/260px), 2-line titles, and bullet-style descriptions.
  */
 
 const CATEGORY_META = [
   {
     id: "punjab-govt",
-    title: "Punjab General Exam",
-    desc: "Police, PSSSB, PPSC & general state board recruitments.",
+    title: "Punjab General Exams",
+    desc: "Police • PSSSB • PPSC • Revenue",
     icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR8W5eTBPdzztA7cziqnMmtWk9InL1yflUD_xb4vAsLw&s=10",
     color: "text-primary",
     bgColor: "bg-orange-50"
   },
   {
     id: "punjab-teaching",
-    title: "Punjab Teaching Exam",
-    desc: "PSTET, CTET, Master Cadre, ETT & Lecturer recruitment nodes.",
+    title: "Punjab Teaching Exams",
+    desc: "PSTET • CTET • Master Cadre • ETT",
     icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbNnoge6pNWx1HZYrUJKM58qWk1dDw85xvKPBoG-O4ew&s=10",
     color: "text-blue-600",
     bgColor: "bg-blue-50"
   },
   {
     id: "punjab-technical",
-    title: "Punjab Technical Exam",
-    desc: "PSPCL, PSTCL, ALM & Technical Assistant posts.",
+    title: "Punjab Technical Exams",
+    desc: "PSPCL • PSTCL • ALM • Technical Asst.",
     icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo0ZK9JI5KMfg9RoNdIwcsNlpx5IcPBWuKZw&s",
     color: "text-amber-500",
     bgColor: "bg-amber-50"
   },
   {
     id: "banking",
-    title: "Punjab Banking Corporation Exam",
-    desc: "State Cooperative Bank, Apex, PADB and Central Bank nodes.",
+    title: "Punjab Banking Exams",
+    desc: "Cooperative • Apex • PADB • Banks",
     icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7McWqZqOgKy-BakccvR02WQdEQFrwuvmHBG5rYJzuEg&s=10",
     color: "text-emerald-600",
     bgColor: "bg-emerald-50"
   },
   {
     id: "central-govt",
-    title: "Central Govt",
-    desc: "SSC, Railways, Army & National exams.",
+    title: "Central Govt Exams",
+    desc: "SSC • Railways • Army • National",
     icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmRNHVIV2W9Pn_87u6EQmluADidwUQWhOotUwQUV_VWtEBWqoxjf-OBEt4&s=10",
     color: "text-indigo-600",
     bgColor: "bg-indigo-50"
@@ -87,53 +87,53 @@ export default function FeaturedCategories() {
   if (!mounted) return null;
 
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="container mx-auto px-4 max-w-7xl space-y-12 text-left">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-          <div className="space-y-2">
+    <section className="py-12 md:py-20 bg-white">
+      <div className="container mx-auto px-4 max-w-7xl space-y-8 md:space-y-12 text-left">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 md:gap-6">
+          <div className="space-y-1">
              <div className="flex items-center gap-2">
                 <Landmark className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">EXAM CATEGORIES</span>
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">EXAM CATEGORIES</span>
              </div>
-             <h2 className="text-3xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-none">
-                STUDY BY <span className="text-primary">CATEGORY</span>
+             <h2 className="text-2xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-none">
+                CHOOSE YOUR <span className="text-primary">CATEGORY</span>
              </h2>
-             <p className="text-slate-500 text-sm md:text-lg font-medium">Browse tests for your target exams.</p>
+             <p className="text-slate-500 text-xs md:text-lg font-medium">Select your field to explore preparation hubs.</p>
           </div>
-          <Button asChild variant="ghost" className="text-primary font-black uppercase text-[10px] tracking-widest gap-2">
-             <Link href="/exams">View All Categories <ArrowRight className="h-4 w-4" /></Link>
+          <Button asChild variant="ghost" className="text-primary font-black uppercase text-[9px] md:text-[10px] tracking-widest gap-2 hover:bg-slate-50">
+             <Link href="/exams">View All <ArrowRight className="h-3.5 w-3.5" /></Link>
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           {categoriesWithCounts.map((cat, idx) => (
             <motion.div 
               key={cat.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.05 }}
             >
                <Link href={`/exams/category/${cat.id}`}>
-                  <Card className="border-none shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col border border-slate-100 p-8 relative">
-                     <div className={cn("h-16 w-16 rounded-2xl flex items-center justify-center mb-8 shadow-inner transition-transform group-hover:scale-110", cat.bgColor, cat.color)}>
-                        <div className="h-full w-full flex items-center justify-center overflow-hidden rounded-xl">
-                          <img src={cat.icon} className="h-full w-full object-contain p-2" alt={cat.title} />
+                  <Card className="border-none shadow-lg hover:shadow-3xl transition-all duration-500 rounded-[1.5rem] md:rounded-[2rem] bg-white group overflow-hidden h-[260px] md:h-[320px] flex flex-col border border-slate-100 p-6 md:p-8 relative">
+                     <div className={cn("h-12 w-12 md:h-16 md:w-16 rounded-xl md:rounded-2xl flex items-center justify-center mb-6 md:mb-8 shadow-inner transition-transform group-hover:scale-110", cat.bgColor, cat.color)}>
+                        <div className="h-full w-full flex items-center justify-center overflow-hidden rounded-lg md:rounded-xl">
+                          <img src={cat.icon} className="h-full w-full object-contain p-1.5 md:p-2.5" alt={cat.title} />
                         </div>
                      </div>
                      
-                     <div className="space-y-3 flex-1">
-                        <h3 className="text-xl font-black text-[#0F172A] uppercase leading-tight group-hover:text-primary transition-colors">{cat.title}</h3>
-                        <p className="text-xs font-medium text-slate-400 leading-relaxed line-clamp-2">{cat.desc}</p>
+                     <div className="space-y-1.5 md:space-y-2 flex-1">
+                        <h3 className="text-lg md:text-xl font-black text-[#0F172A] uppercase leading-[1.1] group-hover:text-primary transition-colors line-clamp-2">{cat.title}</h3>
+                        <p className="text-[10px] md:text-sm font-semibold text-slate-400 leading-tight uppercase tracking-tight line-clamp-2">{cat.desc}</p>
                      </div>
 
-                     <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
+                     <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
                         {loading ? (
-                          <div className="h-3 w-20 bg-slate-100 animate-pulse rounded" />
+                          <div className="h-2.5 w-16 bg-slate-50 animate-pulse rounded" />
                         ) : (
-                          <span className="text-[10px] font-black text-[#0F172A] uppercase tracking-widest">{cat.countLabel}</span>
+                          <span className="text-[9px] md:text-[10px] font-black text-[#0F172A] uppercase tracking-widest">{cat.countLabel}</span>
                         )}
-                        <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                        <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all text-slate-300">
                            <ChevronRight className="h-4 w-4" />
                         </div>
                      </div>
