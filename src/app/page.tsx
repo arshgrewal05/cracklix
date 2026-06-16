@@ -14,7 +14,7 @@ import Footer from "@/components/layout/Footer";
 
 /**
  * @fileOverview Official Home Hub v175.0 (Optimized Order).
- * FLOW: Discovery (Hero/Search) -> Categorization -> Specific Exams -> Practice -> Engagement.
+ * FLOW: Discovery (Hero/Search) -> Categorization -> Specific Exams -> Practice -> Mobile -> Trust -> Engagement.
  */
 
 export default function HomePage() {
@@ -48,10 +48,10 @@ export default function HomePage() {
       {/* 7. Competitive Index (Merit List) */}
       <MeritPreview />
 
-      {/* 8. Hardware Hub (App Download) */}
+      {/* 8. Hardware Hub (Mobile App) */}
       <AppPreview />
 
-      {/* 9. Leadership Node */}
+      {/* 9. Leadership Node (Founder) */}
       <MeetFounder />
       
       <Footer />

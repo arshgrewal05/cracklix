@@ -1,23 +1,21 @@
 'use client';
 
-import { useMemo, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Smartphone, CheckCircle2, ShieldCheck, MapPin, Landmark, Globe, Apple, Play } from "lucide-react";
+import { Smartphone, CheckCircle2, ShieldCheck, Download, Apple, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Regional Hub Section v13.1 (Map Restoration).
- * RESTORED: India National Map and Punjab Regional Node side-by-side.
- * FIXED: Imported 'cn' to resolve ReferenceError in Badge component.
+ * @fileOverview Redesigned Mobile App Hub v14.0.
+ * UPDATED: Removed maps, added smartphone mockup and checkmark benefits.
  */
 
 export default function AppPreview() {
   const db = useFirestore();
-  const punjabMap = "https://www.mapsofindia.com/maps/punjab/punjab-map.jpg";
-  const indiaMap = "https://www.mapsofindia.com/images2/india-map.jpg";
+  const phoneMockup = "https://picsum.photos/seed/phone/600/1200"; // Placeholder for app mockup
 
   const { data: settings } = useDoc<any>(useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]));
 
@@ -25,7 +23,7 @@ export default function AppPreview() {
   const appStoreLink = settings?.appStoreUrl || "#";
 
   return (
-    <section className="py-20 md:py-32 bg-white overflow-hidden border-t border-slate-50">
+    <section className="py-16 md:py-24 bg-white overflow-hidden border-t border-slate-50">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
           
@@ -33,83 +31,82 @@ export default function AppPreview() {
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-6 md:space-y-8 text-left"
+            className="space-y-6 md:space-y-10 text-left order-2 lg:order-1"
           >
-            <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner">
-               <Smartphone className="h-6 w-6 md:h-7 md:w-7 text-primary" />
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                 <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                    <Smartphone className="h-5 w-5" />
+                 </div>
+                 <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-slate-500">Official Mobile Node</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-headline font-black text-[#0F172A] leading-tight md:leading-[0.95] tracking-tight uppercase">
+                Study Anywhere. <br />
+                <span className="text-primary">Anytime.</span>
+              </h2>
+              <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed max-w-lg">
+                Download the official <span className="text-[#0F172A] font-bold">Cracklix App</span> to access high-quality preparation resources on the go.
+              </p>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-headline font-black text-[#0F172A] leading-tight md:leading-[0.95] tracking-tight uppercase">
-              STUDY ON THE <br className="hidden sm:block" />
-              <span className="text-primary">MOBILE APP</span>
-            </h2>
-            <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed max-w-lg">
-              Download the official Cracklix app on your phone to get instant notifications and access tests offline.
-            </p>
 
-            <ul className="space-y-3 md:space-y-5 pt-2">
-               <FeatureItem text="Direct Mobile Access" />
-               <FeatureItem text="Bilingual Tests (English & Punjabi)" />
-               <FeatureItem text="Instant Admit Card & Result Alerts" />
-            </ul>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <BenefitItem text="500+ Mock Tests" />
+               <BenefitItem text="Daily Study Notes" />
+               <BenefitItem text="Bilingual Updates" />
+               <BenefitItem text="Real-time Alerts" />
+            </div>
 
-            <div className="flex gap-4 pt-4 md:pt-8">
-               <a href={appStoreLink} target="_blank" rel="noopener noreferrer">
-                 <Button className="h-16 px-8 bg-slate-900 hover:bg-black text-white rounded-2xl shadow-xl gap-3">
-                    <Apple className="h-6 w-6" /> App Store
+            <div className="flex flex-wrap gap-4 pt-4">
+               <a href={playStoreLink} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                 <Button className="w-full h-16 px-10 bg-[#0F172A] hover:bg-black text-white rounded-2xl shadow-xl gap-4 font-black uppercase text-[11px] tracking-widest border-none transition-all active:scale-95">
+                    <Play className="h-5 w-5 text-primary fill-current" /> Download Android
                  </Button>
                </a>
-               <a href={playStoreLink} target="_blank" rel="noopener noreferrer">
-                 <Button className="h-16 px-8 bg-slate-900 hover:bg-black text-white rounded-2xl shadow-xl gap-3">
-                    <Play className="h-6 w-6" /> Play Store
+               <a href={appStoreLink} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto opacity-50 cursor-not-allowed">
+                 <Button variant="outline" className="w-full h-16 px-10 border-2 border-slate-100 bg-white text-slate-400 rounded-2xl gap-4 font-black uppercase text-[11px] tracking-widest transition-all">
+                    <Apple className="h-5 w-5" /> iOS Coming Soon
                  </Button>
                </a>
             </div>
           </motion.div>
 
-          <div className="space-y-12 md:space-y-16 mt-12 lg:mt-0">
-             <div className="relative flex flex-col md:flex-row gap-6 justify-center">
-                
-                {/* 1. INDIA MAP NODE */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="w-full md:w-1/2 relative group"
-                >
-                   <div className="absolute top-4 left-4 z-20">
-                      <Badge className="bg-[#0F172A] text-white border-none text-[8px] font-black uppercase px-3 py-1 rounded shadow-lg">National Registry</Badge>
-                   </div>
-                   <div className="w-full aspect-[3/4] rounded-[2rem] overflow-hidden border border-slate-100 shadow-2xl relative">
-                      <img src={indiaMap} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700" alt="India Map" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/40 to-transparent" />
-                   </div>
-                </motion.div>
-
-                {/* 2. PUNJAB MAP NODE */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="w-full md:w-1/2 relative group"
-                >
-                   <div className="absolute top-4 left-4 z-20">
-                      <Badge className="bg-primary text-white border-none text-[8px] font-black uppercase px-3 py-1 rounded shadow-lg">Punjab Hub</Badge>
-                   </div>
-                   <div className="w-full aspect-[3/4] rounded-[2rem] overflow-hidden border border-slate-100 shadow-2xl relative">
-                      <img src={punjabMap} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700" alt="Punjab Map" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/40 to-transparent" />
-                   </div>
-                </motion.div>
-
-             </div>
+          <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end">
+             <div className="absolute -inset-20 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
              
-             <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex items-center justify-center gap-4 bg-slate-50/50 py-6 md:py-8 rounded-[2rem] md:rounded-[3rem] border border-slate-100/50">
-                <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl border-2 border-white bg-primary flex items-center justify-center text-white shadow-xl"><ShieldCheck className="h-5 w-5 md:h-6 md:w-6" /></div>
-                <div className="text-left">
-                   <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 md:mb-1.5">Platform Founder</p>
-                   <p className="text-sm md:text-base font-bold text-[#0F172A]">Developed by <span className="text-primary font-black uppercase tracking-tighter ml-1 transition-colors">Arsh Grewal</span></p>
+             <motion.div 
+               initial={{ opacity: 0, y: 50 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               className="relative w-full max-w-[320px] md:max-w-[400px] z-10"
+             >
+                {/* DEVICE MOCKUP FRAME */}
+                <div className="relative aspect-[9/18.5] bg-[#0F172A] rounded-[3.5rem] p-3 shadow-5xl border-[8px] border-[#1E293B] ring-1 ring-white/10">
+                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-[#1E293B] rounded-b-2xl z-20" />
+                   <div className="w-full h-full rounded-[2.5rem] overflow-hidden bg-white relative">
+                      <img 
+                        src={phoneMockup} 
+                        className="w-full h-full object-cover" 
+                        alt="App Screenshot" 
+                        data-ai-hint="app mockup"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/20 to-transparent pointer-events-none" />
+                   </div>
                 </div>
+
+                {/* DECORATIVE BADGE */}
+                <motion.div 
+                   animate={{ y: [0, -10, 0] }}
+                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                   className="absolute -right-8 top-1/4 bg-white p-4 rounded-2xl shadow-4xl border border-slate-100 flex items-center gap-3 z-30"
+                >
+                   <div className="h-10 w-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 shadow-inner">
+                      <ShieldCheck className="h-5 w-5" />
+                   </div>
+                   <div className="text-left">
+                      <p className="text-[10px] font-black text-[#0F172A] uppercase leading-none">Safe Registry</p>
+                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Verified App</p>
+                   </div>
+                </motion.div>
              </motion.div>
           </div>
         </div>
@@ -118,21 +115,13 @@ export default function AppPreview() {
   );
 }
 
-function FeatureItem({ text }: { text: string }) {
+function BenefitItem({ text }: { text: string }) {
   return (
-    <li className="flex items-center gap-3 md:gap-4 text-[#0F172A] font-bold uppercase text-[10px] md:text-xs tracking-tight">
-       <div className="h-5 w-5 md:h-6 md:w-6 rounded-full bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
-          <CheckCircle2 className="h-3 w-3 md:h-3.5 md:w-3.5 text-emerald-500" />
+    <div className="flex items-center gap-3 text-[#0F172A] font-bold uppercase text-[10px] md:text-xs tracking-tight">
+       <div className="h-6 w-6 rounded-full bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
        </div>
        {text}
-    </li>
-  );
-}
-
-function Badge({ children, className }: any) {
-  return (
-    <div className={cn("inline-flex items-center justify-center", className)}>
-      {children}
     </div>
-  )
+  );
 }
