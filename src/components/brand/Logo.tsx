@@ -14,11 +14,10 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Official Cracklix Brand Hub v33.0.
- * UPDATED: Optimized dimensions for tight header integration (40px/48px).
+ * @fileOverview Official Cracklix Brand Hub v34.0.
+ * UPDATED: Optimized dimensions for high-density header integration (40px/48px).
  */
 export default function Logo({ className = "", href = "/", variant = 'light', imgClassName = "", onClick }: LogoProps) {
-  // Use dark logo for light background, and light logo for dark background
   const logoSrc = variant === 'light' ? '/logo/cracklix-logo-dark.png' : '/logo/cracklix-logo-light.png';
 
   return (

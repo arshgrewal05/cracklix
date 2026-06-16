@@ -12,8 +12,8 @@ interface SidebarHeaderProps {
 }
 
 /**
- * @fileOverview High-Fidelity Admin Sidebar Header v8.0.
- * FIXED: Synchronized with 72px/88px header height standards and 40px logo.
+ * @fileOverview High-Fidelity Admin Sidebar Header v9.0.
+ * FIXED: Synchronized with 72px/88px header height standards.
  */
 export default function SidebarHeader({ isOpen, onToggle }: SidebarHeaderProps) {
   return (
@@ -25,10 +25,9 @@ export default function SidebarHeader({ isOpen, onToggle }: SidebarHeaderProps) 
         "flex items-center transition-all duration-300",
         isOpen ? "justify-between" : "justify-center"
       )}>
-        {/* LOGO NODE */}
         <div className={cn(
           "transition-all duration-300 flex items-center overflow-hidden shrink-0",
-          isOpen ? "w-[160px]" : "w-[44px]"
+          isOpen ? "w-[160px]" : "w-[40px]"
         )}>
           {isOpen ? (
             <Logo href="/admin" variant="dark" />
@@ -44,13 +43,11 @@ export default function SidebarHeader({ isOpen, onToggle }: SidebarHeaderProps) 
           )}
         </div>
 
-        {/* TOGGLE BUTTON - INTERNAL IN EXPANDED MODE */}
         {isOpen && (
           <SidebarToggle isOpen={isOpen} onToggle={onToggle} />
         )}
       </div>
 
-      {/* TOGGLE BUTTON - STACKED IN COLLAPSED MODE */}
       {!isOpen && (
         <SidebarToggle isOpen={isOpen} onToggle={onToggle} />
       )}

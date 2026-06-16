@@ -23,15 +23,14 @@ import StudentAvatar from "@/components/brand/StudentAvatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import MobileSidebar from "./MobileSidebar";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import Logo from "@/components/brand/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Final Hardened Header v112.0.
- * LAYOUT: Absolute Far-Left [Menu + Logo] with Minimal Spacing.
+ * @fileOverview Final Hardened Header v113.0.
+ * LAYOUT: High-Density Left Block [Menu + Logo] with Zero Spacing.
  * SIZING: Mobile 72px / Desktop 88px.
  * LOGO: 40px standard.
  */
@@ -67,8 +66,8 @@ export default function Navbar() {
       <nav className="w-full border-b border-[#E5E7EB] bg-white h-[72px] lg:h-[88px] px-0 shadow-[0_2px_10px_rgba(0,0,0,0.06)] flex items-center overflow-hidden">
         <div className="w-full flex items-center justify-between h-full px-2 lg:px-6">
           
-          {/* LEFT GROUP: MENU + LOGO (ABSOLUTE LEFT END - ZERO SPACE) */}
-          <div className="flex items-center gap-2 lg:gap-4 shrink-0">
+          {/* LEFT GROUP: MENU + LOGO (ABSOLUTE LEFT END - MINIMAL GAP) */}
+          <div className="flex items-center gap-2 shrink-0">
             <button 
               onClick={() => setIsSidebarOpen(true)}
               className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 active:bg-gray-50 transition-all z-10 shrink-0 shadow-sm"
@@ -82,7 +81,7 @@ export default function Navbar() {
             />
           </div>
 
-          {/* CENTER: DESKTOP NAVIGATION (Hidden on Mobile) */}
+          {/* CENTER: DESKTOP NAVIGATION */}
           <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center h-full mx-6">
              <NavLink href="/" label="Home" active={pathname === '/'} />
              <NavLink href="/mocks" label="Practice" active={pathname === '/mocks'} />
@@ -135,7 +134,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* SIDEBAR OVERLAY */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent 
           side="left" 

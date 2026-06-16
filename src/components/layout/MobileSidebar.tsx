@@ -23,14 +23,13 @@ import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import StudentAvatar from "@/components/brand/StudentAvatar";
 import Logo from "@/components/brand/Logo";
 import { TELEGRAM_GROUP, INSTAGRAM_PROFILE } from "@/lib/constants";
 
 /**
- * @fileOverview Premium Sidebar Hub v19.0.
- * UPDATED: Synchronized Header height (72px) and 40px branding alignment.
+ * @fileOverview Premium Sidebar Hub v20.0.
+ * UPDATED: Close button moved to the right end of the header.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -72,15 +71,15 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
     <div className="flex flex-col h-full bg-white font-body select-none text-left relative overflow-hidden">
       
       {/* 1. BRAND HEADER - 72px (SYNCHRONIZED WITH NAVBAR) */}
-      <div className="flex items-center px-0 h-[72px] border-b shrink-0 bg-white">
+      <div className="flex items-center justify-between px-4 h-[72px] border-b shrink-0 bg-white">
+        <Logo variant="light" href="/" onClick={onClose} />
         <button 
           onClick={onClose}
-          className="w-[72px] h-[72px] flex items-center justify-center text-slate-700 active:bg-gray-50 transition-all shrink-0"
+          className="h-10 w-10 flex items-center justify-center text-slate-700 active:bg-gray-50 transition-all shrink-0 rounded-xl hover:bg-slate-50"
           aria-label="Close menu"
         >
           <X className="w-6 h-6" />
         </button>
-        <Logo variant="light" href="/" onClick={onClose} />
       </div>
 
       {/* 2. NAVIGATION HUB */}

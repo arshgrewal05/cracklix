@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 /**
- * @fileOverview Hardened Admin Hub Layout v12.0.
+ * @fileOverview Hardened Admin Hub Layout v13.0.
  * UPDATED: Header height synchronized to 72px (Mobile) and 88px (Desktop).
  */
 
@@ -68,7 +68,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   
   if (!user || !isAdmin) return null;
 
-  // Synchronization Widths
   const sidebarWidth = isSidebarOpen ? 280 : 88;
 
   return (
