@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Arsh Grewal', url: 'https://cracklix.com' }],
   icons: {
     icon: '/favicon.ico',
-    apple: '/icons/apple-touch-icon.png',
+    apple: '/icons/cracklix-icon.png',
   },
   appleWebApp: {
     capable: true,

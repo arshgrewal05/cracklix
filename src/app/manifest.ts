@@ -1,11 +1,10 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Production-Grade PWA Manifest v3.0.
+ * @fileOverview Production-Grade PWA Manifest v4.0.
+ * UPDATED: Pointed to professional icon and maskable icon nodes.
  */
 export default function manifest(): MetadataRoute.Manifest {
-  const brandIcon = '/logo/cracklix-logo.png';
-
   return {
     name: 'Cracklix',
     short_name: 'Cracklix',
@@ -14,30 +13,24 @@ export default function manifest(): MetadataRoute.Manifest {
     id: '/',
     scope: '/',
     display: 'standalone',
-    background_color: '#081a3a',
-    theme_color: '#081a3a',
+    background_color: '#020617',
+    theme_color: '#2563eb',
     orientation: 'portrait',
     icons: [
       {
-        src: brandIcon,
+        src: '/icons/cracklix-icon.png',
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any',
       },
       {
-        src: brandIcon,
+        src: '/icons/cracklix-icon.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any',
       },
       {
-        src: brandIcon,
-        sizes: '192x192',
-        type: 'image/png',
-        purpose: 'maskable',
-      },
-      {
-        src: brandIcon,
+        src: '/icons/maskable-icon-512x512.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable',

@@ -25,8 +25,8 @@ import { getDeviceId, getBrowserInfo } from "@/lib/device"
 import { motion } from "framer-motion"
 
 /**
- * @fileOverview Hardened Login Hub v15.0 (PWA Optimized).
- * FIXED: Padding issues and card width on small mobile devices.
+ * @fileOverview Hardened Login Hub v16.0.
+ * UPDATED: Uses variant="dark" (White text) for dark atmospheric background.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -210,7 +210,7 @@ function LoginContent() {
       
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="z-10 w-full max-w-[440px] space-y-8">
         <div className="flex flex-col items-center h-12 md:h-20 w-full mb-4">
-          <Logo variant="light" imgClassName="h-full w-auto" />
+          <Logo variant="dark" />
         </div>
 
         {deviceError && (
@@ -228,7 +228,7 @@ function LoginContent() {
           <div className="h-1.5 w-full bg-primary" />
           <CardHeader className="text-center pt-10 md:pt-14 pb-4 px-8 md:px-16">
             <CardTitle className="text-2xl md:text-4xl font-headline font-black uppercase tracking-tight text-white">{mode === 'login' ? "Login" : "Sign Up"}</CardTitle>
-            <CardDescription className="text-slate-500 font-bold uppercase text-[9px] md:text-[11px] tracking-[0.3em] mt-3">REGISTRY ACCESS v15.0</CardDescription>
+            <CardDescription className="text-slate-500 font-bold uppercase text-[9px] md:text-[11px] tracking-[0.3em] mt-3">REGISTRY ACCESS v16.0</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 md:space-y-10 pb-12 md:pb-20 px-8 md:px-16">
             <form onSubmit={handleEmailAuth} className="space-y-4 md:space-y-6">

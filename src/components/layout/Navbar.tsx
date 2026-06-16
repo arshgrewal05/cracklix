@@ -32,8 +32,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Production-Grade Responsive PWA Header v83.0.
- * UPDATED: Precise Z-Index (z-[2001]) for Sidebar to cover all UI elements.
+ * @fileOverview Production-Grade Responsive PWA Header v84.0.
+ * UPDATED: Navbar uses variant="light" (Navy text) for white background.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -75,7 +75,7 @@ export default function Navbar() {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <Logo imgClassName="h-8 lg:h-10 w-auto" />
+            <Logo variant="light" />
           </div>
 
           {/* CENTER: NAVIGATION (Desktop ONLY) */}
@@ -138,7 +138,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* SIDEBAR OVERLAY - FIXED WIDTH & Z-INDEX */}
+      {/* SIDEBAR OVERLAY */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent side="left" className="p-0 border-none w-[300px] bg-white z-[2001] shadow-5xl">
           <SheetHeader className="sr-only">

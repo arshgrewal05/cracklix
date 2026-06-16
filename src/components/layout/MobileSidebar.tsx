@@ -32,9 +32,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar";
 import { TELEGRAM_GROUP, INSTAGRAM_PROFILE } from "@/lib/constants";
 
 /**
- * @fileOverview Premium Sidebar Hub v6.0.
- * UPDATED: Optimized width (300px), larger logo (140px), and clear hierarchy.
- * FIXED: Removed internal close button to rely on Radix/Sheet trigger for 100% fidelity.
+ * @fileOverview Premium Sidebar Hub v7.0.
+ * UPDATED: Sidebar uses variant="light" (Navy text) to match clean white aesthetic.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -77,7 +76,7 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
       
       {/* 1. BRAND HEADER */}
       <div className="h-24 px-6 flex items-center justify-start shrink-0 border-b border-slate-50">
-         <Logo imgClassName="w-[140px] h-auto" />
+         <Logo variant="light" imgClassName="w-[140px] h-auto" />
       </div>
 
       {/* 2. NAVIGATION HUB */}
