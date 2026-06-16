@@ -13,10 +13,10 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Official Cracklix Brand Hub v19.0.
+ * @fileOverview Official Cracklix Brand Hub v20.0.
  * HARDENED: Locked responsive scaling to prevent shrinking.
- * DIMENSIONS: Mobile 48px (h-12) / Desktop 64px (h-16).
- * MIN-WIDTH: 160px to protect brand identity on small viewports.
+ * DIMENSIONS: Mobile 56px (h-14) / Desktop 72px (lg:h-[72px]).
+ * MIN-WIDTH: 180px to protect brand identity and visibility.
  */
 export default function Logo({ className = "", href = "/", variant = 'light', imgClassName = "" }: LogoProps) {
   // Use dark logo for light background, and light logo for dark background
@@ -26,18 +26,18 @@ export default function Logo({ className = "", href = "/", variant = 'light', im
     <Link 
       href={href} 
       className={cn(
-        "flex items-center group pointer-events-auto select-none shrink-0 min-w-[160px]", 
+        "flex items-center group pointer-events-auto select-none shrink-0 min-w-[180px]", 
         className
       )}
     >
       <Image 
         src={logoSrc} 
         alt="Cracklix" 
-        width={180}
-        height={50}
+        width={220}
+        height={60}
         priority
         className={cn(
-          "h-12 w-auto lg:h-16 object-contain transition-transform group-hover:scale-105 shrink-0",
+          "h-14 w-auto lg:h-[72px] object-contain transition-transform group-hover:scale-105 shrink-0",
           imgClassName
         )}
       />

@@ -30,8 +30,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Hardened Header v98.0.
- * LAYOUT: [Menu + Logo] Snug on left.
+ * @fileOverview Hardened Header v99.0.
+ * LAYOUT: [Menu + Logo] Locked to left.
  * SIZING: Mobile 72px / Desktop 88px.
  */
 export default function Navbar() {
@@ -66,8 +66,8 @@ export default function Navbar() {
       <nav className="w-full border-b border-[#E5E7EB] bg-white h-[72px] lg:h-[88px] px-4 lg:px-8 shadow-[0_2px_10px_rgba(0,0,0,0.06)] flex items-center overflow-hidden">
         <div className="w-full max-w-7xl mx-auto flex items-center justify-between h-full">
           
-          {/* LEFT GROUP: MENU + LOGO (SNUG) */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* LEFT GROUP: MENU + LOGO (LOCKED LEFT) */}
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
             <button 
               onClick={() => setIsSidebarOpen(true)}
               className="w-11 h-11 lg:w-16 lg:h-16 rounded-2xl lg:rounded-3xl bg-gray-50 flex items-center justify-center text-slate-700 active:scale-95 transition-all shadow-sm"
@@ -79,14 +79,14 @@ export default function Navbar() {
           </div>
 
           {/* CENTER: DESKTOP NAVIGATION (Hidden on Mobile) */}
-          <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center h-full mx-10">
+          <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center h-full mx-6">
              <NavLink href="/" label="Home" active={pathname === '/'} />
              <NavLink href="/mocks" label="Practice" active={pathname === '/mocks'} />
              <NavLink href="/current-affairs" label="Updates" active={pathname === '/current-affairs'} />
           </nav>
 
           {/* RIGHT GROUP: SEARCH + PROFILE */}
-          <div className="flex items-center gap-2 md:gap-4 shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
              <Link href="/search" className="w-11 h-11 lg:w-16 lg:h-16 rounded-2xl lg:rounded-3xl bg-gray-50 flex items-center justify-center text-slate-700 hover:text-[#2563EB] transition-all active:scale-95 shadow-sm">
                 <Search className="w-6 h-6 lg:w-8 lg:h-8" />
              </Link>
@@ -151,7 +151,7 @@ export default function Navbar() {
 function NavLink({ href, label, active }: { href: string, label: string, active?: boolean }) {
   return (
     <Link href={href} className={cn(
-      "flex items-center px-6 py-2 rounded-xl font-bold text-[15px] transition-all shrink-0 uppercase tracking-widest",
+      "flex items-center px-4 py-2 rounded-xl font-bold text-[14px] transition-all shrink-0 uppercase tracking-widest",
       active 
         ? "bg-blue-50 text-[#2563EB] shadow-sm" 
         : "text-slate-400 hover:text-[#04102B] hover:bg-gray-50"
