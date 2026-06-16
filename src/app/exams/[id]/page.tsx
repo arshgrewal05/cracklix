@@ -1,11 +1,10 @@
-
 "use client"
 
 import React, { useMemo, useState, useEffect } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useDoc, useCollection, useFirestore, useUser } from "@/firebase"
-import { doc, collection, query, where, limit, orderBy, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "firebase/firestore"
+import { doc, collection, query, where, limit, orderBy, updateDoc, arrayUnion, arrayRemove, serverTimestamp, getDoc } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -27,7 +26,8 @@ import {
   Play,
   BarChart3,
   Newspaper,
-  Star
+  Star,
+  ArrowRight
 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
@@ -37,8 +37,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Institutional Exam Hub v33.0 (Pinning Enabled).
- * UPDATED: Added Star icon to header for pinning exams to student interests.
+ * @fileOverview Institutional Exam Hub v34.0 (Elite Card Upgrade).
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -67,12 +66,10 @@ export default function ExamHubPage() {
 
   const [isPinning, setIsPinning] = useState(false);
 
-  // INTEREST AUDIT
   const isPinned = useMemo(() => {
     return profile?.pinnedExams?.includes(examId) || false;
   }, [profile, examId]);
 
-  // PIN TOGGLE NODE
   const togglePin = async () => {
     if (!db || !user || isPinning) return;
     setIsPinning(true);
@@ -92,13 +89,11 @@ export default function ExamHubPage() {
     }
   };
 
-  // PASS ACCESS FIREWALL
   const isPassActive = useMemo(() => {
      if (!user || !profile) return false;
      const userEmail = user.email?.toLowerCase();
      const isFounder = userEmail && SUPER_ADMIN_WHITELIST.includes(userEmail);
      if (profile.role === 'ADMIN' || profile.role === 'SUPER_ADMIN' || isFounder) return true;
-     
      if (profile.pass?.active === true) {
         const expiry = new Date(profile.pass.expiryDate);
         return expiry > new Date();
@@ -106,7 +101,6 @@ export default function ExamHubPage() {
      return false;
   }, [user, profile]);
 
-  // CONTENT GROUPING LOGIC
   const groupedContent = useMemo(() => {
     const mocks = (rawMocks || []).filter(m => {
        const isDirectMatch = m.examId === examId;
@@ -127,15 +121,11 @@ export default function ExamHubPage() {
     }
   }, [rawMocks, rawNotes, caHub, examId, exam])
 
-  // HARDENED PERFORMANCE CHECK
   const examPerformance = useMemo(() => {
      if (!rawMocks || !userResults) return { attempted: 0, avgAcc: 0, bestScore: 0 };
-     
      const allAssociatedMocks = [...groupedContent.FULL, ...groupedContent.SUBJECT, ...groupedContent.SECTIONAL, ...groupedContent.PYQ];
      const mockIds = new Set(allAssociatedMocks.map(m => m.id));
-
      const examResults = (userResults || []).filter(r => mockIds.has(r.mockId));
-     
      if (examResults.length === 0) return { attempted: 0, avgAcc: 0, bestScore: 0 };
      return {
         attempted: examResults.length,
@@ -165,7 +155,6 @@ export default function ExamHubPage() {
     <div className="flex flex-col min-h-screen bg-slate-50/50 font-body text-left">
       <Navbar />
       
-      {/* HEADER */}
       <section className="bg-white border-b border-slate-100 py-6 md:py-16 text-left relative overflow-hidden">
          <div className="absolute top-0 right-0 p-12 opacity-5"><GraduationCap className="h-48 w-48" /></div>
          <div className="container mx-auto px-4 max-w-7xl relative z-10">
@@ -212,7 +201,6 @@ export default function ExamHubPage() {
          </div>
       </section>
 
-      {/* TABS NAVIGATION */}
       <main className="container mx-auto px-4 py-8 max-w-7xl pb-40">
          <Tabs defaultValue="FULL" className="space-y-8 md:space-y-12">
             <div className="bg-white border border-slate-100 rounded-2xl p-1 shadow-md overflow-x-auto no-scrollbar relative">
@@ -228,13 +216,13 @@ export default function ExamHubPage() {
 
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                <TabsContent value="FULL" className="m-0">
-                  <MockList data={groupedContent.FULL} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} />
+                  <MockList data={groupedContent.FULL} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} boards={boards} />
                </TabsContent>
                <TabsContent value="SUBJECT" className="m-0">
-                  <MockList data={groupedContent.SUBJECT} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} />
+                  <MockList data={groupedContent.SUBJECT} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} boards={boards} />
                </TabsContent>
                <TabsContent value="SECTIONAL" className="m-0">
-                  <MockList data={groupedContent.SECTIONAL} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} />
+                  <MockList data={groupedContent.SECTIONAL} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} boards={boards} />
                </TabsContent>
                <TabsContent value="CA" className="m-0">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -259,7 +247,7 @@ export default function ExamHubPage() {
                   </div>
                </TabsContent>
                <TabsContent value="PYQ" className="m-0">
-                  <MockList data={groupedContent.PYQ} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} />
+                  <MockList data={groupedContent.PYQ} results={userResults} isPassActive={isPassActive} user={user} loading={mocksLoading} boards={boards} />
                </TabsContent>
                <TabsContent value="NOTES" className="m-0">
                   <NotesList data={groupedContent.NOTES} isPassActive={isPassActive} loading={notesLoading} />
@@ -280,12 +268,13 @@ function DashboardTab({ value, label, icon }: any) {
    )
 }
 
-function MockList({ data, results, isPassActive, user, loading }: any) {
+function MockList({ data, results, isPassActive, user, loading, boards }: any) {
    const router = useRouter();
+   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
    
    if (loading) return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-         {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-48 w-full rounded-2xl" />)}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+         {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[420px] w-full rounded-[32px]" />)}
       </div>
    );
 
@@ -297,50 +286,80 @@ function MockList({ data, results, isPassActive, user, loading }: any) {
    );
 
    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
          {data.map((mock: any) => {
             const result = results?.find((r: any) => r.mockId === mock.id);
             const tier = (mock.accessLevel || mock.accessType || 'FREE').trim().toUpperCase();
             const isPremium = tier === 'PREMIUM';
             const locked = isPremium && !isPassActive;
+            const board = boards?.find((b: any) => b.id === (mock.boardIds?.[0] || mock.boardId));
+            const difficulty = mock.difficulty || "Medium";
 
             return (
-               <Card key={mock.id} className="border-none shadow-lg rounded-[2rem] bg-white group p-6 md:p-10 flex flex-col h-full border border-slate-100 relative overflow-hidden">
-                  <div className="flex justify-between items-start mb-6 md:mb-10">
-                     <Badge className={cn(
-                        "border-none text-[8px] font-black px-2.5 py-0.5 rounded shadow-md uppercase tracking-widest", 
-                        isPremium ? "bg-amber-100 text-amber-600" : "bg-emerald-50 text-emerald-600"
-                     )}>
-                        {isPremium ? '🔒 PREMIUM' : 'FREE'}
-                     </Badge>
-                     {result && <Badge className="bg-primary text-white border-none text-[7px] font-black px-2 py-0.5 rounded uppercase">CHECKED</Badge>}
-                  </div>
+               <Card key={mock.id} className="border border-[#E5E7EB] shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:translate-y-[-6px] transition-all duration-500 rounded-[32px] bg-white p-8 md:p-10 text-center flex flex-col h-[420px] group relative overflow-hidden">
                   
-                  <h3 className="text-base md:text-2xl font-black text-[#0F172A] uppercase leading-tight mb-6 md:mb-8 flex-1 group-hover:text-primary transition-colors">
-                     {mock.title}
-                  </h3>
-
-                  <div className="flex items-center gap-6 pt-4 border-t border-slate-50 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                     <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-primary" /> {mock.duration}m</span>
-                     <span className="flex items-center gap-2"><BookOpen className="h-3.5 w-3.5 text-primary" /> {mock.totalQuestions} Qs</span>
+                  {/* TOP BADGE */}
+                  <div className="absolute top-6 right-6 flex flex-col gap-2 items-end">
+                    {result && <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black uppercase tracking-widest px-3 py-1 shadow-sm">Attempted</Badge>}
                   </div>
 
-                  <div className="mt-8">
-                     {locked ? (
-                        <Button onClick={() => router.push('/pass')} className="w-full h-12 md:h-16 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase text-[9px] md:text-[10px] tracking-widest rounded-xl shadow-lg gap-2 border-none">
-                           <Lock className="h-3.5 w-3.5" /> UNLOCK TEST
-                        </Button>
+                  {/* BOARD LOGO HUB */}
+                  <div className="h-[70px] w-[70px] mx-auto rounded-full bg-[#F8FAFC] flex items-center justify-center p-3.5 shrink-0 shadow-inner group-hover:scale-110 transition-transform duration-500 mb-8 overflow-hidden border border-slate-100">
+                     {board?.iconUrl && !failedImages[board.id] ? (
+                       <img 
+                         src={board.iconUrl} 
+                         className="h-full w-full object-contain" 
+                         alt="Logo" 
+                         referrerPolicy="no-referrer"
+                         onError={() => setFailedImages(prev => ({...prev, [board.id]: true}))}
+                       />
                      ) : (
-                        <Button onClick={() => router.push(user ? `/mocks/${mock.id}/instructions` : `/login?returnUrl=/mocks/${mock.id}`)} className="w-full h-12 md:h-16 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[9px] md:text-[10px] tracking-widest rounded-xl shadow-lg border-none gap-3 active:scale-95 transition-all">
-                           <Play className="h-4 w-4 fill-current text-primary" /> START TEST
-                        </Button>
+                       <Zap className="h-8 w-8 text-primary fill-current opacity-40" />
                      )}
                   </div>
+
+                  <CardHeader className="p-0 flex-1 space-y-6">
+                     <CardTitle className="font-extrabold text-[28px] text-[#04102B] leading-[1.1] tracking-tight line-clamp-2 min-h-[62px]">
+                        {mock.title}
+                     </CardTitle>
+
+                     <div className="flex items-center justify-center gap-4 text-[14px] font-bold text-[#64748B] tracking-tight">
+                        <span className="flex items-center gap-1.5"><BookOpen className="h-4 w-4 text-primary opacity-50" /> {mock.totalQuestions} Qs</span>
+                        <div className="h-4 w-px bg-slate-100" />
+                        <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-primary opacity-50" /> {mock.duration} Min</span>
+                     </div>
+
+                     <div className="flex items-center justify-center gap-3">
+                        <DifficultyBadge level={difficulty} isPremium={isPremium} />
+                        <Badge variant="outline" className="border-slate-100 text-[#94A3B8] text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">{board?.abbreviation || 'PSSSB'}</Badge>
+                     </div>
+                  </CardHeader>
+
+                  <CardContent className="p-0 mt-10">
+                     {locked ? (
+                        <Button onClick={() => router.push('/pass')} className="w-full h-[56px] bg-amber-500 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-widest rounded-[18px] transition-all shadow-xl shadow-amber-500/10 active:scale-95 border-none gap-2">
+                           <Lock className="h-4 w-4" /> Unlock Premium Pass
+                        </Button>
+                     ) : (
+                        <Button onClick={() => router.push(user ? `/mocks/${mock.id}/instructions` : `/login?returnUrl=/mocks/${mock.id}`)} className="w-full h-[56px] bg-[#04102B] hover:bg-[#2F6BFF] text-white font-black text-xs uppercase tracking-widest rounded-[18px] transition-all shadow-xl shadow-slate-900/10 active:scale-95 border-none group/btn">
+                           <span className="flex items-center justify-center gap-2">
+                             Attempt Now <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                           </span>
+                        </Button>
+                     )}
+                  </CardContent>
                </Card>
             )
          })}
       </div>
    )
+}
+
+function DifficultyBadge({ level, isPremium }: { level: string, isPremium: boolean }) {
+  if (isPremium) return <Badge className="bg-[#EEF2FF] text-[#2F6BFF] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">PREMIUM</Badge>;
+  if (level === 'Easy') return <Badge className="bg-[#DCFCE7] text-[#16A34A] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">EASY</Badge>;
+  if (level === 'Hard') return <Badge className="bg-[#FEE2E2] text-[#DC2626] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">HARD</Badge>;
+  return <Badge className="bg-[#FEF3C7] text-[#D97706] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">MEDIUM</Badge>;
 }
 
 function NotesList({ data, isPassActive, loading }: any) {

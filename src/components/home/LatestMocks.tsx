@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { BookOpen, Clock, Zap, Lock, ArrowRight } from "lucide-react"
+import { BookOpen, Clock, Zap, Lock, ArrowRight, Trophy, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { 
@@ -18,8 +18,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Official Latest Mock Hub v38.0 (Hardened).
- * FIXED: Hydration guard added to prevent mismatched initial UI errors.
+ * @fileOverview Elite Latest Mock Hub v40.0.
+ * DESIGN: 380px x 420px geometry with 32px radius and 70px circular logos.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -34,7 +34,7 @@ export default function LatestMocks() {
     setMounted(true);
   }, []);
   
-  const mocksQuery = useMemo(() => (db ? query(collection(db, "mocks"), where("published", "==", true), limit(5)) : null), [db])
+  const mocksQuery = useMemo(() => (db ? query(collection(db, "mocks"), where("published", "==", true), limit(6)) : null), [db])
   const { data: rawMocks, loading } = useCollection<any>(mocksQuery)
   const { data: boards } = useCollection<any>(useMemo(() => (db ? collection(db, "boards") : null), [db]))
 
@@ -61,19 +61,23 @@ export default function LatestMocks() {
     <section className="py-16 md:py-24 bg-white">
       <div className="container mx-auto px-4 max-w-7xl">
         
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 text-left">
-           <div className="space-y-2">
-              <h2 className="text-3xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-none">Latest Mock Tests</h2>
-              <p className="text-slate-500 font-medium">Recently deployed preparation nodes.</p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6 text-left">
+           <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Zap className="h-6 w-6 text-primary fill-current" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">PUNJAB REGISTRY</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-headline font-black text-[#04102B] uppercase tracking-tight leading-none">Latest Mock Tests</h2>
+              <p className="text-[#64748B] font-medium text-lg">High-fidelity preparation nodes recently deployed.</p>
            </div>
-           <Link href="/mocks" className="text-primary font-black uppercase text-[10px] md:text-xs tracking-widest hover:underline flex items-center gap-2">
-              View All Series <ArrowRight className="h-4 w-4" />
+           <Link href="/mocks" className="bg-slate-50 px-6 py-3 rounded-xl text-primary font-black uppercase text-[10px] md:text-xs tracking-widest hover:bg-primary hover:text-white transition-all flex items-center gap-2 shadow-sm">
+              Explore All <ArrowRight className="h-4 w-4" />
            </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {loading ? (
-             Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-80 w-full rounded-[2.5rem]" />)
+             Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[420px] w-full rounded-[32px] bg-slate-50" />)
           ) : mocks.map((mock, i) => {
             const board = boards?.find((b: any) => b.id === (mock.boardIds?.[0] || mock.boardId));
             const difficulty = mock.difficulty || "Medium";
@@ -82,10 +86,21 @@ export default function LatestMocks() {
             const locked = isPremium && !isPassActive;
             
             return (
-              <motion.div key={mock.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} viewport={{ once: true }}>
-                <Card className="border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 rounded-[2.5rem] bg-white p-6 text-center flex flex-col h-full group">
+              <motion.div key={mock.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }}>
+                <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:translate-y-[-6px] transition-all duration-500 rounded-[32px] bg-white p-8 md:p-10 text-center flex flex-col h-[420px] group relative overflow-hidden">
                   
-                  <div className="h-16 w-16 mx-auto rounded-full bg-slate-50 flex items-center justify-center p-3 shadow-inner group-hover:scale-110 transition-transform mb-6 relative overflow-hidden text-primary">
+                  {/* TOP BADGE */}
+                  <div className="absolute top-6 right-6 flex flex-col gap-2 items-end">
+                    {(i === 0 || i === 1) && (
+                      <Badge className="bg-orange-50 text-[#D97706] border-none text-[8px] font-black uppercase tracking-widest px-3 py-1 shadow-sm">🔥 Popular</Badge>
+                    )}
+                    {mock.isTrending && (
+                      <Badge className="bg-blue-50 text-[#2F6BFF] border-none text-[8px] font-black uppercase tracking-widest px-3 py-1 shadow-sm">⭐ Featured</Badge>
+                    )}
+                  </div>
+
+                  {/* BOARD LOGO HUB */}
+                  <div className="h-[70px] w-[70px] mx-auto rounded-full bg-[#F8FAFC] flex items-center justify-center p-3.5 shrink-0 shadow-inner group-hover:scale-110 transition-transform duration-500 mb-8 overflow-hidden border border-slate-100">
                      {board?.iconUrl && !failedImages[board.id] ? (
                        <img 
                          src={board.iconUrl} 
@@ -95,39 +110,37 @@ export default function LatestMocks() {
                          onError={() => setFailedImages(prev => ({...prev, [board.id]: true}))}
                        />
                      ) : (
-                       <Zap className="h-6 w-6 fill-current" />
+                       <Zap className="h-8 w-8 text-primary fill-current opacity-40" />
                      )}
                   </div>
 
-                  <CardHeader className="p-0 flex-1 space-y-4">
-                     <CardTitle className="font-black text-sm md:text-base text-[#0F172A] leading-tight uppercase line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
+                  <CardHeader className="p-0 flex-1 space-y-6">
+                     <CardTitle className="font-extrabold text-[28px] text-[#04102B] leading-[1.1] tracking-tight line-clamp-2 min-h-[62px]">
                         {mock.title}
                      </CardTitle>
 
-                     <div className="flex items-center justify-center gap-3 text-[9px] font-bold text-slate-400 uppercase tracking-tight">
-                        <span className="flex items-center gap-1.5"><BookOpen className="h-3 w-3 text-slate-300" /> {mock.totalQuestions} Qs</span>
-                        <div className="h-3 w-px bg-slate-100" />
-                        <span className="flex items-center gap-1.5"><Clock className="h-3 w-3 text-slate-300" /> {mock.duration}m</span>
+                     <div className="flex items-center justify-center gap-4 text-[14px] font-bold text-[#64748B] tracking-tight">
+                        <span className="flex items-center gap-1.5"><BookOpen className="h-4 w-4 text-primary opacity-50" /> {mock.totalQuestions} Questions</span>
+                        <div className="h-4 w-px bg-slate-100" />
+                        <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-primary opacity-50" /> {mock.duration} Minutes</span>
                      </div>
 
-                     <Badge className={cn(
-                        "border-none text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded shadow-sm",
-                        difficulty === 'Hard' ? "bg-rose-50 text-rose-500" :
-                        difficulty === 'Easy' ? "bg-emerald-50 text-emerald-600" :
-                        "bg-orange-50 text-orange-500"
-                     )}>
-                        {isPremium ? '🔒 PREMIUM' : difficulty}
-                     </Badge>
+                     <div className="flex items-center justify-center gap-3">
+                        <DifficultyBadge level={difficulty} isPremium={isPremium} />
+                        <Badge variant="outline" className="border-slate-100 text-[#94A3B8] text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">{board?.abbreviation || 'PSSSB'}</Badge>
+                     </div>
                   </CardHeader>
 
-                  <CardContent className="p-0 mt-8 pt-4">
+                  <CardContent className="p-0 mt-10">
                      {locked ? (
-                       <Button asChild className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-black text-[9px] uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 border-none">
-                          <Link href="/pass">Unlock Test</Link>
+                       <Button asChild className="w-full h-[56px] bg-amber-500 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-widest rounded-[18px] transition-all shadow-xl shadow-amber-500/10 active:scale-95 border-none gap-2">
+                          <Link href="/pass"><Lock className="h-4 w-4" /> Unlock Premium Pass</Link>
                        </Button>
                      ) : (
-                       <Button asChild className="w-full h-11 bg-[#0B1528] text-white hover:bg-black font-black text-[9px] uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 border-none">
-                          <Link href={`/mocks/${mock.id}`}>Attempt Now</Link>
+                       <Button asChild className="w-full h-[56px] bg-[#04102B] hover:bg-[#2F6BFF] text-white font-black text-xs uppercase tracking-widest rounded-[18px] transition-all shadow-xl shadow-slate-900/10 active:scale-95 border-none group/btn">
+                          <Link href={`/mocks/${mock.id}`} className="flex items-center justify-center gap-2">
+                             Attempt Now <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                          </Link>
                        </Button>
                      )}
                   </CardContent>
@@ -139,4 +152,13 @@ export default function LatestMocks() {
       </div>
     </section>
   )
+}
+
+function DifficultyBadge({ level, isPremium }: { level: string, isPremium: boolean }) {
+  if (isPremium) return <Badge className="bg-[#EEF2FF] text-[#2F6BFF] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">PREMIUM</Badge>;
+  
+  if (level === 'Easy') return <Badge className="bg-[#DCFCE7] text-[#16A34A] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">EASY</Badge>;
+  if (level === 'Hard') return <Badge className="bg-[#FEE2E2] text-[#DC2626] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">HARD</Badge>;
+  
+  return <Badge className="bg-[#FEF3C7] text-[#D97706] border-none text-[9px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">MEDIUM</Badge>;
 }
