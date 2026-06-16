@@ -23,8 +23,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Cracklix Majestic Hero v6.2.
- * UPDATED: Moved top floating nodes higher in desktop mode (lg:top-[8%]).
+ * @fileOverview Official Cracklix Majestic Hero v6.3.
+ * UPDATED: Recalibrated floating nodes for desktop - top nodes higher (top-0), bottom nodes lower (-bottom-10%).
  */
 
 export default function Hero() {
@@ -140,10 +140,10 @@ export default function Hero() {
 
           {/* RIGHT: ILLUSTRATION HUB */}
           <div className="relative flex justify-center lg:pl-12">
-            <FloatingNode icon={<Zap className="text-blue-600 h-5 w-5" />} label="Mock Tests" className="top-[18%] lg:top-[8%] left-0 md:left-4" />
-            <FloatingNode icon={<Target className="text-purple-600 h-5 w-5" />} label="Daily Practice" className="bottom-[2%] left-0 md:left-0" />
-            <FloatingNode icon={<FileStack className="text-emerald-500 h-5 w-5" />} label="Previous Papers" className="bottom-[2%] right-0 md:right-0" />
-            <FloatingNode icon={<Trophy className="text-orange-500 h-5 w-5" />} label="Punjab Exams" className="top-[18%] lg:top-[8%] right-0 md:right-4" />
+            <FloatingNode icon={<Zap className="text-blue-600 h-5 w-5" />} label="Mock Tests" className="top-[18%] lg:top-[0%] left-0 md:left-4" />
+            <FloatingNode icon={<Target className="text-purple-600 h-5 w-5" />} label="Daily Practice" className="bottom-[2%] lg:-bottom-[10%] left-0 md:left-0" />
+            <FloatingNode icon={<FileStack className="text-emerald-500 h-5 w-5" />} label="Previous Papers" className="bottom-[2%] lg:-bottom-[10%] right-0 md:right-0" />
+            <FloatingNode icon={<Trophy className="text-orange-500 h-5 w-5" />} label="Punjab Exams" className="top-[18%] lg:top-[0%] right-0 md:right-4" />
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100/50 rounded-full blur-3xl -z-10" />
             
