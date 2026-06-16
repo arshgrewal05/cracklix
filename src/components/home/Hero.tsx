@@ -6,28 +6,21 @@ import {
   ArrowRight,
   Star,
   Zap,
-  LayoutGrid,
   ShieldCheck,
   Users,
-  Landmark,
-  BookOpen,
-  Layers,
   ClipboardList,
-  Files,
-  Target,
-  ChevronRight
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Native-Scaled Elite Hero Hub v70.0.
- * UPDATED: Moved image higher and repositioned buttons to match screenshot below it.
+ * @fileOverview Elite Hero Hub v72.0 (High Fidelity Match).
+ * UPDATED: Integrated Stats Bar from screenshot with live registry sync.
  */
 
 export default function Hero() {
@@ -43,41 +36,53 @@ export default function Hero() {
 
   const heroImage = "/images/hero-student.png";
 
-  const featureStats = [
-    { 
-      label: "Mock Tests", 
-      desc: "Exam-focused mock tests", 
-      color: "text-blue-600", 
-      bgColor: "bg-blue-50", 
-      icon: <ClipboardList className="h-5 w-5 md:h-6 md:w-6" /> 
-    },
-    { 
-      label: "Previous Papers", 
-      desc: "Previous year question papers", 
-      color: "text-emerald-500", 
-      bgColor: "bg-emerald-50", 
-      icon: <Files className="h-5 w-5 md:h-6 md:w-6" /> 
-    },
-    { 
-      label: "Daily Practice", 
-      desc: "Practice daily & stay ahead", 
-      color: "text-purple-500", 
-      bgColor: "bg-purple-50", 
-      icon: <Target className="h-5 w-5 md:h-6 md:w-6" /> 
-    },
-    { 
-      label: "Punjab Exams", 
-      desc: "All major Punjab exams at one place", 
-      color: "text-orange-500", 
-      bgColor: "bg-orange-50", 
-      icon: <Landmark className="h-5 w-5 md:h-6 md:w-6" /> 
-    }
-  ];
+  const liveStats = useMemo(() => {
+    const format = (val: number, baseline: string) => {
+      if (!val || val === 0) return baseline;
+      if (val >= 1000) return (val / 1000).toFixed(0) + 'K+';
+      return val + '+';
+    };
+
+    return [
+      { 
+        val: format(stats?.totalQuestions, "50K+"), 
+        label: "Questions", 
+        desc: "High quality practice questions",
+        color: "text-blue-600", 
+        circleBg: "bg-blue-600",
+        icon: <Zap className="h-5 w-5 fill-current" /> 
+      },
+      { 
+        val: format(stats?.totalMocks, "500+"), 
+        label: "Mock Tests", 
+        desc: "Topic wise & full length mocks",
+        color: "text-purple-600", 
+        circleBg: "bg-purple-600",
+        icon: <ClipboardList className="h-5 w-5" /> 
+      },
+      { 
+        val: format(stats?.totalBoards, "50+"), 
+        label: "Exams", 
+        desc: "All major Punjab exams",
+        color: "text-emerald-500", 
+        circleBg: "bg-emerald-500",
+        icon: <ShieldCheck className="h-5 w-5" /> 
+      },
+      { 
+        val: format(stats?.totalUsers, "15K+"), 
+        label: "Aspirants", 
+        desc: "Trust Cracklix for preparation",
+        color: "text-orange-500", 
+        circleBg: "bg-orange-500",
+        icon: <Users className="h-5 w-5" /> 
+      }
+    ];
+  }, [stats]);
 
   if (!mounted) return null;
 
   return (
-    <section className="relative overflow-hidden bg-white pt-6 pb-10 md:pt-16 md:pb-24 text-center lg:text-left w-full border-b border-slate-100">
+    <section className="relative overflow-hidden bg-white pt-6 pb-12 md:pt-16 md:pb-24 text-center lg:text-left w-full border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
         
         <div className="flex flex-col items-center lg:items-start space-y-8">
@@ -87,7 +92,7 @@ export default function Hero() {
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-100 shadow-sm mx-auto lg:mx-0">
               <Star className="h-3 w-3 text-amber-500 fill-current" />
               <span className="text-[9px] md:text-xs font-black text-[#334155] tracking-widest uppercase">
-                {formatNumber(stats?.totalUsers || 15000)}+ ASPIRANTS TRUST CRACKLIX
+                {stats?.totalUsers ? stats.totalUsers.toLocaleString() : "15,000"}+ ASPIRANTS TRUST CRACKLIX
               </span>
             </motion.div>
 
@@ -102,7 +107,7 @@ export default function Hero() {
             </p>
           </div>
 
-          {/* 2. HERO IMAGE - MOVED UP */}
+          {/* 2. HERO IMAGE */}
           <div className="relative flex items-center justify-center w-full mt-4 md:mt-8">
              <motion.div 
                initial={{ opacity: 0, scale: 0.95 }} 
@@ -114,8 +119,8 @@ export default function Hero() {
              </motion.div>
           </div>
 
-          {/* 3. BUTTONS - FROM SCREENSHOT */}
-          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 w-full sm:w-auto pt-4">
+          {/* 3. BUTTONS (SCREENSHOT MATCH) */}
+          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 w-full sm:w-auto pt-4 pb-12 md:pb-16 border-b border-slate-50">
             <Button asChild className="h-14 md:h-16 px-10 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs md:text-sm tracking-widest rounded-2xl shadow-xl shadow-blue-600/20 border-none transition-all active:scale-95">
               <Link href="/mocks" className="flex items-center justify-center gap-3">
                 Start Free Mock Test <ArrowRight className="h-5 w-5" />
@@ -129,17 +134,18 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* 4. FEATURE GRID */}
-        <div className="mt-12 md:mt-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-           {featureStats.map((stat, idx) => (
+        {/* 4. STATS BAR (SCREENSHOT MATCH) */}
+        <div className="mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+           {liveStats.map((stat, idx) => (
              <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} viewport={{ once: true }}>
-               <Card className="border-none shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-5 md:p-6 bg-white hover:translate-y-[-4px] transition-all border border-slate-100 flex items-center gap-4">
-                 <div className={cn("h-12 w-12 md:h-14 md:w-14 rounded-xl flex items-center justify-center shrink-0 shadow-inner", stat.bgColor, stat.color)}>
+               <Card className="border-none shadow-sm rounded-2xl p-5 md:p-6 bg-white border border-slate-100 flex items-center gap-5 group">
+                 <div className={cn("h-12 w-12 md:h-16 md:w-16 rounded-full flex items-center justify-center shrink-0 shadow-lg text-white transition-transform group-hover:scale-110", stat.circleBg)}>
                     {stat.icon}
                  </div>
-                 <div className="min-w-0 text-left">
-                   <p className="text-sm md:text-lg font-black text-slate-900 tracking-tight leading-none">{stat.label}</p>
-                   <p className="text-[10px] md:text-[11px] font-medium text-slate-400 mt-1 leading-tight">{stat.desc}</p>
+                 <div className="min-w-0 text-left space-y-0.5">
+                   <p className={cn("text-xl md:text-2xl font-black tabular-nums leading-none tracking-tight", stat.color)}>{stat.val}</p>
+                   <p className="text-[12px] md:text-sm font-bold text-slate-900 leading-none uppercase tracking-tight">{stat.label}</p>
+                   <p className="text-[9px] md:text-[10px] font-medium text-slate-400 uppercase tracking-tight truncate">{stat.desc}</p>
                  </div>
                </Card>
              </motion.div>
@@ -148,9 +154,4 @@ export default function Hero() {
       </div>
     </section>
   );
-}
-
-function formatNumber(n: number) {
-  if (!n) return "15,000";
-  return n.toLocaleString();
 }
