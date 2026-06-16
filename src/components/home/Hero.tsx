@@ -26,9 +26,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Official Cracklix High-Fidelity Hero v41.0.
- * UPDATED: Positioned student illustration above cards/CTAs in mobile stack.
- * UPDATED: Card titles set to uppercase to match provided reference screenshot.
+ * @fileOverview Official Cracklix High-Fidelity Hero v42.0.
+ * UPDATED: Swapped hero student illustration with the new official asset.
+ * UPDATED: Maintained visual hierarchy with illustration above cards on mobile.
  */
 
 export default function Hero() {
@@ -42,7 +42,7 @@ export default function Hero() {
   const statsRef = useMemo(() => (db ? doc(db, "settings", "stats") : null), [db]);
   const { data: stats, loading: statsLoading } = useDoc<any>(statsRef);
 
-  const heroImage = "https://i.ibb.co/fYJttX5d/Gemini-Generated-Image-n1so6on1so6on1so.png";
+  const heroImage = "https://i.ibb.co/v4tN9H6W/Gemini-Generated-Image-n1so6on1so6on1so.png";
 
   const liveStats = useMemo(() => {
     const format = (n: number, fallback: string) => {
@@ -124,25 +124,25 @@ export default function Hero() {
                   <FloatingNode 
                      position="top-[2%] left-[0%] lg:left-[-10%]"
                      icon={<Zap className="h-4 w-4 text-blue-600 fill-current" />}
-                     title="Mock Tests"
+                     title="MOCK TESTS"
                      delay={0.3}
                   />
                   <FloatingNode 
                      position="top-[2%] right-[0%] lg:right-[-10%]"
                      icon={<Landmark className="h-4 w-4 text-orange-500" />}
-                     title="Punjab Exams"
+                     title="PUNJAB EXAMS"
                      delay={0.6}
                   />
                   <FloatingNode 
                      position="bottom-[5%] left-[0%] lg:left-[-15%]"
                      icon={<Target className="h-4 w-4 text-purple-600" />}
-                     title="Daily Practice"
+                     title="DAILY PRACTICE"
                      delay={0.5}
                   />
                   <FloatingNode 
                      position="bottom-[5%] right-[0%] lg:right-[-15%]"
                      icon={<FileStack className="h-4 w-4 text-emerald-600" />}
-                     title="Previous Papers"
+                     title="PREVIOUS PAPERS"
                      delay={0.4}
                   />
                 </div>
@@ -151,7 +151,7 @@ export default function Hero() {
 
           {/* 3. FEATURE CARDS & CTA HUB */}
           <div className="space-y-10 order-3">
-             {/* Middle Feature Row - Labels set to UPPERCASE per request */}
+             {/* Feature Row */}
              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-3">
                 <FeatureCard icon={<ClipboardCheck className="text-blue-600" />} title="MOCK TESTS" sub="Exam-focused tests" />
                 <FeatureCard icon={<FileText className="text-emerald-500" />} title="PREVIOUS PAPERS" sub="Verified paper bank" />
@@ -181,7 +181,7 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + (idx * 0.1) }}
                 >
-                  <Card className="border-none shadow-2xl rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 bg-white flex items-center gap-6 hover:translate-y-[-6px] transition-all border border-slate-100 group">
+                  <Card className="border-none shadow-2xl rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 bg-white flex items-center gap-6 hover:translate-y-[-4px] transition-all border border-slate-100 group">
                     <div className={cn("h-14 w-14 md:h-16 md:w-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform", stat.color)}>
                       {stat.icon}
                     </div>
