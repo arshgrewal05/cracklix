@@ -12,13 +12,13 @@ interface SidebarHeaderProps {
 }
 
 /**
- * @fileOverview High-Fidelity Admin Sidebar Header v9.0.
- * FIXED: Synchronized with 72px/88px header height standards.
+ * @fileOverview High-Fidelity Admin Sidebar Header v10.0.
+ * FIXED: Synchronized with 140px header height and 120px logo standards.
  */
 export default function SidebarHeader({ isOpen, onToggle }: SidebarHeaderProps) {
   return (
     <div className={cn(
-      "h-[72px] lg:h-[88px] px-4 flex flex-col shrink-0 relative border-b border-white/5",
+      "h-[140px] px-4 flex flex-col shrink-0 relative border-b border-white/5",
       isOpen ? "items-stretch justify-center" : "items-center justify-center gap-4"
     )}>
       <div className={cn(
@@ -27,12 +27,12 @@ export default function SidebarHeader({ isOpen, onToggle }: SidebarHeaderProps) 
       )}>
         <div className={cn(
           "transition-all duration-300 flex items-center overflow-hidden shrink-0",
-          isOpen ? "w-[160px]" : "w-[40px]"
+          isOpen ? "w-[240px]" : "w-[40px]"
         )}>
           {isOpen ? (
             <Logo href="/admin" variant="dark" />
           ) : (
-            <div className="relative h-8 w-8">
+            <div className="relative h-10 w-10">
                <Image 
                   src="/logo/cracklix-icon.png" 
                   alt="C" 

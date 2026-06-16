@@ -29,10 +29,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Final Hardened Header v113.0.
- * LAYOUT: High-Density Left Block [Menu + Logo] with Zero Spacing.
- * SIZING: Mobile 72px / Desktop 88px.
- * LOGO: 40px standard.
+ * @fileOverview Final Hardened Header v114.0.
+ * LAYOUT: 140px height to accommodate 120px Logo.
+ * BRANDING: Left-aligned menu + logo group with zero dead space.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -58,15 +57,15 @@ export default function Navbar() {
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || (user?.email && SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase()));
 
   if (!mounted) return (
-    <nav className="w-full border-b border-[#E5E7EB] bg-white h-[72px] lg:h-[88px]" />
+    <nav className="w-full border-b border-[#E5E7EB] bg-white h-[140px]" />
   );
 
   return (
     <div className="w-full sticky top-0 z-50 font-body">
-      <nav className="w-full border-b border-[#E5E7EB] bg-white h-[72px] lg:h-[88px] px-0 shadow-[0_2px_10px_rgba(0,0,0,0.06)] flex items-center overflow-hidden">
+      <nav className="w-full border-b border-[#E5E7EB] bg-white h-[140px] px-0 shadow-[0_2px_10px_rgba(0,0,0,0.06)] flex items-center overflow-hidden">
         <div className="w-full flex items-center justify-between h-full px-2 lg:px-6">
           
-          {/* LEFT GROUP: MENU + LOGO (ABSOLUTE LEFT END - MINIMAL GAP) */}
+          {/* LEFT GROUP: MENU + LOGO (ABSOLUTE LEFT END) */}
           <div className="flex items-center gap-2 shrink-0">
             <button 
               onClick={() => setIsSidebarOpen(true)}

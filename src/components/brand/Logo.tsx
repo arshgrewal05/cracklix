@@ -14,8 +14,8 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Official Cracklix Brand Hub v34.0.
- * UPDATED: Optimized dimensions for high-density header integration (40px/48px).
+ * @fileOverview Official Cracklix Brand Hub v35.0.
+ * UPDATED: Hardened 120px height standard across all platform registries.
  */
 export default function Logo({ className = "", href = "/", variant = 'light', imgClassName = "", onClick }: LogoProps) {
   const logoSrc = variant === 'light' ? '/logo/cracklix-logo-dark.png' : '/logo/cracklix-logo-light.png';
@@ -32,11 +32,11 @@ export default function Logo({ className = "", href = "/", variant = 'light', im
       <Image 
         src={logoSrc} 
         alt="Cracklix" 
-        width={160}
-        height={48}
+        width={400}
+        height={120}
         priority
         className={cn(
-          "h-10 lg:h-12 w-auto object-contain shrink-0",
+          "h-[120px] w-auto object-contain shrink-0",
           imgClassName
         )}
       />

@@ -28,8 +28,8 @@ import Logo from "@/components/brand/Logo";
 import { TELEGRAM_GROUP, INSTAGRAM_PROFILE } from "@/lib/constants";
 
 /**
- * @fileOverview Premium Sidebar Hub v20.0.
- * UPDATED: Close button moved to the right end of the header.
+ * @fileOverview Premium Sidebar Hub v21.0.
+ * UPDATED: Logo size 120px and header height 140px.
  */
 export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -70,8 +70,8 @@ export default function MobileSidebar({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col h-full bg-white font-body select-none text-left relative overflow-hidden">
       
-      {/* 1. BRAND HEADER - 72px (SYNCHRONIZED WITH NAVBAR) */}
-      <div className="flex items-center justify-between px-4 h-[72px] border-b shrink-0 bg-white">
+      {/* 1. BRAND HEADER - 140px (SYNCHRONIZED WITH NAVBAR) */}
+      <div className="flex items-center justify-between px-4 h-[140px] border-b shrink-0 bg-white">
         <Logo variant="light" href="/" onClick={onClose} />
         <button 
           onClick={onClose}
