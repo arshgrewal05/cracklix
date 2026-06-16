@@ -22,8 +22,8 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Elite Hero Hub v86.0 (Locked Assets).
- * FIXED: Path set to permanent /images/ node with onError fallback.
+ * @fileOverview Elite Hero Hub v87.0 (Locked Assets & Final Scaling).
+ * SIZING: Mobile 220px / Desktop 420px. Min-Height: 520px/680px.
  */
 export default function Hero() {
   const db = useFirestore();
@@ -78,7 +78,7 @@ export default function Hero() {
               </span>
             </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.05] tracking-tight antialiased break-words">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.05] tracking-tight antialiased break-words uppercase">
               Crack Punjab <br />
               <span className="text-blue-600">Government Exams</span> <br />
               With Confidence

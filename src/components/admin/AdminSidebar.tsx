@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -17,8 +16,8 @@ interface AdminSidebarProps {
 }
 
 /**
- * @fileOverview Custom Rebuilt Admin Sidebar v2.0.
- * Standardized Desktop widths: 96px (collapsed) / 280px (expanded).
+ * @fileOverview Custom Rebuilt Admin Sidebar v3.0.
+ * Standardized Desktop widths: 88px (collapsed) / 280px (expanded).
  */
 export default function AdminSidebar({ 
   isOpen, 
@@ -44,9 +43,9 @@ export default function AdminSidebar({
       <aside 
         className={cn(
           "fixed left-0 top-0 h-screen bg-[#0F172A] text-white z-[110] transition-all duration-300 ease-in-out flex flex-col border-r border-[#1E293B]",
-          isOpen ? "w-[280px]" : "w-[96px]",
+          isOpen ? "w-[280px]" : "w-[88px]",
           // Mobile state
-          "max-lg:w-[280px] max-lg:-translate-x-full",
+          "max-lg:w-[85vw] max-lg:max-w-[360px] max-lg:-translate-x-full",
           isOpen && "max-lg:translate-x-0"
         )}
       >

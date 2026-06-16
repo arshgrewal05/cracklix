@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 /**
- * @fileOverview Hardened Admin Hub Layout v9.0.
+ * @fileOverview Hardened Admin Hub Layout v10.0.
  * Standardized widths: 280px (Expanded) / 88px (Collapsed).
  */
 
@@ -93,9 +93,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden bg-blue-600 text-white h-11 w-11 rounded-xl shadow-lg flex items-center justify-center active:scale-95 transition-all"
+              className="lg:hidden bg-blue-600 text-white h-12 w-12 rounded-2xl shadow-lg flex items-center justify-center active:scale-95 transition-all"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-6 w-6" />
             </button>
 
             <div className="flex flex-col text-left">
@@ -105,7 +105,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           
           <div className="flex items-center gap-4">
-             <Button asChild variant="outline" className="h-11 px-7 rounded-xl border-slate-200 font-black uppercase text-[10px] tracking-widest gap-2 hover:bg-slate-50 transition-all active:scale-95">
+             <Button asChild variant="outline" className="h-12 px-7 rounded-2xl border-slate-200 font-black uppercase text-[10px] tracking-widest gap-2 hover:bg-slate-50 transition-all active:scale-95">
                 <Link href="/">VIEW SITE</Link>
              </Button>
              <div className="flex items-center gap-3 pl-4 border-l border-slate-100">
