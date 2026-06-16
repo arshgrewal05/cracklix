@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from "react";
@@ -8,11 +7,11 @@ import { signOut } from "firebase/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Menu, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 /**
- * @fileOverview Hardened Admin Hub Layout v7.0.
- * Stabilized widths: 280px (Expanded) / 96px (Collapsed).
- * Implemented Desktop Push / Mobile Overlay logic.
+ * @fileOverview Hardened Admin Hub Layout v8.0.
+ * Standardized widths: 280px (Expanded) / 96px (Collapsed).
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -75,7 +74,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen w-full bg-white font-body overflow-x-hidden relative flex">
       
-      {/* 1. MASTER SIDEBAR HUB */}
       <AdminSidebar 
         isOpen={isSidebarOpen} 
         onToggle={toggleSidebar} 
@@ -85,17 +83,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         pathname={pathname}
       />
 
-      {/* 2. SYNCHRONIZED CONTENT AREA */}
       <div 
         className="flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out"
         style={{ 
           marginLeft: typeof window !== 'undefined' && window.innerWidth >= 1024 ? sidebarWidth : 0 
         }}
       >
-        {/* STICKY HEADER */}
         <header className="h-20 border-b border-slate-100 flex items-center px-4 md:px-10 justify-between bg-white/80 backdrop-blur-xl sticky top-0 z-40 shrink-0">
           <div className="flex items-center gap-4">
-            {/* Mobile Trigger Only */}
             <button 
               onClick={() => setIsSidebarOpen(true)}
               className="lg:hidden bg-blue-600 text-white h-11 w-11 rounded-xl shadow-lg flex items-center justify-center active:scale-95 transition-all"
@@ -125,7 +120,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
         <main className="flex-1 p-6 md:p-12 max-w-full">
            {children}
         </main>
@@ -133,5 +127,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
-
-import Link from "next/link";
