@@ -1,3 +1,4 @@
+
 import type {Metadata, Viewport} from 'next';
 import './globals.css';
 import { Inter } from "next/font/google";
@@ -11,20 +12,14 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const brandIcon = '/logo/cracklix-logo.png';
-
 export const metadata: Metadata = {
-  title: "Cracklix | Punjab's Mock Test Platform",
+  title: "Cracklix | Punjab's Smart Mock Test Platform",
   description: "Punjab's most trusted government exam preparation platform. PSSSB, PPSC, Punjab Police, and more.",
-  manifest: '/manifest.webmanifest',
+  manifest: '/manifest.json',
   authors: [{ name: 'Arsh Grewal', url: 'https://cracklix.com' }],
   icons: {
-    icon: [
-      { url: brandIcon, sizes: '32x32', type: 'image/png' },
-      { url: brandIcon, sizes: '192x192', type: 'image/png' },
-      { url: brandIcon, sizes: '512x512', type: 'image/png' },
-    ],
-    apple: brandIcon,
+    icon: '/favicon.ico',
+    apple: '/icons/apple-touch-icon.png',
   },
   appleWebApp: {
     capable: true,
@@ -34,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#081a3a',
+  themeColor: '#2563eb',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -66,12 +61,8 @@ export default function RootLayout({
               });
               window.addEventListener('appinstalled', function() {
                 window.deferredPrompt = null;
+                window.dispatchEvent(new CustomEvent('pwa-installed'));
               });
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js');
-                });
-              }
             `,
           }}
         />

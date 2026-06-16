@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Hardened Institutional PWA Lifecycle Manager v31.0.
+ * @fileOverview Hardened Institutional PWA Lifecycle Manager v32.0.
  * UPDATED: Optimized detection logic using display-mode media query and custom events.
  */
 export default function PWAManager() {
@@ -20,11 +21,10 @@ export default function PWAManager() {
   const checkInstallability = useCallback(() => {
     if (typeof window === 'undefined') return;
     
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
     const isExcluded = pathname?.includes('/attempt') || pathname?.startsWith('/admin');
     const hasPrompt = !!(window as any).deferredPrompt;
     
-    // Explicitly update isInstalled state
     if (isStandalone) {
       setIsInstalled(true);
       setShowPrompt(false);
@@ -41,10 +41,8 @@ export default function PWAManager() {
   useEffect(() => {
     setMounted(true);
 
-    // Initial check
     checkInstallability();
 
-    // Listen for availability events dispatched from layout.tsx
     window.addEventListener('pwa-installable', checkInstallability);
     window.addEventListener('pwa-installed', () => {
       setIsInstalled(true);
@@ -90,16 +88,16 @@ export default function PWAManager() {
       >
         <div className="bg-[#0B1528] text-white p-2.5 rounded-2xl shadow-5xl border border-white/10 flex items-center gap-3 relative overflow-hidden group">
           <div className="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
-             <Zap className="h-4 w-4 text-[#F97316] fill-current" />
+             <Zap className="h-4 w-4 text-[#2563eb] fill-current animate-pulse" />
           </div>
           <div className="flex-1 min-w-0 text-left">
              <h4 className="text-[11px] font-black uppercase tracking-tight leading-none mb-1">Install App</h4>
-             <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest leading-tight truncate">Direct access to exams</p>
+             <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest leading-tight truncate">Punjab's Smart Platform</p>
           </div>
           <div className="flex items-center gap-1.5">
              <Button 
               onClick={handleInstallClick}
-              className="h-8 px-3 bg-[#F97316] hover:bg-orange-600 text-white font-black uppercase text-[8px] tracking-widest rounded-lg shadow-xl border-none transition-all active:scale-95 gap-1.5 flex items-center"
+              className="h-8 px-3 bg-[#2563eb] hover:bg-blue-700 text-white font-black uppercase text-[8px] tracking-widest rounded-lg shadow-xl border-none transition-all active:scale-95 gap-1.5 flex items-center"
              >
                 <Download className="h-3 w-3" /> INSTALL
              </Button>
