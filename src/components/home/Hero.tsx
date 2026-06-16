@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useEffect, useState } from "react";
@@ -23,8 +22,8 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Elite Hero Hub v82.0 (Restored Student Image).
- * Primary visual: /logo/hero-student.png
+ * @fileOverview Elite Hero Hub v83.0 (Recovered hero-student.png).
+ * Primary visual centerpiece restored to /logo/hero-student.png.
  */
 export default function Hero() {
   const db = useFirestore();

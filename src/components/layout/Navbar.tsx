@@ -32,9 +32,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Production-Grade Responsive PWA Header v86.0.
- * SIZING: Height 60px (Mobile) / 72px (Desktop). Action Buttons 44px / 48px.
- * SHADOW: 0 2px 10px rgba(0, 0, 0, 0.06)
+ * @fileOverview Production-Grade Responsive PWA Header v87.0.
+ * SIZING: Height 64px (Mobile) / 72px (Desktop) to frame 44px Logo.
+ * BUTTONS: Standardized 44px (Mobile) / 48px (Desktop).
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -60,12 +60,12 @@ export default function Navbar() {
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || (user?.email && SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase()));
 
   if (!mounted) return (
-    <nav className="w-full border-b border-gray-200 bg-white h-[60px] md:h-[72px]" />
+    <nav className="w-full border-b border-gray-200 bg-white h-[64px] md:h-[72px]" />
   );
 
   return (
     <div className="w-full sticky top-0 z-50 font-body">
-      <nav className="w-full border-b border-gray-100 bg-white h-[60px] md:h-[72px] px-4 md:px-5 shadow-[0_2px_10px_rgba(0,0,0,0.06)] flex items-center overflow-hidden">
+      <nav className="w-full border-b border-gray-100 bg-white h-[64px] md:h-[72px] px-4 md:px-6 shadow-[0_2px_10px_rgba(0,0,0,0.06)] flex items-center overflow-hidden">
         <div className="w-full max-w-7xl mx-auto flex items-center justify-between h-full">
           
           {/* LEFT: HAMBURGER (Mobile) + LOGO */}

@@ -7,15 +7,16 @@ import { Button } from "@/components/ui/button";
 import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 /**
- * @fileOverview High-Fidelity Balanced Mobile App Hub v16.0.
- * UPDATED: Fixed image containment and column split for better visual weight.
+ * @fileOverview High-Fidelity Balanced Mobile App Hub v18.0.
+ * FIXED: Added missing Image import from next/image.
  */
 
 export default function AppPreview() {
   const db = useFirestore();
-  const phoneMockup = "/images/hero-student.png"; // Temporarily using student hero as placeholder or high-res mockup if available
+  const phoneMockup = "/logo/hero-student.png"; 
 
   const { data: settings } = useDoc<any>(useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]));
 
@@ -82,10 +83,11 @@ export default function AppPreview() {
                 {/* DEVICE MOCKUP FRAME */}
                 <div className="h-full w-full bg-[#0F172A] rounded-[3.5rem] p-3 shadow-5xl border-[8px] border-[#1E293B] ring-1 ring-white/10 overflow-hidden">
                    <div className="w-full h-full rounded-[2.5rem] overflow-hidden bg-white relative">
-                      <img 
+                      <Image 
                         src={phoneMockup} 
-                        className="w-full h-full object-contain p-8 md:p-12" 
                         alt="App Screenshot" 
+                        fill
+                        className="object-contain p-8 md:p-12"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/5 to-transparent pointer-events-none" />
                    </div>
