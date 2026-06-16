@@ -12,7 +12,9 @@ import {
   FileStack,
   ArrowRight,
   Trophy,
-  Landmark
+  Landmark,
+  BookOpen,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,8 +25,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Cracklix Majestic Hero v9.0.
- * HARDENED: Permanently fixed positions and standardized card sizes for absolute layout stability.
+ * @fileOverview Official Cracklix Majestic Hero v10.0.
+ * HARDENED: Added mobile action hub below the illustration to match high-fidelity wireframe.
  */
 
 export default function Hero() {
@@ -88,16 +90,25 @@ export default function Hero() {
   if (!mounted) return null;
 
   return (
-    <section className="relative overflow-hidden bg-[#F8FAFC] py-12 md:py-24 border-b border-slate-100 text-left">
+    <section className="relative overflow-hidden bg-[#F8FAFC] py-8 md:py-24 border-b border-slate-100 text-left">
       <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-50/50 blur-[120px] rounded-full -z-10" />
 
-      <div className="max-w-7xl mx-auto px-4 space-y-16">
+      <div className="max-w-7xl mx-auto px-4 space-y-12 md:space-y-16">
         
+        {/* MOBILE TAGS REGISTRY (SCREENSHOT MATCH) */}
+        <div className="flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-2">
+           {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map((item) => (
+              <Badge key={item} variant="outline" className="px-5 py-2 whitespace-nowrap rounded-full bg-white border-slate-200 text-slate-700 font-bold text-[10px] shadow-sm uppercase tracking-widest">
+                {item}
+              </Badge>
+           ))}
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-0 items-center">
           
-          {/* LEFT: CONTENT HUB */}
+          {/* LEFT: CONTENT HUB (DESKTOP FOCUS) */}
           <div className="space-y-8 md:space-y-10 z-20">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm">
+            <div className="hidden lg:inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm">
               <Star className="h-4 w-4 text-blue-600 fill-current" />
               <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">10,000+ Aspirants Trust Cracklix</span>
             </div>
@@ -113,7 +124,7 @@ export default function Hero() {
                </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="hidden lg:flex flex-wrap gap-3">
                {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map((item) => (
                   <Badge key={item} variant="outline" className="px-5 py-2 rounded-full bg-white border-slate-200 text-blue-600 font-bold text-xs shadow-sm uppercase tracking-widest">
                     {item}
@@ -121,7 +132,7 @@ export default function Hero() {
                ))}
             </div>
 
-            <div className="flex flex-wrap gap-4 pt-4">
+            <div className="hidden lg:flex flex-wrap gap-4 pt-4">
               <Button asChild className="h-16 px-10 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm tracking-widest rounded-2xl shadow-xl shadow-blue-600/20 gap-3 border-none transition-all active:scale-95">
                 <Link href="/mocks">Start Free Mock Test <ArrowRight className="h-5 w-5" /></Link>
               </Button>
@@ -131,35 +142,31 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: ILLUSTRATION HUB - CENTERED & PROPORTIONAL */}
-          <div className="relative flex justify-center items-center h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full overflow-visible">
+          {/* RIGHT: ILLUSTRATION HUB */}
+          <div className="relative flex flex-col items-center justify-center w-full overflow-visible">
             
             {/* CENTRAL ILLUSTRATION WRAPPER */}
             <div className="relative w-full max-w-[320px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[650px] xl:max-w-[750px] aspect-square flex items-center justify-center">
                 
-                {/* FLOATING NODES - PERMANENT POSITION LOCK */}
-                {/* TOP LEFT: MOCK TESTS */}
+                {/* FLOATING NODES */}
                 <FloatingNode 
                    icon={<Zap className="text-blue-600 h-5 w-5" />} 
                    label="Mock Tests" 
                    className="top-[-8%] left-[-2%] sm:left-[2%] md:left-[5%]" 
                 />
 
-                {/* BOTTOM LEFT: DAILY PRACTICE */}
                 <FloatingNode 
                    icon={<Target className="text-purple-600 h-5 w-5" />} 
                    label="Daily Practice" 
                    className="bottom-[-18%] left-[-2%] sm:left-[2%] md:left-[5%]" 
                 />
 
-                {/* TOP RIGHT: PUNJAB EXAMS */}
                 <FloatingNode 
                    icon={<Trophy className="text-orange-500 h-5 w-5" />} 
                    label="Punjab Exams" 
                    className="top-[-8%] right-[-2%] sm:right-[2%] md:right-[5%]" 
                 />
 
-                {/* BOTTOM RIGHT: PREVIOUS PAPERS */}
                 <FloatingNode 
                    icon={<FileStack className="text-emerald-500 h-5 w-5" />} 
                    label="Previous Papers" 
@@ -180,6 +187,29 @@ export default function Hero() {
                     alt="Cracklix Student" 
                   />
                 </motion.div>
+            </div>
+
+            {/* MOBILE ACTION BUTTONS (BELOW ICON) */}
+            <div className="flex flex-col gap-3 w-full lg:hidden mt-20 sm:mt-24">
+              <Button asChild className="h-14 w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full font-black text-xs tracking-widest shadow-xl border-none transition-all active:scale-95">
+                <Link href="/exams" className="flex items-center justify-between w-full px-6">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="h-5 w-5 text-white" />
+                    <span>Start Learning</span>
+                  </div>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="h-14 w-full border-2 border-blue-600 bg-white text-blue-600 rounded-full font-black text-xs tracking-widest shadow-lg transition-all active:scale-95">
+                <Link href="/mocks" className="flex items-center justify-between w-full px-6">
+                  <div className="flex items-center gap-3">
+                    <ClipboardCheck className="h-5 w-5 text-blue-600" />
+                    <span>Take Free Mock Test</span>
+                  </div>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -212,7 +242,7 @@ function FloatingNode({ icon, label, className }: { icon: React.ReactNode, label
       animate={{ y: [0, -12, 0] }}
       transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       className={cn(
-        "absolute z-20 bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 active:scale-95 w-[130px] sm:w-[150px] md:w-[180px] lg:w-[200px]",
+        "absolute z-20 bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all hover:scale-105 active:scale-95 w-[130px] sm:w-[150px] md:w-[180px] lg:w-[200px]",
         className
       )}
     >
