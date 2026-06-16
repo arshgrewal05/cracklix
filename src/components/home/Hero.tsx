@@ -26,9 +26,9 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Official Cracklix High-Fidelity Hero v46.0.
- * SIZING: Implemented 770x517 intrinsic dimensions with 850px safe-cap.
- * ORDERING: Trust -> Text -> Pills -> CTAs -> Image -> Stats (Mobile Stack).
+ * @fileOverview Official Cracklix High-Fidelity Hero v48.0.
+ * MOBILE ORDER: Trust -> Text -> Pills -> IMAGE -> BUTTONS -> Stats.
+ * BUTTONS: Stacked pill-style based on user reference screenshot.
  */
 
 export default function Hero() {
@@ -63,12 +63,12 @@ export default function Hero() {
     <section className="relative overflow-hidden bg-[#F8FAFC] pt-10 pb-16 md:pt-20 md:pb-32 text-left w-full border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
-          {/* 1. CONTENT HUB (LEFT) */}
-          <div className="space-y-8 text-center lg:text-left order-1">
+          {/* 1. CONTENT HUB (Order 1 on Mobile, Left on Desktop) */}
+          <div className="order-1 space-y-8 text-center lg:text-left">
             <div className="space-y-6">
-              {/* Trust Badge (Step 1) */}
+              {/* Trust Badge */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -78,20 +78,20 @@ export default function Hero() {
                 <span className="text-[10px] md:text-xs font-bold text-slate-600 tracking-widest uppercase">10,000+ Aspirants Trust Cracklix</span>
               </motion.div>
 
-              {/* Heading (Step 2) */}
+              {/* Heading */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.05] antialiased">
                 Crack Punjab <br />
                 <span className="text-blue-600">Government Exams</span> <br />
                 With Confidence
               </h1>
               
-              {/* Description (Step 3) */}
+              {/* Description */}
               <p className="text-base md:text-lg text-slate-500 font-medium max-w-xl leading-relaxed mx-auto lg:mx-0">
                 Practice bilingual mock tests and prepare for Punjab Government Exams with confidence. 
                 Access exam-focused practice, previous papers and performance tracking in one place.
               </p>
 
-              {/* Exam Pills (Step 4) */}
+              {/* Exam Pills */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2.5 pt-2">
                 {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map((pill) => (
                   <div key={pill} className="bg-white border border-slate-200 text-slate-600 px-4 py-1.5 rounded-full font-bold text-[10px] md:text-xs tracking-wide shadow-sm hover:border-blue-600 hover:text-blue-600 transition-all cursor-default">
@@ -100,27 +100,21 @@ export default function Hero() {
                 ))}
               </div>
 
-              {/* CTA Hub (Step 5) */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                <Button asChild className="h-12 md:h-14 px-10 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm tracking-widest rounded-2xl shadow-xl shadow-blue-600/20 gap-3 border-none transition-all active:scale-95">
+              {/* DESKTOP-ONLY CTA Buttons (Side by Side) */}
+              <div className="hidden lg:flex flex-row gap-4 pt-4">
+                <Button asChild className="h-14 px-10 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm tracking-widest rounded-2xl shadow-xl shadow-blue-600/20 gap-3 border-none transition-all active:scale-95">
                   <Link href="/mocks">Start Free Mock Test <ArrowRight className="h-5 w-5" /></Link>
                 </Button>
-                <Button asChild variant="outline" className="h-12 md:h-16 px-10 border-2 border-blue-600 bg-white text-blue-600 font-black text-sm tracking-widest rounded-2xl shadow-sm transition-all active:scale-95 hover:bg-blue-50">
+                <Button asChild variant="outline" className="h-14 px-10 border-2 border-blue-600 bg-white text-blue-600 font-black text-sm tracking-widest rounded-2xl shadow-sm transition-all active:scale-95 hover:bg-blue-50">
                   <Link href="/exams">Browse Exams</Link>
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* 2. ILLUSTRATION HUB (RIGHT / Step 6 on Mobile) */}
-          <div className="relative flex items-center justify-center lg:justify-end w-full order-2">
-             {/* 
-                Sizing Logic:
-                Mobile: max-w-[320-400px]
-                Large Screens: Scale to 770px (native) up to 850px (safe display max)
-             */}
+          {/* 2. ILLUSTRATION HUB (Order 2 on Mobile, Right on Desktop) */}
+          <div className="order-2 relative flex items-center justify-center lg:justify-end w-full">
              <div className="relative w-full max-w-[400px] md:max-w-[650px] lg:max-w-[770px] xl:max-w-[850px] flex items-center justify-center">
-                
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -137,7 +131,7 @@ export default function Hero() {
                    />
                 </motion.div>
 
-                {/* Floating Action Cards - Corner Positioned (Desktop Only) */}
+                {/* Floating Corner Nodes (Visible on Desktop) */}
                 <div className="absolute inset-0 pointer-events-none hidden lg:block">
                   <FloatingNode 
                      position="top-[5%] left-[-8%]"
@@ -171,18 +165,19 @@ export default function Hero() {
              </div>
           </div>
 
-          {/* 3. MOBILE FEATURE GRID (Step 6 Alternate) */}
-          <div className="lg:hidden order-3 pt-4">
-             <div className="grid grid-cols-2 gap-3">
-                <MobileFeatureCard icon={<Zap className="text-blue-600" />} title="MOCK TESTS" href="/mocks" />
-                <MobileFeatureCard icon={<Landmark className="text-orange-500" />} title="PUNJAB EXAMS" href="/exams" />
-                <MobileFeatureCard icon={<Target className="text-purple-600" />} title="FREE PRACTICE" href="/practice" />
-                <MobileFeatureCard icon={<FileStack className="text-emerald-600" />} title="PREVIOUS PAPERS" href="/pyqs" />
-             </div>
+          {/* 3. MOBILE-ONLY CTA HUB (Order 3 on Mobile, Hidden on Desktop) */}
+          <div className="order-3 lg:hidden flex flex-col gap-4 w-full max-w-[400px] mx-auto px-2">
+            <Button asChild className="h-16 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm tracking-widest rounded-full shadow-2xl shadow-blue-600/30 gap-3 border-none transition-all active:scale-95">
+              <Link href="/mocks">Start Free Mock Test <ArrowRight className="h-5 w-5" /></Link>
+            </Button>
+            <Button asChild variant="outline" className="h-16 border-2 border-blue-600 bg-white text-blue-600 font-black text-sm tracking-widest rounded-full shadow-sm transition-all active:scale-95 hover:bg-blue-50">
+              <Link href="/exams">Browse Exams</Link>
+            </Button>
           </div>
+
         </div>
 
-        {/* BOTTOM STATS HUB (Step 7) */}
+        {/* 4. STATS HUB (Order 4 on Mobile) */}
         <div className="mt-16 md:mt-24">
            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
               {liveStats.map((stat, idx) => (
@@ -215,19 +210,6 @@ export default function Hero() {
       </div>
     </section>
   );
-}
-
-function MobileFeatureCard({ icon, title, href }: { icon: React.ReactNode, title: string, href: string }) {
-   return (
-      <Link href={href} className="block w-full">
-         <Card className="p-4 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center gap-3 active:scale-95 transition-all">
-            <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
-               {icon}
-            </div>
-            <span className="text-[10px] font-black text-slate-900 tracking-tight leading-none uppercase">{title}</span>
-         </Card>
-      </Link>
-   )
 }
 
 function FloatingNode({ position, icon, title, delay, href }: { position: string, icon: React.ReactNode, title: string, delay: number, href: string }) {
