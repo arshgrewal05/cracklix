@@ -12,13 +12,13 @@ import AppPreview from "@/components/home/AppPreview";
 import Footer from "@/components/layout/Footer";
 
 /**
- * @fileOverview Official Home Hub v173.0 (Search Integrated).
+ * @fileOverview Official Home Hub v174.0 (Scroll Fixed).
  * PERFORMANCE: Implements the 9-point hierarchical order with Global Search.
  */
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-white font-body pb-safe overflow-x-hidden text-left">
+    <main className="min-h-screen bg-white font-body pb-safe text-left">
       <Navbar />
       
       {/* 1. Hero Section */}

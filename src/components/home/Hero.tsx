@@ -22,8 +22,8 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Native-Scaled Elite Hero Hub v65.0.
- * FIXED: Permanently mapped to local /images/hero-student.png.
+ * @fileOverview Native-Scaled Elite Hero Hub v66.0 (Live Logic Refined).
+ * FIXED: Trust badge now uses live student data with a 10,000+ baseline as requested.
  * ASSET: Using local student illustration with subject-labeled books.
  */
 
@@ -40,6 +40,14 @@ export default function Hero() {
 
   // Strictly local institutional asset
   const heroImage = "/images/hero-student.png";
+
+  const trustCount = useMemo(() => {
+    if (statsLoading || !stats) return "10,000+";
+    const actual = stats.totalUsers || 0;
+    // Show real data if above 10k, else show 10,000+ baseline as requested
+    const displayNum = Math.max(10000, actual);
+    return displayNum.toLocaleString() + "+";
+  }, [stats, statsLoading]);
 
   const liveStats = useMemo(() => {
     const format = (n: number, fallback: string) => {
@@ -107,7 +115,7 @@ export default function Hero() {
               >
                 <Star className="h-3.5 w-3.5 text-amber-500 fill-current" />
                 <span className="text-[10px] md:text-xs font-black text-[#334155] tracking-widest uppercase">
-                  {statsLoading ? "..." : (stats?.totalUsers ? stats.totalUsers.toLocaleString() + "+" : "10,000+")} ASPIRANTS TRUST CRACKLIX
+                  {trustCount} ASPIRANTS TRUST CRACKLIX
                 </span>
               </motion.div>
 

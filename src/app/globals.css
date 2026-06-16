@@ -35,18 +35,12 @@
   }
   html, body {
     width: 100%;
-    overflow-x: hidden;
     position: relative;
     height: auto;
-    min-height: 100dvh;
+    min-height: 100%;
     @apply bg-background text-foreground antialiased;
     -webkit-tap-highlight-color: transparent;
-    pointer-events: auto;
     -webkit-text-size-adjust: 100%;
-    
-    /* Native App Feel */
-    overscroll-behavior-y: none;
-    touch-action: pan-y;
     
     /* PWA Safe Area Support */
     padding-top: env(safe-area-inset-top);
@@ -70,7 +64,6 @@
     max-width: 430px;
     margin: 0 auto;
     width: 100%;
-    overflow-x: hidden;
   }
 }
 
