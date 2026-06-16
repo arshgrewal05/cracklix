@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useEffect, useState } from "react"
@@ -19,12 +20,12 @@ import {
   Clock,
   Sparkles,
   GraduationCap,
-  Bell,
   Activity,
-  Award,
   Trash2,
   RefreshCw,
-  Loader2
+  Loader2,
+  CheckCircle2,
+  Plus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,8 +36,8 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @file Overview My Exams Dashboard v2.1.
- * OPTIMIZED: Skeleton-first loading to prevent PWA synchronizing screen delays.
+ * @file Overview My Hub Dashboard v3.0.
+ * UPDATED: Replaced 'Delete' trash icon with 'Select Target' logic.
  */
 
 export default function MyExamsPage() {
@@ -46,6 +47,7 @@ export default function MyExamsPage() {
   const { toast } = useToast()
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({})
   const [unpinningId, setUnpinningId] = useState<string | null>(null)
+  const [settingTargetId, setSettingTargetId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -93,7 +95,7 @@ export default function MyExamsPage() {
         pinnedExams: arrayRemove(examId),
         updatedAt: serverTimestamp()
       });
-      toast({ title: "Exam Removed", description: "Cleared from your interests." });
+      toast({ title: "Removed from Hub", description: "Exam node cleared from interests." });
     } catch (e) {
       toast({ variant: "destructive", title: "Action Failed" });
     } finally {
@@ -101,10 +103,27 @@ export default function MyExamsPage() {
     }
   };
 
+  const handleSetTarget = async (examName: string, examId: string) => {
+    if (!db || !user || settingTargetId) return;
+    setSettingTargetId(examId);
+    try {
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        targetExam: examName,
+        updatedAt: serverTimestamp()
+      });
+      toast({ title: "Target Locked", description: `You are now preparing for ${examName}.` });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Update Failed" });
+    } finally {
+      setSettingTargetId(null);
+    }
+  };
+
   if (userLoading) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-white space-y-6">
        <Zap className="h-12 w-12 text-primary animate-spin" />
-       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Syncing Dashboard...</p>
+       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Syncing My Hub...</p>
     </div>
   )
 
@@ -119,15 +138,15 @@ export default function MyExamsPage() {
            <div className="space-y-3">
               <div className="flex items-center gap-3">
                  <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-inner">
-                    <Target className="h-6 w-6" />
+                    <LayoutGrid className="h-6 w-6" />
                  </div>
-                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">My Dashboard</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Aspirant Prep Hub</span>
               </div>
-              <h1 className="text-4xl md:text-7xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">MY <span className="text-primary">EXAMS</span></h1>
-              <p className="text-sm md:text-xl text-slate-400 font-medium max-w-xl">Overview of your selected exam categories.</p>
+              <h1 className="text-4xl md:text-7xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">MY <span className="text-primary">HUB</span></h1>
+              <p className="text-sm md:text-xl text-slate-400 font-medium max-w-xl">Manage your selected exams and track preparation nodes.</p>
            </div>
            <Button asChild className="h-16 px-10 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-4xl gap-3">
-              <Link href="/exams"><LayoutGrid className="h-5 w-5" /> Add Exam Hub</Link>
+              <Link href="/exams"><Plus className="h-5 w-5 text-primary" /> Select More Exams</Link>
            </Button>
         </div>
 
@@ -135,75 +154,87 @@ export default function MyExamsPage() {
         <section className="space-y-6">
            <div className="flex items-center justify-between px-2">
               <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-3">
-                 <Star className="h-4 w-4 text-amber-500 fill-current" /> Pinned Exams
+                 <ShieldCheck className="h-4 w-4 text-primary" /> Your Active Selections
               </h3>
            </div>
            
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {profileLoading || examsLoading ? (
-                Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-48 w-full rounded-[2.5rem]" />)
+                Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-[2.5rem]" />)
               ) : pinnedExams.length > 0 ? pinnedExams.map((exam) => {
                  const board = boards?.find((b: any) => b.id.toLowerCase() === exam.boardId?.toLowerCase() || b.abbreviation?.toLowerCase() === exam.boardId?.toLowerCase());
                  const logoUrl = board?.iconUrl || exam.iconUrl;
                  const isImgFailed = failedImages[exam.id];
-                 const isArmy = exam.boardId?.toLowerCase() === 'army' || exam.id?.toLowerCase().includes('army');
+                 const isTarget = profile?.targetExam === exam.name;
                  const isUnpinning = unpinningId === exam.id;
-                 
-                 const hasNewMocks = recentMocks?.some(m => m.examId === exam.id && (Date.now() - (m.createdAt?.seconds * 1000 || 0)) < 86400000 * 7);
+                 const isSettingTarget = settingTargetId === exam.id;
 
                  return (
-                  <div key={exam.id} className="relative group">
-                      <Link href={`/exams/${exam.id}`}>
-                        <Card className="border-none shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] bg-white p-8 text-left h-full flex flex-col border border-slate-100 hover:border-primary/20">
-                          {hasNewMocks && (
-                             <div className="absolute top-8 left-8 z-20">
-                                <Badge className="bg-rose-500 text-white border-none animate-pulse text-[8px] font-black uppercase px-2 py-0.5 rounded-full shadow-lg shadow-rose-500/20">NEW MOCKS</Badge>
+                  <Card key={exam.id} className="border-none shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col border border-slate-100 relative">
+                    {isTarget && (
+                       <div className="absolute top-0 right-0 p-6 z-20">
+                          <Badge className="bg-emerald-500 text-white border-none shadow-lg px-3 py-1 font-black text-[8px] uppercase flex items-center gap-1.5 rounded-lg">
+                             <CheckCircle2 className="h-3 w-3" /> CURRENT TARGET
+                          </Badge>
+                       </div>
+                    )}
+                    
+                    <CardContent className="p-8 flex flex-col h-full">
+                       <div className="flex justify-between items-start mb-8">
+                          <div className="h-16 w-16 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 shadow-inner group-hover:scale-105 transition-transform overflow-hidden">
+                             {logoUrl && !isImgFailed ? (
+                               <img src={logoUrl} className="w-full h-full object-contain p-2" referrerPolicy="no-referrer" alt="Logo" onError={() => setFailedImages(p => ({...p, [exam.id]: true}))} />
+                             ) : (
+                               <GraduationCap className="h-8 w-8 text-slate-200" />
+                             )}
+                          </div>
+                       </div>
+                       
+                       <h4 className="font-black text-xl text-[#0F172A] uppercase leading-tight flex-1 mb-6 pr-4">{exam.name}</h4>
+                       
+                       <div className="space-y-4 pt-6 border-t border-slate-50">
+                          {isTarget ? (
+                             <Button asChild className="w-full h-14 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] tracking-widest rounded-xl shadow-xl border-none">
+                                <Link href={`/exams/${exam.id}`}>Open Exam Center <ChevronRight className="h-4 w-4" /></Link>
+                             </Button>
+                          ) : (
+                             <div className="grid grid-cols-2 gap-3">
+                                <Button 
+                                  onClick={() => handleSetTarget(exam.name, exam.id)}
+                                  disabled={isSettingTarget}
+                                  variant="outline" 
+                                  className="h-12 rounded-xl border-slate-200 font-black uppercase text-[8px] tracking-widest gap-2"
+                                >
+                                   {isSettingTarget ? <Loader2 className="h-3 w-3 animate-spin" /> : <Target className="h-3 w-3" />} SELECT TARGET
+                                </Button>
+                                <Button asChild className="h-12 bg-slate-900 text-white rounded-xl font-black uppercase text-[8px] tracking-widest border-none">
+                                   <Link href={`/exams/${exam.id}`}>OPEN HUB</Link>
+                                </Button>
                              </div>
                           )}
                           
-                          <div className="flex justify-between items-start mb-8">
-                             <div className="h-16 w-16 rounded-2xl bg-white flex items-center justify-center shrink-0 border border-slate-100 shadow-inner group-hover:scale-105 transition-transform overflow-hidden">
-                                {logoUrl && !isImgFailed ? (
-                                  <img src={logoUrl} className={cn("w-full h-full object-contain p-2", isArmy ? "scale-150" : "")} referrerPolicy="no-referrer" alt="Logo" onError={() => setFailedImages(p => ({...p, [exam.id]: true}))} />
-                                ) : (
-                                  <GraduationCap className="h-8 w-8 text-slate-200" />
-                                )}
-                             </div>
-                             <Badge className="bg-primary/5 text-primary border-none text-[8px] font-black uppercase px-3 py-1 rounded-lg">EXAM HUB</Badge>
-                          </div>
-                          
-                          <h4 className="font-black text-xl text-[#0F172A] uppercase leading-tight flex-1 mb-2 pr-10">{exam.name}</h4>
-                          
-                          <div className="flex items-center justify-between pt-6 border-t border-slate-50 mt-6">
-                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{board?.abbreviation || 'GOVT'} Board</p>
-                             <ChevronRight className="h-5 w-5 text-slate-200 group-hover:text-primary transition-all group-hover:translate-x-1" />
-                          </div>
-                        </Card>
-                      </Link>
-
-                      <button 
-                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleUnpin(exam.id); }}
-                         className={cn(
-                            "absolute top-8 right-8 z-30 h-10 w-10 rounded-xl bg-rose-50 text-rose-500 md:opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center hover:bg-rose-100 shadow-sm border border-rose-100",
-                            isUnpinning && "opacity-100 bg-white"
-                         )}
-                         title="Remove from Interests"
-                      >
-                         {isUnpinning ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Trash2 className="h-5 w-5" />}
-                      </button>
-                  </div>
+                          <button 
+                             onClick={() => handleUnpin(exam.id)}
+                             disabled={isUnpinning}
+                             className="w-full text-center py-2 text-[8px] font-black text-slate-300 hover:text-rose-500 uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                          >
+                             {isUnpinning ? <RefreshCw className="h-2.5 w-2.5 animate-spin" /> : <X className="h-2.5 w-2.5" />} Remove from Hub
+                          </button>
+                       </div>
+                    </CardContent>
+                  </Card>
                  )
               }) : (
                  <Card className="col-span-full border-2 border-dashed border-slate-200 bg-white/50 py-24 rounded-[3.5rem] flex flex-col items-center justify-center text-center space-y-6">
-                    <div className="h-20 w-20 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300">
-                       <Sparkles className="h-10 w-10" />
+                    <div className="h-20 w-20 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300 shadow-inner">
+                       <Plus className="h-10 w-10" />
                     </div>
-                    <div className="space-y-2">
-                       <p className="text-xl font-headline font-black text-[#0F172A] uppercase">No Pinned Exams</p>
-                       <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">Pin your exams to track them instantly.</p>
+                    <div className="space-y-2 px-6">
+                       <p className="text-xl font-headline font-black text-[#0F172A] uppercase">Hub Registry Empty</p>
+                       <p className="text-sm font-medium text-slate-400 uppercase tracking-widest max-w-xs">You haven't selected any exams for your preparation hub yet.</p>
                     </div>
-                    <Button asChild className="bg-[#0F172A] hover:bg-black rounded-xl h-12 px-10 font-black uppercase text-[10px] tracking-widest shadow-xl">
-                       <Link href="/exams">Browse All Exams</Link>
+                    <Button asChild className="bg-[#0F172A] hover:bg-black rounded-xl h-14 px-10 font-black uppercase text-[10px] tracking-widest shadow-xl border-none">
+                       <Link href="/exams">Select Your Exams</Link>
                     </Button>
                  </Card>
               )}
@@ -213,15 +244,14 @@ export default function MyExamsPage() {
         {/* RECENT ACTIVITY */}
         <section className="space-y-6">
            <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-3 px-2">
-              <History className="h-4 w-4" /> Recent Tests
+              <History className="h-4 w-4" /> RECENT TEST LOGS
            </h3>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {attemptsLoading ? (
                  Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-32 w-full rounded-[2.5rem]" />)
               ) : recentAttempts.length > 0 ? recentAttempts.map((r: any) => (
                  <Link key={r.id} href={`/results/${r.mockId}`}>
-                    <Card className="border-none shadow-xl hover:shadow-4xl transition-all duration-300 rounded-[2.5rem] bg-white p-6 md:p-10 flex items-center justify-between group overflow-hidden relative">
-                       <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+                    <Card className="border-none shadow-xl hover:shadow-4xl transition-all duration-300 rounded-[2.5rem] bg-white p-6 md:p-10 flex items-center justify-between group overflow-hidden border border-slate-100">
                        <div className="flex items-center gap-8 min-w-0">
                           <div className="h-14 w-14 md:h-20 md:w-20 rounded-[1.5rem] bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary/5 transition-all">
                              <Zap className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
@@ -239,7 +269,7 @@ export default function MyExamsPage() {
                  </Link>
               )) : (
                 <div className="col-span-full py-16 text-center bg-white rounded-[3rem] border border-slate-100 shadow-sm opacity-30 italic">
-                   <p className="font-black uppercase tracking-[0.3em] text-[10px]">No recent test results.</p>
+                   <p className="font-black uppercase tracking-[0.3em] text-[10px]">No recent test sessions recorded.</p>
                 </div>
               )}
            </div>
