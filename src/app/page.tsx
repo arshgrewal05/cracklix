@@ -2,16 +2,17 @@ import React from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
 import FeaturedCategories from "@/components/home/FeaturedCategories";
-import ContinueLearning from "@/components/home/ContinueLearning";
-import LatestMocks from "@/components/home/LatestMocks";
-import AppPreview from "@/components/home/AppPreview";
-import MeetFounder from "@/components/home/MeetFounder";
-import Footer from "@/components/layout/Footer";
 import PopularExams from "@/components/home/PopularExams";
+import LatestMocks from "@/components/home/LatestMocks";
+import ContinueLearning from "@/components/home/ContinueLearning";
+import CurrentAffairsPreview from "@/components/home/CurrentAffairsPreview";
+import MeritPreview from "@/components/home/MeritPreview";
+import AppPreview from "@/components/home/AppPreview";
+import Footer from "@/components/layout/Footer";
 
 /**
- * @fileOverview Official Home Hub v171.0 (Restored).
- * PERFORMANCE: Strict server component root with high-fidelity client sub-modules.
+ * @fileOverview Official Home Hub v172.0 (Optimized Structure).
+ * PERFORMANCE: Implements the 9-point hierarchical order for maximum conversion.
  */
 
 export default function HomePage() {
@@ -19,25 +20,29 @@ export default function HomePage() {
     <main className="min-h-screen bg-white font-body pb-safe overflow-x-hidden text-left">
       <Navbar />
       
+      {/* 1. Hero Section */}
       <Hero />
 
-      {/* 1. Primary Discovery Hub */}
+      {/* 2. Exam Categories */}
       <FeaturedCategories />
 
-      {/* 2. Personalized Student Hub (MY EXAMS) */}
-      <ContinueLearning />
-
-      {/* 3. Authority Hubs (EXAM LIST) */}
+      {/* 3. Popular Exams (Exam Hub) */}
       <PopularExams />
 
-      {/* 4. Content Pulse (Global Latest) */}
+      {/* 4. Latest Mock Tests */}
       <LatestMocks />
 
-      {/* 5. Geographic & Mobile Hub */}
-      <AppPreview />
+      {/* 5. Continue Learning (Logged-in User context) */}
+      <ContinueLearning />
 
-      {/* 6. Founder Identity */}
-      <MeetFounder />
+      {/* 6. Current Affairs / Study Updates */}
+      <CurrentAffairsPreview />
+
+      {/* 7. Punjab Merit / Top Rankers */}
+      <MeritPreview />
+
+      {/* 8. App Download / Mobile Hub */}
+      <AppPreview />
       
       <Footer />
     </main>
