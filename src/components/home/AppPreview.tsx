@@ -9,13 +9,13 @@ import { doc } from 'firebase/firestore';
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Redesigned Mobile App Hub v15.0.
- * UPDATED: Removed floating "Safe Registry" badge for a cleaner look.
+ * @fileOverview High-Fidelity Balanced Mobile App Hub v16.0.
+ * UPDATED: Fixed image containment and column split for better visual weight.
  */
 
 export default function AppPreview() {
   const db = useFirestore();
-  const phoneMockup = "https://picsum.photos/seed/phone/600/1200"; 
+  const phoneMockup = "/images/hero-student.png"; // Temporarily using student hero as placeholder or high-res mockup if available
 
   const { data: settings } = useDoc<any>(useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]));
 
@@ -25,13 +25,13 @@ export default function AppPreview() {
   return (
     <section className="py-16 md:py-24 bg-white overflow-hidden border-t border-slate-50">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
-        <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
           
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-6 md:space-y-10 text-left order-2 lg:order-1"
+            className="space-y-6 md:space-y-10 text-left order-2 lg:order-1 max-w-xl"
           >
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -45,7 +45,7 @@ export default function AppPreview() {
                 <span className="text-primary">Anytime.</span>
               </h2>
               <p className="text-base md:text-xl text-slate-500 font-medium leading-relaxed max-w-lg">
-                Download the official <span className="text-[#0F172A] font-bold">Cracklix App</span> to access high-quality preparation resources on the go.
+                Experience Punjab's smartest mock test platform as a native application on your smartphone.
               </p>
             </div>
 
@@ -58,12 +58,12 @@ export default function AppPreview() {
 
             <div className="flex flex-wrap gap-4 pt-4">
                <a href={playStoreLink} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                 <Button className="w-full h-16 px-10 bg-[#0F172A] hover:bg-black text-white rounded-2xl shadow-xl gap-4 font-black uppercase text-[11px] tracking-widest border-none transition-all active:scale-95">
+                 <Button className="w-full h-14 md:h-16 px-10 bg-[#0F172A] hover:bg-black text-white rounded-2xl shadow-xl gap-4 font-black uppercase text-[11px] tracking-widest border-none transition-all active:scale-95">
                     <Play className="h-5 w-5 text-primary fill-current" /> Download Android
                  </Button>
                </a>
                <a href={appStoreLink} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto opacity-50 cursor-not-allowed">
-                 <Button variant="outline" className="w-full h-16 px-10 border-2 border-slate-100 bg-white text-slate-400 rounded-2xl gap-4 font-black uppercase text-[11px] tracking-widest transition-all">
+                 <Button variant="outline" className="w-full h-14 md:h-16 px-10 border-2 border-slate-100 bg-white text-slate-400 rounded-2xl gap-4 font-black uppercase text-[11px] tracking-widest transition-all">
                     <Apple className="h-5 w-5" /> iOS Coming Soon
                  </Button>
                </a>
@@ -77,19 +77,17 @@ export default function AppPreview() {
                initial={{ opacity: 0, y: 50 }}
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
-               className="relative w-full max-w-[320px] md:max-w-[400px] z-10"
+               className="relative w-full max-w-[320px] md:max-w-[400px] h-[500px] md:h-[600px] z-10"
              >
                 {/* DEVICE MOCKUP FRAME */}
-                <div className="relative aspect-[9/18.5] bg-[#0F172A] rounded-[3.5rem] p-3 shadow-5xl border-[8px] border-[#1E293B] ring-1 ring-white/10">
-                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-[#1E293B] rounded-b-2xl z-20" />
+                <div className="h-full w-full bg-[#0F172A] rounded-[3.5rem] p-3 shadow-5xl border-[8px] border-[#1E293B] ring-1 ring-white/10 overflow-hidden">
                    <div className="w-full h-full rounded-[2.5rem] overflow-hidden bg-white relative">
                       <img 
                         src={phoneMockup} 
-                        className="w-full h-full object-cover" 
+                        className="w-full h-full object-contain p-8 md:p-12" 
                         alt="App Screenshot" 
-                        data-ai-hint="app mockup"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/20 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/5 to-transparent pointer-events-none" />
                    </div>
                 </div>
              </motion.div>
