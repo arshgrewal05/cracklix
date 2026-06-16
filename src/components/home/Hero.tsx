@@ -10,11 +10,12 @@ import {
   Star,
   ShieldCheck,
   LayoutGrid,
-  FileText,
   Users,
   ClipboardCheck,
   CheckCircle2,
-  FileStack
+  FileStack,
+  ChevronRight,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,8 +27,8 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
- * @fileOverview Official Cracklix High-Fidelity Hero v42.0.
- * UPDATED: Swapped hero student illustration with the new official asset.
+ * @fileOverview Official Cracklix High-Fidelity Hero v43.0.
+ * UPDATED: Swapped hero student illustration with the local asset path.
  * UPDATED: Maintained visual hierarchy with illustration above cards on mobile.
  */
 
@@ -42,7 +43,8 @@ export default function Hero() {
   const statsRef = useMemo(() => (db ? doc(db, "settings", "stats") : null), [db]);
   const { data: stats, loading: statsLoading } = useDoc<any>(statsRef);
 
-  const heroImage = "https://i.ibb.co/v4tN9H6W/Gemini-Generated-Image-n1so6on1so6on1so.png";
+  // Use local image path as requested
+  const heroImage = "/images/hero-student.png";
 
   const liveStats = useMemo(() => {
     const format = (n: number, fallback: string) => {
@@ -86,7 +88,7 @@ export default function Hero() {
               </h1>
               
               <p className="text-base md:text-lg text-slate-500 font-medium max-w-xl leading-relaxed mx-auto lg:mx-0">
-                Practice with high-quality mock tests, previous papers and exam-focused preparation for top Punjab exams.
+                Practice bilingual mock tests and prepare for Punjab Government Exams with confidence. Access exam-focused practice, previous papers and performance tracking in one place.
               </p>
 
               {/* Recruitment Board Pills */}
@@ -100,7 +102,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* 2. ILLUSTRATION HUB - sandwiching between text and cards on mobile */}
+          {/* 2. ILLUSTRATION HUB - Positioned above cards on mobile via order-2 */}
           <div className="relative flex items-center justify-center lg:justify-end w-full min-h-[350px] md:min-h-[500px] order-2 lg:row-span-2">
              <div className="relative w-full max-w-[280px] sm:max-w-[420px] md:max-w-[520px] lg:max-w-[620px] aspect-square flex items-center justify-center">
                 
@@ -115,48 +117,51 @@ export default function Hero() {
                      src={heroImage}
                      className="w-full h-auto drop-shadow-3xl object-contain" 
                      alt="Cracklix Student" 
-                     referrerPolicy="no-referrer"
                    />
                 </motion.div>
 
-                {/* Corner Floating Cards (Desktop/Tablet) */}
+                {/* Corner Floating Cards (Desktop/Tablet Only) */}
                 <div className="absolute inset-0 pointer-events-none hidden md:block">
                   <FloatingNode 
                      position="top-[2%] left-[0%] lg:left-[-10%]"
                      icon={<Zap className="h-4 w-4 text-blue-600 fill-current" />}
                      title="MOCK TESTS"
                      delay={0.3}
+                     href="/mocks"
                   />
                   <FloatingNode 
                      position="top-[2%] right-[0%] lg:right-[-10%]"
                      icon={<Landmark className="h-4 w-4 text-orange-500" />}
                      title="PUNJAB EXAMS"
                      delay={0.6}
+                     href="/exams"
                   />
                   <FloatingNode 
                      position="bottom-[5%] left-[0%] lg:left-[-15%]"
                      icon={<Target className="h-4 w-4 text-purple-600" />}
-                     title="DAILY PRACTICE"
+                     title="FREE PRACTICE"
                      delay={0.5}
+                     href="/practice"
                   />
                   <FloatingNode 
                      position="bottom-[5%] right-[0%] lg:right-[-15%]"
                      icon={<FileStack className="h-4 w-4 text-emerald-600" />}
                      title="PREVIOUS PAPERS"
                      delay={0.4}
+                     href="/pyqs"
                   />
                 </div>
              </div>
           </div>
 
-          {/* 3. FEATURE CARDS & CTA HUB */}
+          {/* 3. FEATURE CARDS & CTA HUB - order-3 places them below image on mobile */}
           <div className="space-y-10 order-3">
-             {/* Feature Row */}
+             {/* Feature Row - Visible on Mobile as grid below image */}
              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-3">
-                <FeatureCard icon={<ClipboardCheck className="text-blue-600" />} title="MOCK TESTS" sub="Exam-focused tests" />
-                <FeatureCard icon={<FileText className="text-emerald-500" />} title="PREVIOUS PAPERS" sub="Verified paper bank" />
-                <FeatureCard icon={<Target className="text-purple-600" />} title="DAILY PRACTICE" sub="Learn daily sessions" />
-                <FeatureCard icon={<Landmark className="text-orange-500" />} title="PUNJAB EXAMS" sub="All state boards" />
+                <FeatureCard icon={<ClipboardCheck className="text-blue-600" />} title="MOCK TESTS" sub="Exam-focused tests" href="/mocks" />
+                <FeatureCard icon={<FileStack className="text-emerald-500" />} title="PREVIOUS PAPERS" sub="Verified paper bank" href="/pyqs" />
+                <FeatureCard icon={<Target className="text-purple-600" />} title="FREE PRACTICE" sub="Learn daily sessions" href="/practice" />
+                <FeatureCard icon={<Landmark className="text-orange-500" />} title="PUNJAB EXAMS" sub="All state boards" href="/exams" />
              </div>
 
              {/* CTA HUB */}
@@ -173,7 +178,7 @@ export default function Hero() {
 
         {/* BOTTOM STATS HUB */}
         <div className="mt-20 md:mt-32">
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {liveStats.map((stat, idx) => (
                 <motion.div
                   key={stat.label}
@@ -181,18 +186,18 @@ export default function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + (idx * 0.1) }}
                 >
-                  <Card className="border-none shadow-2xl rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 bg-white flex items-center gap-6 hover:translate-y-[-4px] transition-all border border-slate-100 group">
-                    <div className={cn("h-14 w-14 md:h-16 md:w-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform", stat.color)}>
+                  <Card className="border-none shadow-2xl rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 bg-white flex flex-col md:flex-row items-center gap-4 md:gap-6 hover:translate-y-[-4px] transition-all border border-slate-100 group text-center md:text-left">
+                    <div className={cn("h-12 w-12 md:h-16 md:w-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform", stat.color)}>
                       {stat.icon}
                     </div>
-                    <div className="text-left space-y-1">
+                    <div className="space-y-1">
                       {statsLoading ? (
                         <Skeleton className="h-8 w-20 bg-slate-100" />
                       ) : (
                         <p className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter leading-none tabular-nums">{stat.val}</p>
                       )}
                       <p className="text-sm font-black text-slate-900 leading-none">{stat.label}</p>
-                      <p className="text-[10px] font-medium text-slate-400 leading-tight">{stat.sub}</p>
+                      <p className="text-[10px] font-medium text-slate-400 leading-tight hidden md:block">{stat.sub}</p>
                     </div>
                   </Card>
                 </motion.div>
@@ -205,21 +210,23 @@ export default function Hero() {
   );
 }
 
-function FeatureCard({ icon, title, sub }: { icon: React.ReactNode, title: string, sub: string }) {
+function FeatureCard({ icon, title, sub, href }: { icon: React.ReactNode, title: string, sub: string, href: string }) {
    return (
-      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center lg:items-start text-center lg:text-left gap-2 group hover:shadow-md transition-all">
-         <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-blue-50 transition-colors">
-            {icon}
-         </div>
-         <div className="min-w-0">
-            <h4 className="text-[11px] font-black text-slate-900 leading-tight truncate">{title}</h4>
-            <p className="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">{sub}</p>
-         </div>
-      </div>
+      <Link href={href} className="block h-full">
+        <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center lg:items-start text-center lg:text-left gap-2 group hover:shadow-md transition-all h-full">
+           <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 group-hover:bg-blue-50 transition-colors">
+              {icon}
+           </div>
+           <div className="min-w-0">
+              <h4 className="text-[11px] font-black text-slate-900 leading-tight truncate">{title}</h4>
+              <p className="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">{sub}</p>
+           </div>
+        </div>
+      </Link>
    )
 }
 
-function FloatingNode({ position, icon, title, delay }: { position: string, icon: React.ReactNode, title: string, delay: number }) {
+function FloatingNode({ position, icon, title, delay, href }: { position: string, icon: React.ReactNode, title: string, delay: number, href: string }) {
    return (
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
@@ -227,12 +234,14 @@ function FloatingNode({ position, icon, title, delay }: { position: string, icon
         transition={{ delay, duration: 0.8 }}
         className={cn("absolute z-20 w-[140px] md:w-[180px] lg:w-[210px] hidden md:block", position)}
       >
-         <Card className="p-3 md:p-5 rounded-xl md:rounded-2xl bg-white/95 backdrop-blur-xl border-none shadow-xl flex items-center gap-3 md:gap-4 group hover:shadow-2xl transition-all cursor-pointer pointer-events-auto">
-            <div className="h-8 w-8 md:h-12 md:w-12 rounded-lg md:rounded-xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-blue-50 transition-colors">
-               {icon}
-            </div>
-            <p className="text-[9px] md:text-xs font-black text-slate-900 tracking-tight truncate leading-none">{title}</p>
-         </Card>
+         <Link href={href}>
+            <Card className="p-3 md:p-5 rounded-xl md:rounded-2xl bg-white/95 backdrop-blur-xl border-none shadow-xl flex items-center gap-3 md:gap-4 group hover:shadow-2xl transition-all cursor-pointer pointer-events-auto">
+               <div className="h-8 w-8 md:h-12 md:w-12 rounded-lg md:rounded-xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-blue-50 transition-colors">
+                  {icon}
+               </div>
+               <p className="text-[9px] md:text-xs font-black text-slate-900 tracking-tight truncate leading-none">{title}</p>
+            </Card>
+         </Link>
       </motion.div>
    )
 }
