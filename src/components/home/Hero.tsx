@@ -23,8 +23,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Cracklix Majestic Hero v6.3.
- * UPDATED: Recalibrated floating nodes for desktop - top nodes higher (top-0), bottom nodes lower (-bottom-10%).
+ * @fileOverview Official Cracklix Majestic Hero v7.0.
+ * REFACTORED: Proportional illustration hub with overlap protection and 4-corner stability.
  */
 
 export default function Hero() {
@@ -93,10 +93,10 @@ export default function Hero() {
 
       <div className="max-w-7xl mx-auto px-4 space-y-16">
         
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-0 items-center">
           
           {/* LEFT: CONTENT HUB */}
-          <div className="space-y-10">
+          <div className="space-y-8 md:space-y-10 z-20">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm">
               <Star className="h-4 w-4 text-blue-600 fill-current" />
               <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">10,000+ Aspirants Trust Cracklix</span>
@@ -121,13 +121,6 @@ export default function Hero() {
                ))}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-               <HeroMiniCard icon={<Zap className="text-blue-600" />} title="Mock Tests" sub="Exam-focused tests" />
-               <HeroMiniCard icon={<FileStack className="text-emerald-500" />} title="Previous Papers" sub="Latest official keys" />
-               <HeroMiniCard icon={<Target className="text-purple-600" />} title="Daily Practice" sub="Stay ahead daily" />
-               <HeroMiniCard icon={<Landmark className="text-orange-500" />} title="Punjab Exams" sub="All major boards" />
-            </div>
-
             <div className="flex flex-wrap gap-4 pt-4">
               <Button asChild className="h-16 px-10 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm tracking-widest rounded-2xl shadow-xl shadow-blue-600/20 gap-3 border-none transition-all active:scale-95">
                 <Link href="/mocks">Start Free Mock Test <ArrowRight className="h-5 w-5" /></Link>
@@ -138,23 +131,56 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: ILLUSTRATION HUB */}
-          <div className="relative flex justify-center lg:pl-12">
-            <FloatingNode icon={<Zap className="text-blue-600 h-5 w-5" />} label="Mock Tests" className="top-[18%] lg:top-[0%] left-0 md:left-4" />
-            <FloatingNode icon={<Target className="text-purple-600 h-5 w-5" />} label="Daily Practice" className="bottom-[2%] lg:-bottom-[10%] left-0 md:left-0" />
-            <FloatingNode icon={<FileStack className="text-emerald-500 h-5 w-5" />} label="Previous Papers" className="bottom-[2%] lg:-bottom-[10%] right-0 md:right-0" />
-            <FloatingNode icon={<Trophy className="text-orange-500 h-5 w-5" />} label="Punjab Exams" className="top-[18%] lg:top-[0%] right-0 md:right-4" />
-
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100/50 rounded-full blur-3xl -z-10" />
+          {/* RIGHT: ILLUSTRATION HUB - CENTERED & PROPORTIONAL */}
+          <div className="relative flex justify-center items-center h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full overflow-visible">
             
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative z-10 lg:-mt-16"
-            >
-              <img src="/images/hero-student.png" className="w-full max-w-md h-auto" alt="Cracklix Student" />
-            </motion.div>
+            {/* CENTRAL ILLUSTRATION WRAPPER */}
+            <div className="relative w-full max-w-[320px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[650px] xl:max-w-[750px] aspect-square flex items-center justify-center">
+                
+                {/* FLOATING NODES - 4 CORNER MAPPING */}
+                {/* TOP LEFT: MOCK TESTS */}
+                <FloatingNode 
+                   icon={<Zap className="text-blue-600 h-5 w-5" />} 
+                   label="Mock Tests" 
+                   className="top-[5%] left-[-10%] sm:left-[-5%] lg:left-[5%] xl:left-[10%]" 
+                />
+
+                {/* BOTTOM LEFT: DAILY PRACTICE */}
+                <FloatingNode 
+                   icon={<Target className="text-purple-600 h-5 w-5" />} 
+                   label="Daily Practice" 
+                   className="bottom-[15%] left-[-10%] sm:left-[-5%] lg:left-[5%] xl:left-[10%]" 
+                />
+
+                {/* TOP RIGHT: PUNJAB EXAMS */}
+                <FloatingNode 
+                   icon={<Trophy className="text-orange-500 h-5 w-5" />} 
+                   label="Punjab Exams" 
+                   className="top-[5%] right-[-10%] sm:right-[-5%] lg:right-[5%] xl:right-[10%]" 
+                />
+
+                {/* BOTTOM RIGHT: PREVIOUS PAPERS */}
+                <FloatingNode 
+                   icon={<FileStack className="text-emerald-500 h-5 w-5" />} 
+                   label="Previous Papers" 
+                   className="bottom-[15%] right-[-10%] sm:right-[-5%] lg:right-[5%] xl:right-[10%]" 
+                />
+
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100/30 rounded-full blur-3xl -z-10" />
+                
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8 }}
+                  className="relative z-10 w-full"
+                >
+                  <img 
+                    src="/images/hero-student.png" 
+                    className="w-full h-auto drop-shadow-2xl" 
+                    alt="Cracklix Student" 
+                  />
+                </motion.div>
+            </div>
           </div>
         </div>
 
@@ -179,35 +205,23 @@ export default function Hero() {
   );
 }
 
-function HeroMiniCard({ icon, title, sub }: { icon: React.ReactNode, title: string, sub: string }) {
-  return (
-    <Card className="p-4 rounded-2xl bg-white border-slate-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-all group cursor-pointer text-left h-full">
-       <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-          {icon}
-       </div>
-       <div className="min-w-0">
-          <p className="text-[11px] md:text-xs font-black text-slate-900 tracking-tight leading-tight mb-1">{title}</p>
-          <p className="text-[9px] font-medium text-slate-400 leading-tight">{sub}</p>
-       </div>
-    </Card>
-  );
-}
-
 function FloatingNode({ icon, label, className }: { icon: React.ReactNode, label: string, className: string }) {
   return (
     <motion.div
       initial={{ y: 0 }}
-      animate={{ y: [0, -10, 0] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      animate={{ y: [0, -12, 0] }}
+      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       className={cn(
-        "absolute z-20 bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-90 min-w-[120px] md:min-w-[140px]",
+        "absolute z-20 bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl border border-slate-100 flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-105 active:scale-95 min-w-[110px] sm:min-w-[130px] md:min-w-[150px] lg:min-w-[180px]",
         className
       )}
     >
        <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-slate-50 flex items-center justify-center shrink-0 shadow-inner">
           {icon}
        </div>
-       <span className="text-[9px] md:text-[10px] font-black text-[#0F172A] tracking-widest uppercase text-center leading-tight">{label}</span>
+       <span className="text-[9px] md:text-[11px] font-black text-[#0F172A] tracking-widest uppercase text-center leading-tight">
+          {label}
+       </span>
     </motion.div>
   );
 }
