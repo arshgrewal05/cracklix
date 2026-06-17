@@ -22,9 +22,9 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Hero Hub v90.0.
- * RESTORED: Original high-fidelity layout with feature cards and statistics.
- * OPTIMIZED: Applied 'sizes' to student image to resolve Next.js optimization warnings.
+ * @fileOverview Official Hero Hub v95.0.
+ * RESTORED: High-Fidelity Original Layout with 4-Card Feature Grid.
+ * OPTIMIZED: Applied 'sizes' to student image to resolve Next.js warnings.
  */
 export default function Hero() {
   const db = useFirestore();
@@ -100,7 +100,7 @@ export default function Hero() {
               With Confidence
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl">
+            <p className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
               Practice with bilingual mock tests, previous papers and
               exam-focused preparation for PSSSB, Punjab Police,
               PSTET, PSPCL and more.
@@ -111,7 +111,7 @@ export default function Hero() {
                 (item) => (
                   <span
                     key={item}
-                    className="px-4 py-2 rounded-full bg-white border text-sm font-medium text-slate-700"
+                    className="px-4 py-2 rounded-full bg-white border text-[11px] font-bold uppercase tracking-tight text-slate-700"
                   >
                     {item}
                   </span>
@@ -120,42 +120,27 @@ export default function Hero() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-8">
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm border-slate-100">
-                <ClipboardList className="h-6 w-6 text-blue-600 mb-2" />
-                <p className="font-bold">Mock Tests</p>
-              </Card>
-
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm border-slate-100">
-                <BookOpen className="h-6 w-6 text-indigo-600 mb-2" />
-                <p className="font-bold">Study Material</p>
-              </Card>
-
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm border-slate-100">
-                <FileText className="h-6 w-6 text-emerald-600 mb-2" />
-                <p className="font-bold">Previous Papers</p>
-              </Card>
-
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm border-slate-100">
-                <BarChart3 className="h-6 w-6 text-orange-500 mb-2" />
-                <p className="font-bold">Performance Analytics</p>
-              </Card>
+              <FeatureCard icon={<ClipboardList className="h-6 w-6 text-blue-600" />} label="Mock Tests" />
+              <FeatureCard icon={<BookOpen className="h-6 w-6 text-indigo-600" />} label="Study Material" />
+              <FeatureCard icon={<FileText className="h-6 w-6 text-emerald-600" />} label="Previous Papers" />
+              <FeatureCard icon={<BarChart3 className="h-6 w-6 text-orange-500" />} label="Performance Analytics" />
             </div>
 
-            <div className="flex flex-wrap gap-4 mt-8">
+            <div className="flex flex-wrap gap-4 mt-10">
               <Button
                 asChild
-                className="h-12 md:h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 font-bold border-none shadow-xl active:scale-95 transition-all"
+                className="h-14 md:h-16 px-10 rounded-2xl bg-blue-600 hover:bg-blue-700 font-bold border-none shadow-2xl active:scale-95 transition-all text-white"
               >
                 <Link href="/mocks">
                   Start Free Mock Test
-                  <ChevronRight className="ml-2 h-4 w-4" />
+                  <ChevronRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
 
               <Button
                 asChild
                 variant="outline"
-                className="h-12 md:h-14 px-8 rounded-2xl font-bold border-2 border-slate-200 active:scale-95 transition-all"
+                className="h-14 md:h-16 px-10 rounded-2xl font-bold border-2 border-slate-200 active:scale-95 transition-all bg-white"
               >
                 <Link href="/exams">
                   Browse Exams
@@ -185,21 +170,21 @@ export default function Hero() {
         </div>
 
         {/* STATS HUB */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 md:mt-24">
           {liveStats.map((stat) => (
             <Card
               key={stat.id}
-              className="p-6 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 text-left"
+              className="p-6 md:p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 text-left group hover:translate-y-[-4px] transition-all"
             >
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
                   {stat.icon}
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-slate-900 tabular-nums leading-none">
+                  <p className="text-2xl md:text-3xl font-black text-slate-900 tabular-nums leading-none">
                     {stat.val}
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">
                     {stat.label}
                   </p>
                 </div>
@@ -210,4 +195,13 @@ export default function Hero() {
       </div>
     </section>
   );
+}
+
+function FeatureCard({ icon, label }: { icon: React.ReactNode, label: string }) {
+  return (
+    <Card className="p-5 rounded-[2rem] border bg-white shadow-sm border-slate-100 group hover:shadow-lg transition-all text-left">
+      <div className="mb-3 transform group-hover:scale-110 transition-transform">{icon}</div>
+      <p className="font-bold text-[#0F172A] text-sm md:text-base leading-tight">{label}</p>
+    </Card>
+  )
 }

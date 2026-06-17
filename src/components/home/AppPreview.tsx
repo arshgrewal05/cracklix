@@ -10,12 +10,12 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 /**
- * @fileOverview High-Fidelity Balanced Mobile App Hub v20.0 (Locked Assets).
+ * @fileOverview High-Fidelity Balanced Mobile App Hub v21.0.
+ * UPDATED: Applied 'sizes' and 'w-auto' to resolve Next.js warnings.
  */
 
 export default function AppPreview() {
   const db = useFirestore();
-  // PERMANENT ASSET NODE
   const phoneMockup = "/images/hero-student.png"; 
 
   const { data: settings } = useDoc<any>(useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]));
@@ -80,18 +80,14 @@ export default function AppPreview() {
                viewport={{ once: true }}
                className="relative w-full max-w-[320px] md:max-w-[400px] h-[500px] md:h-[600px] z-10"
              >
-                {/* DEVICE MOCKUP FRAME */}
                 <div className="h-full w-full bg-[#0F172A] rounded-[3.5rem] p-3 shadow-5xl border-[8px] border-[#1E293B] ring-1 ring-white/10 overflow-hidden">
                    <div className="w-full h-full rounded-[2.5rem] overflow-hidden bg-white relative">
                       <Image 
                         src={phoneMockup} 
                         alt="App Screenshot" 
                         fill
+                        sizes="(max-width: 768px) 100vw, 400px"
                         className="object-contain p-8 md:p-12"
-                        onError={(e) => {
-                           const target = e.target as HTMLImageElement;
-                           target.src = "/logo/cracklix-icon.png";
-                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/5 to-transparent pointer-events-none" />
                    </div>
