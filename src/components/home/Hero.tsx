@@ -21,9 +21,9 @@ import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Institutional Hero Hub v97.0.
+ * @fileOverview Institutional Hero Hub v98.0.
+ * UPDATED: Synchronized trust badge with real-time student registry data.
  * UPDATED: Moved student illustration above feature cards per user request.
- * FIXED: Resolved Next.js Image dimension warnings with sizes and style.
  */
 export default function Hero() {
   const db = useFirestore();
@@ -43,7 +43,7 @@ export default function Hero() {
   const liveStats = useMemo(() => {
     const formatNumber = (num: number, fallback: string) => {
       if (!num) return fallback;
-      if (num >= 1000) return Math.floor(num / 1000) + "k+";
+      if (num >= 1000) return (num / 1000).toFixed(1) + "k+";
       return num + "+";
     };
 
@@ -85,7 +85,7 @@ export default function Hero() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm mb-6">
             <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
             <span className="text-sm font-semibold text-slate-700">
-              10,000+ Aspirants Trust Cracklix
+              {stats?.totalUsers ? stats.totalUsers.toLocaleString() : "15,000"}+ Aspirants Trust Cracklix
             </span>
           </div>
 
@@ -116,7 +116,7 @@ export default function Hero() {
             )}
           </div>
 
-          {/* STUDENT ILLUSTRATION - MOVED ABOVE CARDS */}
+          {/* STUDENT ILLUSTRATION - PLACED ABOVE CARDS AS REQUESTED */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
