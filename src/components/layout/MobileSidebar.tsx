@@ -27,8 +27,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar";
 import Logo from "@/components/brand/Logo";
 
 /**
- * @fileOverview Mobile Sidebar Realignment v15.0.
- * UPDATED: Increased logo scale for better visibility in the mobile drawer.
+ * @fileOverview Mobile Sidebar Realignment v16.0.
+ * UPDATED: Logo scale synchronized with main site maximation.
  */
 export default function MobileSidebar({
   onClose,
@@ -92,7 +92,6 @@ export default function MobileSidebar({
           href="/"
           onClick={onClose}
           className="shrink-0 -ml-4"
-          imgClassName="h-14" // Increased for high impact in mobile drawer
         />
 
         <button
