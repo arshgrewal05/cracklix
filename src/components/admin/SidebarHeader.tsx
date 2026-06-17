@@ -12,8 +12,8 @@ interface SidebarHeaderProps {
 }
 
 /**
- * Cracklix Admin Sidebar Header v1.9.
- * UPDATED: Increased height to 160px to support 140px logo with high visibility.
+ * Cracklix Admin Sidebar Header v2.0.
+ * UPDATED: Shifted expanded logo 20px left (-ml-5) for standard alignment.
  */
 export default function SidebarHeader({
   isOpen,
@@ -37,6 +37,7 @@ export default function SidebarHeader({
           <Logo
             href="/admin"
             variant="dark"
+            className="-ml-5"
           />
         ) : (
           <div className="relative h-16 w-16 shrink-0">

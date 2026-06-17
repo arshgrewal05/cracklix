@@ -35,8 +35,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Maximized Premium Header v61.0.
- * UPDATED: Synchronized gaps between brand elements and actions to gap-4 (16px).
+ * @fileOverview Maximized Premium Header v62.0.
+ * UPDATED: Shifted logo 20px left (-ml-5) for high-density branding.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -78,7 +78,7 @@ export default function Navbar() {
       <nav className="w-full h-[160px] bg-white border-b border-slate-100 shadow-sm">
         <div className="w-full max-w-5xl mx-auto px-4 md:px-6 h-full flex items-center justify-between">
 
-          {/* LEFT SIDE: Brand Group - Gap matched to right side */}
+          {/* LEFT SIDE: Brand Group - Logo shifted 20px left */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(true)}
@@ -90,7 +90,7 @@ export default function Navbar() {
 
             <Logo
               variant="light"
-              className="shrink-0"
+              className="shrink-0 -ml-5"
             />
           </div>
 
@@ -115,7 +115,7 @@ export default function Navbar() {
             />
           </div>
 
-          {/* RIGHT SIDE: Actions - Gap matched to left side */}
+          {/* RIGHT SIDE: Actions */}
           <div className="flex items-center gap-4 shrink-0">
             <Link
               href="/search"

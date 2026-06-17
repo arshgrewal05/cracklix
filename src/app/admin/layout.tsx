@@ -7,11 +7,12 @@ import { signOut } from "firebase/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Menu, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Logo from "@/components/brand/Logo";
 import Link from "next/link";
 
 /**
- * @fileOverview Maximized Admin Hub Layout v25.0.
- * UPDATED: Synchronized gaps to 16px (gap-4) for left and right header groups.
+ * @fileOverview Maximized Admin Hub Layout v26.0.
+ * UPDATED: Logo shifted 20px left (-ml-5) for visual balance with the menu button.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -89,7 +90,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }}
       >
         <header className="h-[160px] border-b border-slate-100 flex items-center px-4 md:px-8 justify-between bg-white/80 backdrop-blur-xl sticky top-0 z-40 shrink-0">
-          {/* LEFT: Branding Group - Gap set to 16px */}
+          {/* LEFT: Branding Group - Logo shifted 20px left */}
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(true)}
@@ -98,13 +99,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="flex flex-col text-left">
-               <span className="text-[11px] font-black uppercase text-blue-600 tracking-[0.2em] leading-none">Admin Hub</span>
-               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 hidden xs:block">Audit Node Active</span>
-            </div>
+            <Logo
+              variant="light"
+              className="shrink-0 -ml-5"
+            />
           </div>
           
-          {/* RIGHT: Action Hub - Gap set to 16px */}
+          {/* RIGHT: Action Hub */}
           <div className="flex items-center gap-4">
              <Button asChild variant="outline" className="h-12 px-6 rounded-xl border-slate-200 font-bold text-sm tracking-tight gap-2 hover:bg-slate-50 transition-all active:scale-95">
                 <Link href="/">View Site</Link>
