@@ -15,7 +15,7 @@ interface LogoProps {
 
 /**
  * Cracklix Official Logo Component
- * UPDATED: Maximized to 140px standard for ultra-prominent branding.
+ * UPDATED: Synchronized to 130px for high-density 134px headers.
  */
 export default function Logo({
   className = "",
@@ -34,10 +34,10 @@ export default function Logo({
       src={logoSrc}
       alt="Cracklix"
       width={460}
-      height={140}
+      height={130}
       priority
       className={cn(
-        "h-[140px] w-auto object-contain shrink-0",
+        "h-[130px] w-auto object-contain shrink-0",
         imgClassName
       )}
     />

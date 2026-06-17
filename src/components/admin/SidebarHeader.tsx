@@ -12,8 +12,8 @@ interface SidebarHeaderProps {
 }
 
 /**
- * Cracklix Admin Sidebar Header v5.0.
- * UPDATED: Reduced height to 144px while keeping logo at 140px.
+ * Cracklix Admin Sidebar Header v6.0.
+ * UPDATED: Reduced height to 134px while keeping logo at 130px.
  */
 export default function SidebarHeader({
   isOpen,
@@ -22,7 +22,7 @@ export default function SidebarHeader({
   return (
     <div
       className={cn(
-        "h-[144px] border-b border-white/5 px-4 shrink-0 flex items-center",
+        "h-[134px] border-b border-white/5 px-4 shrink-0 flex items-center",
         isOpen ? "justify-between" : "justify-center"
       )}
     >

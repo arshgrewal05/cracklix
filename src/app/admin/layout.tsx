@@ -11,8 +11,8 @@ import Logo from "@/components/brand/Logo";
 import Link from "next/link";
 
 /**
- * @fileOverview Maximized Admin Hub Layout v29.0.
- * UPDATED: Reduced header height to 144px for tighter vertical profile.
+ * @fileOverview Maximized Admin Hub Layout v30.0.
+ * UPDATED: Reduced header height to 134px for tighter vertical profile.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -89,7 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           marginLeft: typeof window !== 'undefined' && window.innerWidth >= 1024 ? sidebarWidth : 0 
         }}
       >
-        <header className="h-[144px] border-b border-slate-100 flex items-center px-4 md:px-8 justify-between bg-white/80 backdrop-blur-xl sticky top-0 z-40 shrink-0">
+        <header className="h-[134px] border-b border-slate-100 flex items-center px-4 md:px-8 justify-between bg-white/80 backdrop-blur-xl sticky top-0 z-40 shrink-0">
           {/* LEFT: Branding Group */}
           <div className="flex items-center gap-4">
             <button 
