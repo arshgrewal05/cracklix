@@ -28,9 +28,8 @@ import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
 /**
- * @fileOverview Hardened CBT Engine v54.0 (SDL Guard Integrated).
- * SECURITY: Real-time device monitoring is handled via the global SessionGuard.
- * If a session is pulled, this page will automatically redirect to login.
+ * @fileOverview Hardened CBT Engine v55.0 (Security Perimeter Hardened).
+ * ENFORCEMENT: Strict subscription check before engine hydration.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -73,15 +72,18 @@ export default function MockAttemptPage() {
         const mData = mockSnap.data();
         setMockData(mData);
 
+        // --- STRICT SECURITY PERIMETER ---
         const tier = (mData.accessLevel || 'FREE').toUpperCase();
         const userEmail = user.email?.toLowerCase();
         const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || (userEmail && SUPER_ADMIN_WHITELIST.includes(userEmail));
         const hasActivePass = isAdmin || (profile?.pass?.active === true && new Date(profile.pass.expiryDate) > new Date());
 
         if (tier === 'PREMIUM' && !hasActivePass) {
+           console.warn("[ACCESS_DENIED]: Attempted premium bypass detected.");
            router.replace('/pass');
            return;
         }
+        // ---------------------------------
 
         const questionIds = mData.questionIds || [];
         if (questionIds.length === 0) throw new Error("Question bank is empty.");

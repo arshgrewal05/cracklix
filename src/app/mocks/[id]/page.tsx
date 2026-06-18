@@ -31,8 +31,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Individual Mock Gateway v30.0 (High Density Mobile).
- * FIXED: Card spacing and button accessibility for smaller devices.
+ * @fileOverview Individual Mock Gateway v31.0 (Hardened Access).
+ * ENFORCEMENT: Synchronized visual and logical locking nodes.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];

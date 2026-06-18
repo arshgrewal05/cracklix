@@ -16,8 +16,8 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Download Center v2.2.
- * TEXT: Replaced Hub with Center.
+ * @fileOverview Institutional Download Center v2.3 (Premium Locked).
+ * SECURITY: Standardized locking for premium study assets.
  */
 
 export default function NotesLibrary() {
@@ -143,6 +143,7 @@ function NotesGrid({ data, loading, profile }: any) {
 
 function DownloadCard({ asset, profile }: { asset: any, profile: any }) {
    const isPassValid = useMemo(() => {
+     if (profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN') return true;
      if (!profile?.pass?.active) return false;
      return new Date(profile.pass.expiryDate) > new Date();
    }, [profile]);
@@ -154,7 +155,7 @@ function DownloadCard({ asset, profile }: { asset: any, profile: any }) {
          <CardContent className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 md:gap-10 flex-1">
             <div className={cn(
                "h-20 w-20 md:h-24 md:w-24 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform",
-               asset.isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-500"
+               asset.isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
             )}>
                {isLocked ? <Lock className="h-8 w-8 md:h-10 md:w-10" /> : <FileText className="h-8 w-8 md:h-10 md:w-10" />}
             </div>
@@ -162,7 +163,7 @@ function DownloadCard({ asset, profile }: { asset: any, profile: any }) {
                <div className="flex items-center gap-4">
                   <Badge className={cn(
                      "border-none font-black text-[9px] uppercase tracking-widest px-3 py-1",
-                     asset.isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-500"
+                     asset.isFree ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
                   )}>
                      {asset.subjectId || 'GENERAL'}
                   </Badge>
