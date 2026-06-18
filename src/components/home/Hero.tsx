@@ -8,28 +8,24 @@ import {
   Users,
   Zap,
   ChevronRight,
-  Star,
-  Play
+  BookOpen,
+  FileText,
+  BarChart3,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import Image from "next/image";
 import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 /**
- * @fileOverview High-Fidelity Hero Hub v83.0 (Fixed Imports).
+ * @fileOverview Restored Hero Hub v2.0.
+ * Features: Two-column discovery layout, quick-access feature cards, and bottom stats grid.
  */
-
 export default function Hero() {
   const db = useFirestore();
   const [mounted, setMounted] = useState(false);
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-student');
 
   useEffect(() => {
     setMounted(true);
@@ -40,38 +36,38 @@ export default function Hero() {
     [db]
   );
 
-  const { data: stats, loading } = useDoc<any>(statsRef);
+  const { data: stats } = useDoc<any>(statsRef);
 
   const liveStats = useMemo(() => {
-    const formatNumber = (num: number) => {
-      if (!num) return "0";
-      if (num >= 1000) return (num / 1000).toFixed(1) + "k+";
-      return num.toString() + "+";
+    const formatNumber = (num: number, fallback: string) => {
+      if (!num) return fallback;
+      if (num >= 1000) return Math.floor(num / 1000) + "k+";
+      return num + "+";
     };
 
     return [
       {
         id: "q",
-        icon: <Zap className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />,
-        val: stats ? formatNumber(stats.totalQuestions) : null,
+        icon: <Zap className="h-5 v-5 text-blue-600" />,
+        val: formatNumber(stats?.totalQuestions, "50k+"),
         label: "Questions"
       },
       {
         id: "m",
-        icon: <ClipboardList className="h-4 w-4 md:h-5 md:w-5 text-indigo-600" />,
-        val: stats ? formatNumber(stats.totalMocks) : null,
+        icon: <ClipboardList className="h-5 v-5 text-indigo-600" />,
+        val: formatNumber(stats?.totalMocks, "500+"),
         label: "Mock Tests"
       },
       {
         id: "e",
-        icon: <ShieldCheck className="h-4 w-4 md:h-5 md:w-5 text-emerald-600" />,
-        val: stats ? formatNumber(stats.totalBoards) : null,
+        icon: <ShieldCheck className="h-5 v-5 text-emerald-600" />,
+        val: formatNumber(stats?.totalBoards, "50+"),
         label: "Exams"
       },
       {
         id: "u",
-        icon: <Users className="h-4 w-4 md:h-5 md:w-5 text-orange-500" />,
-        val: stats ? formatNumber(stats.totalUsers) : null,
+        icon: <Users className="h-5 v-5 text-orange-500" />,
+        val: formatNumber(stats?.totalUsers, "15k+"),
         label: "Aspirants"
       }
     ];
@@ -80,131 +76,124 @@ export default function Hero() {
   if (!mounted) return null;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white to-blue-50 py-10 md:py-20 lg:py-28">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
-      
+    <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-blue-50 py-12 md:py-24 text-left">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          
-          <div className="text-left space-y-8 md:space-y-10 relative z-10">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-blue-600/5 border border-blue-600/10 shadow-sm"
-            >
-              <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500 animate-pulse" />
-              <div className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] text-blue-600">
-                {loading ? <Skeleton className="h-4 w-24 bg-blue-600/10" /> : <span>{stats?.totalUsers?.toLocaleString() || "0"} Registered Aspirants</span>}
-              </div>
-            </motion.div>
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* LEFT CONTENT */}
+          <div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm mb-6">
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              <span className="text-sm font-semibold text-slate-700">
+                10,000+ Aspirants Trust Cracklix
+              </span>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="space-y-4"
-            >
-              <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-[#0F172A] leading-[1.05] tracking-tight uppercase">
-                Crack Punjab <br />
-                <span className="text-blue-600">State Exams</span> <br />
-                With Precision.
-              </h1>
-              <p className="text-base md:text-xl text-slate-500 font-medium max-w-xl leading-relaxed">
-                Punjab's smarter preparation node. Access bilingual mock tests, official previous papers, and AI rationalizations verified by Arsh Grewal Management.
-              </p>
-            </motion.div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 leading-tight uppercase">
+              Crack Punjab <br/>
+              <span className="block text-blue-600">
+                Government Exams
+              </span>
+              With Confidence
+            </h1>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex flex-wrap gap-4 pt-4"
-            >
+            <p className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl font-medium">
+              Practice with bilingual mock tests, previous papers and
+              exam-focused preparation for PSSSB, Punjab Police,
+              PSTET, PSPCL and more.
+            </p>
+
+            <div className="flex flex-wrap gap-3 mt-6">
+              {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map(
+                (item) => (
+                  <span
+                    key={item}
+                    className="px-4 py-2 rounded-full bg-white border text-sm font-medium text-slate-700"
+                  >
+                    {item}
+                  </span>
+                )
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <Card className="p-4 rounded-3xl border bg-white shadow-sm">
+                <ClipboardList className="h-6 w-6 text-blue-600 mb-2" />
+                <p className="font-bold">Mock Tests</p>
+              </Card>
+
+              <Card className="p-4 rounded-3xl border bg-white shadow-sm">
+                <BookOpen className="h-6 w-6 text-indigo-600 mb-2" />
+                <p className="font-bold">Study Material</p>
+              </Card>
+
+              <Card className="p-4 rounded-3xl border bg-white shadow-sm">
+                <FileText className="h-6 w-6 text-emerald-600 mb-2" />
+                <p className="font-bold">Previous Papers</p>
+              </Card>
+
+              <Card className="p-4 rounded-3xl border bg-white shadow-sm">
+                <BarChart3 className="h-6 w-6 text-orange-500 mb-2" />
+                <p className="font-bold">Performance Analytics</p>
+              </Card>
+            </div>
+
+            <div className="flex flex-wrap gap-4 mt-8">
               <Button
                 asChild
-                className="h-14 md:h-18 px-8 md:px-12 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] md:text-[11px] shadow-3xl shadow-blue-600/20 transition-all active:scale-95 border-none"
+                className="h-12 md:h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold"
               >
                 <Link href="/mocks">
-                  Start Free Mock <ChevronRight className="ml-2 h-4 w-4" />
+                  Start Free Mock Test
+                  <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
 
               <Button
                 asChild
                 variant="outline"
-                className="h-14 md:h-18 px-8 md:px-12 rounded-2xl border-2 border-slate-100 bg-white text-slate-600 font-black uppercase tracking-widest text-[10px] md:text-[11px] transition-all active:scale-95 hover:bg-slate-50 shadow-sm"
+                className="h-12 md:h-14 px-8 rounded-2xl border-2 font-bold"
               >
                 <Link href="/exams">
-                  Browse Verticals
+                  Browse Exams
                 </Link>
               </Button>
-            </motion.div>
+            </div>
           </div>
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="hidden lg:block relative"
-          >
-             <div className="absolute inset-0 bg-blue-600/10 blur-[100px] rounded-full scale-75" />
-             <div className="relative aspect-[4/3] rounded-[3.5rem] overflow-hidden shadow-5xl border border-white/20 bg-white">
-                <Image 
-                  src={heroImage?.imageUrl || "https://picsum.photos/seed/hero/800/600"} 
-                  alt={heroImage?.description || "Cracklix Hero"}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 600px"
-                  data-ai-hint={heroImage?.imageHint || "student studying"}
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/10 to-transparent" />
-                
-                <div className="absolute bottom-10 left-10 right-10">
-                   <div className="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/50 shadow-2xl flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                         <div className="h-12 w-12 bg-primary rounded-xl flex items-center justify-center text-white shadow-xl">
-                            <Play className="h-6 w-6 fill-current" />
-                         </div>
-                         <div className="text-left">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Experience Hub</p>
-                            <p className="text-sm font-black text-[#0F172A] uppercase">Virtual CBT Demo</p>
-                         </div>
-                      </div>
-                      <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[9px] uppercase">LIVE NOW</Badge>
-                   </div>
-                </div>
-             </div>
-          </motion.div>
+          {/* RIGHT IMAGE */}
+          <div className="relative flex justify-center">
+            <motion.img
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              src="/images/hero-student.png"
+              alt="Cracklix Student"
+              className="w-full max-w-md object-contain"
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-16 md:mt-24 lg:mt-32">
-          {liveStats.map((stat, idx) => (
-            <motion.div
+        {/* BOTTOM STATS GRID */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16">
+          {liveStats.map((stat) => (
+            <Card
               key={stat.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + (idx * 0.1) }}
+              className="p-6 rounded-3xl bg-white border shadow-sm group hover:shadow-md transition-shadow"
             >
-              <Card
-                className="p-5 md:p-10 rounded-[1.8rem] md:rounded-[3rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 text-left group hover:translate-y-[-4px] transition-all overflow-hidden"
-              >
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 md:gap-6 min-w-0">
-                  <div className="h-10 w-10 md:h-16 md:w-16 rounded-xl md:rounded-[1.5rem] bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                    {stat.icon}
-                  </div>
-                  <div className="text-center sm:text-left min-w-0 flex-1">
-                    <div className="text-xl md:text-4xl lg:text-5xl font-headline font-black text-[#0F172A] tabular-nums leading-none tracking-tighter truncate">
-                      {loading ? <Skeleton className="h-6 w-12 md:h-10 md:w-24 bg-slate-100" /> : stat.val || "0"}
-                    </div>
-                    <div className="text-[7px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2 md:mt-3 truncate">
-                      {stat.label}
-                    </div>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="shrink-0">
+                  {stat.icon}
                 </div>
-              </Card>
-            </motion.div>
+                <div className="min-w-0">
+                  <p className="text-2xl font-black text-slate-900 tabular-nums">
+                    {stat.val}
+                  </p>
+                  <p className="text-sm text-slate-500 font-medium uppercase tracking-widest">
+                    {stat.label}
+                  </p>
+                </div>
+              </div>
+            </Card>
           ))}
         </div>
       </div>
