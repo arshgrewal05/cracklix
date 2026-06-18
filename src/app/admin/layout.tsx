@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Refined Admin Layout v4.0 (Padding Hardened).
- * FIXED: Strictly standardized padding to prevent content squashing on mobile.
+ * @fileOverview Refined Admin Layout v5.0 (Padding & Content Hardened).
+ * FIXED: Standardized main content padding to eliminate text-clipping in narrow viewports.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -62,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   if (!mounted || loading) return (
-    <div className="h-screen w-full bg-[#0F172A] flex flex-col items-center justify-center space-y-6">
+    <div className="h-screen w-full bg-[#0F172A] flex flex-col items-center justify-center space-y-6 text-center">
        <ShieldCheck className="h-12 w-12 text-blue-600 animate-pulse" />
        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Securing Registry Center...</p>
     </div>
@@ -82,12 +82,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         pathname={pathname}
       />
 
-      {/* Main Content Hub */}
+      {/* Main Content Hub - HARDENED PADDING */}
       <div className={cn(
-        "flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out w-full min-w-0",
+        "flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out w-full min-w-0 overflow-x-hidden",
         isSidebarOpen ? "lg:pl-[280px]" : "lg:pl-[88px]"
       )}>
-        <header className="h-20 border-b border-slate-100 flex items-center px-4 md:px-8 justify-between bg-white/80 backdrop-blur-xl sticky top-0 z-40 shrink-0">
+        <header className="h-20 border-b border-slate-100 flex items-center px-4 md:px-10 justify-between bg-white/80 backdrop-blur-xl sticky top-0 z-40 shrink-0">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(true)}
@@ -115,7 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8 lg:p-12 w-full max-w-full overflow-x-hidden min-w-0">
+        <main className="flex-1 p-4 md:p-10 lg:p-14 w-full max-w-full overflow-x-hidden">
            <div className="max-w-7xl mx-auto w-full">
               {children}
            </div>
@@ -124,3 +124,4 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
+
