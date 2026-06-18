@@ -22,9 +22,9 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Premium Redesigned Hero Hub v26.0.
- * UPDATED: Integrated functional "Screenshot Matched" feature cards.
- * ROUTING: Mocks, Exams, PYQs, and Practice nodes fully connected.
+ * @fileOverview Premium Clean Hero Hub v28.0.
+ * UPDATED: Desktop visual hub simplified for a "clean" look.
+ * UPDATED: Feature nodes moved to the content column.
  */
 
 export default function Hero() {
@@ -84,7 +84,7 @@ export default function Hero() {
       <div className="absolute top-0 right-0 w-1/3 h-full bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start md:items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* LEFT: CONTENT HUB */}
           <div className="flex flex-col items-start text-left space-y-8 md:space-y-10">
@@ -113,15 +113,25 @@ export default function Hero() {
               </p>
             </div>
 
-            {/* INTEGRATED FUNCTIONAL CARDS (SCREENSHOT MATCHED) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-              <FeatureCard icon={<Zap className="h-5 w-5" />} label="MOCK TESTS" href="/mocks" />
-              <FeatureCard icon={<BookOpen className="h-5 w-5" />} label="PUNJAB EXAMS" href="/exams" />
-              <FeatureCard icon={<FileText className="h-5 w-5" />} label="PREVIOUS PAPERS" href="/pyqs" />
-              <FeatureCard icon={<ShieldCheck className="h-5 w-5" />} label="FREE PRACTICE" href="/mocks" />
+            {/* EXAM CATEGORY PILLS */}
+            <div className="flex flex-wrap gap-2 md:gap-3">
+              {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map((item) => (
+                <span key={item} className="px-4 py-2 rounded-full bg-white border border-slate-100 text-[10px] md:text-xs font-bold text-slate-600 shadow-sm uppercase tracking-tight">
+                   {item}
+                </span>
+              ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            {/* INTEGRATED FEATURE GRID (WORKING NODES) */}
+            <div className="grid grid-cols-2 gap-3 md:gap-4 w-full max-w-lg">
+               <FeatureCard icon={<Zap />} label="MOCK TESTS" href="/mocks" />
+               <FeatureCard icon={<Landmark />} label="PUNJAB EXAMS" href="/exams" />
+               <FeatureCard icon={<FileText />} label="PREVIOUS PAPERS" href="/pyqs" />
+               <FeatureCard icon={<ShieldCheck />} label="FREE PRACTICE" href="/mocks" />
+            </div>
+
+            {/* CTA BUTTONS */}
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2">
               <Button
                 asChild
                 className="h-14 md:h-16 px-10 bg-[#2563EB] hover:bg-blue-700 text-white font-black uppercase text-[11px] md:text-xs tracking-[0.1em] rounded-full shadow-xl transition-all active:scale-95 border-none group/btn"
@@ -144,7 +154,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: VISUAL HUB */}
+          {/* RIGHT: CLEAN VISUAL HUB */}
           <div className="relative flex justify-center items-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -155,7 +165,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-blue-600/5 blur-[100px] rounded-full scale-110 pointer-events-none" />
               <img
                 src="/images/hero-student.png"
-                alt="Cracklix Student"
+                alt="Cracklix Student Illustration"
                 className="w-full h-auto object-contain drop-shadow-2xl max-w-[320px] md:max-w-[420px] lg:max-w-[520px] xl:max-w-[620px]"
               />
             </motion.div>
@@ -171,7 +181,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
             >
-              <Card className="p-6 md:p-8 rounded-3xl bg-white border border-slate-100 shadow-xl group hover:translate-y-[-4px] transition-all duration-300 text-left">
+              <Card className="p-6 md:p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl group hover:translate-y-[-4px] transition-all duration-300 text-left">
                 <div className="flex flex-col items-start gap-4">
                   <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 flex items-center justify-center shadow-inner group-hover:bg-blue-50 transition-colors">
                     {stat.icon}
@@ -201,19 +211,15 @@ export default function Hero() {
 
 function FeatureCard({ icon, label, href }: { icon: React.ReactNode, label: string, href: string }) {
   return (
-    <Link href={href}>
-      <motion.div 
-        whileHover={{ scale: 1.02, translateY: -2 }}
-        whileTap={{ scale: 0.98 }}
-        className="bg-white p-4 md:p-6 rounded-full shadow-lg border border-slate-100 flex items-center gap-4 group transition-all cursor-pointer"
-      >
-        <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary transition-colors duration-300">
-           {React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 text-primary group-hover:text-white transition-colors" })}
+    <Link href={href} className="block group">
+      <div className="bg-white p-3 md:p-5 rounded-full shadow-lg border border-slate-50 flex items-center gap-3 transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px] active:scale-95 cursor-pointer">
+        <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary transition-colors duration-300">
+           {React.cloneElement(icon as React.ReactElement, { className: "h-4 w-4 md:h-5 md:w-5 text-primary group-hover:text-white transition-colors" })}
         </div>
-        <span className="font-black text-xs md:text-sm text-[#0F172A] tracking-tight uppercase group-hover:text-primary transition-colors truncate">
+        <span className="font-black text-[9px] md:text-[11px] text-[#0F172A] tracking-tight uppercase group-hover:text-primary transition-colors truncate">
           {label}
         </span>
-      </motion.div>
+      </div>
     </Link>
   );
 }
