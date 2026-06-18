@@ -110,7 +110,7 @@ export interface Board {
 export interface Exam {
   id: string;
   name: string;
-  title?: string; // presentation alias for name
+  title?: string;
   boardId: string;
   categoryId: string;
   displayOrder: number;
@@ -123,6 +123,7 @@ export interface Exam {
   activeQuestions?: number;
   totalQuestions?: number;
   duration?: number;
+  category?: string;
 }
 
 export interface Subject {

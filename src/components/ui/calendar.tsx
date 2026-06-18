@@ -9,6 +9,10 @@ import { buttonVariants } from "@/components/ui/button"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
+/**
+ * @fileOverview Production-grade Calendar node v9.11.
+ * UPDATED: Uses react-day-picker v9 components API for Chevron icons.
+ */
 function Calendar({
   className,
   classNames,

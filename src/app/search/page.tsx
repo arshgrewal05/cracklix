@@ -151,7 +151,9 @@ function SearchResultItem({ icon, title, category, href }: { icon: React.ReactNo
          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-xl flex items-center justify-between group border border-slate-100 transition-all duration-300">
             <div className="flex items-center gap-4 min-w-0 flex-1">
                <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/5 transition-all shrink-0 shadow-inner">
-                  {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<{ className?: string }>, { className: "h-5 w-5" }) : icon}
+                  {React.isValidElement(icon) 
+                    ? React.cloneElement(icon as React.ReactElement<{ className?: string }>, { className: "h-5 w-5" }) 
+                    : icon}
                </div>
                <div className="text-left min-w-0 flex-1 space-y-1">
                   <p className="font-black text-[#0F172A] group-hover:text-primary transition-colors text-sm md:text-xl uppercase leading-tight line-clamp-1 truncate">{title}</p>
