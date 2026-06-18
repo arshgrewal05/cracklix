@@ -36,7 +36,8 @@ import {
   Smartphone,
   Trash2,
   CheckCircle2,
-  Clock
+  Clock,
+  LucideIcon
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -47,8 +48,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Profile Center v24.0 (PWA Optimized).
- * FIXED: Responsive card alignment and standardized high-density layout.
+ * @fileOverview Student Profile Center v25.0.
+ * FIXED: Resolved cloneElement TypeScript mismatch by using component references.
  */
 export default function ProfilePage() {
   const { user, profile, loading, profileLoading, currentDeviceId } = useUser()
@@ -227,9 +228,9 @@ export default function ProfilePage() {
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-12">
               <div className="lg:col-span-8 space-y-6 md:space-y-12">
                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-8">
-                    <StatsCard icon={<ClipboardList />} label="TESTS DONE" value={resultsLoading ? "..." : stats.total} color="text-blue-500" bgColor="bg-blue-50" />
-                    <StatsCard icon={<Target />} label="ACCURACY" value={resultsLoading ? "..." : `${stats.avgAccuracy}%`} color="text-primary" bgColor="bg-primary/10" />
-                    <StatsCard icon={<Trophy />} label="RANK" value={resultsLoading ? "..." : stats.rank} color="text-emerald-500" bgColor="bg-emerald-50" className="hidden sm:flex" />
+                    <StatsCard icon={ClipboardList} label="TESTS DONE" value={resultsLoading ? "..." : stats.total} color="text-blue-500" bgColor="bg-blue-50" />
+                    <StatsCard icon={Target} label="ACCURACY" value={resultsLoading ? "..." : `${stats.avgAccuracy}%`} color="text-primary" bgColor="bg-primary/10" />
+                    <StatsCard icon={Trophy} label="RANK" value={resultsLoading ? "..." : stats.rank} color="text-emerald-500" bgColor="bg-emerald-50" className="hidden sm:flex" />
                  </div>
 
                  {/* DEVICE MANAGEMENT HUB */}
@@ -295,11 +296,11 @@ export default function ProfilePage() {
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8 md:gap-y-12">
-                        <ProfileDataNode icon={<Calendar className="text-blue-500" />} label="DATE OF BIRTH" value={profile?.dob ? new Date(profile.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : "Not Linked"} />
-                        <ProfileDataNode icon={<Phone className="text-emerald-500" />} label="MOBILE NODE" value={profile?.phone || "Not Linked"} />
-                        <ProfileDataNode icon={<MapPin className="text-rose-500" />} label="HQs ADDRESS" value={profile?.address || "Not Added"} colSpan={2} />
-                        <ProfileDataNode icon={<ShieldCheck className="text-primary" />} label="ACCESS LEVEL" value={`${profile?.role || 'STUDENT'}`} />
-                        <ProfileDataNode icon={<Activity className="text-orange-500" />} label="REGISTRY SINCE" value={profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : "---"} />
+                        <ProfileDataNode icon={Calendar} label="DATE OF BIRTH" value={profile?.dob ? new Date(profile.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : "Not Linked"} />
+                        <ProfileDataNode icon={Phone} label="MOBILE NODE" value={profile?.phone || "Not Linked"} />
+                        <ProfileDataNode icon={MapPin} label="HQs ADDRESS" value={profile?.address || "Not Added"} colSpan={2} />
+                        <ProfileDataNode icon={ShieldCheck} label="ACCESS LEVEL" value={`${profile?.role || 'STUDENT'}`} />
+                        <ProfileDataNode icon={Activity} label="REGISTRY SINCE" value={profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : "---"} />
                       </div>
                     )}
                  </Card>
@@ -383,9 +384,9 @@ export default function ProfilePage() {
 function HeaderInfo({ icon, text }: { icon: React.ReactNode, text: string }) {
    return (<div className="flex items-center gap-2.5 text-white/60 font-bold uppercase text-[9px] md:text-[12px] tracking-tight"><span className="shrink-0">{icon}</span><span className="truncate max-w-[180px] md:max-w-[320px]">{text || 'Awaiting Node'}</span></div>)
 }
-function StatsCard({ icon, label, value, color, bgColor, className }: any) {
-   return (<Card className={cn("border-none shadow-2xl rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-12 bg-white group hover:translate-y-[-6px] transition-all duration-500", className)}><div className="flex flex-col gap-5 md:gap-8"><div className={cn("h-10 w-10 md:h-16 md:w-16 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-inner", bgColor)}>{React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement, { className: cn("h-5 w-5 md:h-8 md:w-8", color) }) : icon}</div><div className="space-y-1 text-left"><p className="text-[8px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p><p className={cn("text-xl md:text-5xl font-headline font-black leading-none tabular-nums", color)}>{value}</p></div></div></Card>)
+function StatsCard({ icon: Icon, label, value, color, bgColor, className }: { icon: LucideIcon, label: string, value: string | number, color: string, bgColor: string, className?: string }) {
+   return (<Card className={cn("border-none shadow-2xl rounded-[1.5rem] md:rounded-[3rem] p-6 md:p-12 bg-white group hover:translate-y-[-6px] transition-all duration-500", className)}><div className="flex flex-col gap-5 md:gap-8"><div className={cn("h-10 w-10 md:h-16 md:w-16 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-inner", bgColor)}><Icon className={cn("h-5 w-5 md:h-8 md:w-8", color)} /></div><div className="space-y-1 text-left"><p className="text-[8px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p><p className={cn("text-xl md:text-5xl font-headline font-black leading-none tabular-nums", color)}>{value}</p></div></div></Card>)
 }
-function ProfileDataNode({ icon, label, value, colSpan = 1 }: any) {
-   return (<div className={cn("flex items-start gap-5 md:gap-8", colSpan > 1 ? "md:col-span-2" : "")}><div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary/5 transition-colors">{React.cloneElement(icon, { className: "h-5 w-5 md:h-7 md:w-7" })}</div><div className="min-w-0 space-y-1 text-left"><p className="text-[8px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p><p className="text-[13px] md:text-xl font-bold text-[#0F172A] leading-relaxed break-words uppercase tracking-tight">{value}</p></div></div>)
+function ProfileDataNode({ icon: Icon, label, value, colSpan = 1 }: { icon: LucideIcon, label: string, value: string, colSpan?: number }) {
+   return (<div className={cn("flex items-start gap-5 md:gap-8", colSpan > 1 ? "md:col-span-2" : "")}><div className="h-12 w-12 md:h-16 md:w-16 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary/5 transition-colors"><Icon className="h-5 w-5 md:h-7 md:w-7" /></div><div className="min-w-0 space-y-1 text-left"><p className="text-[8px] md:text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p><p className="text-[13px] md:text-xl font-bold text-[#0F172A] leading-relaxed break-words uppercase tracking-tight">{value}</p></div></div>)
 }

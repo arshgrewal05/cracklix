@@ -9,15 +9,15 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion"
-import { HelpCircle, ShieldCheck, BookOpen, GraduationCap, Zap } from "lucide-react"
+import { HelpCircle, ShieldCheck, BookOpen, GraduationCap, Zap, LucideIcon } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, where, orderBy } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 import { HelpArticle } from "@/types"
 
 /**
- * @fileOverview Official Institutional FAQ Hub v3.1.
- * FIXED: Explicit React import for cloneElement compatibility.
+ * @fileOverview Official Institutional FAQ Hub v3.2.
+ * FIXED: Explicitly typed icon component to resolve cloneElement mismatch.
  */
 
 export default function FAQPage() {
@@ -42,7 +42,7 @@ export default function FAQPage() {
           <div className="bg-white p-8 md:p-12 rounded-[2.5rem] md:rounded-[4rem] shadow-3xl border border-slate-100 space-y-8">
             <Accordion type="single" collapsible className="w-full">
               {loading ? (
-                 Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl mb-4" />)
+                 Array.from({ length: 4 }).map((_, i) => <Skeleton className="h-16 w-full rounded-xl mb-4" />)
               ) : faqs && faqs.length > 0 ? (
                  faqs.map((faq, idx) => (
                   <AccordionItem key={faq.id} value={`item-${idx}`} className="border-b border-slate-50 py-4 last:border-0">
@@ -61,9 +61,9 @@ export default function FAQPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-             <QuickHelp icon={<ShieldCheck />} label="Verified Patterns" desc="Official commission norms" />
-             <QuickHelp icon={<BookOpen />} label="Bilingual Hub" desc="Punjabi/English Support" />
-             <QuickHelp icon={<GraduationCap />} label="Elite Mentors" desc="Arsh Grewal Management" />
+             <QuickHelp icon={ShieldCheck} label="Verified Patterns" desc="Official commission norms" />
+             <QuickHelp icon={BookOpen} label="Bilingual Hub" desc="Punjabi/English Support" />
+             <QuickHelp icon={GraduationCap} label="Elite Mentors" desc="Arsh Grewal Management" />
           </div>
         </div>
       </main>
@@ -72,11 +72,11 @@ export default function FAQPage() {
   )
 }
 
-function QuickHelp({ icon, label, desc }: any) {
+function QuickHelp({ icon: Icon, label, desc }: { icon: LucideIcon, label: string, desc: string }) {
   return (
     <div className="p-8 md:p-10 bg-white rounded-[2.5rem] shadow-xl border border-slate-100 text-center space-y-4">
        <div className="h-12 w-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto text-primary shadow-inner">
-          {React.cloneElement(icon, { className: "h-6 w-6" })}
+          <Icon className="h-6 w-6" />
        </div>
        <div className="space-y-1">
           <p className="font-headline font-black text-sm uppercase text-[#0F172A] tracking-tight">{label}</p>

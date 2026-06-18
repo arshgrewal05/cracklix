@@ -11,7 +11,8 @@ import {
   BookOpen,
   FileText,
   BarChart3,
-  Star
+  Star,
+  LucideIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,9 +23,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Fluid Hero Hub v12.1 (Production Hardened).
- * FIXED: Explicit Badge and cn imports to resolve build ReferenceErrors.
- * TYPOGRAPHY: Implemented fluid Title Case scaling for high-density mobile screens.
+ * @fileOverview Official Fluid Hero Hub v13.0.
+ * FIXED: Resolved cloneElement TypeScript mismatch by using component references.
  */
 export default function Hero() {
   const db = useFirestore();
@@ -59,25 +59,29 @@ export default function Hero() {
     return [
       {
         id: "q",
-        icon: <Zap className="h-5 w-5 text-blue-600" />,
+        icon: Zap,
+        iconColor: "text-blue-600",
         val: formatNumber(stats?.totalQuestions, "50k+"),
         label: "Questions"
       },
       {
         id: "m",
-        icon: <ClipboardList className="h-5 w-5 text-indigo-600" />,
+        icon: ClipboardList,
+        iconColor: "text-indigo-600",
         val: formatNumber(stats?.totalMocks, "500+"),
         label: "Mock Tests"
       },
       {
         id: "e",
-        icon: <ShieldCheck className="h-5 w-5 text-emerald-600" />,
+        icon: ShieldCheck,
+        iconColor: "text-emerald-600",
         val: formatNumber(stats?.totalBoards, "50+"),
         label: "Exams"
       },
       {
         id: "u",
-        icon: <Users className="h-5 w-5 text-orange-500" />,
+        icon: Users,
+        iconColor: "text-orange-500",
         val: formatNumber(stats?.totalUsers, "15k+"),
         label: "Aspirants"
       }
@@ -147,10 +151,10 @@ export default function Hero() {
 
             {/* QUICK FEATURE GRID */}
             <div className="grid grid-cols-2 gap-4 md:gap-6 mt-4">
-              <HeroFeatureCard icon={<ClipboardList />} label="Mock Tests" color="text-blue-600" />
-              <HeroFeatureCard icon={<BookOpen />} label="Study Material" color="text-indigo-600" />
-              <HeroFeatureCard icon={<FileText />} label="Previous Papers" color="text-emerald-600" />
-              <HeroFeatureCard icon={<BarChart3 />} label="Performance Analytics" color="text-orange-500" />
+              <HeroFeatureCard icon={ClipboardList} label="Mock Tests" color="text-blue-600" />
+              <HeroFeatureCard icon={BookOpen} label="Study Material" color="text-indigo-600" />
+              <HeroFeatureCard icon={FileText} label="Previous Papers" color="text-emerald-600" />
+              <HeroFeatureCard icon={BarChart3} label="Performance Analytics" color="text-orange-500" />
             </div>
 
             {/* CTAS */}
@@ -182,41 +186,44 @@ export default function Hero() {
 
         {/* BOTTOM LIVE STATS GRID */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-16 md:mt-24 lg:mt-32">
-          {liveStats.map((stat) => (
-            <Card
-              key={stat.id}
-              className="p-5 md:p-8 rounded-[2rem] bg-white border border-slate-100 shadow-xl group hover:shadow-2xl transition-all duration-500"
-            >
-              <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-5 text-center sm:text-left">
-                <div className="shrink-0 p-3 rounded-xl bg-slate-50 group-hover:bg-blue-50 transition-colors shadow-inner">
-                  {stat.icon}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 tabular-nums leading-none tracking-tighter mb-1.5">
-                    {statsLoading ? (
-                       <div className="h-8 w-12 bg-slate-100 animate-pulse rounded" />
-                    ) : (
-                       stat.val
-                    )}
+          {liveStats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card
+                key={stat.id}
+                className="p-5 md:p-8 rounded-[2rem] bg-white border border-slate-100 shadow-xl group hover:shadow-2xl transition-all duration-500"
+              >
+                <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-5 text-center sm:text-left">
+                  <div className="shrink-0 p-3 rounded-xl bg-slate-50 group-hover:bg-blue-50 transition-colors shadow-inner">
+                    <Icon className={cn("h-5 w-5", stat.iconColor)} />
                   </div>
-                  <div className="text-[8px] md:text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] leading-none">
-                    {stat.label}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 tabular-nums leading-none tracking-tighter mb-1.5">
+                      {statsLoading ? (
+                        <div className="h-8 w-12 bg-slate-100 animate-pulse rounded" />
+                      ) : (
+                        stat.val
+                      )}
+                    </div>
+                    <div className="text-[8px] md:text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] leading-none">
+                      {stat.label}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            )
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-function HeroFeatureCard({ icon, label, color }: { icon: React.ReactNode, label: string, color: string }) {
+function HeroFeatureCard({ icon: Icon, label, color }: { icon: LucideIcon, label: string, color: string }) {
   return (
     <Card className="p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-100 bg-white shadow-sm group hover:border-blue-600/30 hover:shadow-2xl transition-all text-left">
       <div className={cn("h-8 w-8 md:h-12 md:w-12 rounded-xl flex items-center justify-center mb-4 shadow-inner bg-slate-50 transition-transform group-hover:scale-110", color)}>
-        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 md:h-6 md:w-6" }) : icon}
+        <Icon className="h-5 w-5 md:h-6 md:w-6" />
       </div>
       <p className="font-black text-[#0F172A] text-[10px] md:text-[13px] uppercase tracking-widest">{label}</p>
     </Card>

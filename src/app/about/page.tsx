@@ -18,7 +18,8 @@ import {
   Trophy,
   History,
   Landmark,
-  Loader2
+  Loader2,
+  LucideIcon
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -30,8 +31,8 @@ import { doc } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Refined Founder's Story Hub v14.0.
- * FIXED: Consolidated React imports and resolved cloneElement context.
+ * @fileOverview Refined Founder's Story Hub v15.0.
+ * FIXED: Switched to type-safe icon components to resolve build errors.
  */
 
 export default function AboutPage() {
@@ -164,19 +165,19 @@ export default function AboutPage() {
                        <ImpactNode 
                           label="LIVE STUDENTS" 
                           val={mounted ? liveStats.students : "---"} 
-                          icon={<Users className="text-primary h-4 w-4" />} 
+                          icon={Users} 
                           loading={statsLoading || !mounted}
                        />
                        <ImpactNode 
                           label="VERIFIED MCQs" 
                           val={mounted ? liveStats.mcqs : "---"} 
-                          icon={<ShieldCheck className="text-emerald-500 h-4 w-4" />} 
+                          icon={ShieldCheck} 
                           loading={statsLoading || !mounted}
                        />
                        <ImpactNode 
                           label="OFFICIAL HUBS" 
                           val={mounted ? liveStats.hubs : "---"} 
-                          icon={<Landmark className="text-blue-500 h-4 w-4" />} 
+                          icon={Landmark} 
                           loading={statsLoading || !mounted}
                        />
                     </div>
@@ -195,29 +196,29 @@ export default function AboutPage() {
 
               <div className="space-y-16 md:space-y-32">
                  <TimelineItem 
-                    icon={<Zap />} 
+                    icon={Zap} 
                     title="Student Struggle" 
                     desc="Witnessing the gap in reliable, high-quality exam preparation resources while navigating competitive exams." 
                  />
                  <TimelineItem 
-                    icon={<Compass />} 
+                    icon={Compass} 
                     title="The Vision" 
                     desc="Envisioning a centralized area where technology and educational precision eliminate all preparation barriers." 
                     right 
                  />
                  <TimelineItem 
-                    icon={<Sparkles />} 
+                    icon={Sparkles} 
                     title="Creation of Cracklix" 
                     desc="Launched as a student-centric commitment to confidence, clarity, and convenience." 
                  />
                  <TimelineItem 
-                    icon={<Target />} 
+                    icon={Target} 
                     title="Student Impact" 
                     desc="Empowering thousands of learners across Punjab to unlock their potential and achieve their dream careers." 
                     right 
                  />
                  <TimelineItem 
-                    icon={<History />} 
+                    icon={History} 
                     title="Future Growth" 
                     desc="Building India's most trusted educational area, ensuring quality learning for all." 
                  />
@@ -254,12 +255,12 @@ export default function AboutPage() {
                  <ValueCard 
                     title="Our Mission" 
                     desc="To provide students with accessible, reliable, and innovative educational resources that enable smarter preparation and greater confidence." 
-                    icon={<Zap className="h-5 w-5 text-primary" />}
+                    icon={Zap}
                  />
                  <ValueCard 
                     title="Our Vision" 
                     desc="To build one of India's most trusted educational areas, empowering learners to achieve their goals through technology solutions." 
-                    icon={<Target className="h-5 w-5 text-blue-500" />}
+                    icon={Target}
                  />
               </div>
            </div>
@@ -289,11 +290,11 @@ export default function AboutPage() {
   )
 }
 
-function ImpactNode({ label, val, icon, loading }: any) {
+function ImpactNode({ label, val, icon: Icon, loading }: { label: string, val: string, icon: LucideIcon, loading: boolean }) {
    return (
       <div className="bg-white/5 border border-white/10 rounded-[1.5rem] p-4 flex items-center gap-4 shadow-xl group hover:border-primary/30 transition-all">
          <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform shrink-0">
-            {icon}
+            <Icon className="h-4 w-4" />
          </div>
          <div className="text-left min-w-0">
             {loading ? (
@@ -307,12 +308,12 @@ function ImpactNode({ label, val, icon, loading }: any) {
    )
 }
 
-function ValueCard({ icon, title, desc }: any) {
+function ValueCard({ icon: Icon, title, desc }: { icon: LucideIcon, title: string, desc: string }) {
   return (
     <Card className="bg-white/5 border-white/10 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] shadow-4xl text-left space-y-6 group hover:border-primary/20 transition-all duration-500 h-full flex flex-col relative overflow-hidden">
-       <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">{icon}</div>
+       <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><Icon className="h-5 w-5" /></div>
        <div className="h-10 w-10 rounded-[1rem] bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:bg-primary/5 transition-colors">
-          {icon}
+          <Icon className="h-5 w-5" />
        </div>
        <div className="space-y-3 flex-1">
           <h3 className="text-xl md:text-2xl font-headline font-black text-white uppercase tracking-tight group-hover:text-primary transition-colors">{title}</h3>
@@ -322,7 +323,7 @@ function ValueCard({ icon, title, desc }: any) {
   )
 }
 
-function TimelineItem({ icon, title, desc, right = false }: any) {
+function TimelineItem({ icon: Icon, title, desc, right = false }: { icon: LucideIcon, title: string, desc: string, right?: boolean }) {
    return (
       <motion.div 
          initial={{ opacity: 0, x: right ? 30 : -30 }}
@@ -350,7 +351,7 @@ function TimelineItem({ icon, title, desc, right = false }: any) {
                "h-14 w-14 md:h-20 md:w-20 rounded-[1.5rem] bg-white/5 border border-white/10 flex items-center justify-center text-primary shadow-2xl backdrop-blur-xl z-10 shrink-0 group hover:border-primary transition-all",
                right ? "md:-translate-x-1/2" : "md:translate-x-1/2"
             )}>
-               {React.cloneElement(icon, { className: "h-6 w-6 md:h-8 md:w-8 fill-current" })}
+               <Icon className="h-6 w-6 md:h-8 md:w-8 fill-current" />
             </div>
             {/* Visual connector line for continuity */}
             <div className="absolute top-full w-px h-16 md:h-32 bg-gradient-to-b from-white/20 to-transparent -z-0 hidden md:block" />

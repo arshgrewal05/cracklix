@@ -15,7 +15,8 @@ import {
   BookOpen,
   ShieldCheck,
   MessageCircle,
-  Loader2
+  Loader2,
+  LucideIcon
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,16 +28,16 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { HelpArticle } from "@/types"
 
 /**
- * @fileOverview Official Institutional Help Hub v2.1.
- * FIXED: Added missing React import for cloneElement compatibility.
+ * @fileOverview Official Institutional Help Hub v2.2.
+ * FIXED: Resolved TypeScript cloneElement mismatch by passing component references.
  */
 
 const HELP_CATEGORIES = [
-  { id: "PAYMENTS", label: "Payments", icon: <CreditCard />, desc: "UPI, Cards, and Refunds" },
-  { id: "PASS", label: "Premium Pass", icon: <Zap />, desc: "Plans and Benefits" },
-  { id: "PWA", label: "App Setup", icon: <Smartphone />, desc: "Install Cracklix PWA" },
-  { id: "TECHNICAL", label: "CBT Issues", icon: <ShieldCheck />, desc: "Test engine help" },
-  { id: "ACCOUNT", label: "Account Hub", icon: <Lock />, desc: "Security and Profile" }
+  { id: "PAYMENTS", label: "Payments", icon: CreditCard, desc: "UPI, Cards, and Refunds" },
+  { id: "PASS", label: "Premium Pass", icon: Zap, desc: "Plans and Benefits" },
+  { id: "PWA", label: "App Setup", icon: Smartphone, desc: "Install Cracklix PWA" },
+  { id: "TECHNICAL", label: "CBT Issues", icon: ShieldCheck, desc: "Test engine help" },
+  { id: "ACCOUNT", label: "Account Hub", icon: Lock, desc: "Security and Profile" }
 ]
 
 export default function HelpCenterPage() {
@@ -83,19 +84,22 @@ export default function HelpCenterPage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-           {HELP_CATEGORIES.map(cat => (
-              <Card key={cat.id} className="border-none shadow-xl rounded-[2.5rem] bg-white group hover:translate-y-[-6px] transition-all duration-500 border border-slate-100 cursor-pointer">
-                 <CardContent className="p-6 md:p-8 text-center space-y-4">
-                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto shadow-inner group-hover:scale-110 group-hover:bg-primary/5 transition-all text-primary">
-                       {React.cloneElement(cat.icon as React.ReactElement, { className: "h-6 w-6" })}
-                    </div>
-                    <div>
-                       <h3 className="font-headline font-black text-xs md:text-sm uppercase text-[#0F172A]">{cat.label}</h3>
-                       <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-widest leading-tight">{cat.desc}</p>
-                    </div>
-                 </CardContent>
-              </Card>
-           ))}
+           {HELP_CATEGORIES.map(cat => {
+              const Icon = cat.icon;
+              return (
+                <Card key={cat.id} className="border-none shadow-xl rounded-[2.5rem] bg-white group hover:translate-y-[-6px] transition-all duration-500 border border-slate-100 cursor-pointer">
+                  <CardContent className="p-6 md:p-8 text-center space-y-4">
+                      <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto shadow-inner group-hover:scale-110 group-hover:bg-primary/5 transition-all text-primary">
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-headline font-black text-xs md:text-sm uppercase text-[#0F172A]">{cat.label}</h3>
+                        <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-widest leading-tight">{cat.desc}</p>
+                      </div>
+                  </CardContent>
+                </Card>
+              )
+           })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
