@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils"
 /**
  * @fileOverview Punjab Exam Architecture Manager v2.2.
  * Centralized hierarchical board for Category → Hub → Exam mapping.
+ * FIXED: Explicitly typed sort parameters and prevented in-place mutation to resolve Vercel build failures.
  */
 
 export default function ArchitectureManager() {
@@ -103,7 +104,7 @@ export default function ArchitectureManager() {
                      </CardHeader>
                      <CardContent className="p-10">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                           {cat.hubs.length > 0 ? cat.hubs.sort((a,b) => (a.displayOrder || 0) - (b.displayOrder || 0)).map((hub: any) => (
+                           {cat.hubs.length > 0 ? [...cat.hubs].sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0)).map((hub: any) => (
                               <div key={hub.id} className="space-y-4 bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100">
                                  <div className="flex items-center justify-between">
                                     <h4 className="font-black text-sm uppercase text-[#0F172A] flex items-center gap-2">
@@ -112,7 +113,7 @@ export default function ArchitectureManager() {
                                     <Badge className="bg-white border-slate-200 text-slate-400 text-[7px] font-black uppercase px-2">{hub.exams.length} Verticals</Badge>
                                  </div>
                                  <div className="space-y-2">
-                                    {hub.exams.sort((a,b) => (a.displayOrder || 0) - (b.displayOrder || 0)).map((exam: any) => (
+                                    {[...hub.exams].sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0)).map((exam: any) => (
                                        <div key={exam.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 shadow-sm group hover:border-primary/20 transition-all">
                                           <span className="text-[10px] font-bold text-slate-500 uppercase truncate pr-2">{exam.name}</span>
                                           <div className="flex gap-1.5 shrink-0">
