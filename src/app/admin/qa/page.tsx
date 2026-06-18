@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useState } from "react"
@@ -159,7 +158,7 @@ export default function QADashboard() {
                   <TableHeader className="bg-slate-50/50">
                      <TableRow className="border-slate-50 h-16">
                         <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Conflict Statements</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase text-center text-slate-500">Confidence</TableHead>
+                        <TableHead className="text-[10px) font-black uppercase text-center text-slate-500">Confidence</TableHead>
                         <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Audit Action</TableHead>
                      </TableRow>
                   </TableHeader>

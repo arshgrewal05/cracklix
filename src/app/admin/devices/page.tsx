@@ -9,6 +9,7 @@ import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, orderBy, limit, where } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 

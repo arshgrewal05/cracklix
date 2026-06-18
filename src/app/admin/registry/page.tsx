@@ -338,7 +338,7 @@ export default function MasterRegistryPage() {
       {/* HUB EDIT DIALOG */}
       <Dialog open={!!editingBoard || !!editingExam || !!editingSubject} onOpenChange={() => { setEditingBoard(null); setEditingExam(null); setEditingSubject(null); }}>
          <DialogContent className="sm:max-w-xl rounded-[2.5rem] bg-white border-none shadow-5xl p-0 overflow-hidden text-left">
-            <div className="h-2 w-full bg-[#0F172A]" />
+            <div className="h-2 w-full bg-[#0F172A] shrink-0" />
             <DialogHeader className="p-10 pb-0">
                <DialogTitle className="text-2xl font-black font-headline uppercase">Registry Node Architect</DialogTitle>
                <DialogDescription className="sr-only">Update the specific registry node details in the database.</DialogDescription>
