@@ -10,7 +10,7 @@ interface ExamCardProps {
 
 /**
  * @fileOverview Institutional Exam Discovery Card v2.1.
- * FIXED: Corrected property access to match the current Exam interface (name, boardId).
+ * FIXED: Corrected property access to match the hardened Exam interface.
  */
 
 export default function ExamCard({ exam }: ExamCardProps) {

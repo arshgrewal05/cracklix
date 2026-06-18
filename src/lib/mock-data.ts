@@ -4,6 +4,7 @@ export const EXAMS: Exam[] = [
   {
     id: "psssb-patwari",
     name: "Revenue Patwari",
+    title: "Revenue Patwari",
     boardId: "PSSSB",
     description: "Prepare for Revenue Patwari, Canal Patwari and Ziladar recruitment for Punjab Government departments.",
     categoryId: "Revenue",
@@ -16,6 +17,7 @@ export const EXAMS: Exam[] = [
   {
     id: "psssb-clerk",
     name: "Clerk (General/IT/Accounts)",
+    title: "Clerk (General/IT/Accounts)",
     boardId: "PSSSB",
     description: "Multi-departmental clerk recruitment exams with Punjabi qualifying sections.",
     categoryId: "Clerical",
@@ -28,6 +30,7 @@ export const EXAMS: Exam[] = [
   {
     id: "ppsc-pcs",
     name: "Punjab Civil Services (PCS)",
+    title: "Punjab Civil Services (PCS)",
     boardId: "PPSC",
     description: "Higher Class A & B services including Executive, DSP, and Tehsildar posts.",
     categoryId: "Executive",

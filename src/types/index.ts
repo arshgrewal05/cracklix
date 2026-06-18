@@ -16,6 +16,43 @@ export type CurrentAffairType = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUIZ' | 'SPECI
 
 export type MockAssignmentMode = 'SINGLE' | 'MULTIPLE' | 'AUTHORITY';
 
+export interface CalendarEvent {
+  id: string;
+  post: string;
+  board: string;
+  date: string;
+  status: string;
+  type: string;
+  color?: string;
+  published: boolean;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
+export interface HelpArticle {
+  id: string;
+  title: string;
+  category: string;
+  content: string;
+  published: boolean;
+  displayOrder: number;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
+export interface SuccessStory {
+  id: string;
+  name: string;
+  exam: string;
+  rank: string;
+  year: string;
+  quote: string;
+  imageUrl: string;
+  published: boolean;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
 export interface Notification {
   id: string;
   title: string;
@@ -73,6 +110,7 @@ export interface Board {
 export interface Exam {
   id: string;
   name: string;
+  title?: string; // presentation alias for name
   boardId: string;
   categoryId: string;
   displayOrder: number;
@@ -85,8 +123,6 @@ export interface Exam {
   activeQuestions?: number;
   totalQuestions?: number;
   duration?: number;
-  board?: string;
-  thumbnail?: string;
 }
 
 export interface Subject {
@@ -125,9 +161,6 @@ export interface MockTest {
   updatedAt: any;
   isTrending?: boolean;
   accessType?: string;
-  durationInMinutes?: number;
-  attempts?: number;
-  questions?: Question[];
 }
 
 export type Mock = MockTest;
@@ -150,6 +183,7 @@ export interface Question {
   optionDPunjabi?: string;
   optionDHindi?: string;
   correctAnswer: 'A' | 'B' | 'C' | 'D';
+  difficulty: Difficulty;
   englishExplanation?: string;
   punjabiExplanation?: string;
   hindiExplanation?: string;
@@ -157,22 +191,12 @@ export interface Question {
   boardId: string;
   examId?: string;
   sectionId?: string;
-  difficulty: Difficulty;
   status: QuestionLifecycleStatus;
   usedCount: number;
   lastUsedDate?: string;
   mockIdsUsedIn?: string[];
   createdAt: any;
   updatedAt: any;
-  topic?: string;
-  subject?: string;
-  question?: string;
-  options?: string[];
-  explanation?: string;
-  questionEn?: string;
-  questionPa?: string;
-  questionHi?: string;
-  displayId?: string;
 }
 
 export interface UserProfile {

@@ -210,6 +210,8 @@ export default function SupportPage() {
         </div>
       </main>
 
+      <Footer />
+
       <Dialog open={isRaising} onOpenChange={setIsRaising}>
          <DialogContent className="sm:max-w-xl rounded-[3rem] bg-white border-none shadow-5xl p-0 overflow-hidden text-left flex flex-col">
             <div className="h-2 w-full bg-[#0F172A] shrink-0" />
