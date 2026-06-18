@@ -14,8 +14,8 @@ import { useMemo, useState, useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Success Stories Hub v4.0.
- * FIXED: Hydration error with live count via isMounted guard.
+ * @fileOverview Institutional Success Stories Hub v4.1.
+ * REALITY AUDIT: Connected to master registry stats for dynamic student counts.
  */
 
 const STORIES = [
@@ -57,7 +57,8 @@ export default function SuccessStoriesPage() {
   const { data: stats, loading } = useDoc<any>(statsRef);
 
   const liveAspirantCount = useMemo(() => {
-    const count = (stats?.totalUsers || 15000);
+    if (!stats) return "0";
+    const count = stats.totalUsers || 0;
     return count.toLocaleString();
   }, [stats]);
 
@@ -84,7 +85,7 @@ export default function SuccessStoriesPage() {
                        <Image src={story.image} fill alt={story.name} className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                        <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-60" />
                        <div className="absolute bottom-10 left-10 right-10 flex items-center justify-between">
-                          <Badge className="bg-emerald-500 text-white border-none px-6 py-2 rounded-2xl font-black">{story.rank}</Badge>
+                          <Badge className="bg-emerald-50 text-white border-none px-6 py-2 rounded-2xl font-black">{story.rank}</Badge>
                        </div>
                     </div>
                  </div>
@@ -114,7 +115,7 @@ export default function SuccessStoriesPage() {
              <div className="absolute top-0 right-0 p-12 opacity-5 rotate-12"><Trophy className="h-64 w-64" /></div>
              <h2 className="text-5xl md:text-7xl font-headline font-black uppercase leading-tight relative z-10">Your Success <br/> <span className="text-primary">Is Next.</span></h2>
              <p className="text-slate-400 text-xl max-w-xl mx-auto font-medium relative z-10">
-                Join {mounted ? liveAspirantCount : "---"}+ aspirants already preparing with institutional grade mocks.
+                Join {loading ? <Skeleton className="h-6 w-16 inline-block" /> : liveAspirantCount} aspirants already preparing with institutional grade mocks.
              </p>
              <Button asChild className="h-20 px-20 bg-white text-black hover:bg-slate-100 font-black uppercase text-sm tracking-widest rounded-3xl gap-4 shadow-4xl relative z-10 group">
                 <Link href="/login">Create My Account <ChevronRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" /></Link>

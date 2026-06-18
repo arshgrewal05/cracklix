@@ -19,10 +19,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Institutional Hero Hub v108.0.
- * FIXED: Removed all merge conflict markers.
+ * @fileOverview Institutional Hero Hub v109.0.
+ * REALITY AUDIT: Zero hardcoded stats. All values derived from settings/stats doc.
  */
 export default function Hero() {
   const db = useFirestore();
@@ -37,38 +38,38 @@ export default function Hero() {
     [db]
   );
 
-  const { data: stats } = useDoc<any>(statsRef);
+  const { data: stats, loading } = useDoc<any>(statsRef);
 
   const liveStats = useMemo(() => {
-    const formatNumber = (num: number, fallback: string) => {
-      if (!num) return fallback;
+    const formatNumber = (num: number) => {
+      if (!num) return "0";
       if (num >= 1000) return (num / 1000).toFixed(1) + "k+";
-      return num + "+";
+      return num.toString() + "+";
     };
 
     return [
       {
         id: "q",
         icon: <Zap className="h-5 w-5 text-blue-600" />,
-        val: formatNumber(stats?.totalQuestions, "50k+"),
+        val: stats ? formatNumber(stats.totalQuestions) : null,
         label: "Questions"
       },
       {
         id: "m",
         icon: <ClipboardList className="h-5 w-5 text-indigo-600" />,
-        val: formatNumber(stats?.totalMocks, "500+"),
+        val: stats ? formatNumber(stats.totalMocks) : null,
         label: "Mock Tests"
       },
       {
         id: "e",
         icon: <ShieldCheck className="h-5 w-5 text-emerald-600" />,
-        val: formatNumber(stats?.totalBoards, "50+"),
+        val: stats ? formatNumber(stats.totalBoards) : null,
         label: "Exams"
       },
       {
         id: "u",
         icon: <Users className="h-5 w-5 text-orange-500" />,
-        val: formatNumber(stats?.totalUsers, "15k+"),
+        val: stats ? formatNumber(stats.totalUsers) : null,
         label: "Aspirants"
       }
     ];
@@ -84,7 +85,7 @@ export default function Hero() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm mb-6">
             <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
             <span className="text-sm font-semibold text-slate-700">
-              {stats?.totalUsers ? stats.totalUsers.toLocaleString() : "15,000"}+ Aspirants Trust Cracklix
+              {loading ? <Skeleton className="h-4 w-20 inline-block" /> : (stats?.totalUsers?.toLocaleString() || "0")} Aspirants Preparing
             </span>
           </div>
 
@@ -188,7 +189,7 @@ export default function Hero() {
                 </div>
                 <div>
                   <p className="text-2xl md:text-4xl font-black text-slate-900 tabular-nums leading-none tracking-tight">
-                    {stat.val}
+                    {loading ? <Skeleton className="h-8 w-16" /> : (stat.val || "0")}
                   </p>
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">
                     {stat.label}

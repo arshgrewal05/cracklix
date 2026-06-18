@@ -16,7 +16,8 @@ import {
   Compass,
   Trophy,
   History,
-  Landmark
+  Landmark,
+  Loader2
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -29,9 +30,8 @@ import { doc } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Refined Founder's Story Hub v12.0.
- * FIXED: Timeline pattern alignment where headings and text were separating.
- * UPDATED: Reduced text sizes across the page for an elite institutional feel.
+ * @fileOverview Refined Founder's Story Hub v13.0.
+ * REALITY AUDIT: Removed hardcoded stats fallbacks. Connected directly to registry stats.
  */
 
 export default function AboutPage() {
@@ -49,7 +49,7 @@ export default function AboutPage() {
   const { data: stats, loading: statsLoading } = useDoc<any>(statsRef);
 
   const liveStats = useMemo(() => {
-    if (!mounted || !stats) return { students: "15k+", mcqs: "10k+", hubs: "8+" };
+    if (!mounted || !stats) return { students: "0", mcqs: "0", hubs: "0" };
     
     const formatNumber = (num: number) => {
        if (!num) return "0";
@@ -58,9 +58,9 @@ export default function AboutPage() {
     }
     
     return {
-      students: formatNumber(stats.totalUsers || 15000),
-      mcqs: formatNumber(stats.totalQuestions || 10000),
-      hubs: (stats.totalBoards || 8).toString() + "+"
+      students: formatNumber(stats.totalUsers || 0),
+      mcqs: formatNumber(stats.totalQuestions || 0),
+      hubs: (stats.totalBoards || 0).toString() + "+"
     };
   }, [stats, mounted]);
 
