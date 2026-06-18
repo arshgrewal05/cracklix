@@ -24,8 +24,9 @@ interface ShareButtonProps {
 }
 
 /**
- * @fileOverview Hardened Social Share Hub v7.0.
- * COMPACT: Optimized dialog dimensions and button heights for mobile clarity.
+ * @fileOverview Hardened Social Share Hub v8.0.
+ * DIRECT SHARE: Integrated direct WhatsApp and Telegram links for desktop/fallback scenarios.
+ * NATIVE: Prioritizes OS-native share sheet for "Other App" functioning.
  */
 export default function ShareButton({ 
   className = "", 
@@ -52,9 +53,11 @@ export default function ShareButton({
     };
 
     try {
+      // Priority 1: Native OS Share Sheet (Functions like other native apps)
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else {
+        // Priority 2: Custom Social Hub Fallback
         setIsShareDialogOpen(true);
       }
     } catch (err) {

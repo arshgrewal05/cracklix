@@ -31,9 +31,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ShareButton from "@/components/navigation/ShareButton";
 
 /**
- * @fileOverview Mobile Sidebar Realignment v23.0 (Overlap Hardened).
- * MAXIMIZED: Logo height set to 78px to match the header limit.
+ * @fileOverview Mobile Sidebar Realignment v24.0.
  * FIXED: Reduced vertical bulk of sections to prevent content overlapping.
+ * FIXED: Hardened flex container to ensure footer doesn't squash content on small screens.
  */
 export default function MobileSidebar({
   onClose,
@@ -88,10 +88,10 @@ export default function MobileSidebar({
   if (!mounted) return null;
 
   return (
-    <div className="flex h-full flex-col bg-white font-body">
+    <div className="flex h-full flex-col bg-white font-body overflow-hidden">
 
-      {/* HEADER: Maximized Logo */}
-      <div className="flex h-20 items-center justify-between border-b px-4 shrink-0 gap-1">
+      {/* HEADER */}
+      <div className="flex h-20 items-center justify-between border-b px-4 shrink-0 bg-white">
         <Logo
           variant="light"
           href="/"
@@ -109,8 +109,8 @@ export default function MobileSidebar({
         </button>
       </div>
 
-      {/* CONTENT */}
-      <div className="flex-1 overflow-y-auto no-scrollbar py-2">
+      {/* CONTENT AREA */}
+      <div className="flex-1 overflow-y-auto no-scrollbar">
 
         {/* PROFILE CARD */}
         <div className="px-4 py-4">
@@ -120,9 +120,9 @@ export default function MobileSidebar({
             className="block active:scale-[0.98] transition-all"
           >
             <div className="flex items-center gap-4 rounded-[1.5rem] border border-slate-100 bg-white p-4 shadow-sm hover:border-primary/20 transition-all">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
                 {profileLoading ? (
-                  <Skeleton className="h-full w-full rounded-xl bg-slate-100" />
+                  <Skeleton className="h-full w-full rounded-xl" />
                 ) : (
                   <StudentAvatar
                     profile={profile}
@@ -137,7 +137,7 @@ export default function MobileSidebar({
                   {profile?.name || user?.displayName || "Aspirant"}
                 </h3>
                 <p className="mt-0.5 text-[8px] text-slate-400 font-bold uppercase tracking-widest">
-                  Manage Node
+                  Manage Account Node
                 </p>
               </div>
 
@@ -162,7 +162,7 @@ export default function MobileSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex h-12 items-center gap-4 rounded-xl px-6 transition-all active:scale-[0.98]",
+                    "flex h-11 items-center gap-4 rounded-xl px-6 transition-all active:scale-[0.98]",
                     isActive
                       ? "bg-blue-50 text-primary shadow-sm"
                       : "text-slate-600 hover:bg-slate-50"
@@ -186,23 +186,23 @@ export default function MobileSidebar({
           </div>
         </div>
 
-        {/* SHARE NODE - REDUCED BULK */}
-        <div className="px-4 py-4">
-           <div className="bg-[#0B1528] rounded-[2rem] p-5 space-y-4 border border-white/5 shadow-2xl relative overflow-hidden group">
+        {/* SHARE NODE - REDUCED VERTICAL BULK */}
+        <div className="px-4 py-6">
+           <div className="bg-[#0B1528] rounded-[2rem] p-6 space-y-4 border border-white/5 shadow-2xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Award className="h-20 w-20" /></div>
               <div className="relative z-10 text-left">
-                <h4 className="text-[11px] font-black uppercase text-white">Elite Network</h4>
-                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">Invite fellow aspirants</p>
+                <h4 className="text-[11px] font-black uppercase text-white leading-none">Elite Network</h4>
+                <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1.5">Invite fellow aspirants</p>
               </div>
               <ShareButton 
                 variant="dark" 
-                className="w-full h-11 rounded-xl bg-primary hover:bg-blue-600 text-white text-[9px] border-none shadow-lg relative z-10" 
+                className="w-full h-12 rounded-xl bg-primary hover:bg-blue-600 text-white text-[10px] border-none shadow-lg relative z-10" 
               />
            </div>
         </div>
 
         {/* SUPPORT */}
-        <div className="px-2 pb-8">
+        <div className="px-2 pb-10">
           <p className="mb-2 px-6 text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
             Institutional Support
           </p>
@@ -213,7 +213,7 @@ export default function MobileSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className="flex h-12 items-center gap-4 rounded-xl px-6 text-slate-600 transition-all hover:bg-slate-50 active:scale-[0.98]"
+                className="flex h-11 items-center gap-4 rounded-xl px-6 text-slate-600 transition-all hover:bg-slate-50 active:scale-[0.98]"
               >
                 <item.icon className="h-5 w-5 shrink-0 text-slate-400" />
                 <span className="font-bold text-[13px] uppercase tracking-tight">
@@ -225,8 +225,8 @@ export default function MobileSidebar({
         </div>
       </div>
 
-      {/* FOOTER - HARDENED FOOTER */}
-      <div className="border-t border-slate-100 bg-white p-4 pb-[env(safe-area-inset-bottom)]">
+      {/* FOOTER */}
+      <div className="border-t border-slate-100 bg-white p-4 pb-[calc(env(safe-area-inset-bottom)+8px)] shrink-0">
         <button
           onClick={handleLogout}
           className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-[#0F172A] text-[11px] font-black uppercase tracking-widest text-white shadow-xl transition-all active:scale-95"
