@@ -25,8 +25,9 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Login Hub v28.0 (Takeover Flow).
+ * @fileOverview Hardened Login Hub v28.1 (Messaging Update).
  * IMPLEMENTED: Last-Login Wins policy. New login always terminates old session.
+ * UPDATED: Branding-aligned welcome message.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -97,7 +98,7 @@ function LoginContent() {
       if (mode === 'login') {
         const creds = await signInWithEmailAndPassword(auth, email, password)
         await updateActiveDevice(creds.user.uid);
-        toast({ title: "Authorized", description: "Welcome to your preparation hub." })
+        toast({ title: "Authorized", description: "Welcome to Cracklix" })
         startTransition(() => { router.replace(returnUrl) })
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password)
