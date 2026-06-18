@@ -23,8 +23,8 @@ import { cn } from "@/lib/utils"
 import type { Category, Board, Exam } from "@/types"
 
 /**
- * @fileOverview Punjab Registry Architect v15.2.
- * FIXED: Local ExtendedBoard and ExtendedCategory interfaces to handle nested state.
+ * @fileOverview Punjab Registry Architect v15.3.
+ * FIXED: Explicitly typed higher-order function callbacks to resolve implicit any blockers.
  */
 
 interface ExtendedBoard extends Board {

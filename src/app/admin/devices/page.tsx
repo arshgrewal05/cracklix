@@ -1,12 +1,12 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Smartphone, ShieldAlert, User, Clock, Search, ShieldCheck, Activity, Loader2, ChevronRight } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, query, orderBy, limit, where } from "firebase/firestore"
+import { collection, query, limit, where } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 /**
- * @fileOverview Institutional Device Monitoring v12.0.
- * FIXED: Added missing Button import and explicitly typed sort callbacks.
+ * @fileOverview Institutional Device Monitoring v12.1.
+ * FIXED: Explicitly typed callback parameters to resolve implicit any errors.
  */
 
 export default function DeviceMonitoringPage() {

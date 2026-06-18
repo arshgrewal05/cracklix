@@ -22,8 +22,8 @@ import { doc } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Official Hero Section v75.1.
- * FIXED: Replaced standard HTML <p> with <div> to allow nested Skeleton (div) components.
+ * @fileOverview Official Hero Section v75.2.
+ * FIXED: Hydration error - replaced standard <p> containers with <div> nodes for stat points.
  */
 
 export default function Hero() {
@@ -103,57 +103,6 @@ export default function Hero() {
             exam-focused preparation for PSSSB, Punjab Police,
             PSTET, PSPCL and more.
           </p>
-
-          <div className="flex flex-wrap gap-2 md:gap-3 mt-6">
-            {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map(
-              (item) => (
-                <span
-                  key={item}
-                  className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white border text-[10px] md:text-sm font-medium text-slate-700 shadow-sm"
-                >
-                  {item}
-                </span>
-              )
-            )}
-          </div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="relative w-full max-w-2xl h-[260px] xs:h-[300px] md:h-[450px] mt-10 mb-6"
-          >
-            <Image 
-              src="/images/hero-student.png"
-              alt="Cracklix Student"
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 800px"
-              className="object-contain object-left"
-            />
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
-              <ClipboardList className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-3 transform group-hover:scale-110 transition-transform" />
-              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Mock Tests</div>
-            </Card>
-
-            <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
-              <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-indigo-600 mb-3 transform group-hover:scale-110 transition-transform" />
-              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Study Material</div>
-            </Card>
-
-            <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
-              <FileText className="h-6 w-6 md:h-8 md:w-8 text-emerald-600 mb-3 transform group-hover:scale-110 transition-transform" />
-              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Previous Papers</div>
-            </Card>
-
-            <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
-              <BarChart3 className="h-6 w-6 md:h-8 md:w-8 text-orange-500 mb-3 transform group-hover:scale-110 transition-transform" />
-              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Analytics</div>
-            </Card>
-          </div>
 
           <div className="flex flex-wrap gap-4 mt-12">
             <Button

@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo, useEffect, Suspense } from "react"
@@ -21,8 +20,8 @@ import QuestionRenderer from "@/components/questions/QuestionRenderer"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Manual Question Entry v17.0.
- * UPDATED: Set default status to UNUSED for immediate mock eligibility.
+ * @fileOverview Hardened Manual Question Entry v17.1.
+ * FIXED: Explicitly typed state updater to resolve implicit any.
  */
 
 export default function QuestionEntryPage() {
@@ -66,7 +65,7 @@ function QuestionEntryContent() {
 
   useEffect(() => {
     if (existingData) {
-      setFormData(prev => ({ 
+      setFormData((prev: any) => ({ 
         ...prev, 
         ...existingData,
         englishQuestion: existingData.englishQuestion || "",
