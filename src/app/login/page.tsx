@@ -23,11 +23,9 @@ import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { getDeviceId, getBrowserInfo } from "@/lib/device"
 import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Login Hub v24.1 (Full Synchronization).
- * FIXED: Integrated missing 'cn' utility import for robust animation rendering.
+ * @fileOverview Hardened Login Hub v24.0 (SDL Enforcement).
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -104,6 +102,7 @@ function LoginContent() {
       await setDoc(deviceRef, { lastActive: serverTimestamp() }, { merge: true });
     }
 
+    // MANDATORY: Update activeDeviceId to enforce SDL (Last Device Wins)
     await setDoc(doc(db, 'users', userId), {
       activeDeviceId: deviceId,
       lastLoginAt: serverTimestamp(),
