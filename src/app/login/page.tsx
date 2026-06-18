@@ -26,7 +26,7 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Login Hub v24.1 (Fixed Missing Imports).
+ * @fileOverview Hardened Login Hub v25.0 (Restored Logo & Takeover Fix).
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -66,10 +66,11 @@ function LoginContent() {
   const sessionTerminated = searchParams.get('session') === 'terminated';
 
   useEffect(() => {
-    if (!authLoading && user && !deviceError) {
+    // If user is already authenticated and NO session termination flag, redirect
+    if (!authLoading && user && !sessionTerminated && !deviceError) {
        router.replace(returnUrl);
     }
-  }, [user, authLoading, router, returnUrl, deviceError]);
+  }, [user, authLoading, router, returnUrl, sessionTerminated, deviceError]);
 
   const onAuthSuccess = async (userId: string) => {
     if (!db) return;
@@ -78,6 +79,7 @@ function LoginContent() {
     const deviceId = await getDeviceId();
     const { browser, platform } = getBrowserInfo();
     
+    // 1. Device Registration Node
     const deviceRef = doc(db, 'users', userId, 'devices', deviceId);
     const deviceSnap = await getDoc(deviceRef);
     
@@ -103,7 +105,7 @@ function LoginContent() {
       await setDoc(deviceRef, { lastActive: serverTimestamp() }, { merge: true });
     }
 
-    // MANDATORY: Update activeDeviceId to enforce SDL (Last Device Wins)
+    // 2. SDL ENFORCEMENT: Take control of the session (Last Login Wins)
     await setDoc(doc(db, 'users', userId), {
       activeDeviceId: deviceId,
       lastLoginAt: serverTimestamp(),
@@ -130,7 +132,7 @@ function LoginContent() {
         const creds = await signInWithEmailAndPassword(auth, email, password)
         const authorized = await onAuthSuccess(creds.user.uid);
         if (authorized) {
-          toast({ title: "Login Successful", description: "Welcome back!" })
+          toast({ title: "Authorized", description: "Welcome to your preparation hub." })
           startTransition(() => { router.replace(returnUrl) })
         }
       } else {
@@ -210,8 +212,6 @@ function LoginContent() {
     }
   };
 
-  if (!authLoading && user && !deviceError) return null;
-
   const isActuallyLoading = loading || isPending;
 
   return (
@@ -219,15 +219,17 @@ function LoginContent() {
       <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-primary/5 blur-[140px] rounded-full" />
       
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="z-10 w-full max-w-[440px] space-y-6 md:space-y-8">
-        <div className="flex flex-col items-center h-auto w-full mb-2 md:mb-4">
+        
+        {/* LOGO NODE */}
+        <div className="flex flex-col items-center justify-center w-full mb-2 md:mb-6">
           <Logo variant="light" />
         </div>
 
         {sessionTerminated && (
-          <div className="bg-rose-50 border border-rose-100 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 animate-in slide-in-from-top-6 duration-700 shadow-sm">
-            <ShieldAlert className="h-6 w-6 text-rose-500 shrink-0" />
-            <p className="text-xs md:sm font-bold text-rose-600 tracking-tight leading-snug text-left">
-              This account was just logged in on another device.
+          <div className="bg-amber-50 border border-amber-100 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 animate-in slide-in-from-top-6 duration-700 shadow-sm">
+            <ShieldAlert className="h-6 w-6 text-amber-600 shrink-0" />
+            <p className="text-xs md:sm font-bold text-amber-700 tracking-tight leading-snug text-left">
+              Your session ended because this account was used on another device. Log in again to take control.
             </p>
           </div>
         )}
@@ -249,40 +251,50 @@ function LoginContent() {
             <CardTitle className="text-xl md:text-4xl font-black tracking-tight text-[#0F172A] uppercase">
               {mode === 'login' ? "Login" : "Sign Up"}
             </CardTitle>
-            <CardDescription className="text-slate-400 font-bold text-[9px] md:text-[12px] tracking-widest mt-2 md:mt-3 uppercase">Registry Access v23.1</CardDescription>
+            <CardDescription className="text-slate-400 font-bold text-[9px] md:text-[12px] tracking-widest mt-2 md:mt-3 uppercase">Institutional Registry Access</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 md:space-y-10 pb-10 md:pb-20 px-4 md:px-16">
+          <CardContent className="space-y-6 md:space-y-10 pb-10 md:pb-20 px-4 md:px-16 text-left">
             <form onSubmit={handleEmailAuth} className="space-y-4 md:space-y-6">
               {mode === 'register' && (
                 <div className="space-y-4">
-                  <Input 
-                    value={name} 
-                    onChange={(e) => setName(e.target.value)} 
-                    required 
-                    className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold px-4 md:px-6 shadow-inner" 
-                    placeholder="Full Identity" 
-                  />
-                  <div className="relative">
-                    <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm md:text-lg">+91</span>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Full Identity</Label>
                     <Input 
-                      value={phone} 
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0,10))} 
+                      value={name} 
+                      onChange={(e) => setName(e.target.value)} 
                       required 
-                      className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold pl-14 md:pl-16 px-4 md:px-6 tracking-widest shadow-inner" 
-                      placeholder="Mobile Node" 
+                      className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold px-4 md:px-6 shadow-inner" 
+                      placeholder="e.g. Arsh Grewal" 
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Mobile Node</Label>
+                    <div className="relative">
+                      <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm md:text-lg">+91</span>
+                      <Input 
+                        value={phone} 
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0,10))} 
+                        required 
+                        className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold pl-14 md:pl-16 px-4 md:px-6 tracking-widest shadow-inner" 
+                        placeholder="10-digit number" 
+                      />
+                    </div>
                   </div>
                 </div>
               )}
-              <Input 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-                className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold px-4 md:px-6 shadow-inner" 
-                placeholder="Email Address" 
-              />
               <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Email Address</Label>
+                <Input 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                  className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold px-4 md:px-6 shadow-inner" 
+                  placeholder="name@domain.com" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Password</Label>
                 <div className="relative">
                   <Input 
                     type={showPassword ? "text" : "password"} 
@@ -290,7 +302,7 @@ function LoginContent() {
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
                     className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary pr-12 md:pr-14 px-4 md:px-6 text-sm md:text-lg font-bold shadow-inner" 
-                    placeholder="Password" 
+                    placeholder="Enter secret key" 
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors">
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -303,18 +315,21 @@ function LoginContent() {
                 )}
               </div>
               {mode === 'register' && (
-                <div className="relative">
-                  <Input 
-                    type={showConfirmPassword ? "text" : "password"} 
-                    value={confirmPassword} 
-                    onChange={(e) => setConfirmPassword(e.target.value)} 
-                    required 
-                    className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary pr-12 md:pr-14 px-4 md:px-6 text-sm md:text-lg font-bold shadow-inner" 
-                    placeholder="Verify Password" 
-                  />
-                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors">
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Verify Password</Label>
+                  <div className="relative">
+                    <Input 
+                      type={showConfirmPassword ? "text" : "password"} 
+                      value={confirmPassword} 
+                      onChange={(e) => setConfirmPassword(e.target.value)} 
+                      required 
+                      className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary pr-12 md:pr-14 px-4 md:px-6 text-sm md:text-lg font-bold shadow-inner" 
+                      placeholder="Repeat password" 
+                    />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors">
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
                 </div>
               )}
               <Button type="submit" className="w-full h-14 md:h-20 bg-primary hover:bg-blue-700 text-white font-black uppercase text-base md:text-lg rounded-xl md:rounded-[2.5rem] shadow-4xl shadow-primary/20 border-none transition-all active:scale-95 tracking-widest" disabled={isActuallyLoading}>
