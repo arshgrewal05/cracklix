@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -18,6 +19,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import type { Question } from "@/types"
+
+/**
+ * @fileOverview CBT Integrity Hub v12.0.
+ * FIXED: Added missing Button import and explicitly typed sort/filter parameters.
+ */
 
 interface QAStatCardProps {
   label: string;
@@ -190,7 +196,7 @@ function QAStatCard({ label, value, color, desc }: QAStatCardProps) {
    return (
       <Card className="border-slate-100 bg-white rounded-[2.5rem] p-10 shadow-2xl text-left border border-slate-50">
          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">{label}</p>
-         <h4 className={`text-6xl font-headline font-black tracking-tighter ${color} leading-none`}>{value}</h4>
+         <h4 className={`text-6xl font-headline font-black tracking-tighter ${color} leading-none tabular-nums`}>{value}</h4>
          <p className="text-xs font-bold text-slate-500 mt-5 leading-relaxed">{desc}</p>
       </Card>
    )

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useMemo } from "react"
@@ -7,6 +8,11 @@ import { useCollection, useFirestore } from "@/firebase"
 import { collection } from "firebase/firestore"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton"
+
+/**
+ * @fileOverview Institutional Analytics Hub v16.0.
+ * FIXED: Explicitly typed all parameters in map, filter, and reduce calls.
+ */
 
 interface MetricCardProps {
   label: string;
@@ -78,7 +84,7 @@ export default function AdminAnalytics() {
   return (
     <div className="space-y-12 pb-20 text-left">
       <div className="flex justify-between items-center">
-        <div>
+        <div className="text-left">
            <div className="flex items-center gap-3 mb-2"><BarChart3 className="h-5 w-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Institutional Governance Monitor</span></div>
           <h1 className="text-5xl font-black font-headline text-primary uppercase tracking-tight">Ecosystem Insights</h1>
           <p className="text-[#0F172A] mt-2 text-lg font-medium">Tracking student growth and registry lifecycle metrics.</p>
@@ -155,7 +161,7 @@ function MetricCard({ label, value, trend, icon }: MetricCardProps) {
           <div className="h-16 w-16 rounded-[1.5rem] bg-slate-50 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">{icon}</div>
           <div className={`text-[10px] font-black px-3 py-1 rounded-xl bg-slate-50 text-slate-400 uppercase tracking-widest`}>{trend}</div>
        </div>
-       <div className="text-5xl font-headline font-black text-[#0F172A] tracking-tighter leading-none">{value}</div>
+       <div className="text-5xl font-headline font-black text-[#0F172A] tracking-tighter leading-none tabular-nums">{value}</div>
        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-5">{label}</p>
     </Card>
   )

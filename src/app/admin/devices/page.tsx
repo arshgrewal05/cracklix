@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -12,6 +13,11 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+
+/**
+ * @fileOverview Institutional Device Monitoring v12.0.
+ * FIXED: Added missing Button import and explicitly typed sort callbacks.
+ */
 
 export default function DeviceMonitoringPage() {
   const db = useFirestore()
@@ -55,7 +61,7 @@ export default function DeviceMonitoringPage() {
            <Card className="border-slate-100 bg-white rounded-2xl px-8 py-4 flex items-center gap-4 shadow-xl">
               <div className="space-y-0.5 text-left">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Shared Nodes (2+)</p>
-                 <p className="text-3xl font-headline font-black text-rose-600">{stats.shared}</p>
+                 <p className="text-3xl font-headline font-black text-rose-600 tabular-nums">{stats.shared}</p>
               </div>
               <Activity className="h-8 w-8 text-rose-100" />
            </Card>
@@ -104,7 +110,7 @@ export default function DeviceMonitoringPage() {
                     </TableCell>
                     <TableCell className="text-center">
                        <div className="inline-flex flex-col items-center">
-                          <p className={cn("text-3xl font-headline font-black", u.deviceCount >= 2 ? "text-rose-600" : "text-[#0F172A]")}>{u.deviceCount}</p>
+                          <p className={cn("text-3xl font-headline font-black tabular-nums", u.deviceCount >= 2 ? "text-rose-600" : "text-[#0F172A]")}>{u.deviceCount}</p>
                           <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">ACTIVE DEVICES</p>
                        </div>
                     </TableCell>

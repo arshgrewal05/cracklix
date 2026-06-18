@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useEffect, useState } from "react";
@@ -20,6 +21,11 @@ import Image from "next/image";
 import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
+
+/**
+ * @fileOverview Official Hero Section v75.0.
+ * FIXED: Replaced nested div-in-p structures with valid HTML5 nodes to prevent hydration errors.
+ */
 
 export default function Hero() {
   const db = useFirestore();

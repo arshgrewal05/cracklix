@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect, Suspense, useCallback } from "react"
@@ -34,6 +35,11 @@ import { MockType, Difficulty, AccessLevel, LanguageDisplayMode, MockAssignmentM
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+
+/**
+ * @fileOverview Institutional Mock Builder Hub v15.0.
+ * FIXED: Explicitly typed all map and filter parameters to resolve build-time implicit any errors.
+ */
 
 export default function MockBuilderPage() {
   return (
@@ -261,7 +267,7 @@ function MockBuilderContent() {
         <div className="lg:col-span-4 space-y-8">
            <Card className="border-none shadow-2xl rounded-[3rem] bg-white p-6 md:p-10 space-y-8 border border-slate-100">
               <div className="space-y-3">
-                 <Label className="text-[12px] font-black uppercase text-slate-500 tracking-tight ml-1">Series Headline</Label>
+                 <div className="text-[12px] font-black uppercase text-slate-500 tracking-tight ml-1">Series Headline</div>
                  <Input value={mockData.title} onChange={e => setMockData({...mockData, title: e.target.value})} className="h-14 md:h-16 rounded-2xl bg-slate-50/50 border-none font-black text-lg px-6 shadow-inner focus-visible:ring-primary text-[#0F172A]" placeholder="Patwari Mock Series 01" />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -322,7 +328,7 @@ function MockBuilderContent() {
                       <div className="space-y-3"><Label className="text-[11px] font-black uppercase text-slate-500 tracking-widest ml-1">Subject Node</Label><select value={filterSubject} onChange={e => setSubjectFilter(e.target.value)} className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 outline-none font-bold uppercase text-[11px]"><option value="all" className="bg-[#0B1528]">All Nodes</option>{subjects?.map((s: any) => <option key={s.id} value={s.id} className="bg-[#0B1528]">{s.name}</option>)}</select></div>
                       <div className="flex flex-col justify-end space-y-3"><div className="flex items-center justify-between bg-white/5 px-5 py-3 rounded-xl border border-white/10 h-12"><span className="text-[11px] font-black uppercase tracking-widest text-slate-300">UNUSED ONLY</span><Switch checked={hideUsed} onCheckedChange={setHideUsed} /></div></div>
                    </div>
-                   <div className="relative z-10 flex flex-col md:flex-row items-center gap-4 pt-6 border-t border-white/10"><div className="flex-1 text-left"><p className="text-[10px] font-black uppercase text-primary tracking-[0.3em]">Selection Queue</p><p className="text-xl md:text-3xl font-headline font-black tabular-nums">{bankSelection.length} <span className="text-sm text-slate-500">Nodes Staged</span></p></div><Button onClick={handleLinkQuestions} disabled={bankSelection.length === 0} className="w-full md:w-auto h-16 px-12 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-3xl gap-3 transition-all">Link Staged Assets <CheckCircle2 className="h-5 w-5" /></Button></div>
+                   <div className="relative z-10 flex flex-col md:flex-row items-center gap-4 pt-6 border-t border-white/10"><div className="flex-1 text-left"><p className="text-[10px] font-black uppercase text-primary tracking-[0.3em]">Selection Queue</p><div className="text-xl md:text-3xl font-headline font-black tabular-nums">{bankSelection.length} <span className="text-sm text-slate-500">Nodes Staged</span></div></div><Button onClick={handleLinkQuestions} disabled={bankSelection.length === 0} className="w-full md:w-auto h-16 px-12 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-3xl gap-3 transition-all">Link Staged Assets <CheckCircle2 className="h-5 w-5" /></Button></div>
                 </Card>
                 <div className="grid grid-cols-1 gap-3">
                    {bankLoading ? Array.from({length: 5}).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-2xl bg-white" />) : visibleBank.map((q: any) => {

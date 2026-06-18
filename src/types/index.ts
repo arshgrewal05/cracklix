@@ -54,6 +54,19 @@ export interface Board {
   iconUrl?: string;
   color?: string;
   updatedAt?: any;
+  displayOrder?: number;
+}
+
+export interface Exam {
+  id: string;
+  name: string;
+  boardId: string;
+  categoryId: string;
+  displayOrder: number;
+  isTrending?: boolean;
+  updatedAt?: any;
+  createdAt?: any;
+  iconUrl?: string;
 }
 
 export interface Subject {
