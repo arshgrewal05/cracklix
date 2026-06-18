@@ -16,8 +16,9 @@ interface ShareButtonProps {
 }
 
 /**
- * @fileOverview Reliable Share Action Node v3.0.
- * HARDENED: Added permission guard for Clipboard API to prevent runtime exceptions.
+ * @fileOverview Hardened Native Share Node v4.0.
+ * LOGIC: Triggers the OS-native share sheet (WhatsApp, Telegram, etc.) on supported devices.
+ * FALLBACK: Copy-to-clipboard functionality for legacy browsers.
  */
 export default function ShareButton({ 
   className = "", 
@@ -32,34 +33,31 @@ export default function ShareButton({
   const { data: settings, loading } = useDoc<any>(settingsRef);
 
   const handleShare = async () => {
-    if (!settings) {
-      toast({ variant: "destructive", title: "Wait", description: "Settings still loading." });
-      return;
-    }
-
     const shareData = {
-      title: settings.shareTitle || "Cracklix",
-      text: settings.shareDescription || "Prepare for Punjab Government Exams with Cracklix.",
-      url: settings.shareUrl || window.location.origin
+      title: settings?.shareTitle || "Cracklix | Punjab's Smart Mock Test Platform",
+      text: settings?.shareDescription || "Join thousands of aspirants preparing for Punjab Government Exams with high-fidelity mocks and official patterns.",
+      url: settings?.shareUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://cracklix.com')
     };
 
     try {
+      // 1. Trigger Native OS Share Sheet (Direct WhatsApp/Telegram option)
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
-      } else if (navigator.clipboard) {
-        // Permission-Safe Clipboard execution
-        try {
+      } else {
+        // 2. Fallback: Copy to Clipboard
+        if (navigator.clipboard) {
           await navigator.clipboard.writeText(shareData.url);
           toast({
             title: "Link Copied!",
-            description: "Cracklix link saved to your clipboard.",
+            description: "Direct link saved to your clipboard. You can now paste it in any app.",
           });
-        } catch (clipErr) {
-          console.warn("[CLIPBOARD_BLOCKED]:", clipErr);
         }
       }
     } catch (err) {
-      // Handle user cancellation silently
+      // Handle user cancellation silently, log other errors
+      if ((err as Error).name !== 'AbortError') {
+        console.error('[SHARE_NODE_FAILURE]', err);
+      }
     }
   };
 
