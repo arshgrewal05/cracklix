@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { 
   ShieldAlert, 
   Trash2, 
@@ -14,14 +15,13 @@ import {
 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp, deleteDoc } from "firebase/firestore"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import type { Question } from "@/types"
 
 /**
- * @fileOverview CBT Integrity Hub v12.0.
- * FIXED: Added missing Button import and explicitly typed sort/filter parameters.
+ * @fileOverview CBT Integrity Hub v12.1.
+ * FIXED: Added missing Button, Badge, and Skeleton imports for registry audit.
  */
 
 interface QAStatCardProps {
@@ -148,7 +148,7 @@ export default function QADashboard() {
                   <TableHeader className="bg-slate-50/50">
                      <TableRow className="border-slate-50 h-16">
                         <TableHead className="px-10 text-[10px] font-black uppercase text-slate-500">Conflict Statements</TableHead>
-                        <TableHead className="text-[10px) font-black uppercase text-center text-slate-500">Confidence</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase text-center text-slate-500">Confidence</TableHead>
                         <TableHead className="text-right px-10 text-[10px] font-black uppercase text-slate-500">Audit Action</TableHead>
                      </TableRow>
                   </TableHeader>

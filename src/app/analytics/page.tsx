@@ -25,8 +25,8 @@ import { cn } from "@/lib/utils"
 import BackButton from "@/components/navigation/BackButton"
 
 /**
- * @fileOverview Official Progress Report Hub v2.3.
- * FIXED: Integrated missing Zap icon import.
+ * @fileOverview Official Progress Report Hub v2.4.
+ * FIXED: Resolved missing Zap icon import.
  */
 
 export default function DeepAnalytics() {
@@ -90,7 +90,7 @@ export default function DeepAnalytics() {
   if (authLoading) return null
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-32">
+    <div className="min-h-screen bg-slate-50/50 pb-safe text-left">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8 max-w-6xl space-y-10 text-left">
@@ -113,7 +113,7 @@ export default function DeepAnalytics() {
          {results.length === 0 && !dataLoading ? (
             <Card className="p-20 text-center border-2 border-dashed rounded-[3rem] opacity-40">
                <Activity className="h-16 w-16 mx-auto mb-6 text-slate-300" />
-               <p className="font-headline font-black uppercase text-xl text-slate-500">Awaiting Performance Data</p>
+               <p className="font-headline font-black text-xl text-slate-500 uppercase">Awaiting Performance Data</p>
                <p className="text-sm font-medium mt-2">Complete a mock test to generate your progress nodes.</p>
             </Card>
          ) : (

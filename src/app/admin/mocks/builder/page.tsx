@@ -36,8 +36,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview Institutional Mock Builder Hub v18.0 (Hardened Syntax).
- * FIXED: Corrected mismatched JSX tag </button> -> </Button>.
+ * @fileOverview Institutional Mock Builder Hub v18.1 (Production Hardened).
+ * FIXED: Mismatched Button closing tag resolved to ensure build stability.
  */
 
 export default function MockBuilderPage() {
@@ -241,7 +241,7 @@ function MockBuilderContent() {
   if (isInitializing) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0B1528] space-y-8">
        <Zap className="h-12 w-12 text-primary animate-pulse" />
-       <p className="text-[11px] font-black uppercase tracking-[0.5em] text-primary">Hydrating Assembly hub...</p>
+       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Hydrating Assembly hub...</p>
     </div>
   );
 

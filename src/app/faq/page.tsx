@@ -1,7 +1,6 @@
-
 "use client"
 
-import { useMemo } from "react"
+import React, { useMemo } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { 
@@ -17,8 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { HelpArticle } from "@/types"
 
 /**
- * @fileOverview Institutional FAQ Hub v3.0.
- * UPDATED: Connected to Firestore 'help_articles' collection.
+ * @fileOverview Official Institutional FAQ Hub v3.1.
+ * FIXED: Explicit React import for cloneElement compatibility.
  */
 
 export default function FAQPage() {

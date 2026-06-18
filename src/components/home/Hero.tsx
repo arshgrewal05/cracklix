@@ -22,8 +22,9 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Fluid Hero Hub v12.0 (Build Fixed).
- * FIXED: Realigned Student image above feature cards and implemented fluid Title Case typography.
+ * @fileOverview Official Fluid Hero Hub v12.1 (Production Hardened).
+ * FIXED: Explicit Badge and cn imports to resolve build ReferenceErrors.
+ * TYPOGRAPHY: Implemented fluid Title Case scaling for high-density mobile screens.
  */
 export default function Hero() {
   const db = useFirestore();
