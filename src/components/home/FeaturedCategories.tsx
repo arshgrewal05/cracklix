@@ -17,8 +17,8 @@ import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Elite Exam Categories Hub v13.1.
- * UPDATED: Added sizes to Image components to resolve Next.js warnings.
+ * @fileOverview Elite Exam Categories Hub v14.0.
+ * TYPOGRAPHY: Switched to Title Case for headings and counts.
  */
 
 const CATEGORY_META = [
@@ -94,7 +94,7 @@ export default function FeaturedCategories() {
           <div className="space-y-1.5 md:space-y-2">
              <div className="flex items-center gap-2">
                 <Landmark className="h-4 w-4 text-primary" />
-                <span className="text-[9px] md:text-[11px] font-bold text-slate-500 tracking-tight">Exam Categories</span>
+                <span className="text-[11px] font-bold text-slate-500 tracking-tight">Exam Categories</span>
              </div>
              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#0F172A] tracking-tight leading-[0.95] break-words">
                 Choose Your <span className="text-blue-600">Category</span>
@@ -131,14 +131,14 @@ export default function FeaturedCategories() {
                      
                      <div className="space-y-1 md:space-y-2 flex-1 min-w-0">
                         <h3 className="text-base xs:text-lg md:text-xl font-bold text-[#0F172A] leading-[1.1] group-hover:text-blue-600 transition-colors line-clamp-2">{cat.title}</h3>
-                        <p className="text-[9px] xs:text-[10px] md:text-sm font-semibold text-slate-400 leading-tight tracking-tight line-clamp-2">{cat.desc}</p>
+                        <p className="text-[10px] md:text-sm font-semibold text-slate-400 leading-tight tracking-tight line-clamp-2">{cat.desc}</p>
                      </div>
 
                      <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
                         {loading ? (
                           <Skeleton className="h-2.5 w-16 bg-slate-50 rounded" />
                         ) : (
-                          <span className="text-[8px] xs:text-[9px] md:text-[10px] font-bold text-[#0F172A] tracking-tight">{cat.countLabel}</span>
+                          <span className="text-[10px] font-bold text-[#0F172A] tracking-tight">{cat.countLabel}</span>
                         )}
                         <div className="h-6 w-6 xs:h-7 xs:w-7 md:h-8 md:w-8 rounded-lg bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all text-slate-300">
                            <ChevronRight className="h-3.5 w-3.5 md:h-4 md:w-4" />

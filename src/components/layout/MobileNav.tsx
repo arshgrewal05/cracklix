@@ -13,8 +13,8 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Production Mobile Bottom Navigation v1.2
- * UPDATED: Synchronized with Logo Blue (#1677FF) for active states.
+ * Production Mobile Bottom Navigation v1.3
+ * TYPOGRAPHY: Switched to Title Case for a cleaner mobile interface.
  */
 
 export default function MobileNav() {
@@ -35,7 +35,7 @@ export default function MobileNav() {
       icon: Home,
     },
     {
-      label: "Hub",
+      label: "My Hub",
       href: "/my-exams",
       icon: Target,
     },
@@ -85,13 +85,13 @@ export default function MobileNav() {
                 )}
               >
                 <Icon
-                  className="h-6 w-6"
+                  className="h-5 w-5"
                   fill={isActive ? "currentColor" : "none"}
                 />
 
                 <span
                   className={cn(
-                    "mt-1 text-[10px] font-bold uppercase tracking-wide",
+                    "mt-1 text-[11px] font-bold tracking-tight",
 
                     isActive
                       ? "text-white"

@@ -21,8 +21,9 @@ import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Refined Hero Hub v2.1.
- * REALIGNMENT: Moved student illustration above the feature cards per user request.
+ * @fileOverview Refined Hero Hub v3.0.
+ * TYPOGRAPHY: Removed uppercase for a premium Title Case look.
+ * REALIGNMENT: Student image positioned exactly above feature cards.
  */
 export default function Hero() {
   const db = useFirestore();
@@ -80,7 +81,8 @@ export default function Hero() {
     <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-blue-50 py-12 md:py-24 text-left">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* CONTENT COLUMN */}
+          
+          {/* LEFT CONTENT */}
           <div className="space-y-10">
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm">
@@ -90,7 +92,7 @@ export default function Hero() {
                 </span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 leading-tight uppercase">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.05]">
                 Crack Punjab <br/>
                 <span className="block text-blue-600">
                   Government Exams
@@ -118,12 +120,12 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* INTEGRATED HERO IMAGE: MOVED ABOVE CARDS */}
+            {/* STUDENT HERO IMAGE - POSITIONED ABOVE FEATURE CARDS */}
             <div className="relative flex justify-center lg:justify-start">
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7 }}
                 className="relative w-full max-w-sm md:max-w-md"
               >
                 <img
@@ -136,22 +138,22 @@ export default function Hero() {
 
             {/* FEATURE GRID */}
             <div className="grid grid-cols-2 gap-4">
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
+              <Card className="p-4 md:p-6 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
                 <ClipboardList className="h-6 w-6 text-blue-600 mb-2" />
                 <p className="font-bold text-[#0F172A]">Mock Tests</p>
               </Card>
 
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
+              <Card className="p-4 md:p-6 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
                 <BookOpen className="h-6 w-6 text-indigo-600 mb-2" />
                 <p className="font-bold text-[#0F172A]">Study Material</p>
               </Card>
 
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
+              <Card className="p-4 md:p-6 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
                 <FileText className="h-6 w-6 text-emerald-600 mb-2" />
                 <p className="font-bold text-[#0F172A]">Previous Papers</p>
               </Card>
 
-              <Card className="p-4 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
+              <Card className="p-4 md:p-6 rounded-3xl border bg-white shadow-sm group hover:border-primary transition-colors">
                 <BarChart3 className="h-6 w-6 text-orange-500 mb-2" />
                 <p className="font-bold text-[#0F172A]">Performance Analytics</p>
               </Card>
@@ -181,8 +183,8 @@ export default function Hero() {
           </div>
 
           {/* RIGHT COLUMN (DESKTOP BALANCE) */}
-          <div className="hidden lg:block relative h-full min-h-[400px]">
-             {/* This column remains empty on desktop to allow the centered vertical stack of the left column to breathe */}
+          <div className="hidden lg:block relative">
+             {/* Spacing for desktop layout balance */}
           </div>
         </div>
 
@@ -197,11 +199,11 @@ export default function Hero() {
                 <div className="shrink-0 p-2 rounded-xl bg-slate-50 group-hover:bg-blue-50 transition-colors">
                   {stat.icon}
                 </div>
-                <div className="min-w-0">
-                  <p className="text-2xl font-black text-slate-900 tabular-nums">
+                <div className="min-w-0 text-left">
+                  <p className="text-2xl md:text-3xl font-black text-slate-900 tabular-nums">
                     {stat.val}
                   </p>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                  <p className="text-xs text-slate-500 font-semibold">
                     {stat.label}
                   </p>
                 </div>
