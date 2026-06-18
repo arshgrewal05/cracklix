@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils"
 import type { Category, Board, Exam } from "@/types"
 
 /**
- * @fileOverview Punjab Exam Architecture Manager v2.5 (TypeScript Hardened).
+ * @fileOverview Punjab Exam Architecture Manager v2.6 (TypeScript Hardened).
  */
 
 export default function ArchitectureManager() {
@@ -37,11 +37,11 @@ export default function ArchitectureManager() {
 
   const hierarchy = useMemo(() => {
     if (!categories || !hubs || !exams) return []
-    return categories.map((cat: Category) => ({
+    return (categories as Category[]).map((cat: Category) => ({
       ...cat,
-      hubs: hubs.filter((h: Board) => h.categoryId === cat.id).map((hub: Board) => ({
+      hubs: (hubs as Board[]).filter((h: Board) => h.categoryId === cat.id).map((hub: Board) => ({
         ...hub,
-        exams: exams.filter((e: Exam) => e.boardId === hub.id || e.boardId === hub.abbreviation)
+        exams: (exams as Exam[]).filter((e: Exam) => e.boardId === hub.id || e.boardId === hub.abbreviation)
       }))
     }))
   }, [categories, hubs, exams])
@@ -79,7 +79,7 @@ export default function ArchitectureManager() {
                      <CardHeader className="p-10 pb-6 border-b border-slate-50 bg-slate-50/30 flex flex-row items-center justify-between">
                         <div className="flex items-center gap-6">
                            <div className="h-14 w-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                              {cat.iconUrl ? <img src={cat.iconUrl} className="h-full w-full object-contain p-2" /> : <Layers className="h-6 w-6 text-slate-300" />}
+                              {cat.iconUrl ? <img src={cat.iconUrl} className="h-full w-full object-contain p-2" alt="Icon" /> : <Layers className="h-6 w-6 text-slate-300" />}
                            </div>
                            <div className="text-left">
                               <h3 className="text-2xl font-black font-headline uppercase text-[#0F172A]">{cat.title}</h3>

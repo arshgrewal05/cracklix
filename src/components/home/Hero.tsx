@@ -22,10 +22,7 @@ import { doc } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Institutional Hero Hub v112.0 (Hardened Build).
- * FIXED: Removed merge conflict markers.
- * FIXED: Scaled typography for 320px screens.
- * FIXED: Hydration error - changed p/span wrappers of Skeleton to div.
+ * @fileOverview Institutional Hero Hub v113.0 (Hydration Refined).
  */
 export default function Hero() {
   const db = useFirestore();
@@ -87,7 +84,7 @@ export default function Hero() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm mb-6">
             <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
             <div className="text-[11px] sm:text-sm font-semibold text-slate-700 flex items-center gap-2">
-              {loading ? <Skeleton className="h-4 w-20" /> : (stats?.totalUsers?.toLocaleString() || "0")} Aspirants Preparing
+              {loading ? <Skeleton className="h-4 w-20" /> : <div className="min-w-0">{stats?.totalUsers?.toLocaleString() || "0"} Aspirants Preparing</div>}
             </div>
           </div>
 
@@ -137,22 +134,22 @@ export default function Hero() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
             <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
               <ClipboardList className="h-6 w-6 md:h-8 md:w-8 text-blue-600 mb-3 transform group-hover:scale-110 transition-transform" />
-              <p className="font-bold text-[12px] md:text-base uppercase tracking-tight">Mock Tests</p>
+              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Mock Tests</div>
             </Card>
 
             <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
               <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-indigo-600 mb-3 transform group-hover:scale-110 transition-transform" />
-              <p className="font-bold text-[12px] md:text-base uppercase tracking-tight">Study Material</p>
+              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Study Material</div>
             </Card>
 
             <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
               <FileText className="h-6 w-6 md:h-8 md:w-8 text-emerald-600 mb-3 transform group-hover:scale-110 transition-transform" />
-              <p className="font-bold text-[12px] md:text-base uppercase tracking-tight">Previous Papers</p>
+              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Previous Papers</div>
             </Card>
 
             <Card className="p-4 md:p-6 rounded-3xl border bg-white group hover:shadow-lg transition-all border-slate-100">
               <BarChart3 className="h-6 w-6 md:h-8 md:w-8 text-orange-500 mb-3 transform group-hover:scale-110 transition-transform" />
-              <p className="font-bold text-[12px] md:text-base uppercase tracking-tight">Analytics</p>
+              <div className="font-bold text-[12px] md:text-base uppercase tracking-tight">Analytics</div>
             </Card>
           </div>
 
@@ -191,11 +188,11 @@ export default function Hero() {
                 </div>
                 <div>
                   <div className="text-xl md:text-4xl font-black text-slate-900 tabular-nums leading-none tracking-tight">
-                    {loading ? <Skeleton className="h-8 w-16" /> : (stat.val || "0")}
+                    {loading ? <Skeleton className="h-8 w-16" /> : <div className="min-w-0">{stat.val || "0"}</div>}
                   </div>
-                  <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">
+                  <div className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">
                     {stat.label}
-                  </p>
+                  </div>
                 </div>
               </div>
             </Card>

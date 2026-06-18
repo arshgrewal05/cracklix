@@ -9,8 +9,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Final Administrative Control Center v4.4 (Strictly Hardened).
- * FIXED: Hydration error - changed p tag to div for value in MetricCard.
+ * @fileOverview Final Administrative Control Center v4.5 (TypeScript & Hydration Hardened).
  */
 
 interface MetricCardProps {
@@ -48,9 +47,9 @@ export default function AdminAnalytics() {
   const stats = useMemo(() => {
      if (!questions) return { used: 0, unused: 0, locked: 0, total: 0 };
      return {
-        used: questions.filter((q: any) => q.status === 'USED').length,
-        unused: questions.filter((q: any) => q.status === 'UNUSED' || !q.status).length,
-        locked: questions.filter((q: any) => q.status === 'LOCKED').length,
+        used: (questions as any[]).filter((q: any) => q.status === 'USED').length,
+        unused: (questions as any[]).filter((q: any) => q.status === 'UNUSED' || !q.status).length,
+        locked: (questions as any[]).filter((q: any) => q.status === 'LOCKED').length,
         total: questions.length
      }
   }, [questions]);
@@ -58,16 +57,16 @@ export default function AdminAnalytics() {
   const mockStats = useMemo(() => {
     if (!mocks) return { free: 0, premium: 0 };
     return {
-      free: mocks.filter((m: any) => (m.accessLevel || 'FREE') === 'FREE').length,
-      premium: mocks.filter((m: any) => m.accessLevel === 'PREMIUM').length
+      free: (mocks as any[]).filter((m: any) => (m.accessLevel || 'FREE') === 'FREE').length,
+      premium: (mocks as any[]).filter((m: any) => m.accessLevel === 'PREMIUM').length
     };
   }, [mocks]);
 
-  const proUsers = useMemo(() => users?.filter((u: any) => u.pass?.active === true) || [], [users]);
+  const proUsers = useMemo(() => (users as any[] || []).filter((u: any) => u.pass?.active === true), [users]);
 
   const avgAccuracy = useMemo(() => {
     if (!results || results.length === 0) return 0
-    return Math.round(results.reduce((acc: number, r: any) => acc + (r.accuracy || 0), 0) / (results.length || 1))
+    return Math.round((results as any[]).reduce((acc: number, r: any) => acc + (r.accuracy || 0), 0) / (results.length || 1))
   }, [results])
 
   const dynamicChartData = useMemo(() => {

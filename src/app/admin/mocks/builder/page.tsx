@@ -28,7 +28,7 @@ import {
   Layers
 } from "lucide-react"
 import { useCollection, useFirestore, useDoc } from "@/firebase"
-import { collection, doc, setDoc, serverTimestamp, query, limit, getDocs, writeBatch, where, documentId, getDocs as getDocsStatic, orderBy } from "firebase/firestore"
+import { collection, doc, setDoc, serverTimestamp, query, limit, getDocs, writeBatch, where, documentId, orderBy } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { MockType, Difficulty, AccessLevel, LanguageDisplayMode, MockAssignmentMode, Question, ExamSection } from "@/types"
 import { cn } from "@/lib/utils"
@@ -36,7 +36,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 /**
- * @fileOverview Hardened Mock Architect v96.4 (TypeScript Hardened).
+ * @fileOverview Hardened Mock Architect v96.5 (Strict Type Fix).
  */
 
 export default function MockBuilderPage() {
@@ -127,7 +127,7 @@ function MockBuilderContent() {
       let currentIndex = 0;
       const hydratedSections = (existingMock.sections || [{ name: 'GENERAL HUB', count: existingMock.questionIds.length }]).map((s: any, idx: number) => {
         const count = Number(s.count) || 0;
-        const sectionQIds: string[] = existingMock.questionIds.slice(currentIndex, currentIndex + count);
+        const sectionQIds: string[] = (existingMock.questionIds as string[]).slice(currentIndex, currentIndex + count);
         currentIndex += count;
         return { 
           id: `sec-${idx + 1}`, 
