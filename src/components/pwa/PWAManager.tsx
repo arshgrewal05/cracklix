@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Smart Institutional PWA Install Node v5.0.
+ * @fileOverview Smart Institutional PWA Install Node v6.0.
  * LOGIC: Only appears after engagement threshold or if the user interacts.
- * TESTING: Threshold reduced to 1000ms as requested for immediate audit.
+ * THEME: Synchronized to Institutional Primary Blue (#1677FF).
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -42,7 +42,7 @@ export default function PWAManager() {
   useEffect(() => {
     setMounted(true);
 
-    // Engagement Logic: Reduced to 1 second for testing as requested
+    // Engagement Logic: 1 second threshold for testing
     const timer = setTimeout(() => {
       setEngagementThresholdMet(true);
     }, 1000);
@@ -100,8 +100,8 @@ export default function PWAManager() {
           <div className="flex flex-col gap-5 relative z-10">
              <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                   <div className="h-12 w-12 rounded-2xl bg-[#2563EB]/20 border border-[#2563EB]/30 flex items-center justify-center shrink-0 shadow-inner">
-                      <Zap className="h-6 w-6 text-[#2563EB] fill-current animate-pulse" />
+                   <div className="h-12 w-12 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 shadow-inner">
+                      <Zap className="h-6 w-6 text-primary fill-current animate-pulse" />
                    </div>
                    <div className="min-w-0 text-left">
                       <h4 className="text-sm font-black uppercase tracking-tight leading-tight mb-1">Cracklix App</h4>
@@ -126,7 +126,7 @@ export default function PWAManager() {
                 </p>
                 <Button 
                   onClick={handleInstallClick}
-                  className="w-full h-14 bg-[#2563EB] hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl shadow-3xl border-none transition-all active:scale-95 gap-3"
+                  className="w-full h-14 bg-primary hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl shadow-3xl border-none transition-all active:scale-95 gap-3"
                 >
                    <Download className="h-4 w-4" /> INSTALL CRACKLIX APP
                 </Button>

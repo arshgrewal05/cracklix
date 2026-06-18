@@ -15,6 +15,10 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+/**
+ * @fileOverview Root Layout v45.0.
+ * HARDENED: Synchronized PWA metadata with the unified primary brand color (#1677FF).
+ */
 export const metadata: Metadata = {
   title: "Cracklix | Punjab's Smart Mock Test Platform",
 
@@ -62,7 +66,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#2563EB",
+  themeColor: "#1677FF",
 };
 
 export default function RootLayout({

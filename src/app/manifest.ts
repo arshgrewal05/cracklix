@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Production-Grade PWA Manifest v8.0.
- * HARDENED: Synchronized icon registry with standard public/icons/ directory.
+ * @fileOverview Production-Grade PWA Manifest v9.0.
+ * HARDENED: Added maskable icon support and categories for high-fidelity app store appearance.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -14,33 +14,38 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: '/',
     display: 'standalone',
     background_color: '#FFFFFF',
-    theme_color: '#2563EB',
+    theme_color: '#1677FF',
     orientation: 'portrait',
     icons: [
       {
         src: '/icons/icon-72x72.png',
         sizes: '72x72',
         type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/icon-96x96.png',
         sizes: '96x96',
         type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/icon-128x128.png',
         sizes: '128x128',
         type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/icon-144x144.png',
         sizes: '144x144',
         type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/icon-152x152.png',
         sizes: '152x152',
         type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/icon-192x192.png',
@@ -52,6 +57,7 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/icons/icon-384x384.png',
         sizes: '384x384',
         type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/icon-512x512.png',
