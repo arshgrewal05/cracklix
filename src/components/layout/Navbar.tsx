@@ -35,9 +35,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Header v82.0 (Right-Aligned Logo).
- * UPDATED: Logo moved to right side to fix overlap with menu button.
- * MAXIMIZED: Logo height increased to 88px for dominant visibility.
+ * @fileOverview Institutional Header v83.0 (Left-Integrated Logo).
+ * UPDATED: Logo moved next to the menu button on the left.
+ * MAXIMIZED: Logo height locked to 88px with origin-left scaling.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -79,8 +79,8 @@ export default function Navbar() {
       <nav className="w-full h-20 bg-white border-b border-slate-100 shadow-sm overflow-visible">
         <div className="w-full max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between">
 
-          {/* LEFT SIDE: Menu Hub */}
-          <div className="flex items-center shrink-0">
+          {/* LEFT SIDE: Menu Hub + Integrated Logo */}
+          <div className="flex items-center shrink-0 gap-1">
             <button
               onClick={() => setIsSidebarOpen(true)}
               aria-label="Open menu"
@@ -88,17 +88,23 @@ export default function Navbar() {
             >
               <Menu className="w-6 h-6" />
             </button>
+
+            <Logo
+              variant="light"
+              className="shrink-0 -ml-4 scale-[0.85] xs:scale-100 sm:scale-110 origin-left transition-all duration-500"
+              imgClassName="h-[88px]"
+            />
           </div>
 
           {/* DESKTOP NAVIGATION (CENTERED) */}
-          <div className="hidden lg:flex items-center justify-center gap-10 flex-1 px-8">
+          <div className="hidden lg:flex items-center justify-center gap-8 flex-1 px-4">
             <NavLink href="/" label="Home" active={pathname === '/'} />
             <NavLink href="/mocks" label="Practice" active={pathname === '/mocks'} />
             <NavLink href="/pyqs" label="Previous Papers" active={pathname === '/pyqs'} />
             <NavLink href="/current-affairs" label="Study Center" active={pathname === '/current-affairs'} />
           </div>
 
-          {/* RIGHT SIDE: Action Hub & Right-Aligned Logo */}
+          {/* RIGHT SIDE: Action Hub */}
           <div className="flex items-center gap-3 md:gap-4 shrink-0">
             <Link
               href="/search"
@@ -154,13 +160,6 @@ export default function Navbar() {
                 Login
               </Link>
             )}
-
-            {/* BRANDING: Right side anchored with maximized scale */}
-            <Logo
-              variant="light"
-              className="shrink-0 -mr-10 xs:-mr-12 lg:-mr-14 scale-[0.8] xs:scale-100 sm:scale-110 origin-right transition-all duration-500"
-              imgClassName="h-[88px]"
-            />
           </div>
         </div>
       </nav>
