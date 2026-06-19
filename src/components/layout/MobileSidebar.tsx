@@ -30,8 +30,8 @@ import ShareButton from "@/components/navigation/ShareButton";
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Mobile Sidebar Overhaul v36.0.
- * BRAND SYSTEM: Logo centered, 36px height, 24px margins, divider below.
+ * @fileOverview Mobile Sidebar Overhaul v36.1.
+ * BRAND SYSTEM: Logo centered, 42px height, 24px margins, divider below.
  */
 export default function MobileSidebar({
   onClose,
@@ -75,7 +75,7 @@ export default function MobileSidebar({
   return (
     <div className="flex h-full flex-col bg-white font-body overflow-hidden text-left">
 
-      {/* HEADER OVERHAUL: Centered logo, 36px height, margins, divider */}
+      {/* HEADER OVERHAUL: Centered logo, 42px height, margins, divider */}
       <div className="px-4 shrink-0 bg-white">
         <div className="flex items-center justify-end pt-4">
           <button
@@ -90,7 +90,7 @@ export default function MobileSidebar({
            <Logo
              variant="light"
              align="center"
-             imgClassName="h-[36px]"
+             imgClassName="h-[36px] md:h-[42px]"
              onClick={onClose}
            />
            <div className="w-full h-px bg-slate-100 mt-6" />

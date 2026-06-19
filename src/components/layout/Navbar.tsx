@@ -36,8 +36,8 @@ import { Button } from "@/components/ui/button";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Header v96.0.
- * BRAND SYSTEM: Fixed 80px height, 40px logo, 16px menu spacing.
+ * @fileOverview Institutional Header v97.0 (Sizing & Position Update).
+ * BRAND SYSTEM: Increased logo size (52px) and moved towards left edge.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -77,9 +77,9 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-50 w-full font-body">
       <nav className="w-full h-20 bg-white border-b border-slate-100 shadow-sm">
-        <div className="w-full max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between gap-4">
+        <div className="w-full max-w-7xl mx-auto px-2 md:px-4 h-full flex items-center justify-between gap-4">
 
-          {/* LEFT SIDE: Menu Hub + Logo Node */}
+          {/* LEFT SIDE: Menu Hub + Logo Node (Shifted Left) */}
           <div className="flex items-center shrink-0">
             <button
               onClick={() => setIsSidebarOpen(true)}
@@ -89,11 +89,11 @@ export default function Navbar() {
               <Menu className="w-5 h-5 md:w-6 md:h-6" />
             </button>
 
-            {/* BRANDING: 16px spacing, responsive sizing */}
+            {/* BRANDING: Reduced spacing (8px) and increased size */}
             <Logo
               variant="light"
-              className="ml-4 flex-shrink-0"
-              imgClassName="h-[32px] md:h-[40px]"
+              className="ml-2 flex-shrink-0"
+              imgClassName="h-[42px] md:h-[52px]"
             />
           </div>
 

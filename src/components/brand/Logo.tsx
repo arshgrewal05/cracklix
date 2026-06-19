@@ -13,14 +13,17 @@ interface LogoProps {
   onClick?: () => void;
   priority?: boolean;
   align?: 'left' | 'center' | 'right';
+  iconOnly?: boolean;
 }
 
 /**
- * @fileOverview Master Cracklix Branding Node v2.0.
+ * @fileOverview Master Cracklix Branding Node v2.1.
  * Strictly implements the official brand guidelines:
  * - variant="light": Uses cracklix-logo-dark.png (for light backgrounds)
  * - variant="dark": Uses cracklix-logo-light.png (for dark backgrounds)
  * - variant="icon": Uses cracklix-icon.png
+ * 
+ * UPDATED: Increased default responsive heights for better visibility.
  */
 export default function Logo({
   className = "",
@@ -29,7 +32,8 @@ export default function Logo({
   imgClassName = "",
   onClick,
   priority = true,
-  align = 'left'
+  align = 'left',
+  iconOnly = false
 }: LogoProps) {
   
   // Official Asset Mapping
@@ -39,14 +43,12 @@ export default function Logo({
     icon: "/logo/cracklix-icon.png"
   };
 
-  const src = assets[variant];
-  const isIcon = variant === 'icon';
+  const src = assets[iconOnly ? 'icon' : variant];
+  const isIcon = variant === 'icon' || iconOnly;
 
-  // Responsive Height Logic based on Overhaul Specs
-  // Header: 40px desktop / 32px mobile
+  // Header: 52px desktop / 42px mobile
   // Sidebar: 42px desktop / 36px mobile
   // Login: 60px desktop / 50px mobile
-  // Admin: 38px desktop / 32px mobile
 
   const content = (
     <div className={cn(
@@ -59,13 +61,12 @@ export default function Logo({
       <Image
         src={src}
         alt="Cracklix"
-        width={isIcon ? 48 : 240}
-        height={isIcon ? 48 : 80}
+        width={isIcon ? 48 : 320}
+        height={isIcon ? 48 : 100}
         priority={priority}
         className={cn(
           "object-contain w-auto",
-          // Heights are strictly controlled by parent or these specific classes
-          !isIcon && "h-[32px] md:h-[40px]",
+          !isIcon && "h-[42px] md:h-[52px]",
           imgClassName
         )}
       />
