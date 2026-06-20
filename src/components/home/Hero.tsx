@@ -23,8 +23,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Restored Hero Hub v5.2 (Deep Sync Enabled).
- * FIXED: Feature cards now show live counts from the stats registry.
+ * @fileOverview Official Restored Hero Hub v6.0 (Real Data Hardened).
+ * FIXED: Removed fake data fallbacks (500+, 100+) to show actual registry counts.
  */
 
 export default function Hero() {
@@ -42,6 +42,12 @@ export default function Hero() {
   const { data: stats } = useDoc<any>(statsRef);
   const { data: settings } = useDoc<any>(settingsRef);
 
+  const formatNumber = (num: number | undefined) => {
+    if (num === undefined || num === null) return "...";
+    if (num >= 1000) return (num / 1000).toFixed(1) + "k";
+    return num.toString();
+  };
+
   const trustBadgeContent = useMemo(() => {
     if (!settings) return "10,000+ Aspirants Trust Cracklix";
     const count = settings.trustBadgeCount || 10000;
@@ -49,36 +55,30 @@ export default function Hero() {
     return `${count.toLocaleString()}+ ${text}`;
   }, [settings]);
 
-  const formatNumber = (num: number, fallback: string) => {
-    if (!num) return fallback;
-    if (num >= 1000) return (num / 1000).toFixed(1) + "k+";
-    return num + "+";
-  };
-
   const liveStats = useMemo(() => {
     return [
       {
         id: "q",
         icon: <Zap className="h-5 w-5 text-blue-600" />,
-        val: formatNumber(stats?.totalQuestions, "50k+"),
+        val: formatNumber(stats?.totalQuestions) + "+",
         label: "Questions"
       },
       {
         id: "m",
         icon: <ClipboardList className="h-5 w-5 text-indigo-600" />,
-        val: formatNumber(stats?.totalMocks, "500+"),
+        val: formatNumber(stats?.totalMocks) + "+",
         label: "Mock Tests"
       },
       {
         id: "e",
         icon: <ShieldCheck className="h-5 w-5 text-emerald-600" />,
-        val: formatNumber(stats?.totalBoards, "50+"),
+        val: formatNumber(stats?.totalBoards) + "+",
         label: "Exams"
       },
       {
         id: "u",
         icon: <Users className="h-5 w-5 text-orange-500" />,
-        val: formatNumber(stats?.totalUsers, "15k+"),
+        val: formatNumber(stats?.totalUsers) + "+",
         label: "Aspirants"
       }
     ];
@@ -100,7 +100,7 @@ export default function Hero() {
             >
               <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 animate-pulse" />
               <span className="text-sm font-semibold text-slate-700">
-                {formatNumber(stats?.totalUsers || 10000, "10,000+")} Aspirants Trust Cracklix
+                {trustBadgeContent}
               </span>
             </motion.div>
 
@@ -155,21 +155,21 @@ export default function Hero() {
               <FeatureCard 
                 icon={ClipboardList} 
                 label="Mock Tests" 
-                sub={formatNumber(stats?.totalMocks, "500+") + " Series"} 
+                sub={formatNumber(stats?.totalMocks) + "+ Series"} 
                 color="text-blue-600" 
                 href="/mocks" 
               />
               <FeatureCard 
                 icon={BookOpen} 
                 label="Study Material" 
-                sub={formatNumber(stats?.totalNotes, "500+") + " Notes"} 
+                sub={formatNumber(stats?.totalNotes) + "+ Notes"} 
                 color="text-indigo-600" 
                 href="/notes" 
               />
               <FeatureCard 
                 icon={FileText} 
                 label="Previous Papers" 
-                sub={formatNumber(stats?.totalPYQs, "100+") + " Papers"} 
+                sub={formatNumber(stats?.totalPYQs) + "+ Papers"} 
                 color="text-emerald-600" 
                 href="/pyqs" 
               />
