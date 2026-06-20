@@ -13,6 +13,11 @@ import { collection } from "firebase/firestore"
 import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
+/**
+ * @fileOverview Institutional Search Center v14.0.
+ * FIXED: Explicit React import and type-safe cloneElement handling.
+ */
+
 export default function SearchPage() {
   return (
     <Suspense fallback={<div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>}>

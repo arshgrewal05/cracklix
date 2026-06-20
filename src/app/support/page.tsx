@@ -36,6 +36,11 @@ import Link from "next/link"
 const TELEGRAM_GROUP = "https://t.me/cracklixapp";
 const INSTAGRAM_PROFILE = "https://www.instagram.com/arshgrewal_official/";
 
+/**
+ * @fileOverview Institutional Support Hub v2.3.
+ * FIXED: Added missing Link and Loader2 imports.
+ */
+
 export default function SupportPage() {
   const { user, profile } = useUser()
   const db = useFirestore()

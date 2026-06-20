@@ -42,6 +42,11 @@ import { Button } from "@/components/ui/button";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
+/**
+ * @fileOverview Refined Institutional Navbar v42.0.
+ * UPDATED: Responsive Profile Dropdown (280px on mobile).
+ * FIXED: Added missing AlertCircle import.
+ */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -141,7 +146,7 @@ export default function Navbar() {
                 <DropdownMenuContent
                   align="end"
                   sideOffset={12}
-                  className="w-[320px] max-h-[85vh] overflow-y-auto custom-scrollbar rounded-[28px] p-6 bg-white border border-[#EEF2F7] shadow-[0_12px_30px_rgba(15,23,42,0.08)] z-[2001]"
+                  className="w-[280px] xs:w-[320px] max-h-[85vh] overflow-y-auto custom-scrollbar rounded-[28px] p-4 xs:p-6 bg-white border border-[#EEF2F7] shadow-[0_12px_30px_rgba(15,23,42,0.08)] z-[2001]"
                 >
                   <div className="flex flex-col items-center text-center space-y-6">
                     
@@ -155,12 +160,12 @@ export default function Navbar() {
                           )}
                        </div>
                        <div className="space-y-0.5">
-                         <h3 className="text-xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate max-w-[260px]">
+                         <h3 className="text-lg xs:text-xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate max-w-[240px]">
                            {profile?.name || "Aspirant"}
                          </h3>
                          <Link 
                            href="/profile" 
-                           className="text-[13px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] hover:text-primary transition-colors"
+                           className="text-[12px] xs:text-[13px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] hover:text-primary transition-colors"
                          >
                            View Profile
                          </Link>
@@ -170,7 +175,7 @@ export default function Navbar() {
                     {!emailVerified && (
                        <div className="w-full p-4 bg-rose-50 rounded-2xl border border-rose-100 flex items-center gap-3">
                           <AlertCircle className="h-4 w-4 text-rose-500 shrink-0" />
-                          <p className="text-[10px] font-bold text-rose-600 uppercase text-left leading-tight">Account Not Verified. Check Email.</p>
+                          <p className="text-[10px] font-bold text-rose-600 uppercase text-left leading-tight">Verify email first</p>
                        </div>
                     )}
 
@@ -220,7 +225,7 @@ export default function Navbar() {
       </nav>
 
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-        <SheetContent side="left" className="w-[320px] p-0 border-none bg-white z-[2001] shadow-2xl [&>button]:hidden">
+        <SheetContent side="left" className="w-[300px] xs:w-[320px] p-0 border-none bg-white z-[2001] shadow-2xl [&>button]:hidden">
           <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle><SheetDescription>Navigation hub</SheetDescription></SheetHeader>
           <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
         </SheetContent>
