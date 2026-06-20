@@ -38,12 +38,12 @@ import { cn } from "@/lib/utils";
 import Logo from "@/components/brand/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import PWAInstallButton from "@/components/PWAInstallButton";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Standardized Navbar Hub v45.0.
- * TYPOGRAPHY: Removed uppercase from links and menus.
+ * @fileOverview Standardized Navbar Hub v46.0 (PWA Fixed).
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -120,6 +120,11 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
+            <PWAInstallButton 
+              variant="outline"
+              className="hidden md:flex h-10 px-4 text-[9px] rounded-xl border-slate-200"
+            />
+
             <Link
               href="/search"
               className="w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center bg-slate-50 text-slate-600 hover:text-primary transition-all active:scale-95"

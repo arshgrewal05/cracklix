@@ -7,9 +7,8 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Smart Institutional PWA Install Node v6.0.
- * LOGIC: Only appears after engagement threshold or if the user interacts.
- * THEME: Synchronized to Institutional Primary Blue (#1677FF).
+ * @fileOverview Smart Institutional PWA Install Node v7.0.
+ * LOGIC: Captures native beforeinstallprompt and manages the global installation state.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -17,7 +16,6 @@ export default function PWAManager() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [sessionDismissed, setSessionDismissed] = useState(false);
-  const [engagementThresholdMet, setEngagementThresholdMet] = useState(false);
 
   const checkInstallability = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -32,38 +30,41 @@ export default function PWAManager() {
       return;
     }
 
-    if (!isExcluded && !sessionDismissed && hasPrompt && engagementThresholdMet) {
+    if (!isExcluded && !sessionDismissed && hasPrompt) {
       setShowPrompt(true);
     } else {
       setShowPrompt(false);
     }
-  }, [pathname, sessionDismissed, engagementThresholdMet]);
+  }, [pathname, sessionDismissed]);
 
   useEffect(() => {
     setMounted(true);
 
-    // Engagement Logic: 1 second threshold for testing
-    const timer = setTimeout(() => {
-      setEngagementThresholdMet(true);
-    }, 1000);
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      (window as any).deferredPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-installable'));
+      checkInstallability();
+    };
 
-    checkInstallability();
-
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('pwa-installable', checkInstallability);
-    window.addEventListener('pwa-installed', () => {
+    window.addEventListener('appinstalled', () => {
       setIsInstalled(true);
       setShowPrompt(false);
     });
 
+    // Check on mount
+    checkInstallability();
+
     return () => {
-      clearTimeout(timer);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('pwa-installable', checkInstallability);
     };
   }, [checkInstallability]);
 
   const handleInstallClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     const prompt = (window as any).deferredPrompt;
     if (!prompt) return;
 
@@ -76,13 +77,6 @@ export default function PWAManager() {
     }
   };
 
-  const handleClose = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowPrompt(false);
-    setSessionDismissed(true);
-  };
-
   if (!mounted || isInstalled || !showPrompt) return null;
 
   return (
@@ -93,8 +87,7 @@ export default function PWAManager() {
         exit={{ y: 100, opacity: 0 }}
         className="fixed bottom-28 md:bottom-12 left-4 md:left-auto md:right-8 z-[2000] w-[calc(100%-2rem)] md:w-[360px] pointer-events-auto"
       >
-        <div className="bg-[#0B1528] text-white p-5 rounded-[2.5rem] shadow-5xl border border-white/10 relative overflow-hidden group ring-1 ring-white/5">
-          {/* AMBIENT BACKGROUND GLOW */}
+        <div className="bg-[#0B1528] text-white p-5 rounded-[2.5rem] shadow-5xl border border-white/10 relative overflow-hidden group">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-3xl rounded-full pointer-events-none" />
           
           <div className="flex flex-col gap-5 relative z-10">
@@ -104,17 +97,16 @@ export default function PWAManager() {
                       <Zap className="h-6 w-6 text-primary fill-current animate-pulse" />
                    </div>
                    <div className="min-w-0 text-left">
-                      <h4 className="text-sm font-black uppercase tracking-tight leading-tight mb-1">Cracklix App</h4>
+                      <h4 className="text-sm font-black uppercase tracking-tight leading-none mb-1">Cracklix App</h4>
                       <div className="flex items-center gap-1.5 text-primary">
                          <Sparkles className="h-3 w-3" />
-                         <p className="text-[9px] font-black uppercase tracking-[0.2em]">Institutional Hub</p>
+                         <p className="text-[9px] font-black uppercase tracking-widest">Institutional Hub</p>
                       </div>
                    </div>
                 </div>
                 <button 
-                  onClick={handleClose}
-                  className="h-8 w-8 flex items-center justify-center text-slate-500 hover:text-white transition-colors cursor-pointer active:scale-90 shrink-0 bg-white/5 rounded-xl border border-white/5"
-                  aria-label="Close"
+                  onClick={() => setShowPrompt(false)}
+                  className="h-8 w-8 flex items-center justify-center text-slate-500 hover:text-white bg-white/5 rounded-xl border border-white/5"
                 >
                    <X className="h-4 w-4" />
                 </button>
@@ -122,13 +114,13 @@ export default function PWAManager() {
 
              <div className="space-y-4">
                 <p className="text-[13px] font-bold text-slate-300 leading-snug">
-                   🚀 <span className="text-white">Get Faster Access</span> to Punjab Govt Exams. Install for better performance & offline access.
+                   🚀 <span className="text-white">Get Faster Access</span> to Punjab Govt Exams. Install for better performance.
                 </p>
                 <Button 
                   onClick={handleInstallClick}
-                  className="w-full h-14 bg-primary hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-[0.2em] rounded-2xl shadow-3xl border-none transition-all active:scale-95 gap-3"
+                  className="w-full h-14 bg-primary hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-3xl border-none transition-all active:scale-95 gap-3"
                 >
-                   <Download className="h-4 w-4" /> INSTALL CRACKLIX APP
+                   <Download className="h-4 w-4" /> INSTALL APP
                 </Button>
              </div>
           </div>

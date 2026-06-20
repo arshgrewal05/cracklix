@@ -26,10 +26,10 @@ import Logo from "@/components/brand/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import ShareButton from "@/components/navigation/ShareButton";
 import { Button } from "@/components/ui/button";
+import PWAInstallButton from "@/components/PWAInstallButton";
 
 /**
- * @fileOverview Mobile Sidebar Overhaul v40.0.
- * BRAND SYSTEM: Maximized Logo (60px) within 72px normalized header area.
+ * @fileOverview Mobile Sidebar Overhaul v41.0 (PWA Integrated).
  */
 export default function MobileSidebar({
   onClose,
@@ -121,6 +121,13 @@ export default function MobileSidebar({
               <ChevronRight className="h-4 w-4 shrink-0 text-slate-300" />
             </div>
           </Link>
+        </div>
+
+        <div className="px-2 mb-6">
+           <PWAInstallButton 
+             variant="dark"
+             className="w-full h-12 rounded-xl mb-4"
+           />
         </div>
 
         <div className="px-2">

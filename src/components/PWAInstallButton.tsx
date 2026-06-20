@@ -13,40 +13,44 @@ interface PWAInstallButtonProps {
 }
 
 /**
- * @fileOverview Production PWA Trigger Node v8.0.
- * LOGIC: Context-aware handling for Native Prompts and iOS Shared Sheet.
+ * @fileOverview Production PWA Trigger Node v9.0.
+ * LOGIC: Reactive to native prompt availability and standalone status.
  */
 export default function PWAInstallButton({ 
   className, 
   variant = 'default',
   showLabel = true 
 }: PWAInstallButtonProps) {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [canInstall, setCanInstall] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    setMounted(true);
+  const updateState = () => {
     if (typeof window === 'undefined') return;
-
+    
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
     setIsInstalled(isStandalone);
 
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(ios);
 
-    if ((window as any).deferredPrompt) {
-      setDeferredPrompt((window as any).deferredPrompt);
-    }
+    // Show if native prompt is available OR if it's iOS (manual instruction)
+    setCanInstall(!!(window as any).deferredPrompt || ios);
+  };
 
-    const handleInstallable = () => {
-      setDeferredPrompt((window as any).deferredPrompt);
+  useEffect(() => {
+    setMounted(true);
+    updateState();
+
+    window.addEventListener('pwa-installable', updateState);
+    window.addEventListener('appinstalled', updateState);
+    
+    return () => {
+      window.removeEventListener('pwa-installable', updateState);
+      window.removeEventListener('appinstalled', updateState);
     };
-
-    window.addEventListener('pwa-installable', handleInstallable);
-    return () => window.removeEventListener('pwa-installable', handleInstallable);
   }, []);
 
   const handleInstall = async (e: React.MouseEvent) => {
@@ -61,28 +65,28 @@ export default function PWAInstallButton({
        return;
     }
 
-    if (!deferredPrompt) {
+    const prompt = (window as any).deferredPrompt;
+    if (!prompt) {
       toast({
-        title: "App Ready",
-        description: "Cracklix is already optimized for your device. If you don't see an install prompt, check your browser menu.",
+        title: "Already Optimized",
+        description: "Cracklix is already installed or your browser handles installation automatically.",
       });
       return;
     }
 
     try {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
       if (outcome === 'accepted') {
-        setDeferredPrompt(null);
         (window as any).deferredPrompt = null;
+        setCanInstall(false);
       }
     } catch (err) {
-      console.error('[PWA] Error triggering native prompt:', err);
+      console.error('[PWA] Native prompt failed:', err);
     }
   };
 
-  if (!mounted || isInstalled) return null;
+  if (!mounted || isInstalled || !canInstall) return null;
 
   return (
     <Button

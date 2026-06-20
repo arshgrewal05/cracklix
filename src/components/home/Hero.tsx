@@ -19,10 +19,10 @@ import { useDoc, useFirestore } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import PWAInstallButton from "@/components/PWAInstallButton";
 
 /**
- * @fileOverview Hero Section v39.0 (Typography Overhaul).
- * RESTORED: Removed uppercase from headings and buttons for a premium look.
+ * @fileOverview Hero Section v40.0 (PWA Integrated).
  */
 
 export default function Hero() {
@@ -88,13 +88,10 @@ export default function Hero() {
       
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10 xl:px-12 relative z-10">
         
-        {/* HERO GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-8 xl:gap-16 items-center">
           
-          {/* LEFT: CONTENT HUB */}
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 md:space-y-10 max-w-4xl lg:max-w-[680px] mx-auto lg:mx-0">
             
-            {/* DYNAMIC TRUST BADGE */}
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -119,7 +116,6 @@ export default function Hero() {
               </p>
             </div>
 
-            {/* CTA BUTTONS */}
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-4 justify-center lg:justify-start">
               <Button
                 asChild
@@ -131,19 +127,12 @@ export default function Hero() {
                 </Link>
               </Button>
 
-              <Button
-                asChild
+              <PWAInstallButton 
                 variant="outline"
-                className="h-14 md:h-16 px-10 border-2 border-slate-200 bg-white text-[#0F172A] font-bold text-sm tracking-tight rounded-full shadow-sm hover:bg-slate-50 transition-all active:scale-95 group/btn2"
-              >
-                <Link href="/exams" className="flex items-center justify-center gap-3">
-                  <span>Browse Exams</span>
-                  <ChevronRight className="h-5 w-5 transition-transform group-hover/btn2:translate-x-1" />
-                </Link>
-              </Button>
+                className="h-14 md:h-16 px-10 border-2 border-slate-200 bg-white text-[#0F172A] font-bold text-sm tracking-tight rounded-full shadow-sm"
+              />
             </div>
 
-            {/* FEATURES GRID */}
             <div className="grid grid-cols-2 gap-3 md:gap-6 w-full max-w-2xl pt-2">
                <FeatureCard icon={<Zap />} label="Mock Tests" href="/mocks" />
                <FeatureCard icon={<Landmark />} label="Punjab Exams" href="/exams" />
@@ -152,7 +141,6 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: STUDENT ILLUSTRATION */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -163,13 +151,11 @@ export default function Hero() {
             <img
               src="/images/hero-student.png"
               alt="Cracklix Student"
-              data-ai-hint="student studying"
               className="w-full h-auto object-contain drop-shadow-2xl max-w-[280px] md:max-w-[480px] lg:max-w-[540px] xl:max-w-[620px]"
             />
           </motion.div>
         </div>
 
-        {/* STATS SECTION */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-16 md:mt-24">
           {liveStats.map((stat, i) => (
             <motion.div
