@@ -17,8 +17,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Master Registry v5.0.
- * TYPOGRAPHY: Responsive scale 4xl to 7xl. Title Case normalization for category cards.
+ * @fileOverview Institutional Master Registry v6.0.
+ * FIXED: Reduced title size and removed line-clamp to fix overflow truncation.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -121,7 +121,7 @@ export default function MocksDiscoveryPage() {
                            </div>
                            
                            <div className="space-y-5 flex-1">
-                              <h3 className="font-black text-4xl md:text-5xl text-[#0F172A] leading-[0.95] tracking-tight group-hover:text-primary transition-colors line-clamp-2">
+                              <h3 className="font-black text-3xl md:text-4xl lg:text-5xl text-[#0F172A] leading-[1.1] tracking-tight group-hover:text-primary transition-colors break-words">
                                  {cat.title}
                               </h3>
                               <p className="text-sm md:text-lg font-medium text-slate-400 leading-relaxed">

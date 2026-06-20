@@ -18,8 +18,8 @@ import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Elite Exam Categories Hub v20.0.
- * TYPOGRAPHY: Optimized Title Case with text-4xl/5xl scaling.
+ * @fileOverview Elite Exam Categories Hub v21.0.
+ * FIXED: Reduced title size and removed line-clamp to prevent overflow truncation.
  */
 
 const CATEGORY_META = [
@@ -109,7 +109,7 @@ export default function FeaturedCategories() {
                 transition={{ delay: idx * 0.05 }}
               >
                  <Link href={`/exams/category/${cat.id}`}>
-                    <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:translate-y-[-8px] transition-all duration-500 rounded-[2rem] md:rounded-[2.5rem] bg-white group overflow-hidden h-[320px] md:h-[380px] flex flex-col p-6 md:p-8 relative">
+                    <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:translate-y-[-8px] transition-all duration-500 rounded-[2rem] md:rounded-[2.5rem] bg-white group overflow-hidden min-h-[320px] md:min-h-[380px] flex flex-col p-6 md:p-8 relative">
                        <div className={cn("h-14 w-14 md:h-16 md:w-16 rounded-[1.2rem] flex items-center justify-center mb-6 shadow-inner transition-transform group-hover:scale-110 relative shrink-0", cat.bgColor, cat.color)}>
                           <div className="h-full w-full flex items-center justify-center overflow-hidden rounded-xl relative p-2.5">
                             <Image 
@@ -123,10 +123,10 @@ export default function FeaturedCategories() {
                        </div>
                        
                        <div className="space-y-4 flex-1 min-w-0">
-                          <h3 className="font-black text-3xl md:text-4xl lg:text-5xl text-[#0F172A] leading-[0.95] tracking-tight group-hover:text-primary transition-colors line-clamp-2">
+                          <h3 className="font-black text-3xl md:text-4xl leading-[1.1] tracking-tight text-[#0F172A] group-hover:text-primary transition-colors break-words">
                             {cat.title}
                           </h3>
-                          <p className="text-[10px] md:text-sm font-semibold text-slate-400 tracking-tight leading-snug line-clamp-2">
+                          <p className="text-[10px] md:text-sm font-semibold text-slate-400 tracking-tight leading-snug">
                             {cat.desc}
                           </p>
                        </div>

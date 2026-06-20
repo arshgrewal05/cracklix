@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Exam List Landing v9.0.
- * TYPOGRAPHY: Premium Title Case for category titles with text-4xl/5xl sizing.
+ * @fileOverview Institutional Exam List Landing v10.0.
+ * FIXED: Reduced title size and removed line-clamp to fix overflow truncation.
  */
 
 const ACRONYMS = ["PSSSB", "PPSC", "PUNJAB POLICE", "PSPCL", "PSTCL", "PSTET", "CTET", "MCQ", "MCQS", "PYQ", "PYQS", "GK", "CA"];
@@ -104,7 +104,7 @@ export default function ExamsEntryPage() {
                            </div>
                            
                            <div className="space-y-3 md:space-y-5 flex-1">
-                              <h3 className="font-black text-4xl md:text-5xl text-[#0F172A] leading-[0.95] tracking-tight group-hover:text-primary transition-colors line-clamp-2">
+                              <h3 className="font-black text-3xl md:text-4xl lg:text-5xl text-[#0F172A] leading-[1.1] tracking-tight group-hover:text-primary transition-colors break-words">
                                  {toTitleCase(cat.title)}
                               </h3>
                               <p className="text-xs md:text-base lg:text-lg font-medium text-slate-400 leading-relaxed">
