@@ -17,8 +17,8 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Exam Vertical Registry v11.1.
- * FIXED: Ensured all components and lucide icons are imported for stable build.
+ * @fileOverview Exam Vertical Registry v11.2.
+ * FIXED: Removed 'uppercase' from exam names in the table view.
  */
 
 export default function ExamRegistryPage() {
@@ -128,7 +128,7 @@ export default function ExamRegistryPage() {
                            <GraduationCap className="h-6 w-6 text-slate-300" />
                         </div>
                         <div>
-                           <p className="font-black text-[#0F172A] text-xl uppercase tracking-tight leading-none">{e.name}</p>
+                           <p className="font-black text-[#0F172A] text-xl tracking-tight leading-none">{e.name}</p>
                            <code className="text-[9px] font-mono text-slate-400 mt-2 block uppercase tracking-widest">ID: {e.id}</code>
                         </div>
                       </div>

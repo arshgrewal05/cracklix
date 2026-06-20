@@ -18,7 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Paginated Question Bank Hub v37.3 (Production Hardened).
+ * @fileOverview Paginated Question Bank Hub v37.4 (Hardened).
+ * FIXED: Removed 'uppercase' from Exam vertical labels in the table view.
  */
 
 type QuestionFilterType = 'ALL' | 'UNUSED' | 'USED' | 'LOCKED' | 'DUPLICATE' | 'REPEATED';
@@ -190,7 +191,7 @@ function QuestionBankContent() {
                     <TableCell>
                        <div className="space-y-2">
                           <div className="flex items-center gap-2.5"><Landmark className="h-4 w-4 text-slate-400" /><span className="text-[10px] md:text-xs font-black text-slate-600 uppercase tracking-tight">{boards?.find((b:any) => b.id === q.boardId)?.abbreviation || 'PSSSB'}</span></div>
-                          <div className="flex items-center gap-2.5"><GraduationCap className="h-4 w-4 text-slate-400" /><span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase truncate max-w-[160px]">{exams?.find((e:any) => e.id === q.examId)?.name || 'GENERAL VERTICAL'}</span></div>
+                          <div className="flex items-center gap-2.5"><GraduationCap className="h-4 w-4 text-slate-400" /><span className="text-[10px] md:text-xs font-bold text-slate-400 truncate max-w-[160px]">{exams?.find((e:any) => e.id === q.examId)?.name || 'GENERAL VERTICAL'}</span></div>
                        </div>
                     </TableCell>
                     <TableCell><LifecycleBadge status={q.status || 'UNUSED'} /></TableCell>

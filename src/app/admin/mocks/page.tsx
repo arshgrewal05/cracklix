@@ -43,8 +43,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Mock Management Hub v16.0.
- * Layout refactor: Removed redundant horizontal padding.
+ * @fileOverview Institutional Mock Management Hub v16.1.
+ * FIXED: Removed 'uppercase' from mock series titles.
  */
 
 export default function MockManagement() {
@@ -175,7 +175,7 @@ export default function MockManagement() {
                     return (
                       <TableRow key={mock.id} className="hover:bg-slate-50 border-slate-50 transition-colors group">
                         <TableCell className="px-10 py-8">
-                          <p className="font-black text-[#0F172A] text-lg uppercase leading-none">{mock.title}</p>
+                          <p className="font-black text-[#0F172A] text-lg leading-none">{mock.title}</p>
                           <div className="flex items-center gap-3 mt-2">
                              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{mock.totalQuestions} Questions • {mock.duration}m</p>
                              {mock.boardIds?.length > 1 && <Badge className="bg-blue-50 text-blue-600 border-none text-[7px] font-black uppercase">Multi-Board</Badge>}

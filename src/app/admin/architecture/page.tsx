@@ -23,8 +23,8 @@ import { cn } from "@/lib/utils"
 import type { Category, Board, Exam } from "@/types"
 
 /**
- * @fileOverview Punjab Registry Architect v15.7.
- * FIXED: Explicitly typed callbacks and implemented locally extended interfaces for nested property access.
+ * @fileOverview Punjab Registry Architect v15.8.
+ * FIXED: Removed 'uppercase' from exam names in the architecture tree.
  */
 
 interface ExtendedBoard extends Board {
@@ -111,7 +111,7 @@ export default function ArchitectureManager() {
                                  <div className="space-y-2">
                                     {[...hub.exams].sort((a: Exam, b: Exam) => (a.displayOrder || 0) - (b.displayOrder || 0)).map((exam: Exam) => (
                                        <div key={exam.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 shadow-sm group hover:border-primary/20 transition-all">
-                                          <span className="text-[10px] font-bold text-slate-500 uppercase truncate pr-2">{exam.name}</span>
+                                          <span className="text-[10px] font-bold text-slate-500 truncate pr-2">{exam.name}</span>
                                           <div className="flex gap-1.5 shrink-0">
                                              <Button asChild size="icon" variant="ghost" className="h-6 w-6 rounded-lg hover:bg-primary/10">
                                                 <Link href={`/admin/architecture/linking/${exam.id}`} title="Link Content"><LinkIcon className="h-3 w-3 text-primary" /></Link>

@@ -20,7 +20,7 @@ import {
   Loader2, 
   CheckCircle2, 
   Landmark, 
-  Image as ImageIcon, 
+  ImageIcon, 
   Upload, 
   X, 
   ShieldCheck,
@@ -38,8 +38,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Master Registry Hub v17.8 (Build Fixed).
- * FIXED: Integrated missing 'cn' and 'Badge' components for responsive stability and strict typing.
+ * @fileOverview Master Registry Hub v17.9.
+ * FIXED: Removed 'uppercase' from Exam and Subject names while keeping Boards capitalized.
  */
 
 export default function MasterRegistryPage() {
@@ -235,7 +235,7 @@ export default function MasterRegistryPage() {
                                     <GraduationCap className="h-6 w-6" />
                                  </div>
                                  <div>
-                                    <p className="font-black text-[#0F172A] text-xl uppercase leading-none">{e.name}</p>
+                                    <p className="font-black text-[#0F172A] text-xl leading-none">{e.name}</p>
                                     <p className="text-[9px] font-bold text-slate-400 mt-2 uppercase">{e.boardId} Hub</p>
                                  </div>
                               </div>
@@ -265,7 +265,7 @@ export default function MasterRegistryPage() {
                                     <SearchCode className="h-6 w-6" />
                                  </div>
                                  <div>
-                                    <p className="font-black text-[#0F172A] text-xl uppercase leading-none">{s.name}</p>
+                                    <p className="font-black text-[#0F172A] text-xl leading-none">{s.name}</p>
                                     <div className="flex gap-2 mt-2">
                                        {s.aliases?.slice(0,3).map((a: string) => <span key={a} className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{a}</span>)}
                                     </div>
