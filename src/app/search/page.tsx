@@ -13,8 +13,9 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Global Search Center v5.0 (Hardened).
+ * @fileOverview Global Search Center v5.1 (Hardened).
  * FIXED: Explicit React import and type-safe icon cloning for stable production build.
+ * SIMPLIFIED: Replaced Registry/Node terms with Center/Item.
  */
 
 export default function SearchPage() {
@@ -48,7 +49,7 @@ function SearchContent() {
     const examMatches = (exams || []).filter((e: any) => 
       e.name?.toLowerCase().includes(term) || 
       e.boardId?.toLowerCase().includes(term)
-    ).map((e: any) => ({ title: e.name, type: "Exam Hub", href: `/exams/${e.id}`, icon: <ShieldCheck className="text-primary" /> }))
+    ).map((e: any) => ({ title: e.name, type: "Exam Center", href: `/exams/${e.id}`, icon: <ShieldCheck className="text-primary" /> }))
 
     const mockMatches = (mocks || []).filter((m: any) => 
       m.title?.toLowerCase().includes(term) || 
@@ -58,7 +59,7 @@ function SearchContent() {
     const notesMatches = (notes || []).filter((n: any) => 
        n.title?.toLowerCase().includes(term) || 
        n.subjectId?.toLowerCase().includes(term)
-    ).map((n: any) => ({ title: n.title, type: "Study PDF", href: `/notes`, icon: <FileText className="text-blue-500" /> }))
+    ).map((n: any) => ({ title: n.title, type: "Study Material", href: `/notes`, icon: <FileText className="text-blue-500" /> }))
 
     return [...examMatches, ...mockMatches, ...notesMatches]
   }, [query, exams, mocks, notes])
@@ -95,7 +96,7 @@ function SearchContent() {
               <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">RESULTS: {results.length}</h3>
-                    <Badge className="bg-primary/5 text-primary border-none text-[8px] font-black px-3 py-0.5 rounded-lg uppercase">Live Index</Badge>
+                    <Badge className="bg-primary/5 text-primary border-none text-[8px] font-black px-3 py-0.5 rounded-lg uppercase">Live Updates</Badge>
                  </div>
                  <div className="grid grid-cols-1 gap-3">
                     {results.length > 0 ? results.map((res, i) => (
@@ -118,7 +119,7 @@ function SearchContent() {
                     <div className="relative z-10 space-y-6">
                        <h4 className="font-black text-[9px] text-primary uppercase tracking-[0.3em]">Quick Search</h4>
                        <ul className="space-y-4">
-                          <TrendingItem text="PSSSB Patwari Hub" onSelect={setQuery} />
+                          <TrendingItem text="PSSSB Patwari Center" onSelect={setQuery} />
                           <TrendingItem text="Punjab Police SI Prep" onSelect={setQuery} />
                           <TrendingItem text="Mental Ability Tests" onSelect={setQuery} />
                           <TrendingItem text="Official Previous Papers" onSelect={setQuery} />
@@ -127,7 +128,7 @@ function SearchContent() {
                  </Card>
                  <Card className="border-none shadow-xl rounded-[2rem] p-8 bg-white group overflow-hidden border border-slate-100">
                     <div className="relative z-10 space-y-6">
-                       <h4 className="font-black text-[9px] text-slate-400 uppercase tracking-[0.3em]">Preparation Centers</h4>
+                       <h4 className="font-black text-[9px] text-slate-400 uppercase tracking-[0.3em]">Study Materials</h4>
                        <div className="flex flex-wrap gap-2">
                           <SearchBadge label="Army Hub" />
                           <SearchBadge label="Teaching" />

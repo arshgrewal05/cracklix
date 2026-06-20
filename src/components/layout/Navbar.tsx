@@ -13,7 +13,8 @@ import {
   ArrowRight,
   Settings,
   HelpCircle,
-  CreditCard
+  CreditCard,
+  AlertCircle
 } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
@@ -40,6 +41,11 @@ import { Button } from "@/components/ui/button";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
+/**
+ * @fileOverview Professional Navigation Hub v55.0 (Language Simplified).
+ * FIXED: Added missing AlertCircle import.
+ * SIMPLIFIED: Replaced technical jargon with easy student terms.
+ */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
