@@ -25,7 +25,7 @@ import Link from "next/link"
 
 /**
  * @fileOverview High-Fidelity PWA Install Hub v1.3 (Build Fixed).
- * FIXED: Added missing CheckCircle2 import.
+ * FIXED: Added missing CheckCircle2 import and resolved syntax error.
  */
 
 export default function InstallPage() {
@@ -209,4 +209,5 @@ function BenefitRow({ icon, title, desc }: any) {
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{desc}</p>
          </div>
       </div>
+   );
 }
