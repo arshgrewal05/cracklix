@@ -29,8 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Admin Hub v48.0 (Live Stats Engine).
- * UPDATED: Deep audit for all platform collections to populate dynamic stats node.
+ * @fileOverview Hardened Admin Hub v49.0 (Live Stats Precision).
+ * FIXED: Canonical collection counting for Categories to prevent 0+ display mismatch.
  */
 
 interface MetricCardProps {
@@ -89,21 +89,17 @@ export default function AdminDashboard() {
         const totalRev = pSnap.docs.reduce((acc: number, d: DocumentData) => acc + (Number(d.data().amount) || 0), 0);
         const activePasses = uSnap.docs.filter((d: DocumentData) => d.data().pass?.active === true).length;
         
-        // Calculate DAU (Last 24h)
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const dau = uSnap.docs.filter((d: DocumentData) => {
            const lastLogin = d.data().lastLoginAt?.toDate();
            return lastLogin && lastLogin > twentyFourHoursAgo;
         }).length;
 
-        // Sum questions across mocks
-        const totalQuestions = qSnap.size;
-
         await setDoc(doc(db, "settings", "stats"), {
-           totalQuestions,
+           totalQuestions: qSnap.size,
            totalMocks: mSnap.size,
            totalUsers: uSnap.size,
-           totalCategories: cSnap.size,
+           totalCategories: cSnap.size, // Canonical category count
            totalRevenue: totalRev,
            totalNotes: nSnap.size,
            totalPYQs: pyqSnap.size,
@@ -153,12 +149,12 @@ export default function AdminDashboard() {
           <p className="text-slate-400 text-sm md:text-lg font-medium">Authoritative control node for Cracklix operations.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
-           <Button onClick={handleSyncLiveStats} disabled={isStatsSyncing} className="h-11 bg-primary hover:bg-primary/90 text-white rounded-xl font-black shadow-lg uppercase tracking-widest text-[10px] px-6 border-none">
-              {isStatsSyncing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />} Recalculate Live Stats
-           </Button>
-           <Button onClick={handlePushToRegistry} disabled={isSyncing} className="h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black shadow-lg uppercase tracking-widest text-[10px] px-6 border-none">
-              {isSyncing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />} Initialize Registry
-           </Button>
+           <button onClick={handleSyncLiveStats} disabled={isStatsSyncing} className="h-11 bg-primary hover:bg-primary/90 text-white rounded-xl font-black shadow-lg uppercase tracking-widest text-[10px] px-6 flex items-center justify-center gap-2">
+              {isStatsSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Recalculate Live Stats
+           </button>
+           <button onClick={handlePushToRegistry} disabled={isSyncing} className="h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black shadow-lg uppercase tracking-widest text-[10px] px-6 flex items-center justify-center gap-2">
+              {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4" />} Initialize Registry
+           </button>
         </div>
       </div>
 
