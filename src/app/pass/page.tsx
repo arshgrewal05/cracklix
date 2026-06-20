@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, Zap, ArrowRight, ShieldCheck, Gem, Loader2, Sparkles, Star, Lock, Gift, QrCode, Clock, Calendar } from "lucide-react"
+import { CheckCircle2, Zap, ArrowRight, ShieldCheck, Gem, Loader2, Sparkles, Star, Lock, Gift, QrCode, Clock, Calendar, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { useUser, useFirestore, useCollection, useDoc } from "@/firebase"
@@ -17,8 +17,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Elite PASS Hub v15.0 (Management Overhaul).
- * DESIGN: Integrated management card with live countdown for active subscribers.
+ * @fileOverview Elite PASS Hub v16.0 (Responsive Typography Fix).
+ * FIXED: Applied text-3xl sm:text-5xl lg:text-7xl with leading-[0.9].
  */
 
 export default function PassPage() {
@@ -84,7 +84,7 @@ export default function PassPage() {
       
       <main className="container mx-auto px-4 py-12 md:py-24 max-w-7xl relative z-10 text-center space-y-12 md:space-y-24">
         
-        {/* MANAGEMENT CARD - TESTBOOK STYLE */}
+        {/* MANAGEMENT CARD */}
         {mounted && profile?.passStatus && passStatus !== 'none' && (
            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
               <Card className="max-w-4xl mx-auto border-none bg-white rounded-[3rem] p-8 md:p-12 shadow-5xl text-left overflow-hidden relative">
@@ -131,10 +131,14 @@ export default function PassPage() {
            </motion.div>
         )}
 
-        <div id="plans" className="space-y-4 md:space-y-8">
+        <div id="plans" className="space-y-6 md:space-y-10">
            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <h1 className="text-3xl sm:text-5xl md:text-8xl font-black tracking-tight uppercase leading-[0.95] text-white">Elite <span className="text-[#2F6BFF]">Master Pass</span></h1>
-              <p className="text-sm md:text-2xl font-medium text-[#94A3B8] max-w-3xl mx-auto mt-6 md:mt-8 leading-relaxed">Unlock all premium mock tests, verified answer keys, and performance reports to secure your selection.</p>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9] text-white break-words">
+                 Elite <span className="text-[#2F6BFF]">Master Pass</span>
+              </h1>
+              <p className="text-sm md:text-2xl font-medium text-[#94A3B8] max-w-3xl mx-auto mt-6 md:mt-8 leading-relaxed">
+                 Unlock all premium mock tests, verified answer keys, and performance reports to secure your selection.
+              </p>
            </motion.div>
         </div>
 

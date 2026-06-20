@@ -38,8 +38,8 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Institutional Exam Hub v35.1 (Hardened Build).
- * FIXED: Integrated missing CardHeader/CardTitle imports and refactored icon rendering for type-safety.
+ * @fileOverview Institutional Exam Hub v36.0 (Responsive Overhaul).
+ * FIXED: Applied fluid typography text-3xl sm:text-5xl lg:text-7xl with shortTitle logic.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -157,14 +157,14 @@ export default function ExamHubPage() {
       <Navbar />
       
       <section className="bg-white border-b border-slate-100 py-6 md:py-16 text-left relative overflow-hidden">
-         <div className="absolute top-0 right-0 p-12 opacity-5"><GraduationCap className="h-48 w-48" /></div>
+         <div className="absolute top-0 right-0 p-12 opacity-[0.02]"><GraduationCap className="h-48 w-48" /></div>
          <div className="container mx-auto px-4 max-w-7xl relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
-               <div className="flex items-center gap-4 flex-1">
+               <div className="flex items-start gap-4 flex-1 min-w-0">
                   <button onClick={() => router.back()} className="h-10 w-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 shrink-0 hover:bg-slate-50">
                      <ChevronLeft className="h-5 w-5" />
                   </button>
-                  <div className="min-w-0 space-y-2">
+                  <div className="min-w-0 space-y-3">
                      <div className="flex items-center gap-3">
                         <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase px-2 py-0.5 rounded shadow-sm">
                            {activeBoard?.abbreviation || 'OFFICIAL'} HUB
@@ -181,9 +181,14 @@ export default function ExamHubPage() {
                            <span className="text-[8px] font-black uppercase tracking-widest">{isPinned ? 'PINNED' : 'PIN TO MY EXAMS'}</span>
                         </button>
                      </div>
-                     <h1 className="text-xl md:text-5xl font-black text-[#0F172A] uppercase leading-tight tracking-tight truncate">
-                        {exam.name}
-                     </h1>
+                     <div className="space-y-1">
+                        <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black text-[#0F172A] leading-[0.9] tracking-tight break-words antialiased">
+                           {activeBoard?.abbreviation || exam.name.split(' ')[0]}
+                        </h1>
+                        <p className="text-sm md:text-2xl font-bold text-slate-400 leading-tight tracking-tight">
+                           {exam.name}
+                        </p>
+                     </div>
                   </div>
                </div>
                
@@ -231,7 +236,7 @@ export default function ExamHubPage() {
                         <Skeleton className="h-40 w-full rounded-2xl" />
                      ) : groupedContent.CA.map((item: any) => (
                         <Link key={item.id} href="/current-affairs">
-                           <Card className="border-none shadow-lg rounded-2xl bg-white p-6 flex items-center justify-between group h-full">
+                           <Card className="border-none shadow-lg rounded-2xl bg-white p-6 flex items-center justify-between group h-full border border-slate-100">
                               <div className="flex items-center gap-6">
                                  <div className="h-12 w-12 rounded-xl bg-orange-50 flex items-center justify-center text-primary shrink-0 shadow-inner">
                                     <Newspaper className="h-6 w-6" />
@@ -318,7 +323,7 @@ function MockList({ data, results, isPassActive, user, loading, boards }: any) {
                   </div>
 
                   <CardHeader className="p-0 flex-1 space-y-6">
-                     <CardTitle className="font-extrabold text-[28px] text-[#04102B] leading-[1.1] tracking-tight line-clamp-2 min-h-[62px]">
+                     <CardTitle className="font-extrabold text-xl md:text-2xl text-[#04102B] leading-tight tracking-tight line-clamp-2 min-h-[62px]">
                         {mock.title}
                      </CardTitle>
 
@@ -395,18 +400,4 @@ function NotesList({ data, isPassActive, loading }: any) {
          ))}
       </div>
    )
-}
-
-function FeatureNode({ icon: Icon, title, desc }: { icon: LucideIcon, title: string, desc: string }) {
-  return (
-    <div className="p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] bg-slate-50 border border-slate-100 space-y-5 md:space-y-8 group hover:bg-white hover:shadow-4xl transition-all duration-500 text-left border-b-4 border-b-slate-100 hover:border-b-primary">
-      <div className="h-14 w-14 md:h-20 md:w-20 bg-white rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500">
-        <Icon className="h-6 w-6 md:h-10 md:w-10 text-primary" />
-      </div>
-      <div className="space-y-2 md:space-y-3">
-         <h3 className="text-lg md:text-2xl font-black text-[#0F172A] uppercase tracking-tight leading-none">{title}</h3>
-         <p className="text-slate-400 font-bold uppercase text-[10px] md:text-[12px] leading-relaxed tracking-widest">{desc}</p>
-      </div>
-    </div>
-  );
 }

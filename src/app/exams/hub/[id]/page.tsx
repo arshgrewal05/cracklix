@@ -16,8 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Hub Explorer v11.0.
- * OPTIMIZED: Added 'sizes' to logo nodes to resolve Next.js warnings.
+ * @fileOverview Institutional Hub Explorer v12.0 (Responsive Fix).
+ * FIXED: Applied text-3xl sm:text-5xl lg:text-7xl with shortTitle pattern.
  */
 
 export default function HubExamsPage() {
@@ -61,14 +61,14 @@ export default function HubExamsPage() {
     <div className="min-h-screen bg-slate-50/50 font-body text-left">
       <Navbar />
       
-      <section className="bg-white border-b border-slate-100 py-10 md:py-16 lg:py-20 overflow-hidden relative">
-         <div className="absolute top-0 right-0 p-12 opacity-[0.03]"><GraduationCap className="h-32 w-32 md:h-64 md:w-64" /></div>
+      <section className="bg-white border-b border-slate-100 py-10 md:py-20 overflow-hidden relative">
+         <div className="absolute top-0 right-0 p-12 opacity-[0.02]"><GraduationCap className="h-32 w-32 md:h-64 md:w-64" /></div>
          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
             <button onClick={() => router.back()} className="h-10 w-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black mb-6 md:mb-10 transition-all active:scale-90">
                <ChevronLeft className="h-5 w-5" />
             </button>
             
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 md:gap-10">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 md:gap-12">
                <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 rounded-2xl md:rounded-[2.5rem] bg-slate-50 border-2 md:border-4 border-white shadow-xl flex items-center justify-center overflow-hidden shrink-0 relative">
                   {hub?.iconUrl && !failedImages['hub'] ? (
                     <Image 
@@ -85,16 +85,21 @@ export default function HubExamsPage() {
                   )}
                </div>
                
-               <div className="space-y-3 md:space-y-4 text-center lg:text-left min-w-0">
+               <div className="space-y-4 md:space-y-6 text-center lg:text-left min-w-0">
                   <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
                      <Badge className="bg-primary text-white border-none font-black px-4 py-1 rounded-xl text-[9px] tracking-widest uppercase">
                        {hub?.abbreviation} EXAMS
                      </Badge>
                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">OFFICIAL VERTICALS</span>
                   </div>
-                  <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-[#0F172A] uppercase leading-[0.95] tracking-tight max-w-4xl break-words antialiased">
-                    {hub?.name}
-                  </h1>
+                  <div className="space-y-2">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-[#0F172A] leading-[0.9] tracking-tight break-words antialiased">
+                      {hub?.abbreviation || hub?.name?.split(' ')[0]}
+                    </h1>
+                    <p className="text-sm md:text-2xl font-bold text-slate-400 leading-tight tracking-tight">
+                       {hub?.name}
+                    </p>
+                  </div>
                </div>
             </div>
          </div>
@@ -135,7 +140,7 @@ export default function HubExamsPage() {
                           </div>
 
                           <div className="space-y-2 flex-1">
-                             <h3 className="text-xl md:text-2xl font-black text-[#0F172A] uppercase leading-tight group-hover:text-primary transition-colors line-clamp-2">{exam.name}</h3>
+                             <h3 className="text-xl md:text-2xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors line-clamp-2">{exam.name}</h3>
                              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{stats.full + stats.subject + stats.pyq + stats.sectional} PREPARATION NODES</p>
                           </div>
 

@@ -15,7 +15,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Category Explorer v11.0 (Typography Overhaul).
+ * @fileOverview Institutional Category Explorer v12.0 (Responsive Fix).
+ * FIXED: Applied responsive typography scale with leading-[0.9].
  */
 
 const ACRONYMS = ["PSSSB", "PPSC", "PUNJAB POLICE", "PSPCL", "PSTCL", "PSTET", "CTET", "MCQ", "MCQS", "PYQ", "PYQS", "GK", "CA"];
@@ -67,9 +68,10 @@ export default function CategoryHubsPage() {
     <div className="min-h-screen bg-slate-50/50 font-body">
       <Navbar />
       
-      <section className="bg-white border-b border-slate-100 py-8 md:py-16 text-left">
-         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <div className="flex items-center gap-6 mb-8">
+      <section className="bg-white border-b border-slate-100 py-10 md:py-20 text-left relative overflow-hidden">
+         <div className="absolute top-0 right-0 p-12 opacity-[0.02]"><Landmark className="h-48 w-48" /></div>
+         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+            <div className="flex items-center gap-6 mb-8 md:mb-12">
                <button onClick={() => router.back()} className="h-10 w-10 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black transition-all">
                   <ChevronLeft className="h-5 w-5" />
                </button>
@@ -82,9 +84,14 @@ export default function CategoryHubsPage() {
                   <span className="text-[10px] md:text-xs font-bold text-slate-500 tracking-tight">Registry Nodes</span>
                </div>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#0F172A] tracking-tight leading-[1.05] break-words antialiased">
-               {toTitleCase(meta.title)} <br/> <span className="text-primary">Exams</span>
-            </h1>
+            <div className="space-y-4">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-[#0F172A] leading-[0.9] tracking-tight break-words antialiased">
+                {toTitleCase(meta.title)}
+              </h1>
+              <p className="text-sm md:text-2xl font-bold text-slate-400 tracking-tight max-w-3xl">
+                Official recruitment centers for the {toTitleCase(meta.title)} category.
+              </p>
+            </div>
          </div>
       </section>
 
@@ -119,7 +126,7 @@ export default function CategoryHubsPage() {
                                    </div>
                                 )}
                              </div>
-                             <Badge variant="outline" className="text-[8px] font-bold text-slate-400 tracking-tight border-slate-100">OFFICIAL CENTER</Badge>
+                             <Badge variant="outline" className="text-[8px] font-bold text-slate-400 tracking-tight border-slate-100 uppercase">OFFICIAL CENTER</Badge>
                           </div>
                           
                           <div className="space-y-2 flex-1 min-w-0">

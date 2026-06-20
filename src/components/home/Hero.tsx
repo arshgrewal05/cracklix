@@ -21,8 +21,8 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Refined Dynamic Hero Hub v35.0 (Typography Overhaul).
- * TYPOGRAPHY: Responsive scale text-3xl to text-6xl. Title Case aesthetic.
+ * @fileOverview Refined Dynamic Hero Hub v36.0 (Responsive Fix).
+ * FIXED: Applied responsive leading-[0.9] and Title Case typography.
  */
 
 export default function Hero() {
@@ -83,7 +83,7 @@ export default function Hero() {
   if (!mounted) return null;
 
   return (
-    <section className="relative overflow-hidden bg-[#F8FAFC] py-12 md:py-24">
+    <section className="relative overflow-hidden bg-[#F8FAFC] py-10 md:py-24">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-full bg-blue-600/5 blur-[140px] rounded-full pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -103,8 +103,8 @@ export default function Hero() {
               </span>
             </motion.div>
 
-            <div className="space-y-4">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0F172A] leading-[1.05]">
+            <div className="space-y-4 md:space-y-6">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#0F172A] leading-[0.9] break-words">
                 Crack Punjab <br/>
                 <span className="text-[#2563EB]">Government Exams</span> <br/>
                 With Confidence
@@ -128,7 +128,7 @@ export default function Hero() {
                 src="/images/hero-student.png"
                 alt="Cracklix Student"
                 data-ai-hint="student studying"
-                className="w-full h-auto object-contain drop-shadow-2xl max-w-[300px] md:max-w-[480px] lg:max-w-[580px]"
+                className="w-full h-auto object-contain drop-shadow-2xl max-w-[280px] md:max-w-[480px] lg:max-w-[580px]"
               />
             </motion.div>
 
@@ -175,7 +175,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
             >
-              <Card className="p-6 md:p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl group hover:translate-y-[-4px] transition-all duration-300 text-left">
+              <Card className="p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] bg-white border border-slate-100 shadow-xl group hover:translate-y-[-4px] transition-all duration-300 text-left">
                 <div className="flex flex-col items-start gap-4">
                   <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 flex items-center justify-center shadow-inner group-hover:bg-blue-50 transition-colors">
                     {stat.icon}

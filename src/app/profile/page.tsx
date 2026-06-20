@@ -50,8 +50,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Profile Center v28.0 (Pass System Update).
- * DESIGN: Integrated pass status card with colored active/expired nodes.
+ * @fileOverview Student Profile Center v29.0 (Responsive Typography Fix).
+ * FIXED: Applied fluid typography text-3xl sm:text-5xl lg:text-7xl with leading-[0.9].
  */
 export default function ProfilePage() {
   const { user, profile, loading, profileLoading, currentDeviceId } = useUser()
@@ -172,17 +172,17 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-12 relative z-10">
                  <div className="relative group shrink-0">
                     {profileLoading ? (
-                      <Skeleton className="h-28 w-28 md:h-44 md:w-44 rounded-[2.5rem] md:rounded-[4rem] bg-white/5" />
+                      <Skeleton className="h-28 w-28 md:h-44 md:w-44 rounded-[2rem] md:rounded-[3rem] bg-white/5" />
                     ) : (
                       <div className="relative">
-                        <StudentAvatar profile={profile} className="h-28 w-28 md:h-44 md:w-44 border-[4px] border-white/10 rounded-[2.5rem] md:rounded-[4rem] shadow-5xl relative bg-[#0F172A]" />
+                        <StudentAvatar profile={profile} className="h-28 w-28 md:h-44 md:w-44 border-[4px] border-white/10 rounded-[2rem] md:rounded-[3rem] shadow-5xl relative bg-[#0F172A]" />
                         <div className="absolute -bottom-1 -right-1 bg-emerald-500 h-8 w-8 md:h-12 md:w-12 rounded-2xl border-[4px] border-[#0B1528] flex items-center justify-center shadow-xl">
                           <ShieldCheck className="h-4 w-4 md:h-6 md:w-6 text-white" />
                         </div>
                       </div>
                     )}
                  </div>
-                 <div className="flex-1 space-y-3 md:space-y-5 min-w-0 text-center md:text-left">
+                 <div className="flex-1 space-y-4 md:space-y-6 min-w-0 text-center md:text-left">
                     {profileLoading ? (
                       <div className="space-y-4">
                         <Skeleton className="h-10 md:h-16 w-3/4 bg-white/5 mx-auto md:mx-0 rounded-xl" />
@@ -191,8 +191,10 @@ export default function ProfilePage() {
                     ) : (
                       <>
                         <div className="flex flex-col md:flex-row items-center gap-3 md:gap-5">
-                          <h1 className="text-3xl md:text-6xl lg:text-7xl font-headline font-black text-white uppercase tracking-tight truncate max-w-full">{profile?.name}</h1>
-                          <Badge className={cn("border-none text-[9px] md:text-[12px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-2xl", profile?.status === 'Free' ? "bg-white/10 text-slate-300" : "bg-primary text-white")}>{profile?.status || 'Free'} Pass</Badge>
+                          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black text-white leading-[0.9] tracking-tight break-words truncate max-w-full">
+                             {profile?.name}
+                          </h1>
+                          <Badge className={cn("border-none text-[9px] md:text-[12px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-2xl shrink-0", profile?.status === 'Free' ? "bg-white/10 text-slate-300" : "bg-primary text-white")}>{profile?.status || 'Free'} Pass</Badge>
                         </div>
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 md:gap-x-10 gap-y-2">
                           <HeaderInfo icon={<Mail className="h-4 w-4 text-primary" />} text={profile?.email || ""} />
@@ -218,7 +220,7 @@ export default function ProfilePage() {
                           <div className="space-y-6">
                              <div className="space-y-1">
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">PASS STATUS</p>
-                                <h3 className="text-2xl md:text-4xl font-headline font-black uppercase" style={{ color: passInfo.color }}>{passInfo.label}</h3>
+                                <h3 className="text-2xl md:text-4xl font-headline font-black uppercase leading-[0.9] tracking-tight" style={{ color: passInfo.color }}>{passInfo.label}</h3>
                              </div>
                              <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-0.5">

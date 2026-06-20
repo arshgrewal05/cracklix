@@ -35,8 +35,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 /**
- * @fileOverview Official Current Affairs Center v13.1.
- * UPDATED: Steady Shell pattern - Navbar is always visible.
+ * @fileOverview Official Current Affairs Center v14.0 (Responsive Fix).
+ * FIXED: Applied text-3xl sm:text-5xl lg:text-7xl with leading-[0.9].
  */
 
 const HUB_TYPES = [
@@ -116,29 +116,31 @@ export default function CurrentAffairsCenter() {
                
                <div className="bg-[#0B1528] p-8 md:p-16 rounded-[2.5rem] md:rounded-[4rem] text-white relative overflow-hidden shadow-4xl group">
                   <div className="absolute top-0 right-0 p-12 opacity-5 rotate-12 group-hover:scale-110 transition-transform duration-1000"><Newspaper className="h-80 w-80" /></div>
-                  <div className="space-y-8 relative z-10 max-w-3xl">
-                  <div className="flex items-center gap-3">
-                     <Badge className="bg-primary text-white border-none px-4 py-1.5 rounded-full font-black uppercase text-[10px] tracking-[0.2em] shadow-xl">
-                        STUDY CENTER
-                     </Badge>
-                  </div>
-                  <h1 className="text-4xl md:text-8xl font-headline font-black tracking-tighter uppercase leading-[0.85]">
-                     PUNJAB <br/>
-                     <span className="text-primary">STUDY CENTER</span>
-                  </h1>
-                  <p className="text-slate-400 font-medium text-base md:text-xl max-w-2xl leading-relaxed">
-                     Daily, Weekly, and Monthly exam updates verified for all upcoming Punjab recruitment exams.
-                  </p>
-                  
-                  <div className="relative w-full md:w-[480px]">
-                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-500" />
-                     <Input 
-                        className="h-16 pl-16 rounded-[1.5rem] bg-white/10 border-white/10 text-white placeholder:text-slate-500 text-lg font-medium backdrop-blur-md shadow-2xl" 
-                        placeholder="Search updates..." 
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                     />
-                  </div>
+                  <div className="space-y-10 relative z-10 max-w-4xl">
+                    <div className="flex items-center gap-3">
+                        <Badge className="bg-primary text-white border-none px-4 py-1.5 rounded-full font-black uppercase text-[10px] tracking-[0.2em] shadow-xl">
+                            STUDY CENTER
+                        </Badge>
+                    </div>
+                    <div className="space-y-4">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] break-words uppercase">
+                            Punjab <br/>
+                            <span className="text-primary">Study Center</span>
+                        </h1>
+                        <p className="text-slate-400 font-medium text-base md:text-2xl max-w-2xl leading-relaxed">
+                            Daily, Weekly, and Monthly exam updates verified for all upcoming Punjab recruitment exams.
+                        </p>
+                    </div>
+                    
+                    <div className="relative w-full md:w-[480px]">
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-500" />
+                        <Input 
+                            className="h-16 pl-16 rounded-[1.5rem] bg-white/10 border-white/10 text-white placeholder:text-slate-500 text-lg font-medium backdrop-blur-md shadow-2xl" 
+                            placeholder="Search updates..." 
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                   </div>
                </div>
 
@@ -158,8 +160,8 @@ export default function CurrentAffairsCenter() {
                         ) : filteredItems.length > 0 ? (
                            <div className="grid grid-cols-1 gap-6">
                               {filteredItems.map((item) => (
-                                 <Card key={item.id} className="bg-white border-none shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] overflow-hidden group text-left">
-                                    <CardContent className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
+                                 <Card key={item.id} className="bg-white border-none shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] overflow-hidden group text-left border border-slate-100 p-8 md:p-10">
+                                    <CardContent className="p-0 flex flex-col md:flex-row items-center gap-8">
                                        <div className={cn(
                                           "h-16 w-16 md:h-20 md:w-20 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform",
                                           item.type === 'DAILY' ? 'bg-orange-50 text-primary' : 
@@ -176,7 +178,7 @@ export default function CurrentAffairsCenter() {
                                                 <Calendar className="h-3 w-3 text-primary" /> {item.month} {item.year}
                                              </span>
                                           </div>
-                                          <h2 className="text-xl md:text-2xl font-headline font-black text-[#0F172A] group-hover:text-primary transition-colors uppercase leading-tight">{item.title}</h2>
+                                          <h2 className="text-xl md:text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors uppercase leading-tight">{item.title}</h2>
                                           <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                                              <Globe className="h-3 w-3" /> Language: {item.language || "Bilingual"}
                                           </div>
@@ -208,7 +210,7 @@ export default function CurrentAffairsCenter() {
                      </div>
 
                      <div className="lg:col-span-4 space-y-12">
-                        <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden">
+                        <Card className="border-none shadow-3xl rounded-[3rem] bg-white overflow-hidden border border-slate-100">
                            <div className="bg-[#0F172A] p-8 text-white">
                               <div className="flex items-center gap-4 mb-2">
                                  <Medal className="h-6 w-6 text-primary" />
@@ -240,20 +242,6 @@ export default function CurrentAffairsCenter() {
                                  </Button>
                               </div>
                            </CardContent>
-                        </Card>
-
-                        <Card className="border-none bg-primary text-white shadow-4xl rounded-[3rem] p-10 space-y-8 relative overflow-hidden group cursor-pointer text-left">
-                           <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"><MessageCircle className="h-40 w-40" /></div>
-                           <div className="relative z-10 space-y-6">
-                              <div className="h-14 w-14 bg-white rounded-2xl flex items-center justify-center text-primary shadow-2xl">
-                                 <MessageCircle className="h-8 w-8 fill-current" />
-                              </div>
-                              <h3 className="text-3xl font-headline font-black uppercase leading-tight">Join Official <br/> Telegram</h3>
-                              <p className="text-white/80 text-sm font-medium leading-relaxed">Direct recruitment updates verified by Arsh Grewal.</p>
-                              <Button asChild className="w-full h-14 bg-white text-black hover:bg-slate-100 font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-2xl border-none">
-                                 <a href="https://t.me/cracklixapp" target="_blank">Join Channel</a>
-                              </Button>
-                           </div>
                         </Card>
                      </div>
                   </div>
