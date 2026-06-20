@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -21,7 +22,7 @@ import {
   Send,
   Search
 } from "lucide-react"
-import { useCollection, useFirestore } from "@/firebase"
+import { useCollection, useFirestore, useUser } from "@/firebase"
 import { collection, query, orderBy, doc, updateDoc, serverTimestamp, deleteDoc } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
@@ -30,8 +31,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Support Ticket Management Console v2.2 (Build Fixed).
- * FIXED: Synchronized missing component imports for stable build.
+ * @fileOverview Institutional Support Ticket Management Console v3.0.
+ * HARDENED: Robust reply logic and real-time status management.
  */
 
 export default function AdminSupportManagement() {
@@ -68,7 +69,7 @@ export default function AdminSupportManagement() {
         status: "IN_PROGRESS",
         updatedAt: serverTimestamp()
       })
-      toast({ title: "Reply Transmitted", description: "Aspirant has been notified." })
+      toast({ title: "Reply Transmitted", description: "Student has been notified." })
       setReply("")
       setSelectedTicket(null)
     } finally {
@@ -79,11 +80,12 @@ export default function AdminSupportManagement() {
   const handleResolve = async (id: string) => {
      if (!db) return
      await updateDoc(doc(db, "support_tickets", id), { status: "RESOLVED", updatedAt: serverTimestamp() })
-     toast({ title: "Ticket Resolved" })
+     toast({ title: "Ticket Resolved", description: "Node marked as complete." })
   }
 
   const handleDelete = async (id: string) => {
-    if (!db || !confirm("Permanently purge this ticket?")) return
+    if (!db) return
+    if (!confirm("Permanently purge this ticket from the registry?")) return
     await deleteDoc(doc(db, "support_tickets", id))
     toast({ title: "Ticket Purged" })
   }
@@ -94,16 +96,16 @@ export default function AdminSupportManagement() {
         <div>
            <div className="flex items-center gap-3 mb-2">
               <ShieldCheck className="h-6 w-6 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Support Governance Console</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Support Governance Hub</span>
            </div>
-          <h1 className="text-5xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Support Tickets</h1>
-          <p className="text-slate-500 mt-2 text-lg font-medium">Monitoring {tickets?.length || 0} student issue nodes across the registry.</p>
+          <h1 className="text-5xl font-black font-headline text-[#0F172A] uppercase tracking-tight">Support Desk</h1>
+          <p className="text-slate-500 mt-2 text-lg font-medium">Monitoring {tickets?.length || 0} student issues across the platform.</p>
         </div>
       </div>
 
       <div className="mx-4 relative group max-w-2xl">
          <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
-         <Input className="h-16 pl-16 rounded-[1.5rem] bg-white border-none shadow-2xl text-lg font-medium text-[#0F172A]" placeholder="Search student or subject..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+         <Input className="h-16 pl-16 rounded-[1.5rem] bg-white border-none shadow-2xl text-lg font-medium text-[#0F172A]" placeholder="Search student name or subject..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
       </div>
 
       <Card className="border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden mx-4">
@@ -111,10 +113,10 @@ export default function AdminSupportManagement() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-slate-50 h-20">
-                <TableHead className="px-12 text-[10px] font-black uppercase text-slate-500">Aspirant Hub</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500">Issue Context</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500">Status</TableHead>
-                <TableHead className="text-right px-12 text-[10px] font-black uppercase text-slate-500">Audit Control</TableHead>
+                <TableHead className="px-12 text-[10px] font-black uppercase text-slate-500">Student Hub</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500">Issue Details</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500">Current Status</TableHead>
+                <TableHead className="text-right px-12 text-[10px] font-black uppercase text-slate-500">Governance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -122,7 +124,7 @@ export default function AdminSupportManagement() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}><TableCell colSpan={4} className="p-10"><Skeleton className="h-16 w-full rounded-2xl" /></TableCell></TableRow>
                 ))
-              ) : filteredTickets.map((ticket: any) => (
+              ) : filteredTickets.length > 0 ? filteredTickets.map((ticket: any) => (
                 <TableRow key={ticket.id} className="hover:bg-slate-50 border-slate-50 transition-all group">
                   <TableCell className="px-12 py-10">
                      <div className="flex items-center gap-6">
@@ -165,7 +167,13 @@ export default function AdminSupportManagement() {
                      </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                   <TableCell colSpan={4} className="h-40 text-center opacity-30 italic font-black uppercase text-xs">
+                      No tickets in queue.
+                   </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -178,21 +186,21 @@ export default function AdminSupportManagement() {
                <DialogTitle className="text-2xl font-black font-headline uppercase flex items-center gap-4">
                   Audit Ticket Node
                </DialogTitle>
-               <DialogDescription className="text-slate-400 font-medium text-sm">Issue reported by {selectedTicket?.userName}.</DialogDescription>
+               <DialogDescription className="text-slate-400 font-medium text-sm">Reviewing issue from {selectedTicket?.userName}.</DialogDescription>
             </DialogHeader>
 
             <div className="p-10 pt-4 space-y-8 overflow-y-auto">
                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
                   <div className="flex items-center gap-3">
                      <AlertCircle className="h-4 w-4 text-slate-400" />
-                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Aspirant Statement</p>
+                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Student Statement</p>
                   </div>
                   <p className="text-lg font-medium text-slate-700 leading-relaxed italic">"{selectedTicket?.message}"</p>
                </div>
 
                <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Admin Resolution Node (Reply)</Label>
-                  <Textarea value={reply} onChange={e => setReply(e.target.value)} className="min-h-[150px] rounded-2xl bg-white border-slate-200 p-5 font-medium leading-relaxed" placeholder="Type resolution message..." />
+                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Admin Response (Visible to Student)</Label>
+                  <Textarea value={reply} onChange={e => setReply(e.target.value)} className="min-h-[150px] rounded-2xl bg-white border-slate-200 p-5 font-medium leading-relaxed" placeholder="Type your resolution message..." />
                </div>
             </div>
 
