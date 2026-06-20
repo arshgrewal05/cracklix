@@ -190,7 +190,7 @@ function LoginContent() {
         {sessionTerminated && (
           <div className="bg-amber-50 border border-amber-100 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 animate-in slide-in-from-top-6 duration-700 shadow-sm">
             <ShieldAlert className="h-6 w-6 text-amber-600 shrink-0" />
-            <p className="text-xs md:text-sm font-bold text-amber-700 tracking-tight leading-snug text-left">
+            <p className="text-xs md:sm font-bold text-amber-700 tracking-tight leading-snug text-left">
               Your session ended because this account was signed in on another device.
             </p>
           </div>
