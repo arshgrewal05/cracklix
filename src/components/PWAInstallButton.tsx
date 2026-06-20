@@ -13,8 +13,8 @@ interface PWAInstallButtonProps {
 }
 
 /**
- * @fileOverview Production PWA Trigger Node v9.0.
- * LOGIC: Reactive to native prompt availability and standalone status.
+ * @fileOverview Production PWA Trigger Node v10.0 (Event Capture Fixed).
+ * LOGIC: Directly captures beforeinstallprompt and syncs with global state.
  */
 export default function PWAInstallButton({ 
   className, 
@@ -36,18 +36,32 @@ export default function PWAInstallButton({
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(ios);
 
-    // Show if native prompt is available OR if it's iOS (manual instruction)
-    setCanInstall(!!(window as any).deferredPrompt || ios);
+    // If it's not installed, and we either have a prompt or it's iOS
+    const hasPrompt = !!(window as any).deferredPrompt;
+    setCanInstall(!isStandalone && (hasPrompt || ios));
   };
 
   useEffect(() => {
     setMounted(true);
-    updateState();
 
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      // Store the event globally
+      (window as any).deferredPrompt = e;
+      setCanInstall(true);
+      // Notify other buttons
+      window.dispatchEvent(new CustomEvent('pwa-installable'));
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('pwa-installable', updateState);
     window.addEventListener('appinstalled', updateState);
     
+    // Initial check
+    updateState();
+
     return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('pwa-installable', updateState);
       window.removeEventListener('appinstalled', updateState);
     };
@@ -93,7 +107,7 @@ export default function PWAInstallButton({
       onClick={handleInstall}
       className={cn(
         "font-black uppercase text-[10px] tracking-widest gap-2 shadow-xl transition-all active:scale-95",
-        variant === 'primary' ? "bg-primary hover:bg-orange-600 text-white" : 
+        variant === 'primary' ? "bg-primary hover:bg-blue-700 text-white" : 
         variant === 'dark' ? "bg-[#0B1528] hover:bg-black text-white" : "",
         className
       )}
