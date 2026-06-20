@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useMemo, useState, useEffect } from "react"
@@ -28,8 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Admin Hub v47.1 (TS Build Fix).
- * FIXED: Added null guards for pendingNodes array to resolve build errors.
+ * @fileOverview Hardened Admin Hub v47.2 (Deep Sync Enabled).
+ * UPDATED: handleSyncLiveStats now audits Notes and PYQs for the Hero registry.
  */
 
 interface MetricCardProps {
@@ -64,7 +65,7 @@ export default function AdminDashboard() {
   const recentResultsQuery = useMemo(() => (db ? query(collection(db, "results"), orderBy("timestamp", "desc"), limit(5)) : null), [db]);
   const { data: recentResults } = useCollection<any>(recentResultsQuery);
 
-  const pendingReqQuery = useMemo(() => (db ? query(collection(db, "payment_requests"), where("status", "==", "PENDING"), limit(1)) : null), [db]);
+  const pendingReqQuery = useMemo(() => (db ? query(collection(db, "payment_requests"), where("status", "==", "PENDING"), limit(10)) : null), [db]);
   const { data: pendingNodes } = useCollection<any>(pendingReqQuery);
 
   const handleSyncLiveStats = async () => {
@@ -72,13 +73,15 @@ export default function AdminDashboard() {
      setIsStatsSyncing(true);
      try {
         console.time("admin-heavy-sync");
-        const [qSnap, mSnap, uSnap, rSnap, eSnap, pSnap] = await Promise.all([
+        const [qSnap, mSnap, uSnap, rSnap, eSnap, pSnap, nSnap, pyqSnap] = await Promise.all([
            getDocs(collection(db, "questions")),
            getDocs(collection(db, "mocks")),
            getDocs(collection(db, "users")),
            getDocs(collection(db, "results")),
            getDocs(collection(db, "exams")),
-           getDocs(query(collection(db, "payment_requests"), where("status", "==", "APPROVED")))
+           getDocs(query(collection(db, "payment_requests"), where("status", "==", "APPROVED"))),
+           getDocs(collection(db, "notes")),
+           getDocs(collection(db, "pyqs"))
         ]);
 
         const totalResults = rSnap.docs.length;
@@ -95,6 +98,8 @@ export default function AdminDashboard() {
            totalUsers: uSnap.size,
            totalBoards: eSnap.size, 
            totalRevenue: totalRev,
+           totalNotes: nSnap.size,
+           totalPYQs: pyqSnap.size,
            activePasses: activePasses,
            averageAccuracy: avgAcc,
            updatedAt: serverTimestamp()
