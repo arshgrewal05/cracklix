@@ -1,7 +1,6 @@
-
 "use client"
 
-import React, { useState, Suspense, useEffect, useMemo } from "react"
+import React, { useState, Suspense, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,11 +18,10 @@ import {
   Zap, 
   RefreshCw, 
   ClipboardList,
-  Languages,
   Users,
   FileText
 } from "lucide-react"
-import { useAuth, useFirestore, useUser, useDoc } from "@/firebase"
+import { useAuth, useFirestore, useUser } from "@/firebase"
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -37,20 +35,13 @@ import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { motion } from "framer-motion"
 import { Checkbox } from "@/components/ui/checkbox"
-import { cn } from "@/lib/utils"
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Cracklix Premium Login Hub v68.0.
- * FIXED: Resolved ReferenceError for Users icon.
+ * @fileOverview Cracklix Premium Login Hub v69.0.
+ * RESTORED: High-authority hardcoded data strings.
  */
-
-const formatCompact = (num: number) => {
-  if (!num) return "0";
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toString();
-};
 
 export default function LoginPage() {
   return (
@@ -79,9 +70,6 @@ function LoginContent() {
   const db = useFirestore()
   const { toast } = useToast()
 
-  const statsRef = useMemo(() => (db ? doc(db, "settings", "stats") : null), [db]);
-  const { data: stats, loading: statsLoading } = useDoc<any>(statsRef);
-
   const returnUrl = searchParams.get("returnUrl") || "/dashboard"
 
   useEffect(() => {
@@ -101,7 +89,18 @@ function LoginContent() {
     try {
       if (mode === 'login') {
         await signInWithEmailAndPassword(auth, email, password)
-        toast({ title: "Welcome Back" })
+        const sessionId = crypto.randomUUID();
+        localStorage.setItem('cracklix_session_id', sessionId);
+        
+        // Parallelized session write for speed
+        const userRef = doc(db!, 'users', auth.currentUser!.uid);
+        updateDoc(userRef, { 
+          activeDeviceId: sessionId, 
+          sessionVersion: increment(1), 
+          lastLoginAt: serverTimestamp(), 
+          updatedAt: serverTimestamp() 
+        }).catch(() => {});
+
         router.replace(returnUrl)
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password)
@@ -153,7 +152,6 @@ function LoginContent() {
         await updateDoc(userRef, { activeDeviceId: sessionId, sessionVersion: increment(1), lastLoginAt: serverTimestamp(), updatedAt: serverTimestamp() });
       }
       
-      toast({ title: "Welcome" })
       router.replace(returnUrl)
     } catch (error: any) {
       toast({ variant: "destructive", title: "Error", description: error.message })
@@ -181,7 +179,7 @@ function LoginContent() {
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row text-[#0F172A] font-body selection:bg-primary/20 overflow-x-hidden">
       
-      {/* LEFT PANEL: BRANDING */}
+      {/* LEFT PANEL: BRANDING (TOP ALIGNED) */}
       <div className="hidden lg:flex flex-[1.1] bg-gradient-to-br from-[#020B2D] via-[#071B4D] to-[#0A2D7A] text-white p-12 xl:p-20 flex-col justify-start relative overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
 
@@ -203,15 +201,15 @@ function LoginContent() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="grid grid-cols-2 gap-6 pt-6">
-            <HeroStat icon={ClipboardList} label={`${statsLoading ? '...' : formatCompact(stats?.totalMocks)} Mock Tests`} />
-            <HeroStat icon={FileText} label={`${statsLoading ? '...' : formatCompact(stats?.totalNotes)} Study Materials`} />
-            <HeroStat icon={Users} label={`${statsLoading ? '...' : formatCompact(stats?.totalUsers)} Registered Users`} />
-            <HeroStat icon={ShieldCheck} label="Official Patterns" />
+            <HeroStat icon={ClipboardList} label="500+ MOCK TESTS" />
+            <HeroStat icon={Zap} label="50,000+ QUESTIONS" />
+            <HeroStat icon={Users} label="15,000+ ASPIRANTS" />
+            <HeroStat icon={ShieldCheck} label="REAL EXAM PATTERN" />
           </motion.div>
         </div>
       </div>
 
-      {/* RIGHT PANEL: AUTH */}
+      {/* RIGHT PANEL: AUTH (TOP ALIGNED) */}
       <div className="flex-1 flex flex-col items-center justify-start p-6 md:p-12 lg:p-20 relative bg-slate-50 lg:bg-white overflow-y-auto">
         <div className="lg:hidden mb-12">
           <Logo variant="light" align="center" imgClassName="h-[80px]" />

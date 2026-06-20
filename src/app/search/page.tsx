@@ -1,10 +1,9 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect, Suspense, cloneElement, isValidElement } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Search as SearchIcon, Zap, BookOpen, Newspaper, Bell, ChevronRight, Sparkles, ShieldCheck, FileText, LayoutGrid, Loader2 } from "lucide-react"
+import { Search as SearchIcon, Zap, ChevronRight, Sparkles, ShieldCheck, FileText, LayoutGrid, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
@@ -14,8 +13,8 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Search Center Hub v2.3 (TypeScript Hardened).
- * FIXED: cloneElement type casting and logic guard.
+ * @fileOverview Search Center Hub v2.4 (Build Fixed).
+ * FIXED: Resolved 'React' UMD global error by using direct cloneElement and any cast.
  */
 
 export default function SearchPage() {
@@ -153,7 +152,7 @@ function SearchResultItem({ icon, title, category, href }: { icon: React.ReactNo
             <div className="flex items-center gap-4 min-w-0 flex-1">
                <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/5 transition-all shrink-0 shadow-inner">
                   {isValidElement(icon) 
-                    ? cloneElement(icon as React.ReactElement<any>, { className: "h-5 w-5" }) 
+                    ? cloneElement(icon as any, { className: "h-5 w-5" }) 
                     : icon}
                </div>
                <div className="text-left min-w-0 flex-1 space-y-1">
