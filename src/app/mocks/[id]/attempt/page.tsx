@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
@@ -26,8 +27,8 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened CBT Engine v58.5.
- * HARDENED: Strict Pass Expiry validation at test initialization.
+ * @fileOverview Hardened CBT Engine v60.0.
+ * FIXED: Optimized layout for full viewport utilization with sticky headers and scrollable content.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -70,7 +71,6 @@ export default function MockAttemptPage() {
         const mData = mockSnap.data();
         setMockData(mData);
 
-        // --- STRICT EXPIRY AUDIT ---
         const tier = (mData.accessLevel || 'FREE').toUpperCase();
         const userEmail = user.email?.toLowerCase();
         const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || (userEmail && SUPER_ADMIN_WHITELIST.includes(userEmail));
@@ -197,11 +197,12 @@ export default function MockAttemptPage() {
   );
 
   return (
-    <div className="flex flex-col h-full bg-white font-body select-none overflow-hidden relative touch-pan-y">
+    <div className="flex flex-col h-screen bg-white font-body select-none overflow-hidden relative touch-pan-y">
       <AntiCheat />
+      
       <ExamHeader onPaletteToggle={() => setIsPaletteOpen(true)} onExitRequest={() => setShowExitModal(true)} />
       
-      <main className="flex-1 flex flex-col overflow-hidden bg-slate-50/50">
+      <main className="flex-1 flex flex-col min-h-0 bg-slate-50/50">
         <AnimatePresence>
           {isPaused && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[110] bg-[#0B1528]/95 backdrop-blur-xl flex items-center justify-center p-6">
@@ -216,18 +217,25 @@ export default function MockAttemptPage() {
           )}
         </AnimatePresence>
         
-        <div className="flex-1 flex flex-col overflow-hidden relative">
+        <div className="flex-1 flex flex-col min-h-0 relative">
           <SubjectTabs />
+          
           <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center px-4 pt-4 pb-32">
-            <div className="w-full max-w-4xl space-y-4">
+            <div className="w-full max-w-4xl">
               {questions[currentIdx] ? (
-                <motion.div key={currentIdx} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                <motion.div 
+                  key={currentIdx} 
+                  initial={{ opacity: 0, y: 5 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  transition={{ duration: 0.2 }}
+                  className="w-full"
+                >
                   <QuestionRenderer 
                     language={language} 
                     question={{...questions[currentIdx], displayId: (currentIdx + 1).toString()}} 
                     selectedAnswer={answers?.[currentIdx] ?? null} 
                     onSelect={(idx: number) => setAnswer(currentIdx, idx, db)} 
-                    className="shadow-md border-none p-4 md:p-10 rounded-xl md:rounded-[3rem]" 
+                    className="shadow-md border-none p-4 md:p-8 lg:p-10 rounded-2xl md:rounded-[3rem]" 
                   />
                 </motion.div>
               ) : (
@@ -239,7 +247,7 @@ export default function MockAttemptPage() {
             </div>
           </div>
           
-          <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
              <div className="max-w-4xl mx-auto pointer-events-auto">
                 <TacticalFooter onSubmit={() => setShowSubmitModal(true)} />
              </div>
