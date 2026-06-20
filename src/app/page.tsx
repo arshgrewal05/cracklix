@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
+import StatsBar from "@/components/home/StatsBar";
 import GlobalSearch from "@/components/home/GlobalSearch";
 import FeaturedCategories from "@/components/home/FeaturedCategories";
 import PopularExams from "@/components/home/PopularExams";
@@ -13,8 +14,8 @@ import MeetFounder from "@/components/home/MeetFounder";
 import Footer from "@/components/layout/Footer";
 
 /**
- * @fileOverview Official Home Hub v180.0.
- * REORDERED: Sequence updated for professional discovery flow.
+ * @fileOverview Official Home Hub v181.0.
+ * RESTORED: Original Hero and separate StatsBar architecture.
  */
 
 export default function HomePage() {
@@ -22,36 +23,39 @@ export default function HomePage() {
     <main className="min-h-screen bg-white font-body pb-safe text-left">
       <Navbar />
       
-      {/* 1. Hero Section & Real-time Stats */}
+      {/* 1. Original Hero Section */}
       <Hero />
+
+      {/* 1.2 Independent Trust Stats Bar */}
+      <StatsBar />
 
       {/* 1.5 Global Search Engine */}
       <div className="relative z-40 py-8 md:py-12 bg-white">
         <GlobalSearch />
       </div>
 
-      {/* 2. Exam Categories (Direct discovery below search) */}
+      {/* 2. Exam Categories */}
       <FeaturedCategories />
 
-      {/* 3. Popular Exams (Authority centers) */}
+      {/* 3. Popular Exams */}
       <PopularExams />
 
-      {/* 4. Latest Mock Tests (Recent practicing nodes) */}
+      {/* 4. Latest Mock Tests */}
       <LatestMocks />
 
-      {/* 5. Personal Hub (Resume Practice) */}
+      {/* 5. Personal Hub */}
       <ContinueLearning />
 
-      {/* 6. Knowledge Hub (Current Affairs) */}
+      {/* 6. Knowledge Hub */}
       <CurrentAffairsPreview />
 
-      {/* 7. Competitive Index (Merit List) */}
+      {/* 7. Competitive Index */}
       <MeritPreview />
 
       {/* 8. Mobile App Node */}
       <AppPreview />
 
-      {/* 9. Leadership Node (Founder) */}
+      {/* 9. Leadership Node */}
       <MeetFounder />
       
       <Footer />
