@@ -21,7 +21,7 @@ import { doc } from "firebase/firestore";
 
 /**
  * @fileOverview Official Restored Hero Hub.
- * Features: Feature Matrix, Split-Screen Layout, and Integrated Live Stats.
+ * Optimized: Hero image moved above feature cards in a unified visual column.
  */
 
 export default function Hero() {
@@ -81,55 +81,45 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
 
-          {/* LEFT: Content Hub */}
-          <div className="text-left">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm mb-6"
-            >
+          {/* LEFT: Text & Action Hub */}
+          <div className="text-left space-y-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm">
               <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
               <span className="text-sm font-semibold text-slate-700">
                 10,000+ Aspirants Trust Cracklix
               </span>
-            </motion.div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 leading-tight">
-              Crack Punjab
-              <span className="block text-blue-600">
-                Government Exams
-              </span>
-              With Confidence
-            </h1>
-
-            <p className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl">
-              Practice with bilingual mock tests, previous papers and
-              exam-focused preparation for PSSSB, Punjab Police,
-              PSTET, PSPCL and more.
-            </p>
-
-            <div className="flex flex-wrap gap-3 mt-6">
-              {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map(
-                (item) => (
-                  <span
-                    key={item}
-                    className="px-4 py-2 rounded-full bg-white border text-sm font-medium text-slate-700"
-                  >
-                    {item}
-                  </span>
-                )
-              )}
             </div>
 
-            {/* Feature Matrix */}
-            <div className="grid grid-cols-2 gap-4 mt-8">
-              <FeatureCard icon={<ClipboardList className="text-blue-600" />} label="Mock Tests" />
-              <FeatureCard icon={<BookOpen className="text-indigo-600" />} label="Study Material" />
-              <FeatureCard icon={<FileText className="text-emerald-600" />} label="Previous Papers" />
-              <FeatureCard icon={<BarChart3 className="text-orange-500" />} label="Performance Analytics" />
+            <div className="space-y-6">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 leading-tight">
+                Crack Punjab
+                <span className="block text-blue-600">
+                  Government Exams
+                </span>
+                With Confidence
+              </h1>
+
+              <p className="text-base sm:text-lg text-slate-600 max-w-xl">
+                Practice with bilingual mock tests, previous papers and
+                exam-focused preparation for PSSSB, Punjab Police,
+                PSTET, PSPCL and more.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map(
+                  (item) => (
+                    <span
+                      key={item}
+                      className="px-4 py-2 rounded-full bg-white border text-sm font-medium text-slate-700"
+                    >
+                      {item}
+                    </span>
+                  )
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 mt-8">
+            <div className="flex flex-wrap gap-4">
               <Button
                 asChild
                 className="h-12 md:h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 border-none text-white font-bold"
@@ -152,17 +142,50 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: Illustration */}
-          <div className="relative flex justify-center lg:justify-end">
-            <motion.img
+          {/* RIGHT: Visual & Features Hub */}
+          <div className="flex flex-col items-center">
+            {/* Hero Image positioned above feature matrix */}
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
-              src="/images/hero-student.png"
-              alt="Cracklix Student"
-              className="w-full max-w-md drop-shadow-2xl"
-            />
+              className="relative flex justify-center mb-10"
+            >
+              <img
+                src="/images/hero-student.png"
+                alt="Cracklix Student"
+                className="w-full max-w-md drop-shadow-2xl"
+              />
+            </motion.div>
+
+            {/* Feature Matrix Cards */}
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Card className="p-5 rounded-3xl border border-slate-100 bg-white hover:shadow-md transition-all duration-300">
+                <ClipboardList className="h-6 w-6 text-blue-600 mb-3" />
+                <p className="font-bold text-slate-900 text-sm">Mock Tests</p>
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">500+ Series</p>
+              </Card>
+
+              <Card className="p-5 rounded-3xl border border-slate-100 bg-white hover:shadow-md transition-all duration-300">
+                <BookOpen className="h-6 w-6 text-indigo-600 mb-3" />
+                <p className="font-bold text-slate-900 text-sm">Study Material</p>
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">Verified Notes</p>
+              </Card>
+
+              <Card className="p-5 rounded-3xl border border-slate-100 bg-white hover:shadow-md transition-all duration-300">
+                <FileText className="h-6 w-6 text-emerald-600 mb-3" />
+                <p className="font-bold text-slate-900 text-sm">Previous Papers</p>
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">Official PYQs</p>
+              </Card>
+
+              <Card className="p-5 rounded-3xl border border-slate-100 bg-white hover:shadow-md transition-all duration-300">
+                <BarChart3 className="h-6 w-6 text-orange-500 mb-3" />
+                <p className="font-bold text-slate-900 text-sm">Analytics</p>
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">State Merit</p>
+              </Card>
+            </div>
           </div>
+
         </div>
 
         {/* STATS: Bottom Grid */}
@@ -191,16 +214,5 @@ export default function Hero() {
 
       </div>
     </section>
-  );
-}
-
-function FeatureCard({ icon, label }: { icon: React.ReactNode, label: string }) {
-  return (
-    <Card className="p-4 rounded-3xl border border-slate-100 bg-white hover:bg-slate-50 transition-colors">
-      <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center mb-3">
-        {React.cloneElement(icon as React.ReactElement, { className: "h-6 w-6" })}
-      </div>
-      <p className="font-bold text-slate-900 text-sm">{label}</p>
-    </Card>
   );
 }
