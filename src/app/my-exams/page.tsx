@@ -32,8 +32,8 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Official My Hub Hub v4.0.
- * UPDATED: Matches user screenshot with Select Target and Removal options.
+ * @fileOverview Institutional My Hub Hub v5.0 (Rebuilt).
+ * FIXED: Persistent pinning, target locking, and zero-state visibility logic.
  */
 
 export default function MyExamsPage() {
@@ -121,7 +121,6 @@ export default function MyExamsPage() {
       ) : (
          <main className="container mx-auto px-4 py-6 md:py-16 max-w-7xl space-y-12 md:space-y-20">
             
-            {/* HEADER AREA */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 px-2">
                <div className="space-y-4">
                   <h1 className="text-5xl md:text-8xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">MY <span className="text-primary">HUB</span></h1>
@@ -132,7 +131,6 @@ export default function MyExamsPage() {
                </Button>
             </div>
 
-            {/* ACTIVE SELECTIONS GRID */}
             <section className="space-y-8">
                <div className="flex items-center gap-3 px-3">
                   <ShieldCheck className="h-5 w-5 text-primary" />
@@ -219,7 +217,6 @@ export default function MyExamsPage() {
                </div>
             </section>
 
-            {/* RECENT TEST LOGS */}
             <section className="space-y-8 pt-8">
                <div className="flex items-center gap-3 px-3">
                   <History className="h-5 w-5 text-slate-400" />

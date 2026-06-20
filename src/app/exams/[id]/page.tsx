@@ -39,8 +39,8 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Institutional Exam Hub v39.0 (Logo Hardened).
- * FIXED: Implemented Scale icon override for Court section to prevent Police logos from appearing.
+ * @fileOverview Institutional Exam Hub v40.0.
+ * FIXED: Rebuilt persistent pinning engine for My Hub integration.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -79,10 +79,10 @@ export default function ExamHubPage() {
     try {
       if (isPinned) {
         await updateDoc(userRef, { pinnedExams: arrayRemove(examId), updatedAt: serverTimestamp() });
-        toast({ title: "Unpinned", description: "Removed from My Exams." });
+        toast({ title: "Removed from Hub", description: "This vertical is no longer in your personal dashboard." });
       } else {
         await updateDoc(userRef, { pinnedExams: arrayUnion(examId), updatedAt: serverTimestamp() });
-        toast({ title: "Pinned!", description: "Added to your interest hub." });
+        toast({ title: "Pinned to Hub", description: "Successfully added to your personal dashboard." });
       }
     } catch (e) {
       toast({ variant: "destructive", title: "Action Failed" });
@@ -174,12 +174,12 @@ export default function ExamHubPage() {
                            onClick={togglePin} 
                            disabled={isPinning}
                            className={cn(
-                              "flex items-center gap-2 px-3 py-1 rounded-full border transition-all active:scale-90",
-                              isPinned ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-slate-200 text-slate-400 hover:border-primary/40 hover:text-primary"
+                              "flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all active:scale-90 shadow-sm font-black uppercase text-[9px] tracking-widest",
+                              isPinned ? "bg-primary border-primary text-white" : "bg-white border-slate-200 text-slate-400 hover:border-primary/40 hover:text-primary"
                            )}
                         >
-                           {isPinning ? <RefreshCw className="h-3 w-3 animate-spin" /> : <Star className={cn("h-3 w-3", isPinned && "fill-current")} />}
-                           <span className="text-[8px] font-black uppercase tracking-widest">{isPinned ? 'PINNED' : 'PIN TO MY EXAMS'}</span>
+                           {isPinning ? <RefreshCw className="h-3 w-3 animate-spin" /> : isPinned ? <CheckCircle2 className="h-3 w-3" /> : <Star className="h-3 w-3" />}
+                           {isPinned ? 'PINNED TO HUB' : 'PIN TO MY HUB'}
                         </button>
                      </div>
                      <div className="space-y-4">
