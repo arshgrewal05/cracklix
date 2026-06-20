@@ -42,7 +42,8 @@ import { Badge } from "@/components/ui/badge";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Header v110.0 (Elite Verification Badge).
+ * @fileOverview Institutional Header v111.0 (Elite Dropdown Hardening).
+ * FIXED: Added max-height and overflow-y-auto to fix the scroll issue in the profile hub.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -138,11 +139,12 @@ export default function Navbar() {
                 <DropdownMenuContent
                   align="end"
                   sideOffset={12}
-                  className="w-[92vw] max-w-[340px] sm:w-[320px] rounded-[28px] p-6 bg-white border border-[#EEF2F7] shadow-[0_12px_30px_rgba(15,23,42,0.08)] z-[2001]"
+                  className="w-[92vw] max-w-[340px] sm:w-[320px] max-h-[85vh] overflow-y-auto custom-scrollbar rounded-[28px] p-6 bg-white border border-[#EEF2F7] shadow-[0_12px_30px_rgba(15,23,42,0.08)] z-[2001]"
                 >
-                  <div className="flex flex-col items-center text-center space-y-6">
+                  <div className="flex flex-col items-center text-center space-y-5">
                     
-                    <div className="h-16 w-16 rounded-2xl bg-[#EEF4FF] flex items-center justify-center text-[#2563EB] shadow-sm border border-blue-50 relative">
+                    {/* AVATAR NODE */}
+                    <div className="h-16 w-16 rounded-2xl bg-[#EEF4FF] flex items-center justify-center text-[#2563EB] shadow-sm border border-blue-50 shrink-0 relative">
                        <User className="h-8 w-8" />
                        {emailVerified && (
                          <div className="absolute -top-1 -right-1 bg-emerald-500 h-5 w-5 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
@@ -151,29 +153,34 @@ export default function Navbar() {
                        )}
                     </div>
 
-                    <div className="space-y-1">
-                      <div className="flex flex-col items-center gap-2">
-                        <h3 className="text-xl md:text-2xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate w-full px-2">
-                          {profile?.name || "Aspirant"}
-                        </h3>
-                        {emailVerified ? (
-                          <Badge className="bg-emerald-50 text-emerald-700 border-none px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1">
-                             <CheckCircle2 className="h-3 w-3" /> Verified
-                          </Badge>
-                        ) : (
-                          <Link href="/verify-email" className="bg-rose-50 text-rose-700 px-3 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1 animate-pulse">
-                             <AlertCircle className="h-3 w-3" /> Unverified
-                          </Link>
-                        )}
-                      </div>
+                    {/* NAME & PROFILE LINK */}
+                    <div className="space-y-1 w-full">
+                      <h3 className="text-xl md:text-2xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate w-full px-2">
+                        {profile?.name || "Aspirant"}
+                      </h3>
                       <Link 
                         href="/profile" 
-                        className="text-[13px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] hover:text-primary transition-colors flex items-center justify-center gap-1 mt-4"
+                        className="text-[13px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] hover:text-primary transition-colors flex items-center justify-center gap-1"
                       >
                         View Profile <ChevronRight className="h-3.5 w-3.5" />
                       </Link>
                     </div>
 
+                    {/* VERIFICATION WARNING (IF NOT VERIFIED) */}
+                    {!emailVerified && (
+                       <Link 
+                        href="/verify-email" 
+                        className="w-full p-4 bg-rose-50 text-rose-700 rounded-2xl border border-rose-100 flex flex-col items-center gap-1 group animate-in fade-in zoom-in-95 duration-500"
+                       >
+                          <div className="flex items-center gap-2">
+                             <AlertCircle className="h-4 w-4" />
+                             <span className="text-[10px] font-black uppercase tracking-widest">Unverified Node</span>
+                          </div>
+                          <p className="text-[11px] font-bold underline underline-offset-4 group-hover:text-rose-900 transition-colors">Click to verify account</p>
+                       </Link>
+                    )}
+
+                    {/* PASS STATUS NODE */}
                     <div className="w-full p-4 bg-[#DBEAFE]/40 text-[#2563EB] rounded-2xl border border-blue-50/50 flex flex-col gap-1">
                        <div className="flex items-center justify-between">
                           <p className="text-[10px] font-black uppercase tracking-widest leading-none">
@@ -186,19 +193,21 @@ export default function Navbar() {
                        </p>
                     </div>
 
+                    {/* ADMIN ACTION NODE */}
                     {isAdmin && (
-                      <Button asChild className="w-full h-12 rounded-2xl text-sm font-black bg-[#0F172A] hover:bg-black text-white shadow-lg border-none transition-all active:scale-95">
+                      <Button asChild className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest bg-[#0F172A] hover:bg-black text-white shadow-lg border-none transition-all active:scale-95">
                          <Link href="/admin">
-                            <ShieldCheck className="h-5 w-5 mr-2 text-primary" />
-                            Admin Control Hub
+                            <ShieldCheck className="h-4 w-4 mr-2 text-primary" />
+                            Admin Center
                           </Link>
                       </Button>
                     )}
 
-                    <div className="w-full pt-2">
+                    {/* LOGOUT NODE */}
+                    <div className="w-full pt-1">
                        <Button
                           onClick={handleLogout}
-                          className="w-full h-12 justify-between px-6 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] font-black text-sm rounded-[14px] transition-all active:scale-95 border-none shadow-none group"
+                          className="w-full h-12 justify-between px-6 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] font-black text-[12px] uppercase tracking-widest rounded-xl transition-all active:scale-95 border-none shadow-none group"
                        >
                           <span>Log Out</span>
                           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
