@@ -17,8 +17,8 @@ import { collection } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Elite Exam Categories Hub v18.0.
- * OPTIMIZED: Standardized height (320px/260px) and refined typography for premium feel.
+ * @fileOverview Elite Exam Categories Hub v19.0.
+ * TYPOGRAPHY: Removed uppercase from headings and card titles.
  */
 
 const CATEGORY_META = [
@@ -84,14 +84,14 @@ export default function FeaturedCategories() {
           <div className="space-y-2">
              <div className="flex items-center gap-3">
                 <Landmark className="h-5 w-5 text-primary" />
-                <span className="text-[11px] font-black uppercase text-slate-500 tracking-[0.3em]">Vertical Library</span>
+                <span className="text-[11px] font-bold text-slate-500 tracking-tight">Vertical Library</span>
              </div>
-             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-headline font-black text-[#0F172A] tracking-tight leading-[0.9] uppercase break-words">
-                CHOOSE YOUR <span className="text-primary">CATEGORY</span>
+             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-[#0F172A] leading-[1.05] break-words">
+                Choose Your <span className="text-primary">Exam Category</span>
              </h2>
              <p className="text-slate-500 font-medium text-sm md:text-lg">Select a vertical to browse official preparation centers.</p>
           </div>
-          <Button asChild variant="ghost" className="text-primary font-black uppercase text-[11px] tracking-widest gap-2">
+          <Button asChild variant="ghost" className="text-primary font-bold text-sm tracking-tight gap-2">
              <Link href="/exams">Full Category List <ArrowRight className="h-4 w-4" /></Link>
           </Button>
         </div>
@@ -127,7 +127,7 @@ export default function FeaturedCategories() {
                        </div>
 
                        <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{count} Exams Live</span>
+                          <span className="text-[10px] font-bold text-slate-500 tracking-tight">{count} Exams Live</span>
                           <div className="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all text-slate-300 shadow-sm border border-slate-100">
                              <ChevronRight className="h-4 w-4" />
                           </div>

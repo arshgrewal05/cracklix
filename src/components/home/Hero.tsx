@@ -21,8 +21,8 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Hero Section v38.0 (Desktop Spacing Fix).
- * OPTIMIZED: Implemented 1440px container and split grid for desktop to reduce empty margins.
+ * @fileOverview Hero Section v39.0 (Typography Overhaul).
+ * RESTORED: Removed uppercase from headings and buttons for a premium look.
  */
 
 export default function Hero() {
@@ -101,13 +101,13 @@ export default function Hero() {
               className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white border border-slate-100 shadow-xl"
             >
               <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-              <span className="text-[10px] md:text-[13px] font-black text-[#04102B] tracking-wider uppercase">
+              <span className="text-[10px] md:text-[13px] font-bold text-[#04102B] tracking-tight">
                 {statsLoading ? "10,000+" : `${dynamicUserCount}+`} Students Trust Cracklix
               </span>
             </motion.div>
 
             <div className="space-y-4 md:space-y-6">
-              <h1 className="text-3xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold tracking-tight text-[#0F172A] leading-[0.9] break-words uppercase">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold tracking-tight text-[#0F172A] leading-[1.05] break-words">
                 Crack Punjab <br/>
                 <span className="text-[#2563EB]">Government Exams</span> <br/>
                 With Confidence
@@ -187,11 +187,11 @@ export default function Hero() {
                     {statsLoading ? (
                       <Skeleton className="h-8 w-16" />
                     ) : (
-                      <p className="text-2xl md:text-4xl font-black text-[#0F172A] tracking-tighter tabular-nums leading-none">
+                      <p className="text-2xl md:text-4xl font-bold text-[#0F172A] tracking-tighter tabular-nums leading-none">
                         {stat.val}
                       </p>
                     )}
-                    <p className="text-[10px] md:text-xs font-bold text-[#64748B] uppercase tracking-widest pt-1">
+                    <p className="text-[10px] md:text-xs font-semibold text-[#64748B] tracking-tight pt-1">
                       {stat.label}
                     </p>
                   </div>
@@ -213,7 +213,7 @@ function FeatureCard({ icon, label, href }: { icon: React.ReactNode, label: stri
         <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary transition-colors duration-300">
            {React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 md:h-6 md:w-6 text-primary group-hover:text-white transition-colors" })}
         </div>
-        <span className="font-bold text-[10px] md:text-xs text-[#0F172A] tracking-tight uppercase group-hover:text-primary transition-colors text-left leading-tight">
+        <span className="font-bold text-[10px] md:text-xs text-[#0F172A] tracking-tight group-hover:text-primary transition-colors text-left leading-tight">
           {label}
         </span>
       </div>

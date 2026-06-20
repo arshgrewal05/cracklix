@@ -42,8 +42,8 @@ import { Button } from "@/components/ui/button";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Standardized Navbar Hub v44.0.
- * FIXED: Auth state sync issues and Navbar flickering.
+ * @fileOverview Standardized Navbar Hub v45.0.
+ * TYPOGRAPHY: Removed uppercase from links and menus.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -75,13 +75,13 @@ export default function Navbar() {
       SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase()));
 
   const passStatus = useMemo(() => {
-    if (!profile?.passExpiresAt) return { label: 'FREE PASS', days: 0, active: false };
+    if (!profile?.passExpiresAt) return { label: 'Free Pass', days: 0, active: false };
     const expiry = new Date(profile.passExpiresAt);
     const now = new Date();
     const diff = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     const active = diff > 0;
     return {
-      label: active ? (profile.pass?.plan || 'ELITE').toUpperCase() : 'PASS EXPIRED',
+      label: active ? (profile.pass?.plan || 'Elite').charAt(0).toUpperCase() + (profile.pass?.plan || 'Elite').slice(1).toLowerCase() : 'Pass Expired',
       days: active ? diff : 0,
       active
     };
@@ -156,12 +156,12 @@ export default function Navbar() {
                           </div>
                        </div>
                        <div className="space-y-0.5">
-                         <h3 className="text-lg xs:text-xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate max-w-[240px]">
+                         <h3 className="text-lg xs:text-xl font-bold text-[#0F172A] tracking-tight leading-tight truncate max-w-[240px]">
                            {profile?.name || "Aspirant"}
                          </h3>
                          <Link 
                            href="/profile" 
-                           className="text-[12px] xs:text-[13px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] hover:text-primary transition-colors"
+                           className="text-[12px] xs:text-[13px] font-bold text-[#94A3B8] tracking-tight hover:text-primary transition-colors"
                          >
                            View Profile
                          </Link>
@@ -170,7 +170,7 @@ export default function Navbar() {
 
                     <div className="h-px w-full bg-slate-100" />
 
-                    <div className="w-full space-y-1">
+                    <div className="w-full space-y-1 text-left">
                        <ProfileMenuItem href="/dashboard" icon={ShieldCheck} label="Dashboard" />
                        <ProfileMenuItem href="/pass" icon={CreditCard} label="My Pass" />
                        <ProfileMenuItem href="/profile" icon={Settings} label="Settings" />
@@ -184,7 +184,7 @@ export default function Navbar() {
                       "w-full p-4 rounded-2xl border transition-all",
                       passStatus.active ? "bg-[#DBEAFE] text-[#2563EB] border-blue-100" : "bg-slate-50 text-slate-400 border-slate-100"
                     )}>
-                       <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-widest leading-none">
+                       <div className="flex items-center justify-between text-[11px] font-bold tracking-tight leading-none">
                           <span>{passStatus.label}</span>
                           <Gem className="h-3.5 w-3.5" />
                        </div>
@@ -197,7 +197,7 @@ export default function Navbar() {
 
                     <Button
                       onClick={handleLogout}
-                      className="w-full h-12 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] font-black text-[12px] uppercase tracking-widest rounded-xl transition-all border-none shadow-none group"
+                      className="w-full h-12 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] font-bold text-[12px] tracking-tight rounded-xl transition-all border-none shadow-none group"
                     >
                        Log Out <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </Button>
