@@ -40,9 +40,9 @@ import { Badge } from "@/components/ui/badge";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Header v105.0.
- * BRAND SYSTEM: Maximized Logo (72px) with minimal left offset.
- * PROFILE HUB: Elite Dropdown Spec - 320px wide, 28px radius, premium layout.
+ * @fileOverview Institutional Header v106.0.
+ * BRAND SYSTEM: Maximized Logo (72px) shifted to the far left.
+ * PROFILE HUB: Elite Dropdown Spec - 320px wide, 28px radius.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -73,7 +73,6 @@ export default function Navbar() {
     (user?.email &&
       SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase()));
 
-  // Calculate Pass Days Left for the Elite Badge
   const passDaysLeft = useMemo(() => {
     if (!profile?.passExpiresAt) return null;
     const expiry = new Date(profile.passExpiresAt);
@@ -89,7 +88,7 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-50 w-full font-body">
       <nav className="w-full h-20 bg-white border-b border-slate-100 shadow-sm">
-        <div className="w-full max-w-7xl mx-auto px-2 md:px-4 h-full flex items-center justify-between gap-4">
+        <div className="w-full max-w-7xl mx-auto px-2 md:px-4 h-full flex items-center justify-between gap-2 md:gap-4">
 
           <div className="flex items-center shrink-0">
             <button
@@ -147,7 +146,7 @@ export default function Navbar() {
                           <div className="h-16 w-16 rounded-2xl bg-[#EEF4FF] flex items-center justify-center text-[#2563EB] shrink-0 shadow-sm border border-blue-50 group-hover:scale-105 transition-transform">
                              <User className="h-8 w-8" />
                           </div>
-                          <div className="min-w-0 flex-1">
+                          <div className="min-w-0 flex-1 text-left">
                             <h3 className="text-xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate">
                               {profile?.name || "Aspirant"}
                             </h3>
@@ -155,8 +154,7 @@ export default function Navbar() {
                           </div>
                        </Link>
 
-                       {/* PASS STATUS NODE */}
-                       <div className="p-4 bg-[#DBEAFE]/40 rounded-2xl border border-blue-50/50 flex flex-col gap-1">
+                       <div className="p-4 bg-[#DBEAFE]/40 rounded-2xl border border-blue-50/50 flex flex-col gap-1 text-left">
                           <p className="text-[10px] font-black text-[#2563EB] uppercase tracking-widest leading-none">
                             {profile?.status?.toUpperCase() || "FREE"} PASS
                           </p>

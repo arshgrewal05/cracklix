@@ -13,8 +13,8 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Elite Global Search Hub v3.5 (Build Fixed).
- * FIXED: Explicit React element casting for icon rendering to resolve 'React' UMD global error.
+ * @fileOverview Elite Global Search Hub v3.6 (Hardened).
+ * FIXED: Explicit React element casting for icon rendering.
  */
 
 export default function SearchPage() {

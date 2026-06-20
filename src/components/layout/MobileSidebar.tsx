@@ -30,8 +30,8 @@ import ShareButton from "@/components/navigation/ShareButton";
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Mobile Sidebar Overhaul v38.0.
- * BRAND SYSTEM: Logo height 72px centered.
+ * @fileOverview Mobile Sidebar Overhaul v39.0.
+ * BRAND SYSTEM: Maximized Logo (64px) within 80px minimized top area.
  */
 export default function MobileSidebar({
   onClose,
@@ -75,25 +75,20 @@ export default function MobileSidebar({
   return (
     <div className="flex h-full flex-col bg-white font-body overflow-hidden text-left">
 
-      <div className="px-4 shrink-0 bg-white">
-        <div className="flex items-center justify-end pt-4">
-          <button
+      {/* MINIMIZED TOP BRANDING AREA (80px) */}
+      <div className="h-20 px-4 shrink-0 bg-white border-b border-slate-50 flex items-center justify-between">
+         <Logo
+           variant="light"
+           align="left"
+           imgClassName="h-[64px]"
+           onClick={onClose}
+         />
+         <button
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
-        </div>
-        
-        <div className="mt-2 mb-6 flex flex-col items-center">
-           <Logo
-             variant="light"
-             align="center"
-             imgClassName="h-[64px] md:h-[72px]"
-             onClick={onClose}
-           />
-           <div className="w-full h-px bg-slate-100 mt-6" />
-        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">

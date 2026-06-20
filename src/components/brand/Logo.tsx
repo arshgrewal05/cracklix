@@ -17,9 +17,9 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Master Cracklix Branding Node v6.0.
- * Maximized for the 80px institutional header.
- * REFINED: Default heights set to 72px (Desktop) / 64px (Mobile).
+ * @fileOverview Master Cracklix Branding Node v7.0.
+ * BRAND SYSTEM: Maximized for institutional authority.
+ * Sizing: 72px (Desktop) / 64px (Mobile) within 80px nodes.
  */
 export default function Logo({
   className = "",
