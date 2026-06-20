@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from "next/link";
 import {
   Search,
@@ -8,6 +8,9 @@ import {
   LogOut,
   Menu,
   ShieldCheck,
+  ChevronRight,
+  Gem,
+  ArrowRight
 } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
@@ -32,12 +35,14 @@ import { cn } from "@/lib/utils";
 import Logo from "@/components/brand/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Header v102.0 (Maximized Logo).
- * BRAND SYSTEM: Logo height 72px Desktop / 64px Mobile inside 80px header.
+ * @fileOverview Institutional Header v105.0.
+ * BRAND SYSTEM: Maximized Logo (72px) with minimal left offset.
+ * PROFILE HUB: Elite Dropdown Spec - 320px wide, 28px radius, premium layout.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -68,10 +73,17 @@ export default function Navbar() {
     (user?.email &&
       SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase()));
 
+  // Calculate Pass Days Left for the Elite Badge
+  const passDaysLeft = useMemo(() => {
+    if (!profile?.passExpiresAt) return null;
+    const expiry = new Date(profile.passExpiresAt);
+    const now = new Date();
+    const diff = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
+  }, [profile]);
+
   if (!mounted) {
-    return (
-      <nav className="w-full border-b border-slate-100 bg-white h-20" />
-    );
+    return <nav className="w-full border-b border-slate-100 bg-white h-20" />;
   }
 
   return (
@@ -127,41 +139,53 @@ export default function Navbar() {
                 <DropdownMenuContent
                   align="end"
                   sideOffset={12}
-                  className="w-[92vw] max-w-[420px] min-w-[280px] rounded-[28px] p-4 sm:p-6 bg-white border border-slate-200 shadow-[0_20px_60px_rgba(15,23,42,0.15)] z-[2001]"
+                  className="w-[92vw] max-w-[340px] sm:w-[320px] rounded-[28px] p-6 bg-white border border-[#EEF2F7] shadow-[0_12px_30px_rgba(15,23,42,0.08)] z-[2001]"
                 >
-                  <DropdownMenuItem asChild className="rounded-2xl p-0 focus:bg-transparent cursor-default">
-                    <div className="w-full">
-                       <Link href="/profile" className="flex items-center gap-4 mb-4 group cursor-pointer p-2 rounded-xl hover:bg-slate-50 transition-all">
-                          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-all">
-                             <User className="h-5 w-5" />
+                  <DropdownMenuItem asChild className="rounded-2xl p-0 focus:bg-transparent cursor-default border-none outline-none">
+                    <div className="w-full space-y-6">
+                       <Link href="/profile" className="flex items-center gap-5 group cursor-pointer transition-all">
+                          <div className="h-16 w-16 rounded-2xl bg-[#EEF4FF] flex items-center justify-center text-[#2563EB] shrink-0 shadow-sm border border-blue-50 group-hover:scale-105 transition-transform">
+                             <User className="h-8 w-8" />
                           </div>
-                          <div>
-                            <h3 className="text-lg font-black text-slate-900 tracking-tight leading-none">{profile?.name || "Aspirant"}</h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">View Profile</p>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate">
+                              {profile?.name || "Aspirant"}
+                            </h3>
+                            <p className="text-[13px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] mt-1">View Profile</p>
                           </div>
                        </Link>
 
+                       {/* PASS STATUS NODE */}
+                       <div className="p-4 bg-[#DBEAFE]/40 rounded-2xl border border-blue-50/50 flex flex-col gap-1">
+                          <p className="text-[10px] font-black text-[#2563EB] uppercase tracking-widest leading-none">
+                            {profile?.status?.toUpperCase() || "FREE"} PASS
+                          </p>
+                          <div className="flex items-center justify-between mt-1">
+                             <p className="text-[12px] font-bold text-slate-500">
+                               {passDaysLeft !== null ? `Expires in ${passDaysLeft} Days` : "Active Subscription"}
+                             </p>
+                             <Gem className="h-3.5 w-3.5 text-[#2563EB] animate-pulse" />
+                          </div>
+                       </div>
+
                        {isAdmin && (
-                         <div className="mb-4">
-                            <Button asChild className="w-full h-12 rounded-xl text-sm font-black bg-primary hover:bg-blue-700 text-white shadow-lg border-none transition-all active:scale-95">
-                               <Link href="/admin">
-                                  <ShieldCheck className="h-5 w-5 mr-2" />
-                                  Admin Control Hub
-                                </Link>
-                            </Button>
-                         </div>
+                         <Button asChild className="w-full h-12 rounded-xl text-sm font-black bg-primary hover:bg-blue-700 text-white shadow-lg border-none transition-all active:scale-95">
+                            <Link href="/admin">
+                               <ShieldCheck className="h-5 w-5 mr-2" />
+                               Admin Control Hub
+                             </Link>
+                         </Button>
                        )}
 
-                       <DropdownMenuSeparator className="my-2 bg-slate-100" />
-
-                       <Button
-                          variant="ghost"
-                          onClick={handleLogout}
-                          className="w-full h-12 justify-start text-red-500 font-bold rounded-xl hover:bg-red-50 hover:text-red-600 transition-all active:scale-95"
-                       >
-                          <LogOut className="h-5 w-5 mr-3" />
-                          Sign Out
-                       </Button>
+                       <div className="pt-2">
+                          <Button
+                             onClick={handleLogout}
+                             className="w-full h-12 justify-between px-6 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] font-black text-sm rounded-[14px] transition-all active:scale-95 border-none shadow-none group"
+                          >
+                             <span>Log Out</span>
+                             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                          </Button>
+                       </div>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
