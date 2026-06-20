@@ -25,7 +25,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Login Hub v48.0 (Takeover Authentication).
+ * @fileOverview Professional Login Hub v49.0 (Logo Maximized).
  * SECURITY: Implements "Latest Login Wins" policy. Automatically signs out older devices.
  */
 export default function LoginPage() {
@@ -65,16 +65,11 @@ function LoginContent() {
     }
   }, [user, authLoading, router, returnUrl]);
 
-  /**
-   * Generates a new session ID and syncs it to Firestore/LocalStorage.
-   * This TAKEOVER flow allows login and invalidates previous sessions.
-   */
   const registerNewSession = async (userId: string) => {
     if (!db) return;
     const sessionId = crypto.randomUUID();
     localStorage.setItem('cracklix_session_id', sessionId);
     
-    // We update the activeDeviceId. SessionGuard on old devices will detect the change.
     await updateDoc(doc(db, 'users', userId), {
       activeDeviceId: sessionId,
       lastLoginAt: serverTimestamp(),
@@ -93,7 +88,6 @@ function LoginContent() {
     try {
       if (mode === 'login') {
         const result = await signInWithEmailAndPassword(auth, email, password)
-        // TAKEOVER: Always allow login, just register new session ID
         await registerNewSession(result.user.uid);
         toast({ title: "Welcome Back" })
         startTransition(() => {
@@ -165,7 +159,6 @@ function LoginContent() {
           pinnedExams: [], verified: true
         })
       } else {
-        // TAKEOVER: Update the session on existing account
         await updateDoc(userRef, {
           activeDeviceId: sessionId,
           lastLoginAt: serverTimestamp(),
@@ -209,7 +202,7 @@ function LoginContent() {
       <div className="hidden lg:flex flex-1 bg-[#0B1528] text-white p-12 md:p-20 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2" />
         <div className="relative z-10 space-y-12">
-           <Logo variant="dark" imgClassName="h-[80px]" />
+           <Logo variant="dark" imgClassName="h-[120px]" />
            <div className="space-y-6">
               <h1 className="text-3xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold tracking-tight text-white leading-[1.05] break-words uppercase">
                 Crack Punjab <br/> 
@@ -236,7 +229,7 @@ function LoginContent() {
         <div className="w-full max-w-[640px] space-y-10">
           
           <div className="lg:hidden text-center space-y-6 mb-10">
-             <Logo variant="light" align="center" imgClassName="h-[64px]" />
+             <Logo variant="light" align="center" imgClassName="h-[80px]" />
           </div>
 
           <div className="space-y-4">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -29,8 +30,8 @@ import { Button } from "@/components/ui/button";
 import PWAInstallButton from "@/components/PWAInstallButton";
 
 /**
- * @fileOverview Mobile Sidebar Overhaul v42.0 (Logo Optimized).
- * FIXED: Maximized logo height to fill the sidebar header area.
+ * @fileOverview Mobile Sidebar Overhaul v43.0 (Logo Maximized).
+ * FIXED: Maximized logo height (72px) to fill the sidebar header area perfectly.
  */
 export default function MobileSidebar({
   onClose,
@@ -78,7 +79,7 @@ export default function MobileSidebar({
          <Logo
            variant="light"
            align="left"
-           imgClassName="h-[68px]"
+           imgClassName="h-[72px]"
            onClick={onClose}
          />
          <button

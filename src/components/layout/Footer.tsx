@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from "react";
@@ -20,8 +21,8 @@ import {
 } from "@/lib/constants";
 
 /**
- * Production Footer v1.6
- * BRAND SYSTEM: Maximized logo height (64px mobile / 80px desktop) for authoritative presence.
+ * Production Footer v1.7
+ * BRAND SYSTEM: Maximized logo height (72px mobile / 96px desktop) for authoritative presence.
  */
 
 export default function Footer() {
@@ -40,7 +41,7 @@ export default function Footer() {
             <Logo
               variant="dark"
               align="left"
-              imgClassName="h-[64px] md:h-[80px]"
+              imgClassName="h-[72px] md:h-[96px]"
             />
 
             <p className="max-w-[300px] text-[15px] leading-relaxed text-slate-300 text-left">
