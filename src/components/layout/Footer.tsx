@@ -20,8 +20,8 @@ import {
 } from "@/lib/constants";
 
 /**
- * Production Footer v1.5
- * BRAND SYSTEM: Maximized logo height (56px) for better visibility.
+ * Production Footer v1.6
+ * BRAND SYSTEM: Maximized logo height (64px mobile / 80px desktop) for authoritative presence.
  */
 
 export default function Footer() {
@@ -40,7 +40,7 @@ export default function Footer() {
             <Logo
               variant="dark"
               align="left"
-              imgClassName="h-[48px] md:h-[56px]"
+              imgClassName="h-[64px] md:h-[80px]"
             />
 
             <p className="max-w-[300px] text-[15px] leading-relaxed text-slate-300 text-left">

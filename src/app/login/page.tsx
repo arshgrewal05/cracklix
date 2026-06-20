@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, Suspense, useEffect, useTransition } from "react"
@@ -25,8 +24,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Login Hub v45.0.
- * FIXED: Implemented strict 1-Account-1-Device session enforcement.
+ * @fileOverview Professional Login Hub v46.0.
+ * BRAND SYSTEM: Maximized logo sizes (80px desktop / 64px mobile).
  */
 export default function LoginPage() {
   return (
@@ -200,7 +199,7 @@ function LoginContent() {
       <div className="hidden lg:flex flex-1 bg-[#0B1528] text-white p-12 md:p-20 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2" />
         <div className="relative z-10 space-y-12">
-           <Logo variant="dark" imgClassName="h-[60px]" />
+           <Logo variant="dark" imgClassName="h-[80px]" />
            <div className="space-y-6">
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-black leading-[0.9] uppercase tracking-tight">
                 Punjab's Smart <br/> 
@@ -227,7 +226,7 @@ function LoginContent() {
         <div className="w-full max-w-[640px] space-y-10">
           
           <div className="lg:hidden text-center space-y-6 mb-10">
-             <Logo variant="light" align="center" imgClassName="h-[50px]" />
+             <Logo variant="light" align="center" imgClassName="h-[64px]" />
           </div>
 
           <div className="space-y-4">
