@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
@@ -16,8 +17,8 @@ const inter = Inter({
 });
 
 /**
- * @fileOverview Root Layout v47.0 (Title & Icon Fix).
- * FIXED: Removed title template to prevent duplication. Updated all icon nodes to unified brand icon.
+ * @fileOverview Root Layout v48.0 (Brand Normalization).
+ * FIXED: Normalized title to prevent duplication. Unified institutional icons.
  */
 export const metadata: Metadata = {
   title: "Cracklix | Punjab's Smart Mock Test Platform",

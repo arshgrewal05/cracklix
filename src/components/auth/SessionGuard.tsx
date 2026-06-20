@@ -8,9 +8,8 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 /**
- * @fileOverview Hardened Single-Device Enforcement Node v5.0.
- * LOGIC: Real-time listener checks if the current device matches the one authorized in Firestore.
- * ACTION: If a mismatch is detected (new login elsewhere), it signs out the current device immediately.
+ * @fileOverview Hardened Single Active Session Enforcement v6.0.
+ * LOGIC: Monitors Firestore profile. If another device logs in, this session is terminated.
  */
 export default function SessionGuard() {
   const { user, profile, loading } = useUser();
@@ -20,24 +19,31 @@ export default function SessionGuard() {
   const isSigningOut = useRef(false);
 
   useEffect(() => {
+    // Phase 1: Wait for auth and profile hydration
     if (loading || !user || !profile || isSigningOut.current) return;
 
     const localSessionId = localStorage.getItem('cracklix_session_id');
     const authorizedDeviceId = profile.activeDeviceId;
 
-    // Check for mismatch: If Firestore has a different ID than local storage
+    // Phase 2: Session Mismatch Audit
+    // If an authorized session ID exists in Firestore and it doesn't match this device
     if (authorizedDeviceId && localSessionId && authorizedDeviceId !== localSessionId) {
       isSigningOut.current = true;
       
+      // Phase 3: Immediate Force-Logout Node
       toast({
         variant: "destructive",
-        title: "Session Terminated",
-        description: "You have been logged out because your account is active on another device.",
+        title: "Session Expired",
+        description: "Your account was logged in from another device. For security, this session has been terminated.",
       });
 
       signOut(auth).then(() => {
         localStorage.removeItem('cracklix_session_id');
+        // Reset state and clear registry references
         router.replace('/login');
+        isSigningOut.current = false;
+      }).catch(err => {
+        console.error("[SESSION_GUARD_CRITICAL]:", err);
         isSigningOut.current = false;
       });
     }

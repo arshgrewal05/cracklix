@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, Suspense, useEffect, useTransition } from "react"
@@ -24,8 +25,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Professional Login Hub v46.0.
- * BRAND SYSTEM: Maximized logo sizes (80px desktop / 64px mobile).
+ * @fileOverview Professional Login Hub v47.0 (Single Active Session).
+ * SECURITY: Generates a unique sessionId to enforce one-device policy.
  */
 export default function LoginPage() {
   return (
@@ -64,13 +65,18 @@ function LoginContent() {
     }
   }, [user, authLoading, router, returnUrl]);
 
+  /**
+   * Generates a new session ID and syncs it to Firestore/LocalStorage.
+   * This invalidates any other active sessions for this account.
+   */
   const updateSessionNode = async (userId: string) => {
     if (!db) return;
     const sessionId = crypto.randomUUID();
     localStorage.setItem('cracklix_session_id', sessionId);
     await updateDoc(doc(db, 'users', userId), {
       activeDeviceId: sessionId,
-      lastLoginAt: serverTimestamp()
+      lastLoginAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     });
   };
 
@@ -85,7 +91,6 @@ function LoginContent() {
     try {
       if (mode === 'login') {
         const result = await signInWithEmailAndPassword(auth, email, password)
-        await result.user.reload();
         await updateSessionNode(result.user.uid);
         toast({ title: "Welcome Back" })
         startTransition(() => {
@@ -142,6 +147,7 @@ function LoginContent() {
       const userRef = doc(db!, 'users', userNode.uid)
       const userSnap = await getDoc(userRef)
       const isSuperAdmin = SUPER_ADMIN_WHITELIST.includes(userNode.email.toLowerCase());
+      
       const sessionId = crypto.randomUUID();
       localStorage.setItem('cracklix_session_id', sessionId);
       
@@ -201,8 +207,8 @@ function LoginContent() {
         <div className="relative z-10 space-y-12">
            <Logo variant="dark" imgClassName="h-[80px]" />
            <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl lg:text-7xl font-black leading-[0.9] uppercase tracking-tight">
-                Punjab's Smart <br/> 
+              <h1 className="text-3xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold tracking-tight text-white leading-[1.05] break-words uppercase">
+                Crack Punjab <br/> 
                 <span className="text-primary">Mock Test Hub</span>
               </h1>
               <p className="text-sm md:text-xl text-slate-400 font-medium max-w-md leading-relaxed">
@@ -210,9 +216,9 @@ function LoginContent() {
               </p>
            </div>
            <div className="space-y-6 pt-10">
-              <BenefitItem text="500+ Mock Tests" />
-              <BenefitItem text="English & Punjabi Mode" />
-              <BenefitItem text="Latest Pattern Mocks" />
+              <BenefitItem text="500+ Practice Tests" />
+              <BenefitItem text="English & Punjabi Support" />
+              <BenefitItem text="Latest Pattern Registry" />
               <BenefitItem text="Solutions with Logic" />
            </div>
         </div>

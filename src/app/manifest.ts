@@ -1,8 +1,9 @@
+
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Production-Grade PWA Manifest v11.4 (Hardened).
- * BRAND SYSTEM: Title and icons synchronized with the unified Cracklix branding.
+ * @fileOverview Production-Grade PWA Manifest v12.0.
+ * BRAND SYSTEM: Unified institutional branding with correct icons and title case.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -30,23 +31,17 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: 'maskable',
       },
       {
-        src: '/icons/icon-192x192.png',
+        src: '/logo/cracklix-icon.png',
         sizes: '192x192',
         type: 'image/png',
-        purpose: 'maskable',
+        purpose: 'any',
       },
       {
-        src: '/icons/icon-512x512.png',
+        src: '/logo/cracklix-icon.png',
         sizes: '512x512',
         type: 'image/png',
-        purpose: 'maskable',
-      },
-      {
-        src: '/icons/maskable-icon-512x512.png',
-        sizes: '512x512',
-        type: 'image/png',
-        purpose: 'maskable',
-      },
+        purpose: 'any',
+      }
     ],
     categories: ['education', 'lifestyle', 'productivity']
   };

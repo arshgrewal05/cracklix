@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -13,9 +14,8 @@ interface PWAInstallButtonProps {
 }
 
 /**
- * @fileOverview Production PWA Trigger Node v11.0 (Direct Broadcast Capture).
- * LOGIC: Directly captures beforeinstallprompt and syncs with global state.
- * FIXED: Reliable visibility by checking standalone state independently of the prompt event.
+ * @fileOverview Hardened PWA Install Trigger v12.0.
+ * LOGIC: Self-listening event node that captures beforeinstallprompt independently.
  */
 export default function PWAInstallButton({ 
   className, 
@@ -37,9 +37,15 @@ export default function PWAInstallButton({
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(ios);
 
-    // Show button if not installed AND (browser says installable OR it's iOS which always allows manual install)
+    // If already installed, hide everything
+    if (isStandalone) {
+      setCanInstall(false);
+      return;
+    }
+
+    // Check for the captured prompt
     const hasPrompt = !!(window as any).deferredPrompt;
-    setCanInstall(!isStandalone && (hasPrompt || ios));
+    setCanInstall(hasPrompt || ios);
   };
 
   useEffect(() => {
@@ -49,20 +55,22 @@ export default function PWAInstallButton({
       e.preventDefault();
       (window as any).deferredPrompt = e;
       setCanInstall(true);
+      // Synchronize all instances
       window.dispatchEvent(new CustomEvent('pwa-installable'));
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('pwa-installable', updateState);
-    window.addEventListener('appinstalled', updateState);
+    window.addEventListener('appinstalled', () => {
+      setIsInstalled(true);
+      setCanInstall(false);
+    });
     
-    // Initial sync
     updateState();
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('pwa-installable', updateState);
-      window.removeEventListener('appinstalled', updateState);
     };
   }, []);
 
@@ -81,8 +89,8 @@ export default function PWAInstallButton({
     const prompt = (window as any).deferredPrompt;
     if (!prompt) {
       toast({
-        title: "PWA Optimized",
-        description: "Cracklix is ready. Use your browser's install icon or check if already installed.",
+        title: "PWA Registry Active",
+        description: "Cracklix is optimized. Use your browser's install menu or check if already installed.",
       });
       return;
     }
@@ -95,7 +103,7 @@ export default function PWAInstallButton({
         setCanInstall(false);
       }
     } catch (err) {
-      console.error('[PWA] Native prompt failed:', err);
+      console.error('[PWA_INSTALL_FAILURE]:', err);
     }
   };
 
@@ -106,13 +114,14 @@ export default function PWAInstallButton({
       onClick={handleInstall}
       className={cn(
         "font-black uppercase text-[10px] tracking-widest gap-2 shadow-xl transition-all active:scale-95",
-        variant === 'primary' ? "bg-primary hover:bg-blue-700 text-white" : 
-        variant === 'dark' ? "bg-[#0B1528] hover:bg-black text-white" : "",
+        variant === 'primary' ? "bg-primary hover:bg-blue-700 text-white border-none" : 
+        variant === 'dark' ? "bg-[#0B1528] hover:bg-black text-white border-none" : 
+        variant === 'outline' ? "bg-white border-slate-200 text-[#0F172A] hover:bg-slate-50" : "",
         className
       )}
     >
       {isIOS ? <Smartphone className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-      {showLabel && (isIOS ? "Install App" : "Install App")}
+      {showLabel && (isIOS ? "Install App" : "Download App")}
       <Sparkles className="h-3 w-3 text-primary animate-pulse" />
     </Button>
   );
