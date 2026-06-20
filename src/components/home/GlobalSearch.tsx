@@ -9,13 +9,13 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
 /**
- * @fileOverview Institutional Global Search Hub v1.0.
- * Performs real-time auditing across all preparation registries.
+ * @fileOverview Institutional Global Search Center v12.0.
+ * Debounced logic for production stability.
  */
 
 const TRENDING = [
-  { label: "Punjab Police Constable", href: "/exams/police-constable" },
-  { label: "PSSSB Clerk 2025", href: "/exams/psssb-clerk" },
+  { label: "Punjab Police Constable", href: "/exams/hub/punjab-police" },
+  { label: "PSSSB Clerk 2025", href: "/exams/hub/psssb" },
   { label: "Revenue Patwari Mock", href: "/mocks" },
   { label: "Latest Punjab GK", href: "/current-affairs" }
 ];
@@ -23,8 +23,15 @@ const TRENDING = [
 export default function GlobalSearch() {
   const db = useFirestore();
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Debounce logic
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   // 1. DATA AGGREGATION
   const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]));
@@ -35,8 +42,8 @@ export default function GlobalSearch() {
 
   // 2. SEARCH LOGIC
   const results = useMemo(() => {
-    if (!query.trim() || query.length < 2) return null;
-    const term = query.toLowerCase();
+    if (!debouncedQuery.trim() || debouncedQuery.length < 2) return null;
+    const term = debouncedQuery.toLowerCase();
 
     return {
       exams: (exams || []).filter(e => e.name?.toLowerCase().includes(term)).slice(0, 3),
@@ -45,7 +52,7 @@ export default function GlobalSearch() {
       pyqs: (pyqs || []).filter(p => p.title?.toLowerCase().includes(term)).slice(0, 3),
       ca: (caHub || []).filter(c => c.title?.toLowerCase().includes(term)).slice(0, 2)
     };
-  }, [query, exams, mocks, notes, pyqs, caHub]);
+  }, [debouncedQuery, exams, mocks, notes, pyqs, caHub]);
 
   const hasResults = results && (
     results.exams.length > 0 || 
@@ -55,7 +62,6 @@ export default function GlobalSearch() {
     results.ca.length > 0
   );
 
-  // 3. EVENT HANDLERS
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -69,7 +75,6 @@ export default function GlobalSearch() {
   return (
     <div className="relative w-full z-40 bg-white md:bg-transparent px-4 md:px-0 sticky top-16 md:static" ref={containerRef}>
       <div className="max-w-[700px] mx-auto relative group">
-        {/* BACKGROUND GLOW */}
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-600/20 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
         
         <div className="relative">
@@ -80,7 +85,7 @@ export default function GlobalSearch() {
           
           <input
             type="text"
-            placeholder="Search exams, mocks, notes, PYQs..."
+            placeholder="Search exams, tests, or notes..."
             value={query}
             onFocus={() => setIsOpen(true)}
             onChange={(e) => {
@@ -100,16 +105,14 @@ export default function GlobalSearch() {
           )}
         </div>
 
-        {/* DROPDOWN HUB */}
         {isOpen && (
           <div className="absolute top-full mt-2 w-full bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 max-h-[500px] overflow-y-auto custom-scrollbar">
             
-            {/* 1. SUGGESTIONS (EMPTY STATE) */}
             {(!query || query.length < 2) ? (
               <div className="p-6 md:p-8 space-y-6">
                 <div className="flex items-center gap-3">
                   <Sparkles className="h-4 w-4 text-primary fill-current" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Trending Preparations</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Quick Links</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {TRENDING.map((item) => (
@@ -126,8 +129,6 @@ export default function GlobalSearch() {
               </div>
             ) : hasResults ? (
               <div className="divide-y divide-slate-50 text-left">
-                
-                {/* GROUP: EXAMS */}
                 {results.exams.length > 0 && (
                   <SearchGroup label="EXAM VERTICALS">
                     {results.exams.map(e => (
@@ -136,38 +137,18 @@ export default function GlobalSearch() {
                   </SearchGroup>
                 )}
 
-                {/* GROUP: MOCKS */}
                 {results.mocks.length > 0 && (
-                  <SearchGroup label="MOCK TEST SERIES">
+                  <SearchGroup label="PRACTICE TESTS">
                     {results.mocks.map(m => (
                       <SearchResult key={m.id} href={`/mocks/${m.id}`} title={m.title} sub={`${m.totalQuestions} Questions`} icon={<Zap className="h-4 w-4 text-primary" />} onClick={() => setIsOpen(false)} />
                     ))}
                   </SearchGroup>
                 )}
 
-                {/* GROUP: PYQS */}
-                {results.pyqs.length > 0 && (
-                  <SearchGroup label="PREVIOUS PAPERS">
-                    {results.pyqs.map(p => (
-                      <SearchResult key={p.id} href="/pyqs" title={p.title} sub={`Official Paper ${p.year}`} icon={<Layers className="h-4 w-4 text-emerald-500" />} onClick={() => setIsOpen(false)} />
-                    ))}
-                  </SearchGroup>
-                )}
-
-                {/* GROUP: NOTES */}
                 {results.notes.length > 0 && (
-                  <SearchGroup label="STUDY NOTES">
+                  <SearchGroup label="STUDY MATERIALS">
                     {results.notes.map(n => (
                       <SearchResult key={n.id} href="/notes" title={n.title} sub={n.category} icon={<BookOpen className="h-4 w-4 text-blue-500" />} onClick={() => setIsOpen(false)} />
-                    ))}
-                  </SearchGroup>
-                )}
-
-                {/* GROUP: CURRENT AFFAIRS */}
-                {results.ca.length > 0 && (
-                  <SearchGroup label="STUDY UPDATES">
-                    {results.ca.map(c => (
-                      <SearchResult key={c.id} href="/current-affairs" title={c.title} sub="Latest Patterns" icon={<Newspaper className="h-4 w-4 text-orange-500" />} onClick={() => setIsOpen(false)} />
                     ))}
                   </SearchGroup>
                 )}
@@ -175,14 +156,9 @@ export default function GlobalSearch() {
             ) : (
               <div className="p-12 text-center space-y-4 opacity-30">
                 <Search className="h-12 w-12 mx-auto text-slate-300" />
-                <p className="font-headline font-black uppercase text-sm tracking-widest">No preparation nodes found</p>
+                <p className="font-headline font-black uppercase text-sm tracking-widest">Awaiting verification...</p>
               </div>
             )}
-
-            <div className="bg-slate-50 p-4 border-t border-slate-100 flex items-center justify-between">
-               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Institutional Global Registry v4.0</p>
-               <Badge className="bg-white border-slate-200 text-slate-400 text-[8px] font-black uppercase px-2">SSL SECURED</Badge>
-            </div>
           </div>
         )}
       </div>

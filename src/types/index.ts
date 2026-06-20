@@ -111,6 +111,7 @@ export interface Exam {
   id: string;
   name: string;
   title?: string;
+  shortTitle?: string;
   boardId: string;
   categoryId: string;
   displayOrder: number;
@@ -204,7 +205,7 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   dob?: string;
   address?: string;
   role: UserRole;
@@ -212,11 +213,12 @@ export interface UserProfile {
   targetExam: string;
   assignedBoardId?: string;
   createdAt: string;
-  status: string;
-  passStatus?: 'active' | 'expired' | 'none';
+  updatedAt: any;
+  status: string; // 'Free' or 'Elite'
+  passType: 'FREE' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
+  passStatus: 'active' | 'expired' | 'none';
   passActivatedAt?: string;
   passExpiresAt?: string;
-  passExpiryDate?: string;
   photoURL?: string;
   gender?: Gender;
   subscriptions?: string[];

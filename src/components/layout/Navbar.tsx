@@ -12,7 +12,9 @@ import {
   Gem,
   ArrowRight,
   AlertCircle,
-  CheckCircle2
+  Settings,
+  HelpCircle,
+  CreditCard
 } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
@@ -36,16 +38,9 @@ import { cn } from "@/lib/utils";
 import Logo from "@/components/brand/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
-/**
- * @fileOverview Institutional Header v112.0.
- * SPECS:
- * Desktop Height: 88px
- * Mobile Height: 72px
- */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -127,7 +122,7 @@ export default function Navbar() {
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-10 h-10 md:w-11 md:h-11 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center active:scale-95 transition-all">
+                  <button className="w-10 h-10 md:h-12 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center active:scale-95 transition-all">
                     <StudentAvatar
                       profile={profile}
                       className="w-full h-full border-none"
@@ -139,85 +134,69 @@ export default function Navbar() {
                 <DropdownMenuContent
                   align="end"
                   sideOffset={12}
-                  className="w-[92vw] max-w-[340px] sm:w-[320px] max-h-[85vh] overflow-y-auto custom-scrollbar rounded-[28px] p-6 bg-white border border-[#EEF2F7] shadow-[0_12px_30px_rgba(15,23,42,0.08)] z-[2001]"
+                  className="w-[320px] rounded-[28px] p-6 bg-white border border-[#EEF2F7] shadow-[0_12px_30px_rgba(15,23,42,0.08)] z-[2001]"
                 >
-                  <div className="flex flex-col items-center text-center space-y-5">
+                  <div className="flex flex-col items-center text-center space-y-6">
                     
-                    {/* AVATAR NODE */}
-                    <div className="h-16 w-16 rounded-2xl bg-[#EEF4FF] flex items-center justify-center text-[#2563EB] shadow-sm border border-blue-50 shrink-0 relative">
-                       <User className="h-8 w-8" />
-                       {emailVerified && (
-                         <div className="absolute -top-1 -right-1 bg-emerald-500 h-5 w-5 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
-                            <ShieldCheck className="h-3 w-3 text-white" />
-                         </div>
+                    {/* AVATAR & IDENTITY */}
+                    <div className="flex flex-col items-center gap-3">
+                       <div className="h-16 w-16 rounded-2xl bg-[#EEF4FF] flex items-center justify-center text-[#2563EB] shadow-sm border border-blue-50 relative">
+                          <User className="h-8 w-8" />
+                          {emailVerified && (
+                            <div className="absolute -top-1 -right-1 bg-emerald-500 h-5 w-5 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                               <ShieldCheck className="h-3 w-3 text-white" />
+                            </div>
+                          )}
+                       </div>
+                       <div className="space-y-0.5">
+                         <h3 className="text-xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate max-w-[240px]">
+                           {profile?.name || "Aspirant"}
+                         </h3>
+                         <Link 
+                           href="/profile" 
+                           className="text-[11px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] hover:text-primary transition-colors"
+                         >
+                           View Profile
+                         </Link>
+                       </div>
+                    </div>
+
+                    <div className="h-px w-full bg-slate-100" />
+
+                    {/* ACTIONS LIST */}
+                    <div className="w-full space-y-1">
+                       <ProfileMenuItem href="/dashboard" icon={ShieldCheck} label="Dashboard" />
+                       <ProfileMenuItem href="/pass" icon={CreditCard} label="My Pass" />
+                       <ProfileMenuItem href="/profile" icon={Settings} label="Settings" />
+                       <ProfileMenuItem href="/help" icon={HelpCircle} label="Help Center" />
+                       {isAdmin && (
+                         <ProfileMenuItem href="/admin" icon={ShieldCheck} label="Admin Center" highlight />
                        )}
                     </div>
 
-                    {/* NAME & PROFILE LINK */}
-                    <div className="space-y-1 w-full">
-                      <h3 className="text-xl md:text-2xl font-[800] text-[#0F172A] tracking-tight leading-tight truncate w-full px-2">
-                        {profile?.name || "Aspirant"}
-                      </h3>
-                      <Link 
-                        href="/profile" 
-                        className="text-[13px] font-[700] text-[#94A3B8] uppercase tracking-[0.15em] hover:text-primary transition-colors flex items-center justify-center gap-1"
-                      >
-                        View Profile <ChevronRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </div>
-
-                    {/* VERIFICATION WARNING (IF NOT VERIFIED) */}
-                    {!emailVerified && (
-                       <Link 
-                        href="/verify-email" 
-                        className="w-full p-4 bg-rose-50 text-rose-700 rounded-2xl border border-rose-100 flex flex-col items-center gap-1 group animate-in fade-in zoom-in-95 duration-500"
-                       >
-                          <div className="flex items-center gap-2">
-                             <AlertCircle className="h-4 w-4" />
-                             <span className="text-[10px] font-black uppercase tracking-widest">Unverified Node</span>
-                          </div>
-                          <p className="text-[11px] font-bold underline underline-offset-4 group-hover:text-rose-900 transition-colors">Click to verify account</p>
-                       </Link>
-                    )}
-
-                    {/* PASS STATUS NODE */}
-                    <div className="w-full p-4 bg-[#DBEAFE]/40 text-[#2563EB] rounded-2xl border border-blue-50/50 flex flex-col gap-1">
-                       <div className="flex items-center justify-between">
-                          <p className="text-[10px] font-black uppercase tracking-widest leading-none">
-                            {profile?.status?.toUpperCase() || "FREE"} PASS
-                          </p>
+                    {/* PASS STATUS MINI BADGE */}
+                    <div className="w-full p-4 bg-[#DBEAFE]/40 text-[#2563EB] rounded-2xl border border-blue-50/50">
+                       <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest leading-none">
+                          <span>{profile?.passType || "FREE"} PASS</span>
                           <Gem className="h-3.5 w-3.5" />
                        </div>
-                       <p className="text-[12px] font-bold text-slate-500 mt-1">
-                         {passDaysLeft !== null ? `${passDaysLeft} Days Remaining` : "Active Subscription"}
+                       <p className="text-[11px] font-bold text-slate-500 mt-1.5">
+                         {passDaysLeft !== null ? `${passDaysLeft} Days Remaining` : "Institutional Access"}
                        </p>
                     </div>
 
-                    {/* ADMIN ACTION NODE */}
-                    {isAdmin && (
-                      <Button asChild className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest bg-[#0F172A] hover:bg-black text-white shadow-lg border-none transition-all active:scale-95">
-                         <Link href="/admin">
-                            <ShieldCheck className="h-4 w-4 mr-2 text-primary" />
-                            Admin Center
-                          </Link>
-                      </Button>
-                    )}
-
-                    {/* LOGOUT NODE */}
-                    <div className="w-full pt-1">
-                       <Button
-                          onClick={handleLogout}
-                          className="w-full h-12 justify-between px-6 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] font-black text-[12px] uppercase tracking-widest rounded-xl transition-all active:scale-95 border-none shadow-none group"
-                       >
-                          <span>Log Out</span>
-                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                       </Button>
-                    </div>
+                    {/* LOGOUT */}
+                    <Button
+                      onClick={handleLogout}
+                      className="w-full h-12 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#EF4444] font-black text-[12px] uppercase tracking-widest rounded-xl transition-all border-none shadow-none group"
+                    >
+                       Log Out <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    </Button>
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/login" className="px-5 md:px-8 h-10 md:h-12 rounded-xl bg-primary text-white font-bold text-sm md:text-base flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-primary/20">
+              <Link href="/login" className="px-6 h-12 rounded-xl bg-primary text-white font-bold text-sm flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-primary/20">
                 Login
               </Link>
             )}
@@ -227,7 +206,7 @@ export default function Navbar() {
 
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent side="left" className="w-[320px] p-0 border-none bg-white z-[2001] shadow-2xl [&>button]:hidden">
-          <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle><SheetDescription>Main menu navigation hub.</SheetDescription></SheetHeader>
+          <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle><SheetDescription>Navigation hub</SheetDescription></SheetHeader>
           <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
         </SheetContent>
       </Sheet>
@@ -241,4 +220,16 @@ function NavLink({ href, label, active }: { href: string; label: string; active?
       {label}
     </Link>
   );
+}
+
+function ProfileMenuItem({ href, icon: Icon, label, highlight }: { href: string, icon: any, label: string, highlight?: boolean }) {
+  return (
+    <Link href={href} className={cn(
+      "flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-sm font-bold",
+      highlight ? "bg-slate-900 text-white hover:bg-black" : "text-slate-600 hover:bg-slate-50"
+    )}>
+       <Icon className={cn("h-4 w-4 shrink-0", highlight ? "text-primary" : "text-slate-400")} />
+       <span className="truncate">{label}</span>
+    </Link>
+  )
 }

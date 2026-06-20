@@ -6,9 +6,8 @@ import { doc, updateDoc, serverTimestamp, setDoc, Firestore } from 'firebase/fir
 import { initializeFirebase } from '@/firebase/app';
 
 /**
- * @fileOverview Elite CBT Global Store v59.0 (Hardened).
- * FIXED: Removed duplicate property definition and corrected initial language state.
- * SIMPLIFIED: Replaced technical jargon with easy student terms.
+ * @fileOverview Elite CBT Global Store v60.0 (Hardened).
+ * Language Simplified: Terms like "Hub" and "Node" replaced for clarity.
  */
 
 interface ExamStore extends AttemptState {

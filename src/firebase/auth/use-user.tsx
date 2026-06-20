@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -9,8 +8,8 @@ import { UserProfile } from '@/types';
 import { getDeviceId } from '@/lib/device';
 
 /**
- * @fileOverview Hardened Auth & Profile Hook v11.0.
- * UPDATED: Optimized status tracking for email verification.
+ * @fileOverview Hardened Auth & Profile Hook v15.0.
+ * Automatically audits pass expiry on every profile sync.
  */
 export function useUser() {
   const auth = useAuth();
@@ -53,10 +52,8 @@ export function useUser() {
       if (timeoutId) clearTimeout(timeoutId);
     });
 
-    // Panic Timeout: Resolve loading state if Firebase takes too long
     timeoutId = setTimeout(() => {
        if (!authResolved) {
-          console.warn("[AUTH_PANIC]: Handshake timed out after 10s. Bypassing blocker for UX.");
           setAuthResolved(true);
           setProfileLoading(false);
        }
@@ -80,7 +77,20 @@ export function useUser() {
 
     const unsubscribeProfile = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
       if (docSnap.exists()) {
-        setProfile({ ...docSnap.data(), id: docSnap.id } as UserProfile);
+        const data = docSnap.data();
+        let passStatus = data.passStatus || 'none';
+        
+        // Pass Expiry Logic: Auto-audit locally and revert if expired
+        if (data.passExpiresAt) {
+           const expiry = new Date(data.passExpiresAt);
+           if (new Date() > expiry) {
+              passStatus = 'expired';
+           } else {
+              passStatus = 'active';
+           }
+        }
+
+        setProfile({ ...data, id: docSnap.id, passStatus } as UserProfile);
       } else {
         setProfile(null);
       }
@@ -88,7 +98,6 @@ export function useUser() {
       profileLoaded.current = true;
       setProfileLoading(false);
     }, (err) => {
-      console.error("[PROFILE_HUB_FAILURE]:", err);
       profileLoaded.current = true;
       setProfileLoading(false);
     });

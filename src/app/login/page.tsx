@@ -4,10 +4,10 @@ import React, { useState, Suspense, useEffect, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import Logo from "@/components/brand/Logo"
-import { Mail, Lock, User, Phone, Eye, EyeOff, Loader2, ShieldCheck, CheckCircle2, Zap, ArrowRight, RefreshCw, AlertCircle } from "lucide-react"
+import { Mail, Lock, User, Eye, EyeOff, Loader2, ShieldCheck, CheckCircle2, Zap, RefreshCw, AlertCircle } from "lucide-react"
 import { useAuth, useFirestore, useUser } from "@/firebase"
 import { 
   signInWithEmailAndPassword, 
@@ -16,7 +16,8 @@ import {
   GoogleAuthProvider,
   sendPasswordResetEmail,
   updateProfile,
-  sendEmailVerification
+  sendEmailVerification,
+  signOut
 } from "firebase/auth"
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
@@ -25,10 +26,6 @@ import { getDeviceId, getBrowserInfo } from "@/lib/device"
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
-/**
- * @fileOverview Professional Login Hub v21.0.
- * UPDATED: Integrated sendEmailVerification on signup and simplified wording.
- */
 export default function LoginPage() {
   return (
     <Suspense fallback={null}>
@@ -40,7 +37,6 @@ export default function LoginPage() {
 function LoginContent() {
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [name, setName] = useState("")
-  const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -100,6 +96,7 @@ function LoginContent() {
         await creds.user.reload();
         
         if (!creds.user.emailVerified) {
+          toast({ title: "Verification Required", description: "Please verify your email to continue." });
           router.push('/verify-email');
           setLoading(false);
           return;
@@ -121,17 +118,18 @@ function LoginContent() {
           id: userNode.uid, 
           name, 
           email, 
-          phone: `+91 ${phone}`,
           role: isSuperAdmin ? 'SUPER_ADMIN' : 'STUDENT',
           state: "Punjab", 
           createdAt: new Date().toISOString(),
           updatedAt: serverTimestamp(), 
-          status: 'Free', 
+          status: 'Free',
+          passType: 'FREE',
+          passStatus: 'none',
           pinnedExams: [],
           verified: false
         })
 
-        toast({ title: "Account Created", description: "Please check your email to verify your account." });
+        toast({ title: "Account Created", description: "Check your email for the verification link." });
         router.push('/verify-email');
       }
     } catch (error: any) {
@@ -159,8 +157,9 @@ function LoginContent() {
           id: userNode.uid, name: userNode.displayName || "Aspirant",
           email: userNode.email, role: isSuperAdmin ? 'SUPER_ADMIN' : 'STUDENT',
           state: "Punjab", createdAt: new Date().toISOString(),
-          updatedAt: serverTimestamp(), status: 'Free', pinnedExams: [], phone: "",
-          verified: userNode.emailVerified
+          updatedAt: serverTimestamp(), status: 'Free', passType: 'FREE', 
+          passStatus: userNode.emailVerified ? 'active' : 'none',
+          pinnedExams: [], verified: userNode.emailVerified
         })
       }
       
@@ -193,25 +192,25 @@ function LoginContent() {
   const isActuallyLoading = loading || isPending;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col lg:flex-row text-[#0F172A] text-left">
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row text-[#0F172A] text-left overflow-hidden">
       
       {/* BRANDING SIDE PANEL */}
-      <div className="hidden lg:flex flex-1 bg-[#0B1528] text-white p-20 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-[#0B1528] text-white p-12 md:p-20 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2" />
         <div className="relative z-10 space-y-12">
            <Logo variant="dark" imgClassName="h-[60px]" />
            <div className="space-y-6">
-              <h1 className="text-5xl font-black leading-[1.1] uppercase tracking-tight">
-                Punjab&apos;s Smart <br/> 
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-black leading-[0.9] uppercase tracking-tight">
+                Punjab's Smart <br/> 
                 <span className="text-primary">Mock Test Hub</span>
               </h1>
-              <p className="text-xl text-slate-400 font-medium max-w-md">
+              <p className="text-sm md:text-xl text-slate-400 font-medium max-w-md leading-relaxed">
                 Prepare for Punjab Government Exams with high-quality mock tests and real-time rankings.
               </p>
            </div>
            <div className="space-y-6 pt-10">
               <BenefitItem text="500+ Mock Tests" />
-              <BenefitItem text="English & Punjabi Mode" />
+              <BenefitItem text="Bilingual Support" />
               <BenefitItem text="Latest Pattern Mocks" />
               <BenefitItem text="Solutions with Logic" />
            </div>
@@ -228,16 +227,10 @@ function LoginContent() {
           
           <div className="lg:hidden text-center space-y-6 mb-10">
              <Logo variant="light" align="center" imgClassName="h-[50px]" />
-             {sessionTerminated && (
-                <div className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center gap-4 text-left">
-                  <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />
-                  <p className="text-xs font-bold text-amber-700 leading-tight">Session ended. Account active on another device.</p>
-                </div>
-             )}
           </div>
 
           <div className="space-y-4">
-             <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#0F172A]">
+             <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#0F172A] leading-[0.9]">
                 {mode === 'login' ? "Login Hub" : "Create Account"}
              </h2>
              <p className="text-slate-500 font-bold text-[12px] md:text-[14px] uppercase tracking-widest leading-none">
@@ -247,32 +240,17 @@ function LoginContent() {
 
           <form onSubmit={handleEmailAuth} className="space-y-6">
             {mode === 'register' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
-                    <Input 
-                      value={name} 
-                      onChange={(e) => setName(e.target.value)} 
-                      required 
-                      className="h-16 rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-lg font-bold pl-16 shadow-inner" 
-                      placeholder="e.g. Arsh Grewal" 
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Mobile Number</Label>
-                  <div className="relative">
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">+91</span>
-                    <Input 
-                      value={phone} 
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0,10))} 
-                      required 
-                      className="h-16 rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-lg font-bold pl-20 shadow-inner" 
-                      placeholder="10 digit number" 
-                    />
-                  </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Full Name</Label>
+                <div className="relative">
+                  <User className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                  <Input 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    required 
+                    className="h-16 rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-lg font-bold pl-16 shadow-inner" 
+                    placeholder="Arsh Grewal" 
+                  />
                 </div>
               </div>
             )}

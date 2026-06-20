@@ -17,11 +17,10 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Standardized Cracklix Branding Node v8.0.
- * SPECS: 
- * Desktop: 48px height
- * Tablet: 42px height
- * Mobile: 36px height
+ * @fileOverview Cracklix Standardized Branding v52.0.
+ * SPECS:
+ * Desktop Header Logo: 52px height
+ * Mobile Header Logo: 40px height
  */
 export default function Logo({
   className = "",
@@ -57,7 +56,7 @@ export default function Logo({
         height={isIcon ? 64 : 180}
         priority={priority}
         className={cn(
-          "object-contain w-auto transition-all flex-shrink-0 h-[36px] sm:h-[42px] md:h-[48px]",
+          "object-contain w-auto transition-all flex-shrink-0 h-[40px] md:h-[52px]",
           imgClassName
         )}
       />
