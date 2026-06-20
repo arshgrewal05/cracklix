@@ -1,7 +1,6 @@
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
-import StatsBar from "@/components/home/StatsBar";
 import GlobalSearch from "@/components/home/GlobalSearch";
 import FeaturedCategories from "@/components/home/FeaturedCategories";
 import PopularExams from "@/components/home/PopularExams";
@@ -14,8 +13,8 @@ import MeetFounder from "@/components/home/MeetFounder";
 import Footer from "@/components/layout/Footer";
 
 /**
- * @fileOverview Official Home Hub v181.0.
- * RESTORED: Original Hero and separate StatsBar architecture.
+ * @fileOverview Official Home Hub v182.0.
+ * UPDATED: Integrated statistics into Hero node. Independent StatsBar removed.
  */
 
 export default function HomePage() {
@@ -23,11 +22,8 @@ export default function HomePage() {
     <main className="min-h-screen bg-white font-body pb-safe text-left">
       <Navbar />
       
-      {/* 1. Original Hero Section */}
+      {/* 1. Restored Feature-Rich Hero Hub */}
       <Hero />
-
-      {/* 1.2 Independent Trust Stats Bar */}
-      <StatsBar />
 
       {/* 1.5 Global Search Engine */}
       <div className="relative z-40 py-8 md:py-12 bg-white">

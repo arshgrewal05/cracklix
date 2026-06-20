@@ -3,146 +3,204 @@
 import React, { useMemo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
+  ClipboardList,
   ShieldCheck,
+  Users,
   Zap,
-  ArrowRight,
-  Play,
-  GraduationCap
+  ChevronRight,
+  BookOpen,
+  FileText,
+  BarChart3,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { useDoc, useFirestore } from "@/firebase";
+import { doc } from "firebase/firestore";
 
 /**
- * @fileOverview Original High-Fidelity Hero Hub v1.0 (Restored).
- * Features: Split-screen architecture with institutional illustration.
+ * @fileOverview Official Restored Hero Hub.
+ * Features: Feature Matrix, Split-Screen Layout, and Integrated Live Stats.
  */
 
 export default function Hero() {
+  const db = useFirestore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const statsRef = useMemo(
+    () => (db ? doc(db, "settings", "stats") : null),
+    [db]
+  );
+
+  const { data: stats } = useDoc<any>(statsRef);
+
+  const liveStats = useMemo(() => {
+    const formatNumber = (num: number, fallback: string) => {
+      if (!num) return fallback;
+      if (num >= 1000) return Math.floor(num / 1000) + "k+";
+      return num + "+";
+    };
+
+    return [
+      {
+        id: "q",
+        icon: <Zap className="h-5 w-5 text-blue-600" />,
+        val: formatNumber(stats?.totalQuestions, "50k+"),
+        label: "Questions"
+      },
+      {
+        id: "m",
+        icon: <ClipboardList className="h-5 w-5 text-indigo-600" />,
+        val: formatNumber(stats?.totalMocks, "500+"),
+        label: "Mock Tests"
+      },
+      {
+        id: "e",
+        icon: <ShieldCheck className="h-5 w-5 text-emerald-600" />,
+        val: formatNumber(stats?.totalBoards, "50+"),
+        label: "Exams"
+      },
+      {
+        id: "u",
+        icon: <Users className="h-5 w-5 text-orange-500" />,
+        val: formatNumber(stats?.totalUsers, "15k+"),
+        label: "Aspirants"
+      }
+    ];
+  }, [stats]);
+
   if (!mounted) return null;
 
   return (
-    <section className="relative overflow-hidden bg-white pt-10 pb-20 md:pt-20 md:pb-32">
-      {/* Background Glow */}
-      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
+    <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-blue-50 py-12 md:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
 
-      <div className="max-w-7xl mx-auto px-4 md:px-12 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 md:gap-20">
-          
-          {/* TEXT CONTENT */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 md:space-y-10"
-          >
-            <div className="space-y-6">
-              <div className="flex flex-col items-center lg:items-start gap-4">
-                <Badge className="bg-primary/10 text-primary border-none px-4 py-1.5 rounded-full font-black uppercase text-[10px] tracking-[0.2em] shadow-sm">
-                   Official Preparation Node
-                </Badge>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-8xl font-black tracking-tight text-[#0F172A] leading-[0.9] antialiased">
-                Crack Punjab <br/>
-                <span className="text-primary font-black">Govt Exams</span>
-              </h1>
+          {/* LEFT: Content Hub */}
+          <div className="text-left">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow-sm mb-6"
+            >
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              <span className="text-sm font-semibold text-slate-700">
+                10,000+ Aspirants Trust Cracklix
+              </span>
+            </motion.div>
 
-              <p className="text-base md:text-xl lg:text-2xl text-slate-500 font-medium max-w-2xl leading-tight tracking-tight">
-                Prepare for PSSSB, PPSC, and Punjab Police with high-fidelity bilingual mock tests and verified patterns.
-              </p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 leading-tight">
+              Crack Punjab
+              <span className="block text-blue-600">
+                Government Exams
+              </span>
+              With Confidence
+            </h1>
+
+            <p className="mt-6 text-base sm:text-lg text-slate-600 max-w-2xl">
+              Practice with bilingual mock tests, previous papers and
+              exam-focused preparation for PSSSB, Punjab Police,
+              PSTET, PSPCL and more.
+            </p>
+
+            <div className="flex flex-wrap gap-3 mt-6">
+              {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map(
+                (item) => (
+                  <span
+                    key={item}
+                    className="px-4 py-2 rounded-full bg-white border text-sm font-medium text-slate-700"
+                  >
+                    {item}
+                  </span>
+                )
+              )}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            {/* Feature Matrix */}
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <FeatureCard icon={<ClipboardList className="text-blue-600" />} label="Mock Tests" />
+              <FeatureCard icon={<BookOpen className="text-indigo-600" />} label="Study Material" />
+              <FeatureCard icon={<FileText className="text-emerald-600" />} label="Previous Papers" />
+              <FeatureCard icon={<BarChart3 className="text-orange-500" />} label="Performance Analytics" />
+            </div>
+
+            <div className="flex flex-wrap gap-4 mt-8">
               <Button
                 asChild
-                className="w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 bg-[#0B1528] hover:bg-black text-white font-black uppercase text-[11px] md:text-[13px] tracking-widest rounded-2xl shadow-4xl border-none transition-all active:scale-95 group/btn"
+                className="h-12 md:h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 border-none text-white font-bold"
               >
-                <Link href="/mocks" className="flex items-center justify-center gap-4">
-                  <Play className="h-5 w-5 fill-primary text-primary" /> Start Free Mock Test
+                <Link href="/mocks">
+                  Start Free Mock Test
+                  <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
 
               <Button
                 asChild
                 variant="outline"
-                className="w-full sm:w-auto h-16 md:h-20 px-10 border-2 border-slate-100 bg-white text-[#0B1528] font-black uppercase text-[11px] md:text-[13px] tracking-widest rounded-2xl shadow-sm hover:bg-slate-50 transition-all active:scale-95 group/btn"
+                className="h-12 md:h-14 px-8 rounded-2xl border-slate-200 bg-white font-bold text-slate-700"
               >
-                <Link href="/exams" className="flex items-center justify-center gap-3">
-                   Browse Exams <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                <Link href="/exams">
+                  Browse Exams
                 </Link>
               </Button>
             </div>
+          </div>
 
-            <div className="flex items-center gap-6 pt-4">
-               <div className="flex items-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-widest">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" /> Verified Pattern
-               </div>
-               <div className="w-px h-4 bg-slate-200" />
-               <div className="flex items-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-widest">
-                  <Zap className="h-4 w-4 text-primary" /> Live Ranking
-               </div>
-            </div>
-          </motion.div>
-
-          {/* HERO IMAGE */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative hidden lg:flex justify-end"
-          >
-            <div className="relative h-[500px] md:h-[650px] w-full max-w-[600px]">
-               <div className="absolute inset-0 bg-primary/5 rounded-[4rem] rotate-3 -z-10" />
-               <div className="absolute inset-0 bg-slate-50 rounded-[4rem] -rotate-2 -z-20 border border-slate-100 shadow-inner" />
-               
-               <Image 
-                 src="/images/hero-student.png" 
-                 alt="Punjab Student Preparation" 
-                 fill 
-                 priority
-                 className="object-contain drop-shadow-3xl"
-                 sizes="600px"
-               />
-
-               {/* Floating elements */}
-               <div className="absolute top-20 -left-10 bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 animate-bounce duration-[3000ms]">
-                  <div className="flex items-center gap-3">
-                     <div className="h-10 w-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500">
-                        <ShieldCheck className="h-6 w-6" />
-                     </div>
-                     <div className="text-left">
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Patterns</p>
-                        <p className="text-xs font-bold text-[#0F172A]">Verified Node</p>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="absolute bottom-20 -right-4 bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 animate-pulse">
-                  <div className="flex items-center gap-3">
-                     <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                        <GraduationCap className="h-6 w-6" />
-                     </div>
-                     <div className="text-left">
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Success</p>
-                        <p className="text-xs font-bold text-[#0F172A]">15K+ Learners</p>
-                     </div>
-                  </div>
-               </div>
-            </div>
-          </motion.div>
-
+          {/* RIGHT: Illustration */}
+          <div className="relative flex justify-center lg:justify-end">
+            <motion.img
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              src="/images/hero-student.png"
+              alt="Cracklix Student"
+              className="w-full max-w-md drop-shadow-2xl"
+            />
+          </div>
         </div>
+
+        {/* STATS: Bottom Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 text-left">
+          {liveStats.map((stat) => (
+            <Card
+              key={stat.id}
+              className="p-6 rounded-3xl bg-white border border-slate-100 shadow-sm group hover:shadow-md transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
+                  {stat.icon}
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-slate-900 leading-none">
+                    {stat.val}
+                  </p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                    {stat.label}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+
       </div>
     </section>
+  );
+}
+
+function FeatureCard({ icon, label }: { icon: React.ReactNode, label: string }) {
+  return (
+    <Card className="p-4 rounded-3xl border border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+      <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center mb-3">
+        {React.cloneElement(icon as React.ReactElement, { className: "h-6 w-6" })}
+      </div>
+      <p className="font-bold text-slate-900 text-sm">{label}</p>
+    </Card>
   );
 }
