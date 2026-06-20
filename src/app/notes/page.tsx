@@ -16,8 +16,8 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Download Center v2.3 (Premium Locked).
- * SECURITY: Standardized locking for premium study assets.
+ * @fileOverview Institutional Download Center v2.3.
+ * SECURITY: Strict Pass Expiry Audit for Premium Assets.
  */
 
 export default function NotesLibrary() {
@@ -144,8 +144,7 @@ function NotesGrid({ data, loading, profile }: any) {
 function DownloadCard({ asset, profile }: { asset: any, profile: any }) {
    const isPassValid = useMemo(() => {
      if (profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN') return true;
-     if (!profile?.pass?.active) return false;
-     return new Date(profile.pass.expiryDate) > new Date();
+     return profile?.passStatus === 'active';
    }, [profile]);
 
    const isLocked = !asset.isFree && !isPassValid;

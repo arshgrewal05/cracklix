@@ -8,9 +8,9 @@ import { UserProfile } from '@/types';
 import { getDeviceId } from '@/lib/device';
 
 /**
- * @fileOverview Hardened Auth & Profile Hub v6.0.
- * Persistent: Uses onAuthStateChanged to maintain stable login states across refreshes.
- * Multi-Device: Allows concurrent sessions on multiple hardware nodes.
+ * @fileOverview Hardened Auth & Profile Hub v6.1.
+ * Persistent: Uses onAuthStateChanged to maintain stable login states.
+ * Real-time Expiry: Audits pass expiry dates on every snapshot.
  */
 export function useUser() {
   const auth = useAuth();
@@ -31,7 +31,6 @@ export function useUser() {
   useEffect(() => {
     if (!auth) return;
 
-    // Standard Firebase listener for session persistence
     const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setAuthResolved(true);
@@ -64,18 +63,39 @@ export function useUser() {
     const unsubscribeProfile = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        let passStatus = data.passStatus || 'none';
         
+        // --- REAL-TIME EXPIRY AUDIT ---
+        let passStatus = data.passStatus || 'none';
+        let passActive = false;
+
+        // 1. Audit by Expiry Date
         if (data.passExpiresAt) {
-           const expiry = new Date(data.passExpiresAt);
-           if (new Date() > expiry) {
+           const expiryDate = new Date(data.passExpiresAt);
+           const now = new Date();
+           
+           if (now > expiryDate) {
               passStatus = 'expired';
-           } else {
+              passActive = false;
+           } else if (data.pass?.active !== false) {
               passStatus = 'active';
+              passActive = true;
            }
+        } 
+        // 2. Audit by legacy boolean if date missing
+        else if (data.pass?.active === true) {
+           passStatus = 'active';
+           passActive = true;
         }
 
-        setProfile({ ...data, id: docSnap.id, passStatus } as UserProfile);
+        setProfile({ 
+          ...data, 
+          id: docSnap.id, 
+          passStatus,
+          pass: {
+            ...(data.pass || {}),
+            active: passActive
+          }
+        } as UserProfile);
       } else {
         setProfile(null);
       }

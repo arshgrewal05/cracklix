@@ -5,7 +5,7 @@ import { useParams, useRouter, usePathname } from "next/navigation"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useDoc, useFirestore, useUser } from "@/firebase"
-import { doc, collection, query, where, getDocs, getDoc } from "firebase/firestore"
+import { doc, getDoc } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,13 +22,18 @@ import {
   RefreshCw,
   Gem,
   CheckCircle2,
-  XCircle
+  ArrowRight
 } from "lucide-react"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
+
+/**
+ * @fileOverview Institutional Exam Hub v38.0.
+ * HARDENED: Strict Pass Expiry Audit for Premium Mocks.
+ */
 
 export default function MockOverviewPage() {
   const params = useParams()
@@ -52,7 +57,7 @@ export default function MockOverviewPage() {
 
   useEffect(() => {
     async function checkAccess() {
-      if (mockLoading || !user || !mock || !db) return;
+      if (mockLoading || !user || !mock || !db || !profile) return;
 
       const tier = (mock.accessLevel || 'FREE').toUpperCase();
       const isPremium = tier === 'PREMIUM';
@@ -66,12 +71,15 @@ export default function MockOverviewPage() {
       const isFounder = userEmail && SUPER_ADMIN_WHITELIST.includes(userEmail);
       const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || isFounder;
       
+      // --- CORE EXPIRY AUDIT ---
       let hasActivePass = false;
       if (isAdmin) {
          hasActivePass = true;
       } else if (profile?.passExpiresAt) {
          const expiry = new Date(profile.passExpiresAt);
-         if (expiry > new Date()) hasActivePass = true;
+         if (expiry > new Date() && profile.pass?.active !== false) {
+           hasActivePass = true;
+         }
       }
       
       setIsLocked(isPremium && !hasActivePass);
@@ -101,21 +109,25 @@ export default function MockOverviewPage() {
                     <Lock className="h-10 w-10" />
                  </div>
                  <div className="space-y-3">
-                    <h2 className="text-3xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-[0.9]">Premium Mock Locked</h2>
-                    <p className="text-slate-500 font-medium text-lg max-w-sm mx-auto">Access this test with Cracklix Elite Pass.</p>
+                    <h2 className="text-3xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight leading-[0.9]">Premium Mock Locked</h2>
+                    <p className="text-slate-500 font-medium text-sm md:text-lg max-w-sm mx-auto">
+                       {profile?.passStatus === 'expired' 
+                         ? "Your elite pass has expired. Renew now to unlock this preparation node." 
+                         : "This mock is part of the elite practice registry."}
+                    </p>
                  </div>
               </div>
 
               <div className="grid grid-cols-1 gap-3 text-left relative z-10 bg-slate-50/80 p-8 rounded-[2rem] border border-slate-100">
-                 <ValueProp text="Unlimited Premium Tests" />
-                 <ValueProp text="Previous Year Papers" />
-                 <ValueProp text="Detailed Solutions & Logic" />
-                 <ValueProp text="All Punjab Merit List" />
+                 <ValueProp text="500+ Premium Mock Series" />
+                 <ValueProp text="Detailed AI Solutions" />
+                 <ValueProp text="State Merit List Entries" />
+                 <ValueProp text="Solved Previous Papers" />
               </div>
 
               <div className="pt-4 space-y-4 relative z-10">
-                 <Button asChild className="w-full h-16 bg-[#0F172A] hover:bg-black text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-2xl transition-all active:scale-95 border-none">
-                    <Link href="/pass">Unlock Elite Access <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                 <Button asChild className="w-full h-16 bg-primary hover:bg-blue-700 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-2xl transition-all active:scale-95 border-none">
+                    <Link href="/pass">{profile?.passStatus === 'expired' ? 'Renew Elite Pass' : 'Unlock Now'} <ArrowRight className="ml-2 h-4 w-4" /></Link>
                  </Button>
                  <button onClick={() => router.back()} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors">
                     Return to Library
@@ -168,9 +180,9 @@ export default function MockOverviewPage() {
         <section className="py-12 md:py-24 bg-white">
            <div className="container mx-auto px-4 md:px-8 max-w-7xl">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                 <FeatureNode icon={ShieldCheck} title="OFFICIAL PATTERN" desc="Verified patterns." />
-                 <FeatureNode icon={Zap} title="EXPERT SOLUTIONS" desc="Bilingual rationales." />
-                 <FeatureNode icon={Target} title="STATE RANKINGS" desc="Compare with toppers." />
+                 <FeatureNode icon={ShieldCheck} title="OFFICIAL PATTERN" desc="Curated according to latest board notifications." />
+                 <FeatureNode icon={Zap} title="EXPERT SOLUTIONS" desc="Detailed rationalizations for every MCQ node." />
+                 <FeatureNode icon={Target} title="STATE RANKINGS" desc="Compare performance with toppers across Punjab." />
               </div>
            </div>
         </section>

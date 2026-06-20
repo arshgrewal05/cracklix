@@ -26,8 +26,8 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Hardened CBT Engine v58.2 (Production Build).
- * FIXED: Resolved JSX tag mismatch and explicitly typed hydration callbacks.
+ * @fileOverview Hardened CBT Engine v58.5.
+ * HARDENED: Strict Pass Expiry validation at test initialization.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -63,19 +63,30 @@ export default function MockAttemptPage() {
 
   useEffect(() => {
     async function loadExam() {
-      if (!db || !user || !mockId) return;
+      if (!db || !user || !mockId || !profile) return;
       try {
         const mockSnap = await getDoc(doc(db, "mocks", mockId));
         if (!mockSnap.exists()) throw new Error("Test registry node not found.");
         const mData = mockSnap.data();
         setMockData(mData);
 
+        // --- STRICT EXPIRY AUDIT ---
         const tier = (mData.accessLevel || 'FREE').toUpperCase();
         const userEmail = user.email?.toLowerCase();
         const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'SUPER_ADMIN' || (userEmail && SUPER_ADMIN_WHITELIST.includes(userEmail));
-        const hasActivePass = isAdmin || (profile?.pass?.active === true && new Date(profile.pass.expiryDate) > new Date());
+        
+        let hasActivePass = false;
+        if (isAdmin) {
+          hasActivePass = true;
+        } else if (profile?.passExpiresAt) {
+          const expiry = new Date(profile.passExpiresAt);
+          if (expiry > new Date() && profile.pass?.active !== false) {
+            hasActivePass = true;
+          }
+        }
 
         if (tier === 'PREMIUM' && !hasActivePass) {
+           toast({ variant: "destructive", title: "Access Expired", description: "Please renew your elite pass." });
            router.replace('/pass');
            return;
         }
@@ -102,7 +113,7 @@ export default function MockAttemptPage() {
       }
     }
     loadExam();
-  }, [db, user, profile, mockId, initExam, router]);
+  }, [db, user, profile, mockId, initExam, router, toast]);
 
   useEffect(() => {
     if (isInitializing || initError) return;
