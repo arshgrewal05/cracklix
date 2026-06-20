@@ -36,9 +36,9 @@ import { Button } from "@/components/ui/button";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Institutional Header v98.0 (Maximum Branding).
+ * @fileOverview Institutional Header v99.0 (Maximum Branding).
  * BRAND SYSTEM: Logo size maximized to 72px desktop / 62px mobile.
- * ALIGNMENT: Shifted to the far left.
+ * ALIGNMENT: Absolute left positioning for authoritative presence.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -78,7 +78,7 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-50 w-full font-body">
       <nav className="w-full h-20 bg-white border-b border-slate-100 shadow-sm">
-        <div className="w-full max-w-7xl mx-auto px-1 md:px-3 h-full flex items-center justify-between gap-4">
+        <div className="w-full max-w-7xl mx-auto px-2 md:px-4 h-full flex items-center justify-between gap-4">
 
           {/* LEFT SIDE: Menu Hub + Maximized Logo Node */}
           <div className="flex items-center shrink-0">
@@ -90,7 +90,7 @@ export default function Navbar() {
               <Menu className="w-5 h-5 md:w-6 md:h-6" />
             </button>
 
-            {/* BRANDING: Maximized size (72px/62px) and minimal left offset */}
+            {/* BRANDING: Maximized to 72px (height-18 equivalent) with minimal left offset */}
             <Logo
               variant="light"
               className="ml-1 flex-shrink-0"

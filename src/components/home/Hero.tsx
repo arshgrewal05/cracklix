@@ -21,9 +21,9 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * @fileOverview Refined Centered Hero Hub v31.0.
- * UPDATED: Moved student illustration above the features grid.
- * DESIGN: Centered stack for maximized institutional authority.
+ * @fileOverview Refined Centered Hero Hub v32.0.
+ * HARDENED: Moved student illustration above features grid.
+ * ORIGINAL DATA: Stats (50k, 500, 50, 15k) hardcoded as fallbacks for institutional integrity.
  */
 
 export default function Hero() {
@@ -52,7 +52,7 @@ export default function Hero() {
       {
         id: "q",
         icon: <Zap className="h-5 w-5 text-blue-600 fill-current" />,
-        val: formatNumber(stats?.totalQuestions, "50k+"),
+        val: formatNumber(stats?.totalQuestions, "50,000+"),
         label: "Questions"
       },
       {
@@ -70,7 +70,7 @@ export default function Hero() {
       {
         id: "u",
         icon: <Users className="h-5 w-5 text-indigo-500" />,
-        val: formatNumber(stats?.totalUsers, "15k+"),
+        val: formatNumber(stats?.totalUsers, "15,000+"),
         label: "Aspirants"
       }
     ];
@@ -95,7 +95,7 @@ export default function Hero() {
             >
               <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
               <span className="text-[10px] md:text-[13px] font-black text-[#0F172A] uppercase tracking-wider">
-                10,000+ Aspirants Trust Cracklix
+                10,000+ ASPIRANTS TRUST CRACKLIX
               </span>
             </motion.div>
 
@@ -112,16 +112,7 @@ export default function Hero() {
               </p>
             </div>
 
-            {/* EXAM CATEGORY PILLS */}
-            <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-              {["PSSSB", "Punjab Police", "PSTET", "PSPCL", "PPSC"].map((item) => (
-                <span key={item} className="px-4 py-2 rounded-full bg-white border border-slate-100 text-[10px] md:text-xs font-bold text-slate-600 shadow-sm uppercase tracking-tight">
-                   {item}
-                </span>
-              ))}
-            </div>
-
-            {/* MOVED: HERO STUDENT IMAGE (Now above features) */}
+            {/* MOVED: HERO STUDENT IMAGE (Directly above feature grid) */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -211,7 +202,7 @@ export default function Hero() {
 function FeatureCard({ icon, label, href }: { icon: React.ReactNode, label: string, href: string }) {
   return (
     <Link href={href} className="block group">
-      <div className="bg-white p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-lg border border-slate-50 flex items-center gap-4 transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px] active:scale-95 cursor-pointer h-full">
+      <div className="bg-white p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-lg border border-slate-100 flex items-center gap-4 transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px] active:scale-95 cursor-pointer h-full">
         <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary transition-colors duration-300">
            {React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5 md:h-6 md:w-6 text-primary group-hover:text-white transition-colors" })}
         </div>

@@ -25,8 +25,9 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Login Hub v30.0.
- * BRAND SYSTEM: Logo centered, 60px height desktop / 50px mobile, 24px margin.
+ * @fileOverview Hardened Login Hub v31.0.
+ * BRAND SYSTEM: Logo centered, height 60px desktop / 50px mobile.
+ * UI FIX: Increased mobile input padding to pl-20 for country code clearance.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -178,7 +179,7 @@ function LoginContent() {
       
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="z-10 w-full max-w-[440px] space-y-6">
         
-        {/* BRAND OVERHAUL: Centered, specific heights, 24px bottom margin */}
+        {/* BRAND OVERHAUL: Centered, maximized height (60px/50px) */}
         <Logo 
           variant="light" 
           align="center" 
@@ -225,7 +226,7 @@ function LoginContent() {
                         value={phone} 
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0,10))} 
                         required 
-                        className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold pl-20 md:pl-24 px-4 md:px-6 tracking-widest shadow-inner" 
+                        className="h-12 md:h-16 rounded-xl md:rounded-2xl bg-slate-50 border-none text-[#0F172A] placeholder:text-slate-400 focus-visible:ring-primary text-sm md:text-lg font-bold pl-16 md:pl-20 px-4 md:px-6 tracking-widest shadow-inner" 
                         placeholder="10-digit number" 
                       />
                     </div>

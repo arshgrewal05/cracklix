@@ -17,13 +17,13 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Master Cracklix Branding Node v2.2.
+ * @fileOverview Master Cracklix Branding Node v3.0.
  * Strictly implements the official brand guidelines:
- * - variant="light": Uses cracklix-logo-dark.png (for light backgrounds)
- * - variant="dark": Uses cracklix-logo-light.png (for dark backgrounds)
+ * - variant="light": Uses cracklix-logo-dark.png (Dark text for Light backgrounds)
+ * - variant="dark": Uses cracklix-logo-light.png (Light text for Dark backgrounds)
  * - variant="icon": Uses cracklix-icon.png
  * 
- * UPDATED: Optimized for maximized header visibility (72px desktop / 62px mobile).
+ * MAXIMIZED: Desktop height 72px / Mobile height 62px.
  */
 export default function Logo({
   className = "",
@@ -36,10 +36,9 @@ export default function Logo({
   iconOnly = false
 }: LogoProps) {
   
-  // Official Asset Mapping
   const assets = {
-    light: "/logo/cracklix-logo-dark.png",  // Logo with dark text for light UI
-    dark: "/logo/cracklix-logo-light.png",  // Logo with light text for dark UI
+    light: "/logo/cracklix-logo-dark.png",
+    dark: "/logo/cracklix-logo-light.png",
     icon: "/logo/cracklix-icon.png"
   };
 
@@ -57,12 +56,12 @@ export default function Logo({
       <Image
         src={src}
         alt="Cracklix"
-        width={isIcon ? 48 : 400}
-        height={isIcon ? 48 : 120}
+        width={isIcon ? 64 : 500}
+        height={isIcon ? 64 : 150}
         priority={priority}
         className={cn(
           "object-contain w-auto transition-all",
-          !isIcon && (imgClassName || "h-[42px] md:h-[52px]"),
+          !isIcon && (imgClassName || "h-[62px] md:h-[72px]"),
           imgClassName
         )}
       />
