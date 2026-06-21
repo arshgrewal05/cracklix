@@ -96,12 +96,14 @@ export default function SidebarNav({
   isOpen,
   pathname,
 }: SidebarNavProps) {
+  // Flatten all items to find the most specific match
+  const allNavItems = React.useMemo(() => NAV_GROUPS.flatMap(g => g.items), []);
+
   return (
     <TooltipProvider delayDuration={0}>
       <nav className="flex-1 overflow-y-auto px-3 py-6 no-scrollbar space-y-8">
         {NAV_GROUPS.map((group) => (
           <div key={group.label} className="space-y-2">
-            {/* GROUP TITLE - TITLE CASE SYNC */}
             {isOpen ? (
               <p className="px-4 text-[10px] font-black tracking-tight text-slate-400">
                 {group.label}
@@ -113,7 +115,18 @@ export default function SidebarNav({
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                
+                // Specific Match Logic: 
+                // An item is active if the path matches AND there isn't a LONGER (more specific) match in the list.
+                const isExact = pathname === item.href;
+                const isMatch = item.href !== "/admin" && pathname.startsWith(item.href);
+                const hasBetterMatch = allNavItems.some(other => 
+                  other.href !== item.href && 
+                  other.href.length > item.href.length && 
+                  pathname.startsWith(other.href)
+                );
+
+                const isActive = isExact || (isMatch && !hasBetterMatch);
 
                 const navItem = (
                   <Link
