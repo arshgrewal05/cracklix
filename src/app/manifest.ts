@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
 
 /**
- * @fileOverview Production-Grade PWA Manifest v20.0 (Hardened).
- * Ensures correct display and orientation for app stores and browsers.
+ * @fileOverview Production-Grade PWA Manifest v21.0.
+ * Hardened for Chrome, Android, Samsung Internet and Edge support.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {

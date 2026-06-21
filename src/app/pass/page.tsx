@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, Zap, ArrowRight, ShieldCheck, Gem, Clock, AlertCircle } from "lucide-react"
+import { CheckCircle2, Zap, ArrowRight, Gem, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { useUser, useFirestore, useCollection } from "@/firebase"
@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview High-Density Pass Center v22.2 (Hardened).
- * FIXED: Captured passExpiresAt into local constant to resolve TS2769.
+ * @fileOverview High-Density Pass Center v22.3.
+ * FIXED: TS2769 by ensuring optional passExpiresAt is correctly narrowed.
  */
 
 export default function PassPage() {

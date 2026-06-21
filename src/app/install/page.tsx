@@ -13,11 +13,9 @@ import {
   Apple, 
   Share,
   PlusSquare,
-  AlertCircle,
   CheckCircle2,
   Info,
   MoreVertical,
-  ExternalLink
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -29,9 +27,8 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview High-Fidelity PWA Install Hub v2.0 (Resilient Detection).
- * FIXED: Hardened standalone detection to prevent incorrect "Already Installed" messages.
- * ADDED: Manual instructions for Android and deep link support.
+ * @fileOverview High-Fidelity PWA Install Hub v3.0.
+ * FIXED: Standalone detection logic and manual instructions for Chrome Android.
  */
 
 type DeviceType = "android" | "ios" | "desktop" | "unknown";
@@ -98,8 +95,8 @@ export default function InstallPage() {
     } else {
        setShowManual(true);
        toast({
-         title: "Setup Node Active",
-         description: "Automated prompt blocked by browser. See manual steps below.",
+         title: "Setup Mode",
+         description: "Automated prompt blocked. See manual steps below.",
        });
     }
   };
@@ -138,7 +135,7 @@ export default function InstallPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-12 items-start">
            
            <div className="lg:col-span-7">
-              <Card className="border-none shadow-5xl rounded-[2.5rem] bg-[#0B1528] text-white overflow-hidden p-6 md:p-14 space-y-6 md:space-y-10 relative">
+              <Card className="border-none shadow-5xl rounded-3xl bg-[#0B1528] text-white overflow-hidden p-6 md:p-14 space-y-6 md:space-y-10 relative">
                  <div className="absolute top-0 right-0 p-8 opacity-5 rotate-12">
                     {isIos ? <Apple className="h-44 w-44 md:h-64 md:w-64" /> : <Smartphone className="h-44 w-44 md:h-64 md:w-64" />}
                  </div>
@@ -192,7 +189,7 @@ export default function InstallPage() {
                              {!isInstallable && !isIos && (
                                 <div className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center gap-2">
                                    <Info className="h-3 w-3 text-primary shrink-0" />
-                                   <p className="text-[9px] text-slate-300 font-bold uppercase tracking-tight">Manual setup node active for Chrome & Browser.</p>
+                                   <p className="text-[9px] text-slate-300 font-bold uppercase tracking-tight">Setup node active for Chrome & Browser.</p>
                                 </div>
                              )}
                           </div>

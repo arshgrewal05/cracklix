@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { X, Zap, Download } from 'lucide-react';
+import { X, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Smart Institutional PWA Install Node v12.0 (Event Capture).
- * This component handles the global beforeinstallprompt event.
+ * @fileOverview Hardened Institutional PWA Manager v14.0.
+ * FIXED: Reliable standalone detection and logging for Android/Samsung Internet.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -19,32 +19,33 @@ export default function PWAManager() {
   const checkStatus = useCallback(() => {
     if (typeof window === 'undefined') return;
     
-    // Check if already in standalone mode (installed)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+    // Hardened detection for standalone vs browser
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
     setIsInstalled(isStandalone);
 
-    // Prompt exclusions
     const isExcluded = pathname?.includes('/attempt') || pathname?.startsWith('/admin') || pathname === '/install';
     const isDismissed = localStorage.getItem('cracklix_pwa_dismissed') === 'true';
+    const hasPrompt = !!(window as any).deferredPrompt;
     
-    // Show prompt only if not installed, not on excluded pages, not dismissed, and prompt is available
-    setShowPrompt(!isStandalone && !isExcluded && !isDismissed && !!(window as any).deferredPrompt);
+    const shouldShow = !isStandalone && !isExcluded && !isDismissed && hasPrompt;
+    setShowPrompt(shouldShow);
+    
+    console.log('[PWA_AUDIT] Status:', { isStandalone, isExcluded, isDismissed, hasPrompt, shouldShow });
   }, [pathname]);
 
   useEffect(() => {
     setMounted(true);
 
     const handlePrompt = (e: any) => {
-      // 1. Prevent default mini-infobar
+      console.log('[PWA_AUDIT] beforeinstallprompt fired');
       e.preventDefault();
-      // 2. Store the event globally
       (window as any).deferredPrompt = e;
-      // 3. Notify components that install is available
       window.dispatchEvent(new CustomEvent('pwa-installable'));
       checkStatus();
     };
 
     const handleAppInstalled = () => {
+      console.log('[PWA_AUDIT] App successfully installed');
       setIsInstalled(true);
       setShowPrompt(false);
       (window as any).deferredPrompt = null;
@@ -65,14 +66,22 @@ export default function PWAManager() {
 
   const handleInstallClick = async () => {
     const prompt = (window as any).deferredPrompt;
-    if (!prompt) return;
+    if (!prompt) {
+      console.warn('[PWA_AUDIT] Prompt called but not available');
+      return;
+    }
 
-    prompt.prompt();
-    const { outcome } = await prompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setShowPrompt(false);
-      (window as any).deferredPrompt = null;
+    try {
+      await prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      console.log('[PWA_AUDIT] Install result:', outcome);
+      
+      if (outcome === 'accepted') {
+        setShowPrompt(false);
+        (window as any).deferredPrompt = null;
+      }
+    } catch (err) {
+      console.error('[PWA_AUDIT] Install interaction failed:', err);
     }
   };
 
@@ -103,7 +112,7 @@ export default function PWAManager() {
                     localStorage.setItem('cracklix_pwa_dismissed', 'true'); 
                     setShowPrompt(false); 
                   }} 
-                  className="p-2 hover:bg-white/5 rounded-xl transition-colors"
+                  className="p-2 hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4 text-slate-500" />
                 </button>

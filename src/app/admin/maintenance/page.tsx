@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -11,23 +11,21 @@ import {
   ShieldAlert, 
   Trash2, 
   LogOut, 
-  Search, 
   Database, 
   AlertCircle,
   Loader2,
-  CheckCircle2,
   ShieldCheck,
   ChevronRight
-} from "lucide-material"
+} from "lucide-react"
 import { useFirestore } from "@/firebase"
-import { collection, query, where, getDocs, writeBatch, doc, setDoc, serverTimestamp, getCountFromServer, deleteDoc, DocumentData, updateDoc } from "firebase/firestore"
+import { collection, query, where, getDocs, writeBatch, doc, setDoc, serverTimestamp, getCountFromServer, DocumentData, updateDoc } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { clearAppCache } from "@/app/actions/maintenance"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Master Admin Maintenance Terminal v2.7.
- * FIXED: Corrected event parameter type for strict TS compliance.
+ * @fileOverview Master Admin Maintenance Terminal v2.8.
+ * FIXED: Corrected event parameter type and added missing Input import.
  */
 
 export default function MaintenancePage() {

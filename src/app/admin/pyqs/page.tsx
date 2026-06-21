@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash2, Edit, FileText, Download, Save, Search, Layers, Loader2, Landmark } from "lucide-react"
+import { Plus, Trash2, Edit, FileText, Download, Save, Search, Layers, Loader2, Landmark, X } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, doc, setDoc, deleteDoc, orderBy, serverTimestamp } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional PYQ Archive CMS v20.1.
+ * @fileOverview Institutional PYQ Archive CMS v21.0.
  * FIXED: Captured correct 'editingPYQ' variable for filtering.
  */
 
@@ -144,7 +144,7 @@ export default function AdminPYQManagement() {
       </Card>
 
       <Dialog open={!!editingPYQ} onOpenChange={o => !o && !isSaving && setEditingPYQ(null)}>
-         <DialogContent className="sm:max-w-xl w-[95vw] max-h-[90vh] bg-white rounded-3xl md:rounded-[3rem] border-none shadow-5xl p-0 overflow-hidden text-left flex flex-col">
+         <DialogContent className="sm:max-w-xl w-[95vw] max-h-[95vh] bg-white rounded-3xl md:rounded-[3rem] border-none shadow-5xl p-0 overflow-hidden text-left flex flex-col">
             <div className="h-2 w-full bg-primary shrink-0" />
             <DialogHeader className="p-6 md:p-10 pb-2 md:pb-4 shrink-0">
                <DialogTitle className="text-xl md:text-3xl font-black text-[#0F172A]">Archive Architect</DialogTitle>

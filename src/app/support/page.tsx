@@ -14,8 +14,6 @@ import {
   MessageCircle, 
   Send, 
   History, 
-  CheckCircle2, 
-  AlertCircle,
   HelpCircle,
   ChevronRight,
   Zap, 
@@ -32,8 +30,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import Link from "next/link"
 
 /**
- * @fileOverview Official Institutional Support Hub v4.6.
- * FIXED: Added missing Link and Loader2 imports.
+ * @fileOverview Official Institutional Support Hub v5.0.
+ * FIXED: Missing Link and Loader2 imports.
  */
 
 const TELEGRAM_GROUP = "https://t.me/cracklixapp";
@@ -195,16 +193,6 @@ export default function SupportPage() {
                     </Button>
                  </div>
               </Card>
-
-              <div className="bg-primary text-white rounded-[3rem] p-10 space-y-8 relative overflow-hidden group shadow-4xl cursor-pointer" onClick={() => window.open(TELEGRAM_GROUP, "_blank")}>
-                 <div className="absolute bottom-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"><MessageCircle className="h-32 w-32" /></div>
-                 <div className="relative z-10 space-y-4">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Instant Updates</h4>
-                    <h3 className="text-2xl font-black uppercase leading-tight">Telegram community</h3>
-                    <p className="text-white/80 text-sm font-medium leading-relaxed">Join 15k+ students for official exam patterns & result alerts.</p>
-                    <div className="pt-4 flex items-center gap-3 text-xs font-black uppercase tracking-widest">Join now <ChevronRight className="h-4 w-4" /></div>
-                 </div>
-              </div>
            </div>
         </div>
       </main>
