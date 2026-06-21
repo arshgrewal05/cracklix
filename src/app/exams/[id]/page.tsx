@@ -43,9 +43,8 @@ import { useToast } from "@/hooks/use-toast"
 import { getAuthorityIcon } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Institutional Exam Hub v44.0 (Normalized & Scalable).
- * FIXED: Standardized typography and spacing.
- * ENHANCED: Relational mapping for Notes and PYQs.
+ * @fileOverview Institutional Exam Hub v45.0.
+ * NORMALIZED: Removed uppercase from exam titles and card titles.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -134,7 +133,9 @@ export default function ExamHubPage() {
                         </button>
                      </div>
                      <div className="space-y-1">
-                        <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight uppercase">{exam.name}</h1>
+                        <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
+                           {exam.name}
+                        </h1>
                         <p className="text-sm md:text-xl font-bold text-slate-400 max-w-3xl leading-snug">Prepare with official patterns and verified study nodes.</p>
                      </div>
                   </div>
@@ -198,7 +199,9 @@ function MockList({ data, results, isPassActive, loading, boards, exam }: any) {
                      {board?.iconUrl ? <img src={board.iconUrl} className="w-full h-full object-contain p-1" alt="Logo" /> : <ShieldCheck className="h-full w-full text-slate-200" />}
                   </div>
                   <CardHeader className="p-0 flex-1 space-y-4">
-                     <CardTitle className="font-black text-lg md:text-xl text-[#0F172A] leading-tight line-clamp-2 uppercase">{mock.title}</CardTitle>
+                     <CardTitle className="font-black text-lg md:text-xl text-[#0F172A] leading-tight line-clamp-2">
+                        {mock.title}
+                     </CardTitle>
                      <div className="flex items-center justify-center gap-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" /> {mock.totalQuestions} Qs</span>
                         <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {mock.duration}m</span>
@@ -236,7 +239,7 @@ function NotesList({ data, isPassActive, loading, type }: any) {
                         {isLocked ? <Lock className="h-5 w-5 text-amber-500" /> : <FileText className={cn("h-5 w-5", type === 'PYQ' ? 'text-emerald-500' : 'text-blue-500')} />}
                      </div>
                      <div className="min-w-0">
-                        <h3 className="text-base font-black text-[#0F172A] uppercase truncate max-w-[240px]">{item.title}</h3>
+                        <h3 className="text-base font-black text-[#0F172A] truncate max-w-[240px]">{item.title}</h3>
                         <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">{item.category || type} Hub</p>
                      </div>
                   </div>

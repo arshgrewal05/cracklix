@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useMemo, useEffect, Suspense, cloneElement, isValidElement } from "react"
@@ -14,7 +13,8 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Search Center Hub v2.5 (Standardized Imports).
+ * @fileOverview Search Center Hub v2.6.
+ * NORMALIZED: Removed uppercase from result names.
  */
 
 export default function SearchPage() {
@@ -156,7 +156,7 @@ function SearchResultItem({ icon, title, category, href }: { icon: React.ReactNo
                     : icon}
                </div>
                <div className="text-left min-w-0 flex-1 space-y-1">
-                  <p className="font-black text-[#0F172A] group-hover:text-primary transition-colors text-sm md:text-xl uppercase leading-tight line-clamp-1 truncate">{title}</p>
+                  <p className="font-black text-[#0F172A] group-hover:text-primary transition-colors text-sm md:text-xl leading-tight line-clamp-1 truncate">{title}</p>
                   <div className="flex items-center gap-2">
                      <span className="text-[7px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">{category}</span>
                      <div className="h-0.5 w-0.5 rounded-full bg-slate-200" />

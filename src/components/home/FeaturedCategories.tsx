@@ -18,8 +18,8 @@ import { collection, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Elite Exam Categories Hub v26.0.
- * NORMALIZED: Reduced heading scale and tightened vertical spacing.
+ * @fileOverview Elite Exam Categories Hub v27.0.
+ * NORMALIZED: Removed uppercase from category titles and section headers.
  */
 
 const FALLBACK_ICONS: Record<string, string> = {
@@ -103,7 +103,7 @@ export default function FeaturedCategories() {
                             <h3 className="text-lg md:text-[22px] font-black leading-tight text-[#0F172A] group-hover:text-primary transition-colors line-clamp-2">
                               {cat.title}
                             </h3>
-                            <p className="text-[13px] md:text-sm text-slate-500 tracking-tight leading-snug line-clamp-3">
+                            <p className="text-[13px] md:text-sm text-slate-600 tracking-tight leading-snug line-clamp-3">
                               {cat.description}
                             </p>
                          </div>

@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils"
 import { getAuthorityIcon } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Elite Latest Mock Hub v51.1 (Logo Size Refined).
- * FIXED: Reduced mock card logo to 40px for balanced hierarchy.
+ * @fileOverview Elite Latest Mock Hub v52.0.
+ * NORMALIZED: Removed uppercase from mock titles.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -106,7 +106,9 @@ export default function LatestMocks() {
                      )}
                   </div>
                   <CardHeader className="p-0 flex-1 space-y-4">
-                     <CardTitle className="font-extrabold text-lg md:text-2xl text-[#04102B] leading-tight tracking-tight line-clamp-2 min-h-[48px] uppercase">{mock.title}</CardTitle>
+                     <CardTitle className="font-extrabold text-lg md:text-2xl text-[#04102B] leading-tight tracking-tight line-clamp-2 min-h-[48px]">
+                        {mock.title}
+                     </CardTitle>
                      <div className="flex items-center justify-center gap-3 text-[12px] font-bold text-[#64748B] tracking-tight">
                         <span className="flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5 text-blue-600 opacity-50" /> {mock.totalQuestions} Qs</span>
                         <div className="h-3 w-px bg-slate-100" />

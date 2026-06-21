@@ -21,8 +21,8 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview High-Fidelity Popular Exams v65.1 (Logo Size Refined).
- * FIXED: Standardized board logos to 48px to prevent visual dominance.
+ * @fileOverview High-Fidelity Popular Exams v66.0.
+ * NORMALIZED: Removed uppercase from board titles.
  */
 
 function getBoardFallbackIcon(id: string, abbrev: string) {
@@ -94,7 +94,7 @@ export default function PopularExams() {
                               )}
                            </div>
                            <div className="min-w-0 flex-1 space-y-1">
-                              <h3 className="text-base md:text-lg font-black text-[#04102B] tracking-tight group-hover:text-blue-600 transition-colors leading-tight uppercase">
+                              <h3 className="text-base md:text-lg font-black text-[#04102B] tracking-tight group-hover:text-blue-600 transition-colors leading-tight">
                                  {board.abbreviation} Exams
                               </h3>
                               <p className="text-[10px] md:text-[11px] font-semibold text-[#94A3B8] leading-snug truncate">

@@ -34,8 +34,8 @@ import ShareButton from "@/components/navigation/ShareButton"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Dashboard v37.0.
- * NORMALIZED: Reduced heading scales, tighter spacing, and refined card padding.
+ * @fileOverview Student Dashboard v38.0.
+ * NORMALIZED: Removed uppercase from student names and test titles.
  */
 export default function StudentDashboard() {
   const { user, profile, loading: authLoading, profileLoading } = useUser() as any;
@@ -102,7 +102,7 @@ export default function StudentDashboard() {
 
     const total = sorted.length
     const correct = sorted.reduce((acc: number, r: any) => acc + (r.correctCount || r.score || 0), 0)
-    const attempted = sorted.reduce((acc: number, r: any) => acc + (r.attemptedCount || r.totalQuestions || 0), 0)
+    const attempted = sorted.reduce((acc: number, r: any) => acc + (Object.keys(r.answers || {}).length), 0)
     const avgAcc = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
     
     const totalSeconds = sorted.reduce((acc: number, r: any) => acc + (r.timeTaken || 0), 0)
@@ -151,7 +151,7 @@ export default function StudentDashboard() {
                   </div>
                   <div className="flex-1 space-y-3 text-center md:text-left min-w-0">
                     <div className="space-y-2">
-                        <h2 className="text-xl md:text-3xl lg:text-4xl font-black tracking-tight uppercase truncate">
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-black tracking-tight truncate">
                           {profile?.name || user?.displayName || "Aspirant"}
                         </h2>
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
@@ -199,7 +199,9 @@ export default function StudentDashboard() {
                                       <Zap className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                                   </div>
                                   <div className="min-w-0 space-y-1">
-                                      <p className="font-black text-[#0B1528] text-sm md:text-lg uppercase truncate leading-none">{r.mockTitle}</p>
+                                      <p className="font-bold text-[#0B1528] text-sm md:text-lg truncate leading-none">
+                                         {r.mockTitle}
+                                      </p>
                                       <div className="flex items-center gap-3 text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-tight">
                                         <span className="flex items-center gap-1"><Calendar className="h-3 w-3 text-slate-200" /> {r.timestamp ? new Date(r.timestamp).toLocaleDateString() : 'N/A'}</span>
                                         <Badge className="bg-emerald-50 text-emerald-600 border-none font-black px-2 py-0.5 rounded text-[8px]">{r.accuracy}% ACC</Badge>

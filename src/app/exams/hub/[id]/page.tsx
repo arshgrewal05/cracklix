@@ -18,8 +18,8 @@ import { useToast } from "@/hooks/use-toast"
 import { getAuthorityIcon } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Institutional Hub Explorer v18.0.
- * UPDATED: Detailed content breakdown instead of "Nodes" and "Coming Soon" guards.
+ * @fileOverview Institutional Hub Explorer v19.0.
+ * NORMALIZED: Removed uppercase from exam titles in cards.
  */
 
 export default function HubExamsPage() {
@@ -220,7 +220,9 @@ export default function HubExamsPage() {
                        </div>
 
                        <div className="space-y-1.5 flex-1">
-                          <h3 className="text-lg font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors line-clamp-2 uppercase">{exam.name}</h3>
+                          <h3 className="text-lg font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                             {exam.name}
+                          </h3>
                           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
                              {stats.full > 0 && <span className="text-[9px] font-bold text-slate-400 uppercase">{stats.full} Mocks</span>}
                              {stats.subject > 0 && <span className="text-[9px] font-bold text-slate-400 uppercase">{stats.subject} Practice</span>}
