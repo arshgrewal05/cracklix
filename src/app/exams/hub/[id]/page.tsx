@@ -9,14 +9,14 @@ import { collection, query, where, doc, updateDoc, arrayUnion, arrayRemove, serv
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, GraduationCap, Zap, BookOpen, Layers, Shield, Loader2, Star, CheckCircle2, RefreshCw, Info } from "lucide-react"
+import { ChevronLeft, ChevronRight, GraduationCap, Star, CheckCircle2, RefreshCw, Info, Loader2, BookOpen, Clock, Zap } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Institutional Board vertical v50.0.
- * FIXED: Removed all legacy terminology. Integrated live stats strip.
+ * @fileOverview Hierarchical Board vertical v60.0.
+ * FIXED: Standardized Title Case and simplified "Open Exam" actions.
  */
 
 export default function HubExamsPage() {
@@ -32,7 +32,7 @@ export default function HubExamsPage() {
   
   const examsQuery = useMemo(() => {
      if (!db || !hub) return null;
-     return query(collection(db, "exams"), where("boardId", "in", [hub.id, hub.abbreviation]));
+     return query(collection(db, "exams"), where("boardId", "==", hub.id));
   }, [db, hub]);
 
   const { data: rawExams, loading: examsLoading } = useCollection<any>(examsQuery);
@@ -89,8 +89,8 @@ export default function HubExamsPage() {
          <div className="container mx-auto px-4 max-w-7xl">
             <button onClick={() => router.back()} className="h-9 w-9 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black mb-6 transition-all"><ChevronLeft className="h-4 w-4" /></button>
             <div className="space-y-2">
-               <Badge className="bg-primary/5 text-primary border-none px-2.5 py-0.5 rounded-lg text-[8px] font-black uppercase">{hub?.abbreviation} Recruitment</Badge>
-               <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">{hub?.abbreviation} Hub</h1>
+               <Badge className="bg-primary/5 text-primary border-none px-2.5 py-0.5 rounded-lg text-[8px] font-black uppercase">{hub?.abbreviation} Hub</Badge>
+               <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">{hub?.abbreviation} Selection</h1>
                <p className="text-sm md:text-lg font-bold text-slate-400 leading-tight">{hub?.name}</p>
             </div>
          </div>
@@ -115,19 +115,15 @@ export default function HubExamsPage() {
                           </button>
                        </div>
                        <h3 className="text-xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors mb-6">{exam.name}</h3>
-                       <div className="space-y-4 mb-8">
-                          <p className="text-xs font-black text-[#0F172A] leading-none uppercase">{s.total} Available Tests</p>
+                       
+                       <div className="mt-auto space-y-5">
                           <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                             <span>{s.full} Full Mocks</span>
-                             <span className="opacity-30">•</span>
-                             <span>{s.subject} Subject</span>
-                             <span className="opacity-30">•</span>
-                             <span>{s.sectional} Sectional</span>
-                             <span className="opacity-30">•</span>
-                             <span>{s.pyq} PYQs</span>
+                             {s.full > 0 && <span>{s.full} Full Mocks</span>}
+                             {s.subject > 0 && <span>{s.subject} Subject Tests</span>}
+                             {s.pyq > 0 && <span>{s.pyq} PYQs</span>}
                           </div>
+                          <Button className="w-full h-11 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-md border-none">Open Exam <ChevronRight className="h-3.5 w-3.5" /></Button>
                        </div>
-                       <Button className="mt-auto w-full h-11 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-md border-none">Open Exam <ChevronRight className="h-3.5 w-3.5" /></Button>
                     </Card>
                   )
                })}

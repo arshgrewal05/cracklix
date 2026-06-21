@@ -7,24 +7,24 @@ import Footer from "@/components/layout/Footer"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, where } from "firebase/firestore"
 import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Zap, Info, Landmark, GraduationCap, Building2, HeartPulse, Scale, Globe } from "lucide-react"
+import { ChevronLeft, ChevronRight, Zap, Info, Landmark, GraduationCap, Building2, Globe, ShieldCheck } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Balanced Category Hub v40.0.
- * UPDATED: Enforces direct board/exam lists with strict Title Case.
+ * @fileOverview Hierarchical Category Hub v45.0.
+ * FLOW: Category -> Board Selection (if applicable) OR Direct Exam List.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
-  "PPSC": <Landmark className="h-8 w-8" />,
-  "Punjab Government Exams": <Landmark className="h-8 w-8" />,
-  "Punjab Teaching Exams": <GraduationCap className="h-8 w-8" />,
-  "Banking Exams": <Building2 className="h-8 w-8" />,
-  "Punjab Technical Exams": <Zap className="h-8 w-8" />,
-  "Central Government Exams": <Globe className="h-8 w-8" />
+  "punjab-government-exams": <Landmark className="h-8 w-8" />,
+  "punjab-teaching-exams": <GraduationCap className="h-8 w-8" />,
+  "banking-exams": <Building2 className="h-8 w-8" />,
+  "punjab-technical-exams": <Zap className="h-8 w-8" />,
+  "central-government-exams": <Globe className="h-8 w-8" />,
+  "judiciary-exams": <ShieldCheck className="h-8 w-8" />,
+  "medical-health-exams": <Building2 className="h-8 w-8" />
 };
 
 export default function CategoryHubsPage() {
@@ -72,6 +72,8 @@ export default function CategoryHubsPage() {
     return rawExams.filter((e: any) => (statsMap[e.id]?.total || 0) > 0);
   }, [rawExams, statsMap]);
 
+  const showBoardSelection = boards && boards.length > 1;
+
   return (
     <div className="min-h-screen bg-slate-50/50 font-body text-left">
       <Navbar />
@@ -83,14 +85,14 @@ export default function CategoryHubsPage() {
             </button>
             <div className="flex items-center gap-6">
                <div className="h-16 w-16 md:h-20 md:w-20 rounded-[2rem] bg-primary/5 text-primary flex items-center justify-center shrink-0 shadow-inner">
-                  {CATEGORY_ICONS[category?.title || ""] || <Landmark className="h-8 w-8" />}
+                  {CATEGORY_ICONS[category?.id || ""] || <Landmark className="h-8 w-8" />}
                </div>
                <div className="space-y-1">
                   <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
                      {category?.title || "Exam Category"}
                   </h1>
                   <p className="text-sm md:text-xl font-bold text-slate-400 tracking-tight max-w-3xl">
-                     {category?.description || "Select an exam vertical to begin your preparation."}
+                     {category?.description || "Select a recruitment board to view official exams."}
                   </p>
                </div>
             </div>
@@ -102,27 +104,23 @@ export default function CategoryHubsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 w-full rounded-[2.5rem]" />)}
             </div>
-         ) : boards && boards.length > 0 ? (
+         ) : showBoardSelection ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {boards.map((board) => {
-                  const boardExamsCount = exams.filter(e => e.boardId === board.id).length;
-                  if (boardExamsCount === 0) return null;
-                  return (
-                    <Card key={board.id} onClick={() => router.push(`/exams/hub/${board.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden flex flex-col p-8 text-left cursor-pointer h-full">
-                       <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center mb-6 text-primary shadow-inner transition-transform group-hover:scale-110">
-                          <Landmark className="h-6 w-6" />
-                       </div>
-                       <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-4">{board.abbreviation} Hub</h3>
-                       <p className="text-[14px] text-slate-500 font-medium mb-8 flex-1">{board.name}</p>
-                       <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
-                          <span className="text-[10px] font-black text-primary uppercase">{boardExamsCount} Verticals Live</span>
-                          <Button variant="ghost" className="h-10 px-6 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[10px] tracking-widest uppercase border-none shadow-md">
-                             Open Hub <ChevronRight className="ml-2 h-4 w-4" />
-                          </Button>
-                       </div>
-                    </Card>
-                  )
-               })}
+               {boards.map((board) => (
+                  <Card key={board.id} onClick={() => router.push(`/exams/hub/${board.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden flex flex-col p-8 text-left cursor-pointer h-full">
+                     <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center mb-6 text-primary shadow-inner transition-transform group-hover:scale-110">
+                        <Landmark className="h-6 w-6" />
+                     </div>
+                     <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-4">{board.abbreviation} Hub</h3>
+                     <p className="text-[14px] text-slate-500 font-medium mb-8 flex-1">{board.name}</p>
+                     <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                        <span className="text-[10px] font-black text-primary uppercase">Board Authority</span>
+                        <Button variant="ghost" className="h-10 px-6 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[10px] tracking-widest uppercase border-none shadow-md">
+                           View Exams <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
+                     </div>
+                  </Card>
+               ))}
             </div>
          ) : exams.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -131,15 +129,20 @@ export default function CategoryHubsPage() {
                   return (
                     <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-8 text-left cursor-pointer">
                        <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center mb-6 text-primary shadow-inner">
-                          <Zap className="h-5 w-5" />
+                          <ShieldCheck className="h-5 w-5" />
                        </div>
                        <h3 className="text-xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors mb-4">{exam.name}</h3>
-                       <p className="text-[11px] font-black text-primary uppercase mb-6">
-                          {s.full} Full Mocks • {s.subject} Subject • {s.pyq} PYQs
-                       </p>
-                       <Button className="mt-auto w-full h-11 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[10px] tracking-widest shadow-lg border-none">
-                          Open Exam <ChevronRight className="ml-2 h-4 w-4" />
-                       </Button>
+                       
+                       <div className="mt-auto space-y-4">
+                          <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                             {s.full > 0 && <span>{s.full} Full Mocks</span>}
+                             {s.subject > 0 && <span>{s.subject} Subject Tests</span>}
+                             {s.pyq > 0 && <span>{s.pyq} PYQs</span>}
+                          </div>
+                          <Button className="w-full h-11 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[10px] tracking-widest shadow-lg border-none">
+                             Open Exam <ChevronRight className="ml-2 h-4 w-4" />
+                          </Button>
+                       </div>
                     </Card>
                   )
                })}
@@ -147,8 +150,8 @@ export default function CategoryHubsPage() {
          ) : (
             <div className="py-40 text-center opacity-20 flex flex-col items-center gap-6">
                <Info className="h-16 w-16" />
-               <p className="font-black text-2xl uppercase tracking-widest">Awaiting Verification</p>
-               <p className="text-sm font-bold max-w-xs">Official content is being audited for this category.</p>
+               <p className="font-black text-2xl uppercase tracking-widest">Awaiting Content</p>
+               <p className="text-sm font-bold max-w-xs">Verified preparation nodes are being audited for this category.</p>
             </div>
          )}
       </main>
