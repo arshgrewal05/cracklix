@@ -15,8 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { SuccessStory } from "@/types"
 
 /**
- * @fileOverview Official Hall of Rankers v6.0 (Typography Hardened).
- * FIXED: Applied global responsive scaling text-3xl sm:text-5xl lg:text-7xl with leading-[0.9].
+ * @fileOverview Official Hall of Rankers v7.0 (High Density).
  */
 
 export default function SuccessStoriesPage() {
@@ -42,78 +41,76 @@ export default function SuccessStoriesPage() {
   return (
     <div className="min-h-screen bg-slate-50/50 text-left font-body">
       <Navbar />
-      <main className="container mx-auto px-4 md:px-6 py-12 md:py-24 max-w-6xl">
-        <div className="space-y-16 md:space-y-24">
-          <div className="text-center space-y-6 md:space-y-10">
-             <div className="h-16 w-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary shadow-2xl">
-                <Trophy className="h-8 w-8" />
+      <main className="container mx-auto px-4 md:px-6 py-10 md:py-24 max-w-6xl space-y-12 md:space-y-24">
+        
+        <div className="text-center space-y-4 md:space-y-10">
+           <div className="h-12 w-12 md:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto text-primary shadow-xl">
+              <Trophy className="h-6 w-6 md:h-8" />
+           </div>
+           <h1 className="text-2xl md:text-7xl font-black text-[#0F172A] tracking-tighter leading-none uppercase">
+              Hall of <span className="text-primary">Rankers</span>
+           </h1>
+           <p className="text-slate-500 font-medium text-[11px] md:text-2xl max-w-2xl mx-auto leading-tight italic">
+              "Success stories from fellow Punjab aspirants using the Cracklix platform."
+           </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 md:gap-20">
+          {storiesLoading ? (
+             Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-[2.5rem] bg-white" />)
+          ) : stories && stories.length > 0 ? (
+             stories.map((story, idx) => (
+                <div key={story.id} className={`flex flex-col md:flex-row items-center gap-6 md:gap-16 ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
+                   <div className="w-full md:w-2/5">
+                      <div className="relative aspect-[4/5] rounded-[2rem] md:rounded-[4rem] overflow-hidden shadow-2xl group border border-slate-100 bg-[#0F172A] max-w-[240px] md:max-w-none mx-auto">
+                         <Image 
+                            src={story.imageUrl || "https://picsum.photos/seed/topper/400/500"} 
+                            fill 
+                            alt={story.name} 
+                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" 
+                         />
+                         <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-60" />
+                         <div className="absolute bottom-4 left-4 right-4">
+                            <Badge className="bg-emerald-50 text-emerald-600 border-none px-3 py-0.5 rounded-lg font-black text-[8px] shadow-lg">{story.rank}</Badge>
+                         </div>
+                      </div>
+                   </div>
+                   <div className="w-full md:w-3/5 space-y-4 md:space-y-10 text-center md:text-left px-2">
+                      <div className="flex justify-center md:justify-start gap-1 text-amber-400">
+                         {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="fill-current h-4 w-4 md:h-8" />)}
+                      </div>
+                      <div className="space-y-2">
+                         <Quote className="h-6 w-6 md:h-12 text-primary opacity-20 mx-auto md:mx-0" />
+                         <blockquote className="text-base md:text-5xl font-headline font-medium italic text-[#0F172A] leading-tight tracking-tight">
+                            "{story.quote}"
+                         </blockquote>
+                      </div>
+                      <div className="space-y-1">
+                         <p className="text-xl md:text-4xl font-black text-[#0F172A] uppercase tracking-tight">{story.name}</p>
+                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-slate-400 font-bold uppercase tracking-widest text-[8px] md:text-[11px]">
+                            <span className="flex items-center gap-1.5"><GraduationCap className="h-3 w-3 text-primary" /> {story.exam}</span>
+                            <span className="flex items-center gap-1.5"><ShieldCheck className="h-3 w-3 text-emerald-500" /> Batch {story.year}</span>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             ))
+          ) : (
+             <div className="py-20 text-center opacity-20 flex flex-col items-center gap-4">
+                <Zap className="h-10 w-10 text-slate-300" />
+                <p className="font-headline font-black text-lg uppercase tracking-widest">Awaiting Merit Nodes</p>
              </div>
-             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-[#0F172A] tracking-tighter leading-[0.9] break-words antialiased">
-                Hall of <br/> <span className="text-primary">Rankers</span>
-             </h1>
-             <p className="text-slate-500 font-medium text-lg md:text-2xl max-w-2xl mx-auto italic leading-tight tracking-tight">
-                "Preparation starts with inspiration. Success stories from fellow Punjab aspirants using the Cracklix platform."
-             </p>
-          </div>
+          )}
+        </div>
 
-          <div className="grid grid-cols-1 gap-12 md:gap-20">
-            {storiesLoading ? (
-               Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-96 w-full rounded-[4rem]" />)
-            ) : stories && stories.length > 0 ? (
-               stories.map((story, idx) => (
-                  <div key={story.id} className={`flex flex-col md:flex-row items-center gap-10 md:gap-16 ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
-                     <div className="w-full md:w-2/5">
-                        <div className="relative aspect-[4/5] rounded-[3rem] md:rounded-[4rem] overflow-hidden shadow-4xl group border border-slate-100 bg-[#0F172A]">
-                           <Image 
-                              src={story.imageUrl || "https://picsum.photos/seed/topper/400/500"} 
-                              fill 
-                              alt={story.name} 
-                              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" 
-                           />
-                           <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-60" />
-                           <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                              <Badge className="bg-emerald-50 text-white border-none px-4 py-1 rounded-xl font-black text-[10px] shadow-lg">{story.rank}</Badge>
-                           </div>
-                        </div>
-                     </div>
-                     <div className="w-full md:w-3/5 space-y-6 md:space-y-10 text-left">
-                        <div className="flex gap-1 text-amber-400">
-                           {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="fill-current h-6 w-6 md:h-8 md:w-8" />)}
-                        </div>
-                        <div className="space-y-4">
-                           <Quote className="h-10 w-10 md:h-12 md:w-12 text-primary opacity-20" />
-                           <blockquote className="text-xl md:text-5xl font-headline font-medium italic text-[#0F172A] leading-[0.95] tracking-tight">
-                              "{story.quote}"
-                           </blockquote>
-                        </div>
-                        <div className="space-y-2">
-                           <p className="text-2xl md:text-4xl font-black text-[#0F172A] uppercase tracking-tight">{story.name}</p>
-                           <div className="flex flex-wrap items-center gap-4 text-slate-400 font-bold uppercase tracking-widest text-[9px] md:text-[11px]">
-                              <span className="flex items-center gap-2"><GraduationCap className="h-4 w-4 text-primary" /> {story.exam}</span>
-                              <span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-500" /> Batch {story.year}</span>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               ))
-            ) : (
-               <div className="py-20 text-center opacity-20 flex flex-col items-center gap-6">
-                  <Zap className="h-16 w-16" />
-                  <p className="font-headline font-black text-2xl uppercase tracking-widest">Awaiting Merit Nodes</p>
-               </div>
-            )}
-          </div>
-
-          <div className="bg-[#0F172A] rounded-[3.5rem] md:rounded-[5rem] p-10 md:p-20 text-center space-y-8 md:space-y-10 text-white relative overflow-hidden shadow-4xl">
-             <div className="absolute top-0 right-0 p-12 opacity-5 rotate-12"><Trophy className="h-64 w-64" /></div>
-             <h2 className="text-4xl md:text-7xl font-headline font-black uppercase leading-tight relative z-10 antialiased tracking-tight">Your Success <br/> <span className="text-primary">Is Next.</span></h2>
-             <p className="text-slate-400 text-base md:text-xl max-w-xl mx-auto font-medium relative z-10">
-                Join {statsLoading ? "..." : liveAspirantCount} aspirants already preparing with institutional grade mocks.
-             </p>
-             <Button asChild className="h-16 md:h-20 px-12 md:px-20 bg-white text-black hover:bg-slate-100 font-black uppercase text-[10px] md:text-sm tracking-widest rounded-3xl gap-4 shadow-4xl relative z-10 group border-none transition-all active:scale-95">
-                <Link href="/login">Initialize My Account <ChevronRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" /></Link>
-             </Button>
-          </div>
+        <div className="bg-[#0F172A] rounded-[2.5rem] md:rounded-[5rem] p-8 md:p-20 text-center space-y-6 md:space-y-10 text-white relative overflow-hidden shadow-4xl mx-2">
+           <h2 className="text-2xl md:text-7xl font-headline font-black uppercase leading-tight relative z-10 antialiased tracking-tight">Your Success <br/> <span className="text-primary">Is Next.</span></h2>
+           <p className="text-slate-400 text-[11px] md:text-xl max-w-xl mx-auto font-medium relative z-10 leading-snug">
+              Join {statsLoading ? "..." : liveAspirantCount} aspirants already preparing with Cracklix.
+           </p>
+           <Button asChild className="h-12 md:h-20 px-8 md:px-20 bg-white text-black hover:bg-slate-100 font-black uppercase text-[9px] md:text-sm tracking-widest rounded-xl md:rounded-3xl shadow-4xl relative z-10 border-none transition-all active:scale-95">
+              <Link href="/login">Initialize My Account <ChevronRight className="h-4 w-4 ml-2" /></Link>
+           </Button>
         </div>
       </main>
       <Footer />

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -30,8 +29,8 @@ import { Button } from "@/components/ui/button";
 import PWAInstallButton from "@/components/PWAInstallButton";
 
 /**
- * @fileOverview Mobile Sidebar Overhaul v43.0 (Logo Maximized).
- * FIXED: Maximized logo height (72px) to fill the sidebar header area perfectly.
+ * @fileOverview Mobile Sidebar v44.0 (High Density).
+ * FIXED: Reduced item height to h-10 and shrunk icons for better visibility.
  */
 export default function MobileSidebar({
   onClose,
@@ -75,16 +74,16 @@ export default function MobileSidebar({
   return (
     <div className="flex h-full flex-col bg-white font-body overflow-hidden text-left">
 
-      <div className="h-[72px] px-4 shrink-0 bg-white border-b border-slate-50 flex items-center justify-between">
+      <div className="h-[64px] px-3 shrink-0 bg-white border-b border-slate-50 flex items-center justify-between">
          <Logo
            variant="light"
            align="left"
-           imgClassName="h-[72px]"
+           imgClassName="h-[54px]"
            onClick={onClose}
          />
          <button
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
           >
             <X className="h-4 w-4" />
           </button>
@@ -92,49 +91,49 @@ export default function MobileSidebar({
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
 
-        <div className="px-3 py-4">
+        <div className="px-2 py-3">
           <Link
             href="/profile"
             onClick={onClose}
             className="block active:scale-[0.98] transition-all"
           >
-            <div className="flex items-center gap-4 rounded-[1.5rem] border border-slate-100 bg-white p-4 shadow-sm hover:border-primary/20 transition-all">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
+            <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-3 shadow-sm hover:border-primary/20 transition-all">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-50">
                 {profileLoading ? (
-                  <Skeleton className="h-full w-full rounded-xl" />
+                  <Skeleton className="h-full w-full rounded-lg" />
                 ) : (
                   <StudentAvatar
                     profile={profile}
                     className="h-full w-full border-none"
-                    iconClassName="w-6 h-6"
+                    iconClassName="w-5 h-5"
                   />
                 )}
               </div>
 
               <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-black text-slate-900 tracking-tight truncate">
+                <h3 className="text-xs font-black text-slate-900 tracking-tight truncate leading-none">
                   {profile?.name || user?.displayName || "Aspirant"}
                 </h3>
-                <p className="mt-0.5 text-[8px] text-slate-400 font-bold tracking-widest uppercase">
-                  Manage Account
+                <p className="mt-1 text-[7px] text-slate-400 font-bold tracking-widest uppercase">
+                  Account Hub
                 </p>
               </div>
 
-              <ChevronRight className="h-4 w-4 shrink-0 text-slate-300" />
+              <ChevronRight className="h-3 w-3 shrink-0 text-slate-300" />
             </div>
           </Link>
         </div>
 
-        <div className="px-2 mb-6">
+        <div className="px-2 mb-4">
            <PWAInstallButton 
              variant="dark"
-             className="w-full h-12 rounded-xl mb-4"
+             className="w-full h-10 rounded-lg"
            />
         </div>
 
         <div className="px-2">
-          <p className="mb-2 px-6 text-[10px] font-bold text-slate-400 tracking-wide uppercase">
-            Library
+          <p className="mb-1.5 px-4 text-[9px] font-bold text-slate-400 tracking-wide uppercase">
+            Discovery
           </p>
 
           <div className="space-y-0.5">
@@ -147,7 +146,7 @@ export default function MobileSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex h-10 items-center gap-4 rounded-xl px-6 transition-all active:scale-[0.98]",
+                    "flex h-9 items-center gap-3 rounded-lg px-4 transition-all active:scale-[0.98]",
                     isActive
                       ? "bg-blue-50 text-primary shadow-sm"
                       : "text-slate-600 hover:bg-slate-50"
@@ -155,14 +154,14 @@ export default function MobileSidebar({
                 >
                   <item.icon
                     className={cn(
-                      "h-4 w-4 shrink-0",
+                      "h-3.5 w-3.5 shrink-0",
                       isActive
                         ? "text-primary"
                         : "text-slate-400"
                     )}
                   />
 
-                  <span className="font-bold text-[13px] tracking-tight">
+                  <span className="font-bold text-[12px] tracking-tight">
                     {item.label}
                   </span>
                 </Link>
@@ -171,39 +170,27 @@ export default function MobileSidebar({
           </div>
         </div>
 
-        <div className="px-4 py-4">
-           <div className="bg-[#0B1528] rounded-[1.8rem] p-4 space-y-3 border border-white/5 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Award className="h-12 w-12" /></div>
+        <div className="px-2 py-4">
+           <div className="bg-[#0B1528] rounded-[1.25rem] p-3 space-y-2 border border-white/5 shadow-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Award className="h-10 w-10" /></div>
               <div className="relative z-10 text-left">
-                <h4 className="text-[10px] font-black text-white tracking-widest leading-none mb-1 uppercase">Elite Network</h4>
+                <h4 className="text-[9px] font-black text-white tracking-widest uppercase">Share App</h4>
               </div>
               <ShareButton 
                 variant="dark" 
-                className="w-full h-11 rounded-xl bg-primary hover:bg-blue-600 text-white text-[10px] border-none shadow-lg relative z-10" 
+                className="w-full h-9 rounded-lg bg-primary hover:bg-blue-600 text-white text-[9px] border-none shadow-lg relative z-10" 
               />
            </div>
         </div>
       </div>
 
-      <div className="border-t border-slate-100 bg-white p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] shrink-0">
+      <div className="border-t border-slate-100 bg-white p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] shrink-0">
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="
-            w-full
-            h-14 sm:h-16
-            justify-start
-            text-red-500
-            text-lg sm:text-xl
-            font-black
-            rounded-2xl
-            hover:bg-red-50
-            hover:text-red-600
-            transition-all
-            active:scale-95
-          "
+          className="w-full h-12 justify-start text-red-500 text-sm font-black rounded-xl hover:bg-red-50 transition-all active:scale-95"
         >
-          <LogOut className="h-5 w-5 sm:h-6 sm:w-6 mr-3" />
+          <LogOut className="h-4 w-4 mr-3" />
           Log Out
         </Button>
       </div>

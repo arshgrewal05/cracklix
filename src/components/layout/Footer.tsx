@@ -20,8 +20,8 @@ import {
 } from "@/lib/constants";
 
 /**
- * @fileOverview Hardened Compact Footer v2.0.
- * FIXED: Removed all excessive spacing and resolved text overlapping.
+ * @fileOverview Hardened Compact Footer v3.0.
+ * FIXED: High-density mobile grid with compressed logo and gaps.
  */
 
 export default function Footer() {
@@ -29,17 +29,17 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-white/5 bg-[#020617] font-body text-white">
-      <div className="mx-auto max-w-7xl px-6 py-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 py-6 md:py-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 items-start">
 
           {/* Brand Section */}
-          <div className="space-y-4">
+          <div className="col-span-2 lg:col-span-1 space-y-4">
             <Logo
               variant="dark"
               align="left"
-              imgClassName="h-[60px] md:h-[80px]"
+              imgClassName="h-[50px] md:h-[80px]"
             />
-            <p className="max-w-[300px] text-sm leading-relaxed text-slate-400">
+            <p className="max-w-[300px] text-[11px] md:text-sm leading-relaxed text-slate-400">
               Punjab's most advanced government exam platform for serious aspirants.
             </p>
             <div className="flex items-center gap-3">
@@ -49,42 +49,38 @@ export default function Footer() {
           </div>
 
           {/* Support Hub */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-primary">Support Hub</h3>
-            <ul className="space-y-3">
+          <div className="space-y-3">
+            <h3 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary">Support</h3>
+            <ul className="space-y-2">
               <FooterLink href="/support">Support Center</FooterLink>
               <FooterLink href="/help">Help Articles</FooterLink>
               <FooterLink href="/privacy">Privacy Policy</FooterLink>
-              <FooterLink href="/terms">Terms of Service</FooterLink>
+              <FooterLink href="/terms">Terms</FooterLink>
             </ul>
           </div>
 
           {/* Resources */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-primary">Resources</h3>
-            <ul className="space-y-3">
+          <div className="space-y-3">
+            <h3 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary">Resources</h3>
+            <ul className="space-y-2">
               <FooterLink href="/mocks">Mock Tests</FooterLink>
-              <FooterLink href="/pyqs">Previous Papers</FooterLink>
+              <FooterLink href="/pyqs">Papers</FooterLink>
               <FooterLink href="/notes">Study Notes</FooterLink>
               <FooterLink href="/about">About Us</FooterLink>
             </ul>
           </div>
 
-          {/* Contact */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-primary">Connect</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm text-slate-400">
-                <Phone className="h-4 w-4 text-primary" />
-                <a href={`tel:${SUPPORT_PHONE}`} className="hover:text-white transition-colors">{SUPPORT_PHONE}</a>
+          {/* Contact - Only visible on desktop or spans full on mobile if needed */}
+          <div className="col-span-2 lg:col-span-1 space-y-3 mt-4 lg:mt-0">
+            <h3 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-primary">Connect</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+              <div className="flex items-center gap-2 text-[11px] md:text-sm text-slate-400">
+                <Phone className="h-3.5 w-3.5 text-primary shrink-0" />
+                <a href={`tel:${SUPPORT_PHONE}`} className="hover:text-white transition-colors truncate">{SUPPORT_PHONE}</a>
               </div>
-              <div className="flex items-center gap-3 text-sm text-slate-400">
-                <Mail className="h-4 w-4 text-primary" />
-                <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-white transition-colors">{SUPPORT_EMAIL}</a>
-              </div>
-              <div className="flex items-center gap-3 text-[11px] text-slate-500 uppercase font-bold">
-                <MapPin className="h-4 w-4 text-primary" />
-                <span>Bathinda, Punjab</span>
+              <div className="flex items-center gap-2 text-[11px] md:text-sm text-slate-400">
+                <Mail className="h-3.5 w-3.5 text-primary shrink-0" />
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-white transition-colors truncate">{SUPPORT_EMAIL}</a>
               </div>
             </div>
           </div>
@@ -93,9 +89,9 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/5 bg-black/20 py-4">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row justify-between items-center gap-2">
-          <p className="text-[12px] text-slate-500">© {currentYear} Cracklix. All Rights Reserved.</p>
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-600">
+        <div className="mx-auto max-w-7xl px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+          <p className="text-[9px] md:text-[12px] text-slate-500">© {currentYear} Cracklix. All Rights Reserved.</p>
+          <div className="flex items-center gap-2 text-[8px] md:text-[10px] font-black uppercase text-slate-600">
             <ShieldCheck className="h-3 w-3 text-emerald-500" />
             <span>Institutional Registry Verified</span>
           </div>
@@ -108,7 +104,7 @@ export default function Footer() {
 function FooterLink({ href, children }: { href: string; children: React.ReactNode; }) {
   return (
     <li>
-      <Link href={href} className="text-sm text-slate-400 hover:text-primary transition-colors font-medium">
+      <Link href={href} className="text-[11px] md:text-sm text-slate-400 hover:text-primary transition-colors font-medium">
         {children}
       </Link>
     </li>
@@ -117,7 +113,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 
 function SocialIcon({ href, icon }: { href: string; icon: React.ReactNode; }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white hover:bg-primary transition-all border border-white/5">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-lg md:rounded-xl bg-white/5 text-white hover:bg-primary transition-all border border-white/5">
       {icon}
     </a>
   );

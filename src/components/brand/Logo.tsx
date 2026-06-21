@@ -10,15 +10,15 @@ interface LogoProps {
   variant?: 'light' | 'dark' | 'icon';
   href?: string;
   imgClassName?: string;
-  onClick?: () => void;
+  onClick?: void;
   priority?: boolean;
   align?: 'left' | 'center' | 'right';
   iconOnly?: boolean;
 }
 
 /**
- * @fileOverview Cracklix Maximized Brand Identity v59.0.
- * FIXED: Removed 'h-full' from wrappers to prevent layout/overlap bugs in footers and flex containers.
+ * @fileOverview Cracklix Maximized Brand Identity v60.0.
+ * FIXED: Reduced mobile height to prevent header overflow.
  */
 export default function Logo({
   className = "",
@@ -56,8 +56,8 @@ export default function Logo({
         className={cn(
           "transition-all flex-shrink-0 w-auto",
           isIcon 
-            ? "h-11 md:h-14 object-center scale-110" 
-            : "h-[64px] md:h-[82px] object-contain",
+            ? "h-10 md:h-14 object-center scale-110" 
+            : "h-[54px] md:h-[82px] object-contain",
           imgClassName
         )}
       />
@@ -68,7 +68,7 @@ export default function Logo({
     return (
       <Link
         href={href || "/"}
-        onClick={onClick}
+        onClick={onClick as any}
         className={cn(
           "flex items-center select-none hover:opacity-90 transition-opacity flex-shrink-0",
           align === 'center' && "w-full justify-center"
