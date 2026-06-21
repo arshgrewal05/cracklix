@@ -12,8 +12,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { AuthorityLogo } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Hierarchical Category Hub v53.0.
- * UI FIX: Removed 'uppercase' from page heading, board titles, and exam names.
+ * @fileOverview Hierarchical Category Hub v54.0.
+ * OPTIMIZATION: Reduced header padding and logo size for PWA density.
  */
 
 export default function CategoryHubsPage() {
@@ -63,18 +63,18 @@ export default function CategoryHubsPage() {
     <div className="min-h-screen bg-slate-50/50 font-body text-left">
       <Navbar />
       
-      <section className="bg-white border-b border-slate-100 py-12 md:py-20 relative overflow-hidden">
+      <section className="bg-white border-b border-slate-100 py-6 md:py-20 relative overflow-hidden">
          <div className="container mx-auto px-4 max-w-7xl relative z-10">
-            <button onClick={() => router.back()} className="h-10 w-10 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black mb-8 transition-all">
-               <ChevronLeft className="h-5 w-5" />
+            <button onClick={() => router.back()} className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black mb-4 md:mb-8 transition-all">
+               <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
             </button>
-            <div className="flex items-center gap-8">
-               <AuthorityLogo category={category} size="xl" className="bg-slate-50 rounded-[2.5rem]" />
-               <div className="space-y-1">
-                  <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
+            <div className="flex items-center gap-4 md:gap-8">
+               <AuthorityLogo category={category} size="lg" className="md:w-28 md:h-28 rounded-xl md:rounded-[2.5rem] bg-slate-50" />
+               <div className="space-y-0.5">
+                  <h1 className="text-xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
                      {category?.title || "Exam Selection"}
                   </h1>
-                  <p className="text-sm md:text-xl font-bold text-slate-400 tracking-tight max-w-3xl">
+                  <p className="text-[11px] md:text-xl font-bold text-slate-400 tracking-tight max-w-3xl">
                      {category?.description || "Select a board or authority to view specific exams."}
                   </p>
                </div>
@@ -82,32 +82,32 @@ export default function CategoryHubsPage() {
          </div>
       </section>
 
-      <main className="container mx-auto px-4 py-16 max-w-7xl">
+      <main className="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
          {hasBoards ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                {boards.map((board) => (
-                  <Card key={board.id} onClick={() => router.push(`/exams/hub/${board.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden flex flex-col p-10 text-left cursor-pointer h-full">
-                     <AuthorityLogo board={board} category={category} size="lg" className="bg-slate-50 rounded-2xl mb-8 group-hover:scale-110 transition-transform" />
-                     <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-4">{board.abbreviation}</h3>
-                     <p className="text-sm text-slate-500 font-medium mb-10 flex-1 leading-relaxed">{board.name}</p>
-                     <div className="mt-auto pt-8 border-t border-slate-50 flex items-center justify-between">
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Board Authority</span>
-                        <Button variant="ghost" className="h-11 px-8 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[11px] tracking-widest uppercase border-none shadow-md gap-2">
-                           View Exams <ChevronRight className="h-4 w-4" />
+                  <Card key={board.id} onClick={() => router.push(`/exams/hub/${board.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-2xl md:rounded-[2.5rem] bg-white group overflow-hidden flex flex-col p-6 md:p-10 text-left cursor-pointer h-full">
+                     <AuthorityLogo board={board} category={category} size="md" className="md:w-20 md:h-20 bg-slate-50 rounded-xl mb-4 md:mb-8 group-hover:scale-105 transition-transform" />
+                     <h3 className="text-lg md:text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-2 md:mb-4">{board.abbreviation}</h3>
+                     <p className="text-[11px] md:text-sm text-slate-500 font-medium mb-6 md:mb-10 flex-1 leading-relaxed">{board.name}</p>
+                     <div className="mt-auto pt-4 md:pt-8 border-t border-slate-50 flex items-center justify-between">
+                        <span className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest">Authority Hub</span>
+                        <Button variant="ghost" className="h-9 md:h-11 px-6 md:px-8 rounded-full bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[9px] md:text-[11px] tracking-widest uppercase border-none shadow-md gap-2">
+                           View <ChevronRight className="h-3 w-3" />
                         </Button>
                      </div>
                   </Card>
                ))}
             </div>
          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                {activeExams.map((exam) => (
-                  <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-10 text-left cursor-pointer">
-                     <AuthorityLogo category={category} size="lg" className="bg-slate-50 rounded-2xl mb-8" />
-                     <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-6">{exam.name}</h3>
-                     <div className="mt-auto space-y-8">
-                        <Button className="w-full h-12 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[11px] tracking-widest uppercase border-none shadow-md gap-2">
-                           Open Exam <ChevronRight className="h-4 w-4" />
+                  <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-2xl md:rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-6 md:p-10 text-left cursor-pointer">
+                     <AuthorityLogo category={category} size="md" className="md:w-20 md:h-20 bg-slate-50 rounded-xl mb-4 md:mb-8" />
+                     <h3 className="text-lg md:text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-4 md:mb-6">{exam.name}</h3>
+                     <div className="mt-auto">
+                        <Button className="w-full h-11 md:h-12 rounded-full bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[10px] md:text-[11px] tracking-widest uppercase border-none shadow-md gap-2">
+                           Open Exam <ChevronRight className="h-3 w-3" />
                         </Button>
                      </div>
                   </Card>
