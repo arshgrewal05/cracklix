@@ -3,12 +3,12 @@ import { Shield, GraduationCap, Scale, Zap, Stethoscope, Landmark, BookOpen, Act
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Branding Engine v10.0 (Hardened).
+ * @fileOverview Institutional Branding Engine v11.0 (Visibility Optimized).
  * 
- * FAIL-SAFE SYSTEM:
- * 1. Hardcoded Canonical Mapping (100% Reliability for official nodes)
- * 2. Firestore Document URLs (Flexible admin overrides)
- * 3. Official Department SVG Fallbacks (Elegant degradation)
+ * OPTIMIZATION: 
+ * 1. Increased base container sizes.
+ * 2. Applied scale-[1.5] to trim excessive transparent padding in source assets.
+ * 3. Removed restrictive internal padding.
  */
 
 const CANONICAL_BOARD_LOGOS: Record<string, string> = {
@@ -51,7 +51,6 @@ export const AuthorityLogo = ({ board, category, boardId, categoryId, className,
   const bId = (boardId || board?.id || "").toLowerCase();
   const cId = (categoryId || category?.id || board?.categoryId || "").toLowerCase();
   
-  // 1. Resolve Logo URL with inheritance and fallbacks
   const logoUrl = 
     CANONICAL_BOARD_LOGOS[bId] || 
     board?.iconUrl || 
@@ -61,24 +60,23 @@ export const AuthorityLogo = ({ board, category, boardId, categoryId, className,
     category?.logoUrl;
   
   const sizeClasses = {
-    sm: "h-6 w-6",
-    md: "h-10 w-10",
-    lg: "h-14 w-14",
-    xl: "h-20 w-20"
+    sm: "h-8 w-8",
+    md: "h-12 w-12",
+    lg: "h-20 w-20",
+    xl: "h-28 w-28"
   };
 
   const containerSize = sizeClasses[size];
 
   if (logoUrl) {
     return (
-      <div className={cn("relative shrink-0 overflow-hidden flex items-center justify-center bg-white rounded-xl", containerSize, className)}>
+      <div className={cn("relative shrink-0 overflow-hidden flex items-center justify-center bg-white rounded-2xl", containerSize, className)}>
         <img 
           src={logoUrl} 
           alt="Institutional Branding" 
-          className="h-full w-full object-contain animate-in fade-in duration-500"
+          className="h-full w-full object-contain animate-in fade-in duration-500 scale-[1.5]"
           referrerPolicy="no-referrer"
           onError={(e) => {
-            // If image fails, revert to SVG fallback
             (e.target as any).style.display = 'none';
           }}
         />
@@ -86,7 +84,6 @@ export const AuthorityLogo = ({ board, category, boardId, categoryId, className,
     );
   }
 
-  // 2. SVG Fallbacks (Only if no local or remote image exists)
   const getFallbackIcon = () => {
     if (cId.includes('govt')) return <Landmark className="h-full w-full text-amber-600" />;
     if (cId.includes('teaching') || bId.includes('pstet')) return <BookOpen className="h-full w-full text-blue-600" />;

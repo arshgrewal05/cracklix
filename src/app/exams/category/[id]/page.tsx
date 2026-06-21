@@ -12,8 +12,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { AuthorityLogo } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Hierarchical Category Hub v51.0.
- * BRANDING: Uses official board logos.
+ * @fileOverview Hierarchical Category Hub v52.0.
+ * UI FIX: Enlarged logos by removing padding and using XL sizes.
  */
 
 export default function CategoryHubsPage() {
@@ -68,8 +68,8 @@ export default function CategoryHubsPage() {
             <button onClick={() => router.back()} className="h-10 w-10 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black mb-8 transition-all">
                <ChevronLeft className="h-5 w-5" />
             </button>
-            <div className="flex items-center gap-6">
-               <AuthorityLogo category={category} size="xl" className="bg-primary/5 rounded-[2rem] p-4 shadow-inner" />
+            <div className="flex items-center gap-8">
+               <AuthorityLogo category={category} size="xl" className="bg-slate-50 rounded-[2.5rem]" />
                <div className="space-y-1">
                   <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
                      {category?.title || "Exam Selection"}
@@ -87,7 +87,7 @@ export default function CategoryHubsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {boards.map((board) => (
                   <Card key={board.id} onClick={() => router.push(`/exams/hub/${board.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden flex flex-col p-10 text-left cursor-pointer h-full">
-                     <AuthorityLogo board={board} category={category} size="lg" className="bg-slate-50 p-2 rounded-2xl mb-8 group-hover:scale-110 transition-transform" />
+                     <AuthorityLogo board={board} category={category} size="lg" className="bg-slate-50 rounded-2xl mb-8 group-hover:scale-110 transition-transform" />
                      <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-4">{board.abbreviation}</h3>
                      <p className="text-sm text-slate-500 font-medium mb-10 flex-1 leading-relaxed">{board.name}</p>
                      <div className="mt-auto pt-8 border-t border-slate-50 flex items-center justify-between">
@@ -103,7 +103,7 @@ export default function CategoryHubsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {activeExams.map((exam) => (
                   <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-10 text-left cursor-pointer">
-                     <AuthorityLogo category={category} size="lg" className="bg-slate-50 p-2 rounded-2xl mb-8" />
+                     <AuthorityLogo category={category} size="lg" className="bg-slate-50 rounded-2xl mb-8" />
                      <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-6">{exam.name}</h3>
                      <div className="mt-auto space-y-8">
                         <Button className="w-full h-12 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[11px] tracking-widest uppercase border-none shadow-md gap-2">

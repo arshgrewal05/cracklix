@@ -13,8 +13,8 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Search Center Hub v2.8.
- * FIXED: Explicit React cloneElement usage to resolve build module conflict.
+ * @fileOverview Search Center Hub v2.9.
+ * UI FIX: Enlarged result icons by removing padding and using contain logic.
  */
 
 export default function SearchPage() {
@@ -150,9 +150,9 @@ function SearchResultItem({ icon, title, category, href }: { icon: React.ReactNo
       <Link href={href} className="block active:scale-[0.99] transition-all">
          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-xl flex items-center justify-between group border border-slate-100 transition-all duration-300">
             <div className="flex items-center gap-4 min-w-0 flex-1">
-               <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/5 transition-all shrink-0 shadow-inner">
+               <div className="h-10 w-10 md:h-16 md:w-16 rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm border border-slate-100">
                   {isValidElement(icon) 
-                    ? cloneElement(icon as any, { className: "h-5 w-5" }) 
+                    ? cloneElement(icon as any, { className: "h-full w-full object-contain p-2" }) 
                     : icon}
                </div>
                <div className="text-left min-w-0 flex-1 space-y-1">

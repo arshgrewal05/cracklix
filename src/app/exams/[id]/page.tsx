@@ -30,8 +30,8 @@ import { useToast } from "@/hooks/use-toast"
 import { AuthorityLogo } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Institutional Exam detail Hub v47.0.
- * BRANDING: Shows parent board logo.
+ * @fileOverview Institutional Exam Detail Hub v48.0.
+ * UI FIX: Enlarged logos by removing padding and using XL sizes.
  */
 
 export default function ExamHubPage() {
@@ -102,9 +102,9 @@ export default function ExamHubPage() {
       <section className="bg-white border-b border-slate-100 py-14 md:py-20 relative overflow-hidden">
          <div className="container mx-auto px-4 max-w-7xl relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-10 md:gap-16">
-               <div className="flex items-start gap-6 flex-1 min-w-0">
+               <div className="flex items-start gap-8 flex-1 min-w-0">
                   <button onClick={() => router.back()} className="h-10 w-10 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 shrink-0 hover:bg-slate-50"><ChevronLeft className="h-5 w-5" /></button>
-                  <div className="min-w-0 space-y-4">
+                  <div className="min-w-0 space-y-6">
                      <div className="flex items-center gap-4">
                         <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded shadow-sm">{activeBoard?.abbreviation || 'OFFICIAL'} HUB</Badge>
                         <button onClick={togglePin} disabled={isPinning} className={cn("flex items-center gap-2 px-4 py-1.5 rounded-xl border transition-all active:scale-95 shadow-sm font-black uppercase text-[9px] tracking-widest", isPinned ? "bg-primary border-primary text-white" : "bg-white border-slate-200 text-slate-400 hover:text-primary")}>
@@ -112,8 +112,8 @@ export default function ExamHubPage() {
                            {isPinned ? 'FOLLOWING' : 'SAVE EXAM'}
                         </button>
                      </div>
-                     <div className="flex items-center gap-6">
-                        <AuthorityLogo board={activeBoard} category={activeCategory} size="xl" className="shadow-inner rounded-[2rem] bg-slate-50 p-4" />
+                     <div className="flex items-center gap-8">
+                        <AuthorityLogo board={activeBoard} category={activeCategory} size="xl" className="rounded-[2.5rem] bg-slate-50" />
                         <h1 className="text-3xl md:text-6xl font-black text-[#0F172A] leading-tight tracking-tight">
                            {exam.name}
                         </h1>
@@ -171,8 +171,8 @@ function MockList({ data, results, isPassActive, loading, boards }: any) {
 
             return (
                <Card key={mock.id} className="border border-slate-100 shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] bg-white p-10 text-center flex flex-col h-[400px] group relative overflow-hidden">
-                  <div className="h-14 w-14 mx-auto mb-8">
-                     <AuthorityLogo board={board} size="lg" className="shadow-inner rounded-xl bg-slate-50 p-2" />
+                  <div className="h-20 w-20 mx-auto mb-8">
+                     <AuthorityLogo board={board} size="lg" className="rounded-xl bg-slate-50" />
                   </div>
                   <CardHeader className="p-0 flex-1 space-y-5">
                      <CardTitle className="font-black text-xl md:text-2xl text-[#0F172A] leading-tight line-clamp-2">

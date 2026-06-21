@@ -12,8 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AuthorityLogo } from '@/lib/exam-icons';
 
 /**
- * @fileOverview Strictly Whitelisted 7-Category Hub v110.0.
- * BRANDING: Updated to the new canonical 7-category list.
+ * @fileOverview Strictly Whitelisted 7-Category Hub v111.0.
+ * UI FIX: Enlarged logos by removing padding and using optimized sizes.
  */
 
 const STRICT_WHITELIST = [
@@ -54,8 +54,8 @@ export default function FeaturedCategories() {
               <motion.div key={cat.id} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.05 }}>
                  <Link href={`/exams/category/${cat.id}`}>
                     <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group overflow-hidden flex flex-col p-8 h-full">
-                       <div className="mb-6">
-                          <AuthorityLogo category={cat} size="lg" className="shadow-inner rounded-xl bg-slate-50 p-2" />
+                       <div className="mb-6 flex justify-start">
+                          <AuthorityLogo category={cat} size="lg" className="bg-slate-50 rounded-xl" />
                        </div>
                        
                        <div className="space-y-3 flex-1">
