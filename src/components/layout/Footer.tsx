@@ -19,8 +19,7 @@ import {
 } from "@/lib/constants";
 
 /**
- * @fileOverview Compact High-Density Footer v9.0.
- * UPDATED: Massively increased logo scaling for better visibility.
+ * @fileOverview Compact High-Density Footer v10.0 (Syntax Fixed).
  */
 
 export default function Footer() {

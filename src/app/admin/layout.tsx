@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Refined Admin Layout v12.0.
- * UPDATED: Integrated massive logo support and larger header.
+ * @fileOverview Refined Admin Layout v13.0.
+ * UPDATED: Persistent Sidebar toggle in header for all viewports.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -90,15 +90,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="h-[80px] md:h-[112px] flex items-center px-3 md:px-10 justify-between">
             <div className="flex items-center gap-2 md:gap-4 h-full">
               <button 
-                onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden bg-white border border-slate-200 text-slate-700 h-10 w-10 rounded-xl shadow-sm flex items-center justify-center active:scale-95 transition-all"
+                onClick={toggleSidebar}
+                className="bg-white border border-slate-200 text-slate-700 h-10 w-10 md:h-12 md:w-12 rounded-xl shadow-sm flex items-center justify-center active:scale-95 transition-all hover:border-primary/30"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5 md:w-6 md:h-6" />
               </button>
 
               <Logo
                 variant="light"
-                className="shrink-0 -ml-2"
+                className="shrink-0"
                 imgClassName="h-[64px] md:h-[92px]"
               />
             </div>

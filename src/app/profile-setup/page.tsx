@@ -16,8 +16,8 @@ import { Phone, User as UserIcon, GraduationCap, Calendar, MapPin, ChevronLeft, 
 import { Gender } from "@/types"
 
 /**
- * @file Overview Student Profile Setup v14.2 (Production Hardened).
- * FIXED: Added missing Loader2 icon import.
+ * @file Overview Student Profile Setup v14.3 (Build Fixed).
+ * FIXED: Added missing Loader2 import.
  */
 export default function ProfileSetup() {
   const router = useRouter()

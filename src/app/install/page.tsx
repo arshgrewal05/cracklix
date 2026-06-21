@@ -27,8 +27,8 @@ import { cn } from "@/lib/utils";
 import PWAInstallButton from "@/components/PWAInstallButton";
 
 /**
- * @fileOverview Public PWA Install Hub v12.2 (Build Fixed).
- * FIXED: Explicitly importing isValidElement and React.
+ * @fileOverview Public PWA Install Hub v12.3 (Build Fixed).
+ * FIXED: Satisfied isValidElement from React core.
  */
 export default function InstallPage() {
   const [device, setDevice] = useState<"android" | "ios" | "desktop" | "unknown">("desktop");
@@ -128,7 +128,7 @@ export default function InstallPage() {
                        <div className="space-y-4">
                           <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-start gap-3">
                              <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                             <p className="text-emerald-50 text-[11px] md:text-sm font-medium leading-relaxed">Native mode active. You are now connected to the elite prep registry.</p>
+                             <p className="text-emerald-50 [11px] md:text-sm font-medium leading-relaxed">Native mode active. You are now connected to the elite prep registry.</p>
                           </div>
                           <Button asChild className="w-full h-12 bg-white text-black hover:bg-slate-100 rounded-full font-black uppercase tracking-widest text-[9px] border-none shadow-xl transition-all">
                              <Link href="/dashboard">Enter Dashboard</Link>
