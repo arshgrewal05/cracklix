@@ -12,7 +12,8 @@ import {
   FileText,
   BarChart3,
   Star,
-  Gem
+  Gem,
+  ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,15 +23,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official High-Density Hero Hub v27.0 (Unified Design System).
+ * @fileOverview Official Compact Hero Hub v28.0 (Redesigned for PWA).
  */
-
-const formatCompact = (num: number) => {
-  if (num === undefined || num === null) return "...";
-  if (num === 0) return "0";
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toString();
-};
 
 export default function Hero() {
   const { profile } = useUser();
@@ -42,14 +36,7 @@ export default function Hero() {
   }, []);
 
   const statsRef = useMemo(() => (db ? doc(db, "settings", "stats") : null), [db]);
-  const { data: stats, loading: statsLoading } = useDoc<any>(statsRef);
-
-  const liveStats = useMemo(() => [
-    { id: "q", icon: <Zap className="h-4 w-4 text-blue-600" />, val: statsLoading ? "..." : `${formatCompact(stats?.totalQuestions)}+`, label: "QUESTIONS" },
-    { id: "m", icon: <ClipboardList className="h-4 w-4 text-indigo-600" />, val: statsLoading ? "..." : `${formatCompact(stats?.totalMocks)}+`, label: "MOCK TESTS" },
-    { id: "e", icon: <ShieldCheck className="h-4 w-4 text-emerald-600" />, val: statsLoading ? "..." : `${formatCompact(stats?.totalCategories)}+`, label: "CATEGORIES" },
-    { id: "u", icon: <Users className="h-4 w-4 text-orange-500" />, val: statsLoading ? "..." : `${formatCompact(stats?.totalUsers)}+`, label: "ASPIRANTS" }
-  ], [stats, statsLoading]);
+  const { data: stats } = useDoc<any>(statsRef);
 
   if (!mounted) return null;
 
@@ -58,94 +45,80 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-4 md:gap-8 items-center">
 
-          {/* 1. CONTENT BLOCK */}
-          <div className="text-left space-y-2 md:space-y-6">
+          {/* 1. CONTENT BLOCK - COMPACT MOBILE */}
+          <div className="text-left space-y-3 md:space-y-6">
             <motion.div 
                initial={{ opacity: 0, x: -20 }}
                animate={{ opacity: 1, x: 0 }}
                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-100 shadow-sm group hover:border-primary/30 transition-all cursor-default"
             >
               <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 animate-pulse" />
-              <span className="text-[8px] md:text-[12px] font-black text-slate-700 tracking-tight uppercase">
-                {statsLoading ? "..." : (stats?.totalUsers || 0).toLocaleString()} Students Preparing
+              <span className="text-[8px] md:text-[12px] font-black text-slate-700 tracking-tight">
+                ✨ Punjab's Smart Exam Platform
               </span>
             </motion.div>
 
-            <div className="space-y-1 md:space-y-4">
-              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.05]">
+            <div className="space-y-1.5 md:space-y-4">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.05]">
                 Crack Punjab <br/>
-                <span className="block text-blue-600">Government Exams</span>
-                With Confidence
+                <span className="block text-primary">Government Exams</span>
               </h1>
 
-              <p className="text-[10px] sm:text-base text-slate-600 max-w-lg leading-relaxed font-medium">
-                Practice with bilingual mock tests, previous papers and exam-focused preparation.
+              <p className="text-[11px] sm:text-lg text-slate-500 max-w-lg leading-relaxed font-medium">
+                Mock Tests, PYQs, Current Affairs and Study Material in one place.
               </p>
+            </div>
+
+            <div className="flex gap-2 md:gap-4 pt-1 md:pt-4">
+              <Button asChild className="flex-1 md:flex-none h-11 md:h-14">
+                <Link href="/mocks">Start Free Mock <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+              <Button asChild variant="outline" className="flex-1 md:flex-none h-11 md:h-14">
+                <Link href="/exams">Explore Exams</Link>
+              </Button>
             </div>
           </div>
 
-          {/* 2. VISUALS & QUICK TOOLS */}
-          <div className="flex flex-col items-center mt-2 md:mt-0">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="relative flex justify-center mb-2 md:mb-6">
+          {/* 2. ILLUSTRATION - SHRUNK FOR PWA */}
+          <div className="hidden lg:flex flex-col items-center">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="relative">
               <img 
                 src="/images/hero-student.png" 
                 alt="Cracklix Student" 
-                className="w-full max-w-[110px] md:max-w-md drop-shadow-2xl h-auto object-contain" 
+                className="w-full max-w-md drop-shadow-2xl h-auto object-contain" 
               />
             </motion.div>
-
-            <div className="grid grid-cols-2 gap-2 md:gap-3 w-full max-w-sm md:max-w-none">
-              <FeatureCard icon={ClipboardList} label="Mock Tests" sub="Premium" color="text-blue-600" href="/mocks" />
-              <FeatureCard icon={BookOpen} label="Study Material" sub="Verified" color="text-indigo-600" href="/notes" />
-              <FeatureCard icon={FileText} label="PYQ Papers" sub="Solved" color="text-emerald-600" href="/pyqs" />
-              <FeatureCard icon={BarChart3} label="Analytics" sub="Merit" color="text-orange-500" href="/dashboard" />
-            </div>
-
-            <div className="flex gap-2 mt-3 md:mt-8 w-full justify-center">
-              <Button asChild className="flex-1 md:flex-none">
-                <Link href="/mocks">Start Free Mock <ChevronRight className="h-4 w-4" /></Link>
-              </Button>
-              <Button asChild variant="outline" className="flex-1 md:flex-none">
-                <Link href="/pass"><Gem className="h-4 w-4 text-primary" /> {profile?.passStatus === 'active' ? 'Manage' : 'Get Pass'}</Link>
-              </Button>
-            </div>
           </div>
+
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="lg:hidden flex justify-center mt-2">
+            <img 
+              src="/images/hero-student.png" 
+              alt="Cracklix Student" 
+              className="h-[90px] w-auto drop-shadow-xl" 
+            />
+          </motion.div>
         </div>
 
-        {/* 3. DYNAMIC STATS STRIP */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 md:mt-10">
-          {liveStats.map((stat) => (
-            <Card key={stat.id} className="p-2 md:p-4 rounded-xl md:rounded-2xl bg-white border border-slate-100 shadow-md group hover:shadow-xl transition-all">
-              <div className="flex items-center gap-2 md:gap-3">
-                <div className="h-7 w-7 md:h-9 md:w-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  {stat.icon}
-                </div>
-                <div className="text-left">
-                  <p className="text-sm md:text-xl font-black text-slate-900 leading-none tabular-nums">{stat.val}</p>
-                  <p className="text-[7px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5 md:mt-1">{stat.label}</p>
-                </div>
-              </div>
-            </Card>
-          ))}
+        {/* QUICK ACTIONS: 2x2 GRID FOR MOBILE */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-6 md:mt-16">
+          <QuickAction icon={Zap} label="Mock Tests" href="/mocks" color="bg-blue-600" />
+          <QuickAction icon={BookOpen} label="Study Material" href="/notes" color="bg-indigo-600" />
+          <QuickAction icon={FileText} label="PYQ Papers" href="/pyqs" color="bg-emerald-600" />
+          <QuickAction icon={BarChart3} label="Current Affairs" href="/current-affairs" color="bg-orange-500" />
         </div>
       </div>
     </section>
   );
 }
 
-function FeatureCard({ icon: Icon, label, sub, color, href }: any) {
+function QuickAction({ icon: Icon, label, href, color }: any) {
   return (
-    <Link href={href} className="block h-full">
-      <Card className="px-3 py-2 rounded-xl border border-slate-100 bg-white hover:shadow-lg transition-all duration-300 h-[74px] md:h-auto group flex flex-col justify-center">
-        <div className="flex items-center gap-2.5 md:block">
-            <div className={cn("h-7 w-7 md:h-8 md:w-8 rounded-lg flex items-center justify-center mb-0 md:mb-3 shadow-inner bg-slate-50 group-hover:scale-110 transition-transform shrink-0")}>
-              <Icon className={cn("h-4 w-4 md:h-4 md:w-4", color)} />
-            </div>
-            <div className="min-w-0">
-                <p className="font-semibold text-slate-900 text-[13px] md:text-xs leading-tight text-left truncate">{label}</p>
-                <p className="text-[9px] md:text-[8px] text-slate-400 mt-0.5 uppercase font-bold tracking-widest text-left truncate">{sub}</p>
-            </div>
+    <Link href={href} className="block group h-full">
+      <Card className="p-3 md:p-6 rounded-xl border border-slate-100 bg-white hover:shadow-lg transition-all duration-300 h-full group flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
+        <div className={cn("h-8 w-8 md:h-12 md:w-12 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 shadow-lg text-white group-hover:scale-110 transition-transform", color)}>
+          <Icon className="h-4 w-4 md:h-6 md:w-6" />
         </div>
+        <span className="text-[10px] md:text-sm font-bold text-slate-800 leading-tight uppercase tracking-tight">{label}</span>
       </Card>
     </Link>
   )

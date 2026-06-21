@@ -2,100 +2,68 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Smartphone, CheckCircle2, ShieldCheck, Apple, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Smartphone, CheckCircle2, ShieldCheck, Zap, LayoutGrid, Activity } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useDoc, useFirestore } from '@/firebase';
-import { doc } from 'firebase/firestore';
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
 
 /**
- * @fileOverview High-Density Study Anywhere Hub v27.0.
+ * @fileOverview High-Density Study Anywhere Hub v28.0 (App-First).
  */
 
 export default function AppPreview() {
-  const db = useFirestore();
-
-  const { data: settings } = useDoc<any>(useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]));
-
   return (
-    <section className="py-8 md:py-24 bg-white overflow-hidden border-t border-slate-50">
+    <section className="py-8 md:py-24 bg-white overflow-hidden border-t border-slate-100">
       <div className="container mx-auto px-4 md:px-6 max-w-7xl text-left">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
-          
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-4 md:space-y-8 order-2 lg:order-1 max-w-xl"
-          >
-            <div className="space-y-2 md:space-y-4">
-              <div className="flex items-center gap-2">
-                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                    <Smartphone className="h-4 w-4" />
-                 </div>
-                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">PWA Hub</span>
+        <div className="space-y-6 md:space-y-12">
+           <div className="space-y-1 px-1">
+              <div className="flex items-center gap-3">
+                 <Smartphone className="h-5 w-5 text-primary" />
+                 <h2 className="text-xl md:text-4xl font-black text-[#0F172A] tracking-tight">Study Anywhere</h2>
               </div>
-              <h2 className="text-2xl md:text-5xl font-extrabold text-[#0F172A] leading-tight tracking-tight">
-                Study Anywhere. Anytime.
-              </h2>
-              <p className="text-[12px] md:text-xl text-slate-500 font-medium leading-relaxed max-w-lg">
-                Experience Punjab's smartest mock test platform as a native application on your smartphone.
-              </p>
-            </div>
+              <p className="text-slate-500 font-medium text-[11px] md:text-lg">Experience Punjab's smartest app on your mobile</p>
+           </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
-               <BenefitItem text="500+ Mocks" />
-               <BenefitItem text="Study Notes" />
-               <BenefitItem text="Bilingual" />
-               <BenefitItem text="Live Alerts" />
-            </div>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+              <FeatureCard icon={Smartphone} label="Mobile Friendly" desc="Optimized for PWA" color="text-blue-500" />
+              <FeatureCard icon={Zap} label="PWA Support" desc="Rapid Node Loading" color="text-orange-500" />
+              <FeatureCard icon={LayoutGrid} label="Offline Access" desc="Sync Data Online" color="text-indigo-500" />
+              <FeatureCard icon={Activity} label="Tracking" desc="Analytics Insight" color="text-emerald-500" />
+           </div>
 
-            <div className="flex flex-wrap gap-3 pt-2">
-               <Button asChild className="flex-1 sm:flex-none h-12 md:h-14 px-8 bg-[#0F172A] hover:bg-black text-white rounded-xl shadow-xl gap-3 font-black uppercase text-[9px] md:text-[10px] tracking-widest border-none transition-all active:scale-95">
-                  <Link href="/install">
-                    <Play className="h-4 w-4 text-primary fill-current" /> Download Android
-                  </Link>
-               </Button>
-               <Button disabled variant="outline" className="flex-1 sm:flex-none h-12 md:h-14 px-8 border-2 border-slate-100 bg-white text-slate-300 rounded-xl gap-3 font-black uppercase text-[9px] md:text-[10px] tracking-widest transition-all">
-                  <Apple className="h-4 w-4" /> iOS Hub
-               </Button>
-            </div>
-          </motion.div>
-
-          <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end">
-             <motion.div 
-               initial={{ opacity: 0, y: 30 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               className="relative w-full max-w-[180px] md:max-w-[360px] h-[280px] md:h-[560px] z-10"
-             >
-                <div className="h-full w-full bg-[#0F172A] rounded-[2rem] md:rounded-[3rem] p-2 md:p-3 shadow-5xl border-[4px] md:border-[6px] border-[#1E293B] overflow-hidden">
-                   <div className="w-full h-full rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-white relative">
-                      <img 
-                        src="/images/hero-student.png" 
-                        alt="App Screenshot" 
-                        className="w-full h-full object-contain p-4 md:p-10"
-                      />
-                   </div>
-                </div>
-             </motion.div>
-          </div>
+           <div className="bg-[#0B1528] rounded-[2.5rem] p-6 md:p-12 text-white relative overflow-hidden shadow-4xl group border border-white/5">
+              <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12 group-hover:scale-110 transition-transform"><Gem className="h-32 w-32" /></div>
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                 <div className="text-center md:text-left space-y-2">
+                    <h3 className="text-xl md:text-3xl font-black uppercase">Elite Membership</h3>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                       <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3 text-primary" /> All Mock Tests</span>
+                       <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3 text-primary" /> Premium Notes</span>
+                       <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3 text-primary" /> Rank Prediction</span>
+                    </div>
+                 </div>
+                 <Button asChild className="w-full md:w-auto h-12 px-10 bg-primary hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] shadow-2xl transition-all border-none active:scale-95">
+                    <Link href="/pass">Get Pass <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                 </Button>
+              </div>
+           </div>
         </div>
       </div>
     </section>
   );
 }
 
-function BenefitItem({ text }: { text: string }) {
-  return (
-    <div className="flex items-center gap-2 text-[#0F172A] font-bold uppercase text-[8px] md:text-xs tracking-tight">
-       <div className="h-5 w-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
-          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-       </div>
-       {text}
-    </div>
-  );
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Gem } from "lucide-react";
+
+function FeatureCard({ icon: Icon, label, desc, color }: any) {
+   return (
+      <Card className="border border-slate-100 shadow-xl rounded-[1.5rem] p-4 text-center space-y-2 hover:translate-y-[-4px] transition-all group cursor-default">
+         <div className={cn("h-10 w-10 md:h-12 md:w-12 rounded-xl bg-slate-50 flex items-center justify-center mx-auto shadow-inner group-hover:scale-110 transition-transform", color)}>
+            <Icon className="h-5 w-5 md:h-6 md:w-6" />
+         </div>
+         <h4 className="text-[11px] md:text-sm font-black text-[#0F172A] uppercase leading-none">{label}</h4>
+         <p className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{desc}</p>
+      </Card>
+   )
 }

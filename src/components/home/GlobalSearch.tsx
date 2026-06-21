@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, Zap, BookOpen, Newspaper, Layers, GraduationCap, ChevronRight, Sparkles, X, Loader2 } from 'lucide-react';
+import { Search, Zap, BookOpen, Newspaper, Layers, GraduationCap, ChevronRight, Sparkles, X, Loader2, Trophy } from 'lucide-react';
 import { useCollection, useFirestore } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
@@ -9,15 +9,14 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
 /**
- * @fileOverview Institutional Global Search Center v12.0.
- * Debounced logic for production stability.
+ * @fileOverview Institutional Sticky Search Hub v13.0 (Title Case Refined).
  */
 
 const TRENDING = [
-  { label: "Punjab Police Constable", href: "/exams/hub/punjab-police" },
-  { label: "PSSSB Clerk 2025", href: "/exams/hub/psssb" },
-  { label: "Revenue Patwari Mock", href: "/mocks" },
-  { label: "Latest Punjab GK", href: "/current-affairs" }
+  { label: "PPSC", href: "/exams/category/punjab-government-exams" },
+  { label: "PSSSB", href: "/exams/category/punjab-government-exams" },
+  { label: "Punjab Police", href: "/exams/category/punjab-government-exams" },
+  { label: "Mock Tests", href: "/mocks" }
 ];
 
 export default function GlobalSearch() {
@@ -27,20 +26,16 @@ export default function GlobalSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Debounce logic
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
   }, [query]);
 
-  // 1. DATA AGGREGATION
   const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]));
   const { data: mocks } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]));
   const { data: notes } = useCollection<any>(useMemo(() => (db ? collection(db, "notes") : null), [db]));
-  const { data: pyqs } = useCollection<any>(useMemo(() => (db ? collection(db, "pyqs") : null), [db]));
   const { data: caHub } = useCollection<any>(useMemo(() => (db ? collection(db, "current_affairs_hub") : null), [db]));
 
-  // 2. SEARCH LOGIC
   const results = useMemo(() => {
     if (!debouncedQuery.trim() || debouncedQuery.length < 2) return null;
     const term = debouncedQuery.toLowerCase();
@@ -49,17 +44,12 @@ export default function GlobalSearch() {
       exams: (exams || []).filter(e => e.name?.toLowerCase().includes(term)).slice(0, 3),
       mocks: (mocks || []).filter(m => m.title?.toLowerCase().includes(term)).slice(0, 4),
       notes: (notes || []).filter(n => n.title?.toLowerCase().includes(term)).slice(0, 3),
-      pyqs: (pyqs || []).filter(p => p.title?.toLowerCase().includes(term)).slice(0, 3),
       ca: (caHub || []).filter(c => c.title?.toLowerCase().includes(term)).slice(0, 2)
     };
-  }, [debouncedQuery, exams, mocks, notes, pyqs, caHub]);
+  }, [debouncedQuery, exams, mocks, notes, caHub]);
 
   const hasResults = results && (
-    results.exams.length > 0 || 
-    results.mocks.length > 0 || 
-    results.notes.length > 0 || 
-    results.pyqs.length > 0 || 
-    results.ca.length > 0
+    results.exams.length > 0 || results.mocks.length > 0 || results.notes.length > 0 || results.ca.length > 0
   );
 
   useEffect(() => {
@@ -73,7 +63,7 @@ export default function GlobalSearch() {
   }, []);
 
   return (
-    <div className="relative w-full z-40 bg-white md:bg-transparent px-4 md:px-0 sticky top-16 md:static" ref={containerRef}>
+    <div className="relative w-full z-40 bg-white md:bg-transparent px-4 md:px-0 sticky top-[64px] md:static" ref={containerRef}>
       <div className="max-w-[700px] mx-auto relative group">
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-600/20 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
         
@@ -85,7 +75,7 @@ export default function GlobalSearch() {
           
           <input
             type="text"
-            placeholder="Search exams, tests, or notes..."
+            placeholder="Search exams, mock tests, study material..."
             value={query}
             onFocus={() => setIsOpen(true)}
             onChange={(e) => {
@@ -106,13 +96,13 @@ export default function GlobalSearch() {
         </div>
 
         {isOpen && (
-          <div className="absolute top-full mt-2 w-full bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 max-h-[500px] overflow-y-auto custom-scrollbar">
+          <div className="absolute top-full mt-2 w-full bg-white rounded-[2rem] shadow-5xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 max-h-[500px] overflow-y-auto custom-scrollbar">
             
             {(!query || query.length < 2) ? (
               <div className="p-6 md:p-8 space-y-6">
                 <div className="flex items-center gap-3">
                   <Sparkles className="h-4 w-4 text-primary fill-current" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Quick Links</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Popular Searches</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {TRENDING.map((item) => (
@@ -130,7 +120,7 @@ export default function GlobalSearch() {
             ) : hasResults ? (
               <div className="divide-y divide-slate-50 text-left">
                 {results.exams.length > 0 && (
-                  <SearchGroup label="EXAM VERTICALS">
+                  <SearchGroup label="📚 Exams">
                     {results.exams.map(e => (
                       <SearchResult key={e.id} href={`/exams/${e.id}`} title={e.name} sub="Official Hub" icon={<GraduationCap className="h-4 w-4" />} onClick={() => setIsOpen(false)} />
                     ))}
@@ -138,7 +128,7 @@ export default function GlobalSearch() {
                 )}
 
                 {results.mocks.length > 0 && (
-                  <SearchGroup label="PRACTICE TESTS">
+                  <SearchGroup label="📝 Mock Tests">
                     {results.mocks.map(m => (
                       <SearchResult key={m.id} href={`/mocks/${m.id}`} title={m.title} sub={`${m.totalQuestions} Questions`} icon={<Zap className="h-4 w-4 text-primary" />} onClick={() => setIsOpen(false)} />
                     ))}
@@ -146,17 +136,21 @@ export default function GlobalSearch() {
                 )}
 
                 {results.notes.length > 0 && (
-                  <SearchGroup label="STUDY MATERIALS">
+                  <SearchGroup label="📖 Study Material">
                     {results.notes.map(n => (
                       <SearchResult key={n.id} href="/notes" title={n.title} sub={n.category} icon={<BookOpen className="h-4 w-4 text-blue-500" />} onClick={() => setIsOpen(false)} />
                     ))}
                   </SearchGroup>
                 )}
+
+                <SearchGroup label="🏆 Rankers">
+                   <SearchResult href="/leaderboard" title="Hall of Rankers" sub="View State Merit List" icon={<Trophy className="h-4 w-4 text-amber-500" />} onClick={() => setIsOpen(false)} />
+                </SearchGroup>
               </div>
             ) : (
               <div className="p-12 text-center space-y-4 opacity-30">
                 <Search className="h-12 w-12 mx-auto text-slate-300" />
-                <p className="font-headline font-black uppercase text-sm tracking-widest">Awaiting verification...</p>
+                <p className="font-headline font-black uppercase text-sm tracking-widest">No matching nodes...</p>
               </div>
             )}
           </div>
@@ -169,7 +163,7 @@ export default function GlobalSearch() {
 function SearchGroup({ label, children }: { label: string, children: React.ReactNode }) {
   return (
     <div className="p-4 space-y-2">
-      <h5 className="px-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">{label}</h5>
+      <h5 className="px-4 text-[9px] font-black text-slate-500 uppercase tracking-[0.3em]">{label}</h5>
       <div className="space-y-1">{children}</div>
     </div>
   );
@@ -187,7 +181,7 @@ function SearchResult({ href, title, sub, icon, onClick }: any) {
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="font-bold text-sm md:text-base text-[#0F172A] truncate uppercase leading-none">{title}</p>
+          <p className="font-bold text-sm md:text-base text-[#0F172A] truncate leading-none">{title}</p>
           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">{sub}</p>
         </div>
       </div>
