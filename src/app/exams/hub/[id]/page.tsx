@@ -9,14 +9,14 @@ import { collection, query, where, doc, updateDoc, arrayUnion, arrayRemove, serv
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Star, CheckCircle2, RefreshCw, BookOpen, Clock, Zap } from "lucide-react"
+import { ChevronLeft, ChevronRight, Star, CheckCircle2, RefreshCw, BookOpen, Clock, Zap, Landmark } from "lucide-react"
 import { AuthorityLogo } from "@/lib/exam-icons"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Hierarchical Board Hub v69.0.
- * UI FIX: Enlarged logos by removing padding and using XL sizes.
+ * @fileOverview Hierarchical Board Hub v69.1.
+ * FIXED: Added missing Landmark icon import to resolve ReferenceError.
  */
 
 export default function HubExamsPage() {
