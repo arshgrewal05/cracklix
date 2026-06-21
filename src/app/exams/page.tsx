@@ -16,11 +16,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { AuthorityLogo } from "@/lib/exam-icons"
 
 /**
- * @fileOverview High-Density Category Explorer v25.0.
+ * @fileOverview High-Density Category Explorer v26.0 (Central Govt Added).
  */
 
 const AUTHORIZED_CATEGORY_IDS = [
   "punjab-government-exams",
+  "central-government-exams",
   "punjab-teaching-exams",
   "punjab-technical-exams",
   "banking-exams",

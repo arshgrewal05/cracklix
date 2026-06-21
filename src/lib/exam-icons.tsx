@@ -3,9 +3,8 @@ import { Shield, GraduationCap, Scale, Zap, Stethoscope, Landmark, BookOpen, Act
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Branding Engine v16.0 (Equalized Size).
+ * @fileOverview Institutional Branding Engine v17.0 (Central Govt Added).
  * RESOLVER: Maps board/category IDs to official high-fidelity local assets.
- * OPTIMIZATION: Increased scale to 1.8 to normalize logos with large transparent padding.
  */
 
 // 1. CANONICAL BOARD REGISTRY (Single Source of Truth)
@@ -29,6 +28,7 @@ const CANONICAL_BOARD_LOGOS: Record<string, string> = {
 // 2. CANONICAL CATEGORY REGISTRY
 const CANONICAL_CAT_LOGOS: Record<string, string> = {
   'punjab-government-exams': '/logos/categories/punjab-government-exams.png',
+  'central-government-exams': '/logos/categories/punjab-government-exams.png', // Placeholder
   'punjab-teaching-exams': '/logos/categories/punjab-teaching-exams.png',
   'punjab-technical-exams': '/logos/punjab-technical-exams.png',
   'banking-exams': '/logos/categories/banking-exams.png',

@@ -14,11 +14,12 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 /**
- * @fileOverview High-Density Category Explorer v121.0 (Title Case Refined).
+ * @fileOverview High-Density Category Explorer v122.0 (Central Govt Added).
  */
 
 const STRICT_WHITELIST = [
   "punjab-government-exams",
+  "central-government-exams",
   "punjab-teaching-exams",
   "punjab-technical-exams",
   "banking-exams",
