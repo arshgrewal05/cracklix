@@ -9,10 +9,11 @@ import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 /**
- * @fileOverview High-Fidelity Balanced Mobile App Hub v21.3 (Hardened Imports).
- * FIXED: Ensured Badge and other components are imported for stable build.
+ * @fileOverview High-Fidelity Balanced Mobile App Hub v22.0.
+ * UPDATED: Android link redirected to internal /install path for direct installation.
  */
 
 export default function AppPreview() {
@@ -21,7 +22,6 @@ export default function AppPreview() {
 
   const { data: settings } = useDoc<any>(useMemo(() => (db ? doc(db, 'settings', 'global') : null), [db]));
 
-  const playStoreLink = settings?.playStoreUrl || "#";
   const appStoreLink = settings?.appStoreUrl || "#";
 
   return (
@@ -59,11 +59,11 @@ export default function AppPreview() {
             </div>
 
             <div className="flex flex-wrap gap-4 pt-4">
-               <a href={playStoreLink} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                 <Button className="w-full h-14 md:h-16 px-10 bg-[#0F172A] hover:bg-black text-white rounded-2xl shadow-xl gap-4 font-black uppercase text-[11px] tracking-widest border-none transition-all active:scale-95">
+               <Button asChild className="w-full sm:w-auto h-14 md:h-16 px-10 bg-[#0F172A] hover:bg-black text-white rounded-2xl shadow-xl gap-4 font-black uppercase text-[11px] tracking-widest border-none transition-all active:scale-95">
+                  <Link href="/install">
                     <Play className="h-5 w-5 text-primary fill-current" /> Download Android
-                 </Button>
-               </a>
+                  </Link>
+               </Button>
                <a href={appStoreLink} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto opacity-50 cursor-not-allowed">
                  <Button variant="outline" className="w-full h-14 md:h-16 px-10 border-2 border-slate-100 bg-white text-slate-400 rounded-2xl gap-4 font-black uppercase text-[11px] tracking-widest transition-all">
                     <Apple className="h-5 w-5" /> iOS Coming Soon
