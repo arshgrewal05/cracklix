@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Landmark, ArrowRight, GraduationCap, Zap, Building2, Scale, Globe, ShieldCheck, HeartPulse } from 'lucide-react';
+import { Landmark, ArrowRight, GraduationCap, Zap, Building2, Scale, Globe, ShieldCheck } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -11,26 +11,26 @@ import { collection, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Strictly Whitelisted 6-Category Hub v101.0.
- * ENFORCED: Whitelist filter ensures only the specific 6 categories appear in Title Case.
+ * @fileOverview Strictly Whitelisted 6-Category Hub v102.0.
+ * ENFORCED: Whitelist filter ensures only the canonical 6 master categories appear.
  */
 
 const STRICT_WHITELIST = [
-  "punjab-govt",
-  "punjab-teaching",
-  "punjab-technical",
+  "punjab-government-exams",
+  "punjab-teaching-exams",
+  "punjab-technical-exams",
   "banking-exams",
   "judiciary-exams",
-  "central-govt"
+  "central-government-exams"
 ];
 
 const CATEGORY_ICONS: Record<string, any> = {
-  "punjab-govt": <Landmark className="h-6 w-6" />,
-  "punjab-teaching": <GraduationCap className="h-6 w-6" />,
-  "punjab-technical": <Zap className="h-6 w-6" />,
+  "punjab-government-exams": <Landmark className="h-6 w-6" />,
+  "punjab-teaching-exams": <GraduationCap className="h-6 w-6" />,
+  "punjab-technical-exams": <Zap className="h-6 w-6" />,
   "banking-exams": <Building2 className="h-6 w-6" />,
   "judiciary-exams": <Scale className="h-6 w-6" />,
-  "central-govt": <Globe className="h-6 w-6" />
+  "central-government-exams": <Globe className="h-6 w-6" />
 };
 
 export default function FeaturedCategories() {

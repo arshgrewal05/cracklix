@@ -1,26 +1,18 @@
 'use client';
 
-import React, { useMemo } from "react"
+import React from "react"
 import { motion } from "framer-motion"
 import { 
   ChevronRight, 
-  Landmark, 
-  ShieldCheck, 
   Zap, 
-  GraduationCap, 
-  HeartPulse, 
-  Scale, 
-  Globe,
   ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { useCollection, useFirestore } from "@/firebase";
-import { collection, limit } from "firebase/firestore";
 
 /**
- * @fileOverview Popular Punjab Exams Hub v70.0.
- * FIXED: Strictly shows only the requested popular exams.
+ * @fileOverview Popular Punjab Exams Hub v71.0.
+ * FIXED: Normalized Title Case and strictly showing targeted popular exams.
  */
 
 const POPULAR_LIST = [
@@ -29,15 +21,12 @@ const POPULAR_LIST = [
   { name: "Patwari", id: "patwari" },
   { name: "Clerk", id: "clerk" },
   { name: "PSTET", id: "pstet-paper-1" },
-  { name: "ALM", id: "assistant-lineman--alm-" },
+  { name: "ALM", id: "alm" },
   { name: "Staff Nurse", id: "staff-nurse" },
   { name: "SSC CGL", id: "ssc-cgl" }
 ];
 
 export default function PopularExams() {
-  const db = useFirestore();
-  const { data: exams } = useCollection<any>(useMemo(() => (db ? collection(db, "exams") : null), [db]));
-
   return (
     <section className="py-16 bg-slate-50/50">
       <div className="container mx-auto px-4 max-w-7xl text-left">

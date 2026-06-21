@@ -1,9 +1,9 @@
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/home/Hero";
+import FeaturedCategories from "@/components/home/FeaturedCategories";
 import PopularExams from "@/components/home/PopularExams";
 import LatestMocks from "@/components/home/LatestMocks";
-import FeaturedCategories from "@/components/home/FeaturedCategories";
 import ContinueLearning from "@/components/home/ContinueLearning";
 import CurrentAffairsPreview from "@/components/home/CurrentAffairsPreview";
 import MeritPreview from "@/components/home/MeritPreview";
@@ -13,8 +13,8 @@ import Footer from "@/components/layout/Footer";
 import GlobalSearch from "@/components/home/GlobalSearch";
 
 /**
- * @fileOverview Official Home Page v202.0.
- * UPDATED: Removed Preparation Hub to streamline discovery flow.
+ * @fileOverview Official Home Page v203.0.
+ * UPDATED: Hierarchy Restoration (Hero -> FeaturedCategories -> LatestMocks).
  */
 export default function HomePage() {
   return (

@@ -8,22 +8,22 @@ import { useCollection, useFirestore } from "@/firebase"
 import { collection, query, where } from "firebase/firestore"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Zap, Info, Landmark, GraduationCap, Building2, Globe, ShieldCheck, HeartPulse, Scale } from "lucide-react"
+import { ChevronLeft, ChevronRight, Zap, Landmark, GraduationCap, Building2, Globe, ShieldCheck, Scale } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hierarchical Category Hub v47.0.
- * FLOW: Category -> Board Selection or Direct Exam List.
+ * @fileOverview Hierarchical Category Hub v48.0.
+ * FLOW: Category -> Board Selection Hub or Exam Vertical List.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
-  "punjab-govt": <Landmark className="h-8 w-8" />,
-  "punjab-teaching": <GraduationCap className="h-8 w-8" />,
-  "punjab-technical": <Zap className="h-8 w-8" />,
+  "punjab-government-exams": <Landmark className="h-8 w-8" />,
+  "punjab-teaching-exams": <GraduationCap className="h-8 w-8" />,
+  "punjab-technical-exams": <Zap className="h-8 w-8" />,
   "banking-exams": <Building2 className="h-8 w-8" />,
   "judiciary-exams": <Scale className="h-8 w-8" />,
-  "central-govt": <Globe className="h-8 w-8" />
+  "central-government-exams": <Globe className="h-8 w-8" />
 };
 
 export default function CategoryHubsPage() {
@@ -39,7 +39,7 @@ export default function CategoryHubsPage() {
   const examsQuery = useMemo(() => (db ? query(collection(db, "exams"), where("categoryId", "==", catId)) : null), [db, catId]);
 
   const { data: boards, loading: boardsLoading } = useCollection<any>(boardsQuery);
-  const { data: exams, loading: examsLoading } = useCollection<any>(examsQuery);
+  const { data: rawExams, loading: examsLoading } = useCollection<any>(examsQuery);
   
   const { data: mocks } = useCollection<any>(useMemo(() => (db ? collection(db, "mocks") : null), [db]));
   const { data: pyqs } = useCollection<any>(useMemo(() => (db ? collection(db, "pyqs") : null), [db]));
@@ -49,24 +49,25 @@ export default function CategoryHubsPage() {
     (mocks || []).forEach(m => {
       const eids = m.examIds || (m.examId ? [m.examId] : []);
       eids.forEach((eid: string) => {
-        if (!map[eid]) map[eid] = { full: 0, subject: 0, sectional: 0, pyq: 0, total: 0 };
-        if (m.mockType === 'FULL') map[eid].full++;
-        else if (m.mockType === 'SUBJECT') map[eid].subject++;
-        else if (m.mockType === 'SECTIONAL') map[eid].sectional++;
+        if (!map[eid]) map[eid] = { total: 0 };
         map[eid].total++;
       });
     });
     (pyqs || []).forEach(p => {
        if (p.examId) {
-          if (!map[p.examId]) map[p.examId] = { full: 0, subject: 0, sectional: 0, pyq: 0, total: 0 };
-          map[p.examId].pyq++;
+          if (!map[p.examId]) map[p.examId] = { total: 0 };
           map[p.examId].total++;
        }
     });
     return map;
   }, [mocks, pyqs]);
 
-  // If a category has boards, show boards. If not, show direct exams.
+  // CONTENT GUARD: Only show exams with 1+ content items
+  const activeExams = useMemo(() => {
+     if (!rawExams) return [];
+     return rawExams.filter(e => (statsMap[e.id]?.total || 0) > 0);
+  }, [rawExams, statsMap]);
+
   const hasBoards = boards && boards.length > 0;
 
   return (
@@ -87,7 +88,7 @@ export default function CategoryHubsPage() {
                      {category?.title || "Exam Selection"}
                   </h1>
                   <p className="text-sm md:text-xl font-bold text-slate-400 tracking-tight max-w-3xl">
-                     {category?.description || "Select an authority or exam to view preparation materials."}
+                     {category?.description || "Select a board or exam vertical to view preparation materials."}
                   </p>
                </div>
             </div>
@@ -115,28 +116,19 @@ export default function CategoryHubsPage() {
             </div>
          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {exams?.filter(e => (statsMap[e.id]?.total || 0) > 0).map((exam) => {
-                  const s = statsMap[exam.id] || { full: 0, subject: 0, sectional: 0, pyq: 0 };
-                  return (
-                     <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-10 text-left cursor-pointer">
-                        <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 text-primary shadow-inner">
-                           <GraduationCap className="h-8 w-8" />
-                        </div>
-                        <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-6">{exam.name}</h3>
-                        
-                        <div className="mt-auto space-y-8">
-                           <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                              {s.full > 0 && <span className="flex items-center gap-1.5"><Zap className="h-3 w-3" /> {s.full} Mocks</span>}
-                              {s.subject > 0 && <span className="flex items-center gap-1.5"><BookOpen className="h-3 w-3" /> {s.subject} Subject</span>}
-                              {s.pyq > 0 && <span className="flex items-center gap-1.5"><ChevronRight className="h-3 w-3" /> {s.pyq} PYQs</span>}
-                           </div>
-                           <Button className="w-full h-12 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[11px] tracking-widest uppercase border-none shadow-md gap-2">
-                              View Exam <ChevronRight className="h-4 w-4" />
-                           </Button>
-                        </div>
-                     </Card>
-                  )
-               })}
+               {activeExams.map((exam) => (
+                  <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-10 text-left cursor-pointer">
+                     <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 text-primary shadow-inner">
+                        <GraduationCap className="h-8 w-8" />
+                     </div>
+                     <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight mb-6">{exam.name}</h3>
+                     <div className="mt-auto space-y-8">
+                        <Button className="w-full h-12 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[11px] tracking-widest uppercase border-none shadow-md gap-2">
+                           View Exams <ChevronRight className="h-4 w-4" />
+                        </Button>
+                     </div>
+                  </Card>
+               ))}
             </div>
          )}
       </main>

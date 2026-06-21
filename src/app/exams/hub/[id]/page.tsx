@@ -15,8 +15,9 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Hierarchical Board Selection Hub v62.0.
+ * @fileOverview Hierarchical Board Selection Hub v63.0.
  * FLOW: Board -> Exam Selection. Terminology: "Open Exam".
+ * HARDENED: Zero-content cards are automatically hidden.
  */
 
 export default function HubExamsPage() {
@@ -61,7 +62,6 @@ export default function HubExamsPage() {
     return map;
   }, [mocks, pyqs]);
 
-  // CONTENT GUARD: Hide exams with 0 content
   const exams = useMemo(() => {
     if (!rawExams) return [];
     return rawExams.filter((e: any) => (statsMap[e.id]?.total || 0) > 0);
@@ -89,7 +89,7 @@ export default function HubExamsPage() {
          <div className="container mx-auto px-4 max-w-7xl">
             <button onClick={() => router.back()} className="h-10 w-10 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black mb-10 transition-all"><ChevronLeft className="h-5 w-5" /></button>
             <div className="space-y-4">
-               <Badge className="bg-primary/5 text-primary border-none px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest">{hub?.abbreviation} HUB</Badge>
+               <Badge className="bg-primary/5 text-primary border-none px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest">{hub?.abbreviation} Hub</Badge>
                <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">{hub?.abbreviation} Selection</h1>
                <p className="text-base md:text-xl font-bold text-slate-400 leading-tight max-w-2xl">{hub?.name}</p>
             </div>
@@ -119,11 +119,11 @@ export default function HubExamsPage() {
                        <div className="mt-auto space-y-8">
                           <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                              {s.full > 0 && <span className="flex items-center gap-1.5"><Zap className="h-3 w-3" /> {s.full} Full Mocks</span>}
-                             {s.subject > 0 && <span className="flex items-center gap-1.5"><BookOpen className="h-3 w-3" /> {s.subject} Subject</span>}
+                             {s.subject > 0 && <span className="flex items-center gap-1.5"><BookOpen className="h-3 w-3" /> {s.subject} Subject Tests</span>}
                              {s.pyq > 0 && <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {s.pyq} PYQs</span>}
                           </div>
                           <Button className="w-full h-12 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[11px] tracking-[0.2em] gap-3 shadow-md border-none transition-all active:scale-95">
-                             View Exam <ChevronRight className="h-4 w-4" />
+                             Open Exam <ChevronRight className="h-4 w-4" />
                           </Button>
                        </div>
                     </Card>
