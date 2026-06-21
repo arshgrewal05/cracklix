@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Trash2, Edit, Save, Calendar, Search, Loader2, X, Bell } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, doc, setDoc, deleteDoc, serverTimestamp, query, orderBy } from "firebase/firestore"
+import { collection, query, doc, setDoc, deleteDoc, serverTimestamp, query as firestoreQuery, orderBy } from "firebase/firestore"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -17,9 +17,8 @@ import { CalendarEvent } from "@/types"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Recruitment Registry Hub CMS v9.0 (PWA Optimized).
- * FIXED: Removed Huge ALL CAPS headers and reduced font scales.
- * FIXED: Implemented High-Density padding and Title Case.
+ * @fileOverview Recruitment Registry Hub CMS v11.0 (PWA Hardened).
+ * FIXED: Removed syntax error at start. Standardized to Title Case.
  */
 
 export default function CalendarManagement() {
@@ -73,19 +72,19 @@ export default function CalendarManagement() {
   }, [events, searchTerm])
 
   return (
-    <div className="space-y-6 md:space-y-12 text-[#0F172A] text-left animate-in fade-in duration-500">
+    <div className="space-y-6 md:space-y-10 text-[#0F172A] text-left animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-1">
         <div className="space-y-1">
            <div className="flex items-center gap-2 mb-1">
               <Calendar className="h-4 w-4 text-primary" />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Recruitment Registry Hub</span>
+              <span className="text-[9px] font-black text-slate-400">Recruitment Registry Hub</span>
            </div>
-          <h1 className="text-2xl md:text-5xl font-black tracking-tight">Exam Calendar</h1>
+          <h1 className="text-2xl md:text-5xl font-black tracking-tight text-[#0F172A]">Exam Calendar</h1>
           <p className="text-slate-500 text-[11px] md:text-lg font-medium leading-tight">Manage upcoming recruitment dates and official notifications.</p>
         </div>
         <Button 
           onClick={() => setEditingEvent({ board: "PSSSB", post: "", date: "", status: "Upcoming", type: "Exam", color: "bg-primary", published: true })} 
-          className="w-full md:w-auto bg-primary hover:bg-blue-700 h-11 md:h-14 px-8 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl border-none active:scale-95 gap-2"
+          className="w-full md:w-auto bg-primary hover:bg-blue-700 h-11 md:h-14 px-8 rounded-full font-black text-[10px] tracking-widest shadow-xl border-none active:scale-95 gap-2"
         >
           <Plus className="h-4 w-4" /> Add Calendar Node
         </Button>
@@ -106,9 +105,9 @@ export default function CalendarManagement() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-slate-100 h-14 md:h-20">
-                <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Recruitment & Board</TableHead>
-                <TableHead className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Scheduled Date</TableHead>
-                <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Control</TableHead>
+                <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black text-slate-400">Recruitment & Board</TableHead>
+                <TableHead className="text-[9px] md:text-[10px] font-black text-slate-400">Scheduled Date</TableHead>
+                <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black text-slate-400">Control</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -143,21 +142,19 @@ export default function CalendarManagement() {
 
       <Dialog open={!!editingEvent} onOpenChange={o => !o && setEditingEvent(null)}>
          <DialogContent className="sm:max-w-xl w-[95vw] max-h-[95vh] rounded-3xl md:rounded-[3rem] bg-white border-none shadow-5xl p-0 overflow-hidden text-left flex flex-col">
-            <div className="h-2 w-full bg-[#0F172A] shrink-0" />
+            <div className="h-2 w-full bg-primary shrink-0" />
             <DialogHeader className="p-6 md:p-10 pb-2 md:pb-4 shrink-0">
-               <DialogTitle className="text-xl md:text-3xl font-black uppercase flex items-center gap-3">
-                  <Calendar className="h-6 w-6 text-primary" /> Calendar Node Architect
-               </DialogTitle>
-               <DialogDescription className="text-slate-400 font-bold uppercase text-[9px] tracking-widest mt-1">Add or edit official recruitment dates.</DialogDescription>
+               <DialogTitle className="text-xl md:text-3xl font-black text-[#0F172A]">Calendar Node Architect</DialogTitle>
+               <DialogDescription className="text-slate-400 font-bold text-[9px] md:text-sm mt-1">Add or edit official recruitment dates.</DialogDescription>
             </DialogHeader>
             <div className="px-6 md:px-10 pb-6 md:pb-10 space-y-6 md:space-y-8 overflow-y-auto custom-scrollbar flex-1">
                <div className="grid grid-cols-2 gap-4 md:gap-6">
                   <div className="space-y-1.5 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Board</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Board</Label>
                      <Input value={editingEvent?.board || ""} onChange={e => setEditingEvent({...editingEvent, board: e.target.value.toUpperCase()})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-black" placeholder="e.g. PSSSB" />
                   </div>
                   <div className="space-y-1.5 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Type</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Type</Label>
                      <select value={editingEvent?.type || "Exam"} onChange={e => setEditingEvent({...editingEvent, type: e.target.value})} className="w-full h-12 md:h-14 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none shadow-inner">
                         <option value="Exam">Exam</option>
                         <option value="Registration">Registration</option>
@@ -167,27 +164,27 @@ export default function CalendarManagement() {
                   </div>
                </div>
                <div className="space-y-1.5 text-left">
-                  <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Post Title</Label>
+                  <Label className="text-[9px] font-black text-slate-500 ml-1">Post Title</Label>
                   <Input value={editingEvent?.post || ""} onChange={e => setEditingEvent({...editingEvent, post: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-bold" placeholder="e.g. Revenue Patwari" />
                </div>
                <div className="grid grid-cols-2 gap-4 md:gap-6">
                   <div className="space-y-1.5 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Date String</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Date String</Label>
                      <Input value={editingEvent?.date || ""} onChange={e => setEditingEvent({...editingEvent, date: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-bold text-center" placeholder="e.g. 15 Mar 2026" />
                   </div>
                   <div className="space-y-1.5 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Status Label</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Status Label</Label>
                      <Input value={editingEvent?.status || ""} onChange={e => setEditingEvent({...editingEvent, status: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-bold text-center" placeholder="e.g. Notification Out" />
                   </div>
                </div>
                <div className="space-y-1.5 text-left">
-                  <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Theme Color (CSS Class)</Label>
+                  <Label className="text-[9px] font-black text-slate-500 ml-1">Theme Color (CSS Class)</Label>
                   <Input value={editingEvent?.color || "bg-primary"} onChange={e => setEditingEvent({...editingEvent, color: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-mono text-xs text-primary" />
                </div>
             </div>
             <DialogFooter className="p-6 md:p-10 pt-4 bg-slate-50 border-t border-slate-100 flex flex-row gap-4">
                <Button variant="ghost" onClick={() => setEditingEvent(null)} className="h-11 md:h-12 px-6 font-black uppercase text-[10px] text-slate-400">Discard</Button>
-               <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 border-none">
+               <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 border-none">
                   {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Commit Node
                </Button>
             </DialogFooter>

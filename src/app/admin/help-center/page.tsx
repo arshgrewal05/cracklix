@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useMemo } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -18,8 +18,8 @@ import { HelpArticle } from "@/types"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Knowledge Base Hub Management v8.0 (PWA Optimized).
- * FIXED: Removed huge ALL CAPS headers and standardized to Title Case.
+ * @fileOverview Knowledge Base Hub Management v10.0 (PWA Hardened).
+ * FIXED: Removed syntax error. Standardized to Title Case and Primary Blue.
  */
 
 export default function HelpCenterManagement() {
@@ -79,19 +79,19 @@ export default function HelpCenterManagement() {
   }, [articles, searchTerm])
 
   return (
-    <div className="space-y-6 md:space-y-12 text-[#0F172A] text-left animate-in fade-in duration-500 pb-20">
+    <div className="space-y-6 md:space-y-10 text-[#0F172A] text-left animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-1">
         <div className="space-y-1">
            <div className="flex items-center gap-2 mb-1">
               <HelpCircle className="h-4 w-4 text-primary" />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Knowledge Base Hub</span>
+              <span className="text-[9px] font-black text-slate-400">Knowledge Base Hub</span>
            </div>
-          <h1 className="text-2xl md:text-5xl font-black tracking-tight">Help Center</h1>
+          <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] tracking-tight">Help Center</h1>
           <p className="text-slate-500 text-[11px] md:text-lg font-medium">Manage support articles, tutorials and global FAQs.</p>
         </div>
         <Button 
           onClick={() => setEditingArticle({ title: "", category: "FAQ", content: "", published: true, displayOrder: (articles?.length || 0) + 1 })} 
-          className="w-full md:w-auto bg-primary hover:bg-blue-700 h-11 md:h-14 px-8 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl border-none active:scale-95 gap-2"
+          className="w-full md:w-auto bg-primary hover:bg-blue-700 h-11 md:h-14 px-8 rounded-full font-black text-[10px] tracking-widest shadow-xl border-none active:scale-95 gap-2"
         >
           <Plus className="h-4 w-4" /> Add Knowledge Node
         </Button>
@@ -112,9 +112,9 @@ export default function HelpCenterManagement() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-slate-100 h-14 md:h-20">
-                <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Article Identity</TableHead>
-                <TableHead className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Category</TableHead>
-                <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Control</TableHead>
+                <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black text-slate-400">Article Identity</TableHead>
+                <TableHead className="text-[9px] md:text-[10px] font-black text-slate-400">Category</TableHead>
+                <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black text-slate-400">Control</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -148,17 +148,15 @@ export default function HelpCenterManagement() {
 
       <Dialog open={!!editingArticle} onOpenChange={o => !o && setEditingArticle(null)}>
          <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[95vh] rounded-3xl md:rounded-[3rem] bg-white border-none shadow-5xl p-0 overflow-hidden text-left flex flex-col">
-            <div className="h-2 w-full bg-[#0F172A] shrink-0" />
+            <div className="h-2 w-full bg-primary shrink-0" />
             <DialogHeader className="p-6 md:p-10 pb-2 md:pb-4 shrink-0">
-               <DialogTitle className="text-xl md:text-3xl font-black uppercase flex items-center gap-3">
-                  <Layers className="h-6 w-6 text-primary" /> Knowledge Node Architect
-               </DialogTitle>
-               <DialogDescription className="text-slate-400 font-bold uppercase text-[9px] tracking-widest mt-1">Modify help article or FAQ content.</DialogDescription>
+               <DialogTitle className="text-xl md:text-3xl font-black text-[#0F172A]">Knowledge Node Architect</DialogTitle>
+               <DialogDescription className="text-slate-400 font-bold text-[9px] md:text-sm mt-1">Modify help article or FAQ content.</DialogDescription>
             </DialogHeader>
             <div className="px-6 md:px-10 pb-6 md:pb-10 space-y-6 md:space-y-8 overflow-y-auto custom-scrollbar flex-1">
                <div className="grid grid-cols-2 gap-4 md:gap-6">
                   <div className="space-y-1.5 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Category</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Category</Label>
                      <select value={editingArticle?.category || "FAQ"} onChange={e => setEditingArticle({...editingArticle, category: e.target.value})} className="w-full h-12 md:h-14 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none shadow-inner">
                         <option value="FAQ">General FAQ</option>
                         <option value="PAYMENTS">Payments Hub</option>
@@ -169,22 +167,22 @@ export default function HelpCenterManagement() {
                      </select>
                   </div>
                   <div className="space-y-1.5 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Display Order</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Display Order</Label>
                      <Input type="number" value={editingArticle?.displayOrder || ""} onChange={e => setEditingArticle({...editingArticle, displayOrder: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-bold" />
                   </div>
                </div>
                <div className="space-y-1.5 text-left">
-                  <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Article Headline</Label>
+                  <Label className="text-[9px] font-black text-slate-500 ml-1">Article Headline</Label>
                   <Input value={editingArticle?.title || ""} onChange={e => setEditingArticle({...editingArticle, title: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-bold" placeholder="e.g. How to activate Quarterly Pass?" />
                </div>
                <div className="space-y-1.5 text-left">
-                  <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Response / content</Label>
+                  <Label className="text-[9px] font-black text-slate-500 ml-1">Response / Content</Label>
                   <Textarea value={editingArticle?.content || ""} onChange={e => setEditingArticle({...editingArticle, content: e.target.value})} className="min-h-[200px] rounded-xl border-slate-200 bg-slate-50 font-medium leading-relaxed" placeholder="Type help content here..." />
                </div>
             </div>
             <DialogFooter className="p-6 md:p-10 pt-4 bg-slate-50 border-t border-slate-100 flex flex-row gap-4">
                <Button variant="ghost" onClick={() => setEditingArticle(null)} className="h-11 md:h-12 px-6 font-black uppercase text-[10px] text-slate-400">Discard</Button>
-               <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 border-none">
+               <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 border-none">
                   {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Commit Node
                </Button>
             </DialogFooter>

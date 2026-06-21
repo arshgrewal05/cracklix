@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,8 +18,8 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Content Hub CMS v8.0 (PWA Optimized).
- * PWA SYNC: Removed uppercase, reduced font scales, and normalized Title Case.
+ * @fileOverview Institutional Content Hub CMS v10.0 (PWA Hardened).
+ * FIXED: Removed syntax error. Standardized to Title Case and Primary Blue.
  */
 
 export default function AdminNotesManagement() {
@@ -67,17 +67,17 @@ export default function AdminNotesManagement() {
   }, [notes, searchTerm])
 
   return (
-    <div className="space-y-6 md:space-y-12 pb-24 text-[#0F172A] text-left animate-in fade-in duration-500">
+    <div className="space-y-6 md:space-y-10 pb-24 text-[#0F172A] text-left animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-1">
         <div className="space-y-1">
            <div className="flex items-center gap-2 mb-1">
               <FileText className="h-4 w-4 text-primary" />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Institutional Study Base</span>
+              <span className="text-[9px] font-black tracking-[0.1em] text-slate-400">Institutional Study Base</span>
            </div>
           <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] tracking-tight">Content Hub</h1>
           <p className="text-slate-500 text-[11px] md:text-lg font-medium">Manage study notes, PDFs, and syllabus metadata.</p>
         </div>
-        <Button onClick={() => setEditingNote({ title: "", boardId: "", examId: "", subjectId: "", category: "NOTES", pdfUrl: "", isFree: true, description: "" })} className="w-full md:w-auto h-11 md:h-14 px-8 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] tracking-widest rounded-full shadow-xl border-none active:scale-95 gap-2">
+        <Button onClick={() => setEditingNote({ title: "", boardId: "", examId: "", subjectId: "", category: "NOTES", pdfUrl: "", isFree: true, description: "" })} className="w-full md:w-auto h-11 md:h-14 px-8 bg-primary hover:bg-blue-700 text-white font-black rounded-full shadow-xl border-none active:scale-95 gap-2">
           <Plus className="h-4 w-4" /> Register Asset
         </Button>
       </div>
@@ -92,10 +92,10 @@ export default function AdminNotesManagement() {
           <Table className="min-w-[800px]">
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-slate-50 h-14 md:h-20">
-                <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Asset Identity</TableHead>
-                <TableHead className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Relational Vertical</TableHead>
-                <TableHead className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Tier</TableHead>
-                <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Audit</TableHead>
+                <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black text-slate-400">Asset Identity</TableHead>
+                <TableHead className="text-[9px] md:text-[10px] font-black text-slate-400">Relational Vertical</TableHead>
+                <TableHead className="text-[9px] md:text-[10px] font-black text-slate-400 text-center">Tier</TableHead>
+                <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black text-slate-400">Audit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -140,26 +140,26 @@ export default function AdminNotesManagement() {
 
       <Dialog open={!!editingNote} onOpenChange={o => !o && !isSaving && setEditingNote(null)}>
          <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] bg-white rounded-3xl md:rounded-[3rem] border-none shadow-5xl p-0 overflow-hidden text-left flex flex-col">
-            <div className="h-2 w-full bg-[#0F172A] shrink-0" />
+            <div className="h-2 w-full bg-primary shrink-0" />
             <DialogHeader className="p-6 md:p-10 pb-2 md:pb-4 shrink-0">
-               <DialogTitle className="text-xl md:text-3xl font-black uppercase">Asset Architect</DialogTitle>
-               <DialogDescription className="text-slate-400 font-bold uppercase text-[9px] tracking-widest mt-1">Configure study material metadata.</DialogDescription>
+               <DialogTitle className="text-xl md:text-3xl font-black text-[#0F172A]">Asset Architect</DialogTitle>
+               <DialogDescription className="text-slate-400 font-bold text-[9px] md:text-sm mt-1">Configure study material metadata.</DialogDescription>
             </DialogHeader>
             <div className="px-6 md:px-10 pb-6 md:pb-10 space-y-6 md:space-y-8 overflow-y-auto custom-scrollbar flex-1">
                <div className="space-y-2 text-left">
-                  <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Asset Title</Label>
-                  <Input value={editingNote?.title || ""} onChange={e => setEditingNote({...editingNote, title: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-bold" />
+                  <Label className="text-[9px] font-black text-slate-500 ml-1">Asset Title</Label>
+                  <Input value={editingNote?.title || ""} onChange={e => setEditingNote({...editingNote, title: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-bold" placeholder="e.g. Punjab GK Master Notes" />
                </div>
                <div className="grid grid-cols-2 gap-4 md:gap-6">
                   <div className="space-y-2 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Assigned Board</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Assigned Board</Label>
                      <select value={editingNote?.boardId || ""} onChange={e => setEditingNote({...editingNote, boardId: e.target.value})} className="w-full h-12 md:h-14 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none shadow-inner">
                         <option value="">Select Board</option>
                         {boards?.map((b: any) => <option key={b.id} value={b.id}>{b.abbreviation}</option>)}
                      </select>
                   </div>
                   <div className="space-y-2 text-left">
-                     <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">Assigned Exam</Label>
+                     <Label className="text-[9px] font-black text-slate-500 ml-1">Assigned Exam</Label>
                      <select value={editingNote?.examId || ""} onChange={e => setEditingNote({...editingNote, examId: e.target.value})} className="w-full h-12 md:h-14 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none shadow-inner">
                         <option value="">Select Exam</option>
                         {exams?.filter((e:any) => !editingNote?.boardId || e.boardId === editingNote.boardId).map((e: any) => <option key={e.id} value={e.id}>{e.name}</option>)}
@@ -167,12 +167,12 @@ export default function AdminNotesManagement() {
                   </div>
                </div>
                <div className="space-y-2 text-left">
-                  <Label className="text-[9px] font-black uppercase text-slate-500 ml-1">PDF Node URL</Label>
+                  <Label className="text-[9px] font-black text-slate-500 ml-1">PDF Node URL</Label>
                   <Input value={editingNote?.pdfUrl || ""} onChange={e => setEditingNote({...editingNote, pdfUrl: e.target.value})} className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 font-mono text-xs text-primary" placeholder="https://..." />
                </div>
                <div className="flex items-center justify-between p-5 md:p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
                   <div className="space-y-0.5">
-                     <p className="text-[10px] font-black uppercase text-[#0F172A]">Public node (Free)</p>
+                     <p className="text-[10px] font-black text-[#0F172A]">Public Node (Free)</p>
                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Disable to require Pass</p>
                   </div>
                   <Switch checked={editingNote?.isFree} onCheckedChange={v => setEditingNote({...editingNote, isFree: v})} />
@@ -180,7 +180,7 @@ export default function AdminNotesManagement() {
             </div>
             <DialogFooter className="p-6 md:p-10 pt-4 bg-slate-50 border-t border-slate-100 flex flex-row gap-4">
                <Button variant="ghost" onClick={() => setEditingNote(null)} className="h-11 md:h-12 px-6 font-black uppercase text-[10px] text-slate-400">Discard</Button>
-               <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 border-none">
+               <Button onClick={handleSave} disabled={isSaving} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 border-none">
                   {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Commit Asset
                </Button>
             </DialogFooter>
