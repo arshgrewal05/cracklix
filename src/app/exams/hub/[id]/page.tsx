@@ -6,7 +6,7 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useDoc, useCollection, useFirestore, useUser } from "@/firebase"
 import { collection, query, where, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "firebase/firestore"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, GraduationCap, Zap, BookOpen, Layers, Shield, Loader2, Star, CheckCircle2, RefreshCw, Info } from "lucide-react"
@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Institutional Board vertical v47.0 (Restructured).
- * STRICT: Title Case only. Hide exams with 0 content.
+ * @fileOverview Institutional Board vertical v50.0.
+ * FIXED: Removed all legacy terminology. Integrated live stats strip.
  */
 
 export default function HubExamsPage() {
@@ -61,7 +61,7 @@ export default function HubExamsPage() {
     return map;
   }, [mocks, pyqs]);
 
-  // CONTENT-ONLY VISIBILITY RULE: Hide if 0 assets
+  // CONTENT-ONLY VISIBILITY: Hide exams with 0 content
   const exams = useMemo(() => {
     if (!rawExams) return [];
     return rawExams.filter((e: any) => (statsMap[e.id]?.total || 0) > 0);
@@ -89,8 +89,8 @@ export default function HubExamsPage() {
          <div className="container mx-auto px-4 max-w-7xl">
             <button onClick={() => router.back()} className="h-9 w-9 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:text-black mb-6 transition-all"><ChevronLeft className="h-4 w-4" /></button>
             <div className="space-y-2">
-               <Badge className="bg-primary/5 text-primary border-none px-2.5 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest">{hub?.abbreviation} Hub</Badge>
-               <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">{hub?.abbreviation} Recruitment</h1>
+               <Badge className="bg-primary/5 text-primary border-none px-2.5 py-0.5 rounded-lg text-[8px] font-black uppercase">{hub?.abbreviation} Recruitment</Badge>
+               <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">{hub?.abbreviation} Hub</h1>
                <p className="text-sm md:text-lg font-bold text-slate-400 leading-tight">{hub?.name}</p>
             </div>
          </div>
@@ -98,28 +98,34 @@ export default function HubExamsPage() {
 
       <main className="container mx-auto px-4 py-12 max-w-7xl">
          {examsLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-2xl bg-white" />)}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 w-full rounded-[2.5rem] bg-white" />)}</div>
          ) : exams.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {exams.map((exam) => {
                   const s = statsMap[exam.id] || { full: 0, subject: 0, sectional: 0, pyq: 0, total: 0 };
                   const isPinned = profile?.pinnedExams?.includes(exam.id);
                   return (
-                    <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[1.5rem] bg-white group overflow-hidden h-full flex flex-col p-6 md:p-8 text-left cursor-pointer">
+                    <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-8 text-left cursor-pointer">
                        <div className="flex justify-between items-start mb-6">
-                          <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner">
-                             <GraduationCap className="h-5 w-5 text-primary" />
+                          <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                             <GraduationCap className="h-6 w-6 text-primary" />
                           </div>
                           <button onClick={(e) => handleTogglePin(e, exam.id)} disabled={pinningId === exam.id} className={cn("h-8 w-8 rounded-lg border flex items-center justify-center transition-all", isPinned ? "bg-primary border-primary text-white" : "bg-white border-slate-100 text-slate-300")}>
                              {pinningId === exam.id ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : isPinned ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Star className="h-3.5 w-3.5" />}
                           </button>
                        </div>
-                       <h3 className="text-xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors mb-4">{exam.name}</h3>
-                       <div className="space-y-1.5 mb-8">
-                          <div className="flex justify-between text-[10px] font-bold uppercase text-slate-400"><span>Full Mocks</span><span className={s.full > 0 ? "text-[#0F172A]" : "text-slate-200"}>{s.full}</span></div>
-                          <div className="flex justify-between text-[10px] font-bold uppercase text-slate-400"><span>Subject Tests</span><span className={s.subject > 0 ? "text-[#0F172A]" : "text-slate-200"}>{s.subject}</span></div>
-                          <div className="flex justify-between text-[10px] font-bold uppercase text-slate-400"><span>Sectional Tests</span><span className={s.sectional > 0 ? "text-[#0F172A]" : "text-slate-200"}>{s.sectional}</span></div>
-                          <div className="flex justify-between text-[10px] font-bold uppercase text-slate-400"><span>Official PYQs</span><span className={s.pyq > 0 ? "text-[#0F172A]" : "text-slate-200"}>{s.pyq}</span></div>
+                       <h3 className="text-xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors mb-6">{exam.name}</h3>
+                       <div className="space-y-4 mb-8">
+                          <p className="text-xs font-black text-[#0F172A] leading-none uppercase">{s.total} Available Tests</p>
+                          <div className="flex flex-wrap gap-x-2 gap-y-1 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                             <span>{s.full} Full Mocks</span>
+                             <span className="opacity-30">•</span>
+                             <span>{s.subject} Subject</span>
+                             <span className="opacity-30">•</span>
+                             <span>{s.sectional} Sectional</span>
+                             <span className="opacity-30">•</span>
+                             <span>{s.pyq} PYQs</span>
+                          </div>
                        </div>
                        <Button className="mt-auto w-full h-11 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-md border-none">Open Exam <ChevronRight className="h-3.5 w-3.5" /></Button>
                     </Card>

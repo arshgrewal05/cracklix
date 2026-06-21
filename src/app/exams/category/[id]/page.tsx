@@ -9,13 +9,13 @@ import { collection, query, where } from "firebase/firestore"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Landmark, GraduationCap, Info } from "lucide-react"
+import { ChevronLeft, ChevronRight, Landmark, GraduationCap, Info, Zap } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Category Explorer v17.0 (Strict Rebuild).
- * UPDATED: Optimized for Board vs Direct Exam detection based on new architecture.
+ * @fileOverview Canonical Explorer v20.0.
+ * UPDATED: Strictly implements Title Case and content-only visibility.
  */
 
 export default function CategoryHubsPage() {
@@ -40,15 +40,16 @@ export default function CategoryHubsPage() {
     (mocks || []).forEach(m => {
       const eids = m.examIds || (m.examId ? [m.examId] : []);
       eids.forEach((eid: string) => {
-        if (!map[eid]) map[eid] = { full: 0, subject: 0, pyq: 0, total: 0 };
+        if (!map[eid]) map[eid] = { full: 0, subject: 0, sectional: 0, pyq: 0, total: 0 };
         if (m.mockType === 'FULL') map[eid].full++;
-        else if (m.mockType === 'SUBJECT' || m.mockType === 'SECTIONAL') map[eid].subject++;
+        else if (m.mockType === 'SUBJECT') map[eid].subject++;
+        else if (m.mockType === 'SECTIONAL') map[eid].sectional++;
         map[eid].total++;
       });
     });
     (pyqs || []).forEach(p => {
        if (p.examId) {
-          if (!map[p.examId]) map[p.examId] = { full: 0, subject: 0, pyq: 0, total: 0 };
+          if (!map[p.examId]) map[p.examId] = { full: 0, subject: 0, sectional: 0, pyq: 0, total: 0 };
           map[p.examId].pyq++;
           map[p.examId].total++;
        }
@@ -56,8 +57,6 @@ export default function CategoryHubsPage() {
     return map;
   }, [mocks, pyqs]);
 
-  // If a category has sub-boards (General, Technical, Health, Central), show Board Cards.
-  // PPSC and PSSSB now correctly detected as boards.
   const hasBoards = boards && boards.length > 0;
 
   return (
@@ -70,8 +69,8 @@ export default function CategoryHubsPage() {
                <ChevronLeft className="h-4 w-4" />
             </button>
             <div className="space-y-2">
-               <Badge className="bg-primary/5 text-primary border-none px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-tight">Category Explorer</Badge>
-               <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
+               <Badge className="bg-primary/5 text-primary border-none px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase">Category Explorer</Badge>
+               <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
                   {category?.title || "Exam Category"}
                </h1>
                <p className="text-sm md:text-xl font-bold text-slate-400 tracking-tight max-w-3xl leading-tight">
@@ -81,22 +80,22 @@ export default function CategoryHubsPage() {
          </div>
       </section>
 
-      <main className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
+      <main className="container mx-auto px-4 py-12 max-w-7xl">
          {hasBoards ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {boardsLoading ? <SkeletonGrid /> : boards.map(board => (
                   <Link key={board.id} href={`/exams/hub/${board.id}`}>
-                     <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group p-6 md:p-8 flex flex-col h-full">
-                        <div className="flex justify-between items-start mb-6">
-                           <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                     <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group p-8 flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-8">
+                           <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                               <Landmark className="h-6 w-6 text-primary" />
                            </div>
-                           <Badge variant="outline" className="text-[8px] font-bold text-slate-400 border-slate-100 uppercase">{board.abbreviation}</Badge>
+                           <Badge variant="outline" className="text-[8px] font-black text-slate-400 border-slate-100 uppercase">{board.abbreviation}</Badge>
                         </div>
-                        <h3 className="text-xl md:text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors mb-2">{board.abbreviation} Exams</h3>
-                        <p className="text-sm font-bold text-slate-400 leading-snug line-clamp-2 mb-6">{board.name}</p>
+                        <h3 className="text-2xl font-black text-[#0F172A] group-hover:text-primary transition-colors mb-2">{board.abbreviation} Exams</h3>
+                        <p className="text-sm font-bold text-slate-400 leading-snug line-clamp-2 mb-8">{board.name}</p>
                         <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
-                           <span className="text-[10px] font-black uppercase tracking-widest text-primary">Open Exam</span>
+                           <span className="text-[10px] font-black uppercase tracking-widest text-primary">View Exams</span>
                            <ChevronRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
                         </div>
                      </Card>
@@ -104,16 +103,17 @@ export default function CategoryHubsPage() {
                ))}
             </div>
          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {examsLoading ? <SkeletonGrid /> : exams.filter(e => (statsMap[e.id]?.total || 0) > 0).map(exam => {
-                  const s = statsMap[exam.id] || { full: 0, subject: 0, pyq: 0, total: 0 };
+                  const s = statsMap[exam.id] || { full: 0, subject: 0, sectional: 0, pyq: 0, total: 0 };
                   return (
-                    <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[1.5rem] bg-white group p-6 md:p-8 flex flex-col h-full cursor-pointer">
+                    <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group p-8 flex flex-col h-full cursor-pointer">
                        <h3 className="text-xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors mb-4">{exam.name}</h3>
-                       <div className="space-y-1.5 mb-8">
-                          <StatItem label="Full Mocks" val={s.full} />
-                          <StatItem label="Subject Tests" val={s.subject} />
-                          <StatItem label="Official PYQs" val={s.pyq} />
+                       <div className="space-y-3 mb-8">
+                          <p className="text-xs font-black text-[#0F172A] leading-none uppercase">{s.total} Content Items</p>
+                          <p className="text-[10px] font-bold text-slate-400 leading-relaxed">
+                             {s.full} Full Mocks • {s.subject} Subject • {s.sectional} Sectional • {s.pyq} PYQs
+                          </p>
                        </div>
                        <Button className="mt-auto w-full h-11 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-md border-none">Open Exam <ChevronRight className="h-3.5 w-3.5" /></Button>
                     </Card>
@@ -125,7 +125,7 @@ export default function CategoryHubsPage() {
          {(!boardsLoading && !examsLoading && boards?.length === 0 && exams?.length === 0) && (
             <div className="py-40 text-center opacity-20 flex flex-col items-center">
                <Info className="h-20 w-20 mb-6" />
-               <p className="font-headline font-black text-2xl uppercase tracking-widest">No Active Exams</p>
+               <p className="font-headline font-black text-2xl uppercase tracking-widest">Awaiting Verification</p>
             </div>
          )}
       </main>
@@ -134,19 +134,10 @@ export default function CategoryHubsPage() {
   )
 }
 
-function StatItem({ label, val }: { label: string, val: number }) {
-   return (
-      <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-tight">
-         <span className="text-slate-400">{label}</span>
-         <span className={cn(val > 0 ? "text-[#0F172A]" : "text-slate-200")}>{val}</span>
-      </div>
-   )
-}
-
 function SkeletonGrid() {
    return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-         {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-[2rem]" />)}
+         {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 w-full rounded-[2.5rem]" />)}
       </div>
    )
 }
