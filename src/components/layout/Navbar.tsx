@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -44,7 +43,8 @@ import PWAInstallButton from "@/components/PWAInstallButton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Standardized Navbar Hub v49.0 (Live Pass Countdown).
+ * @fileOverview Standardized Navbar v49.1.
+ * UPDATED: Simplified terminology for Material and Dashboard.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -136,7 +136,7 @@ export default function Navbar() {
             <NavLink href="/" label="Home" active={pathname === '/'} />
             <NavLink href="/mocks" label="Practice" active={pathname === '/mocks'} />
             <NavLink href="/pyqs" label="Previous Papers" active={pathname === '/pyqs'} />
-            <NavLink href="/current-affairs" label="Study Center" active={pathname === '/current-affairs'} />
+            <NavLink href="/current-affairs" label="Study Material" active={pathname === '/current-affairs'} />
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
@@ -221,12 +221,12 @@ export default function Navbar() {
                     </div>
 
                     <div className="w-full space-y-1 text-left">
-                       <ProfileMenuItem href="/dashboard" icon={ShieldCheck} label="Dashboard" />
+                       <ProfileMenuItem href="/dashboard" icon={ShieldCheck} label="My Progress" />
                        <ProfileMenuItem href="/pass" icon={CreditCard} label="My Pass" />
                        <ProfileMenuItem href="/profile" icon={Settings} label="Settings" />
                        <ProfileMenuItem href="/help" icon={HelpCircle} label="Help Center" />
                        {isAdmin && (
-                         <ProfileMenuItem href="/admin" icon={ShieldCheck} label="Admin Center" highlight />
+                         <ProfileMenuItem href="/admin" icon={ShieldCheck} label="Admin Panel" highlight />
                        )}
                     </div>
 
@@ -250,7 +250,7 @@ export default function Navbar() {
 
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent side="left" className="w-[300px] xs:w-[320px] p-0 border-none bg-white z-[2001] shadow-2xl [&>button]:hidden">
-          <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle><SheetDescription>Navigation hub</SheetDescription></SheetHeader>
+          <SheetHeader className="sr-only"><SheetTitle>Menu</SheetTitle><SheetDescription>Navigation</SheetDescription></SheetHeader>
           <MobileSidebar onClose={() => setIsSidebarOpen(false)} />
         </SheetContent>
       </Sheet>

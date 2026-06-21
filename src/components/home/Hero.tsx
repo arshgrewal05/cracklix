@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 /**
- * @fileOverview Official Live Hero Hub v22.0 (Image Restored).
- * UPDATED: Restored the student hero image on the right side.
+ * @fileOverview Official Hero Section v22.1.
+ * UPDATED: Simplified stats labels.
  */
 
 const formatCompact = (num: number) => {
@@ -64,7 +64,7 @@ export default function Hero() {
       id: "e",
       icon: <ShieldCheck className="h-4 w-4 text-emerald-600" />,
       val: statsLoading ? "..." : `${formatCompact(stats?.totalCategories)}+`,
-      label: "EXAMS LIVE",
+      label: "EXAMS",
       bgColor: "bg-emerald-50"
     },
     {
@@ -106,7 +106,7 @@ export default function Hero() {
               </h1>
 
               <p className="text-base md:text-xl text-slate-600 max-w-lg leading-relaxed font-medium">
-                Practice with bilingual mock tests, previous papers and exam-focused preparation nodes verified by official patterns.
+                Practice with bilingual mock tests, previous papers and exam-focused preparation verified by official patterns.
               </p>
 
               <div className="flex flex-wrap gap-2 pt-2">
@@ -133,7 +133,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT: Hero Image Restored */}
+          {/* RIGHT: Hero Image */}
           <div className="relative hidden lg:flex justify-end">
              <div className="absolute -inset-10 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
              <motion.div 
@@ -157,7 +157,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* STATS STRIP: Normalized Scale */}
+        {/* STATS STRIP */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-12 md:mt-20">
           {liveStats.map((stat) => (
             <motion.div 

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -13,8 +12,8 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview High-Fidelity "My Exams" Hub v11.0 (Live Sync).
- * FIXED: Removed dummy fallback cards and implemented real-time timestamp sorting.
+ * @fileOverview High-Fidelity "My Progress" Hub v11.1.
+ * UPDATED: Simplified student-facing language.
  */
 
 export default function ContinueLearning() {
@@ -29,7 +28,6 @@ export default function ContinueLearning() {
 
   const resultsQuery = useMemo(() => {
     if (!db || !user || !mounted) return null;
-    // We fetch more to allow client-side sorting if index isn't ready
     return query(collection(db, "results"), where("userId", "==", user.uid), limit(20));
   }, [db, user, mounted]);
 
@@ -72,14 +70,14 @@ export default function ContinueLearning() {
               <h2 className="text-xl md:text-3xl font-headline font-black text-[#0F172A] uppercase tracking-tight">MY EXAMS</h2>
            </div>
            <Button asChild variant="ghost" className="text-primary font-black uppercase text-[10px] tracking-widest gap-2">
-              <Link href="/my-exams">Full Dashboard <ChevronRight className="h-4 w-4" /></Link>
+              <Link href="/my-exams">View All <ChevronRight className="h-4 w-4" /></Link>
            </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
            <div className="lg:col-span-7 space-y-6">
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
-                 <Zap className="h-3 w-3 text-primary" /> RESUME PRACTICE
+                 <Zap className="h-3 w-3 text-primary" /> CONTINUE PRACTICE
               </p>
               <div className="grid grid-cols-1 gap-4 md:gap-6">
                  {resultsLoading ? (
@@ -98,7 +96,7 @@ export default function ContinueLearning() {
                                 <p className="text-primary font-black text-[9px] uppercase tracking-[0.4em] mb-1">SCORE: {res.score}</p>
                                 <h3 className="text-base md:text-xl font-black uppercase text-white truncate">{res.mockTitle}</h3>
                                 <Button asChild className="h-9 mt-4 px-6 bg-primary hover:bg-orange-600 text-white font-black uppercase text-[9px] tracking-widest rounded-xl transition-all active:scale-95 border-none">
-                                  <Link href={`/results/${res.mockId}`}>REVIEW RESULT</Link>
+                                  <Link href={`/results/${res.mockId}`}>REVIEW TEST</Link>
                                 </Button>
                             </div>
                         </div>
@@ -106,7 +104,7 @@ export default function ContinueLearning() {
                     ))
                  ) : (
                     <div className="p-12 text-center bg-slate-50 rounded-[2.5rem] border border-dashed border-slate-200">
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No recent attempts found</p>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No tests found</p>
                     </div>
                  )}
               </div>
@@ -114,7 +112,7 @@ export default function ContinueLearning() {
 
            <div className="lg:col-span-5 space-y-6">
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
-                 <Star className="h-3 w-3 text-amber-500 fill-current" /> PINNED INTERESTS
+                 <Star className="h-3 w-3 text-amber-500 fill-current" /> SAVED EXAMS
               </p>
               <div className="grid grid-cols-1 gap-4">
                  {examsLoading ? (
@@ -147,7 +145,7 @@ export default function ContinueLearning() {
                     })
                  ) : (
                     <div className="p-8 text-center bg-slate-50 rounded-[2.5rem] border border-dashed border-slate-200">
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pin an exam to follow it here</p>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Follow an exam to see it here</p>
                     </div>
                  )}
               </div>

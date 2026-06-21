@@ -18,8 +18,8 @@ import { useToast } from "@/hooks/use-toast"
 import { getAuthorityIcon } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Institutional Hub Explorer v19.0.
- * NORMALIZED: Removed uppercase from exam titles in cards.
+ * @fileOverview Institutional Exam Explorer v19.1.
+ * UPDATED: Simplified terminology for exam listing.
  */
 
 export default function HubExamsPage() {
@@ -97,10 +97,10 @@ export default function HubExamsPage() {
     try {
       if (isPinned) {
         await updateDoc(userRef, { pinnedExams: arrayRemove(examId), updatedAt: serverTimestamp() });
-        toast({ title: "Removed from Hub" });
+        toast({ title: "Removed from My Exams" });
       } else {
         await updateDoc(userRef, { pinnedExams: arrayUnion(examId), updatedAt: serverTimestamp() });
-        toast({ title: "Pinned to Hub" });
+        toast({ title: "Added to My Exams" });
       }
     } catch (err) {
       console.error("[PINNING_FAILURE]:", err);
@@ -114,7 +114,7 @@ export default function HubExamsPage() {
      if (!hasContent) {
         toast({
            title: "Coming Soon",
-           description: "Preparation nodes are currently being added for this vertical.",
+           description: "Study material is currently being added for this exam.",
            duration: 3000
         });
         return;
@@ -122,7 +122,7 @@ export default function HubExamsPage() {
      router.push(`/exams/${examId}`);
   };
 
-  if (hubLoading) return <div className="h-screen bg-white flex flex-col items-center justify-center space-y-4"><Zap className="h-8 w-8 text-primary animate-pulse" /><p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Loading Registry...</p></div>;
+  if (hubLoading) return <div className="h-screen bg-white flex flex-col items-center justify-center space-y-4"><Zap className="h-8 w-8 text-primary animate-pulse" /><p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Loading Information...</p></div>;
 
   return (
     <div className="min-h-screen bg-slate-50/50 font-body text-left">
@@ -157,7 +157,7 @@ export default function HubExamsPage() {
                <div className="space-y-3 text-center lg:text-left min-w-0">
                   <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
                      <Badge className="bg-primary/5 text-primary border-none font-black px-2.5 py-0.5 rounded-lg text-[8px] tracking-widest uppercase">
-                       {hub?.abbreviation} CENTER
+                       {hub?.abbreviation} EXAMS
                      </Badge>
                   </div>
                   <div className="space-y-1">
@@ -176,7 +176,7 @@ export default function HubExamsPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-7xl">
          {examsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-48 w-full rounded-2xl" />)}
+               {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-48 w-full rounded-2xl bg-white" />)}
             </div>
          ) : exams && exams.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -228,7 +228,7 @@ export default function HubExamsPage() {
                              {stats.subject > 0 && <span className="text-[9px] font-bold text-slate-400 uppercase">{stats.subject} Practice</span>}
                              {stats.pyq > 0 && <span className="text-[9px] font-bold text-slate-400 uppercase">{stats.pyq} PYQs</span>}
                              {stats.notes > 0 && <span className="text-[9px] font-bold text-slate-400 uppercase">{stats.notes} Notes</span>}
-                             {!hasContent && <span className="text-[9px] font-bold text-orange-500 uppercase tracking-[0.2em] flex items-center gap-1"><Info className="h-2 w-2" /> Content Being Added</span>}
+                             {!hasContent && <span className="text-[9px] font-bold text-orange-500 uppercase tracking-[0.2em] flex items-center gap-1"><Info className="h-2 w-2" /> No Materials Yet</span>}
                           </div>
                        </div>
 
@@ -237,7 +237,7 @@ export default function HubExamsPage() {
                              "w-full h-10 rounded-xl font-black uppercase text-[9px] tracking-widest gap-2 transition-all border-none shadow-md",
                              hasContent ? "bg-slate-900 text-white group-hover:bg-primary" : "bg-slate-100 text-slate-400 cursor-not-allowed"
                           )}>
-                             {hasContent ? 'OPEN HUB' : 'COMING SOON'} <ChevronRight className="h-3.5 w-3.5" />
+                             {hasContent ? 'OPEN EXAM' : 'COMING SOON'} <ChevronRight className="h-3.5 w-3.5" />
                           </Button>
                        </div>
                     </Card>
@@ -247,7 +247,7 @@ export default function HubExamsPage() {
          ) : (
             <div className="py-20 text-center opacity-20 flex flex-col items-center">
                <Layers className="h-12 w-12 mb-4" />
-               <p className="font-headline font-black text-lg uppercase tracking-widest">No Verticals Registered</p>
+               <p className="font-headline font-black text-lg uppercase tracking-widest">No Exams Registered</p>
             </div>
          )}
       </main>

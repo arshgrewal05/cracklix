@@ -15,7 +15,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Exam List Landing v14.0 (Normalized).
+ * @fileOverview Institutional Exam List Landing v14.1.
+ * UPDATED: Simplified terminology for categories and hubs.
  */
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -57,13 +58,13 @@ export default function ExamsEntryPage() {
              <div className="h-8 w-8 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-inner">
                 <Landmark className="h-4 w-4" />
              </div>
-             <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">Official Exam Hubs</span>
+             <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">Official Exam List</span>
           </div>
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-[#0F172A] leading-[1.05]">
             Choose Your <br/> <span className="text-primary">Exam Category</span>
           </h1>
           <p className="text-slate-600 font-medium text-sm md:text-lg max-w-2xl leading-relaxed">
-            Select a vertical to browse official recruitment centers and preparation nodes.
+            Select a category to browse official recruitment exams and preparation materials.
           </p>
         </div>
 
@@ -96,9 +97,9 @@ export default function ExamsEntryPage() {
                            </div>
 
                            <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{hubCount} Official Hubs</span>
+                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{hubCount} Exam Groups</span>
                               <Button variant="ghost" className="h-10 px-6 rounded-xl bg-[#0F172A] text-white group-hover:bg-primary transition-all font-bold text-[10px] tracking-widest uppercase border-none">
-                                 Open Center <ChevronRight className="ml-2 h-3.5 w-3.5" />
+                                 Open Category <ChevronRight className="ml-2 h-3.5 w-3.5" />
                               </Button>
                            </div>
                         </CardContent>
@@ -107,7 +108,7 @@ export default function ExamsEntryPage() {
                 )
              })
            ) : (
-             <div className="col-span-full py-20 text-center opacity-20 italic uppercase font-black tracking-widest">Awaiting Registry...</div>
+             <div className="col-span-full py-20 text-center opacity-20 italic uppercase font-black tracking-widest">Awaiting Data...</div>
            )}
         </div>
       </main>

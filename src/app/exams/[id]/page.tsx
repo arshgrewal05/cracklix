@@ -43,8 +43,8 @@ import { useToast } from "@/hooks/use-toast"
 import { getAuthorityIcon } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Institutional Exam Hub v45.0.
- * NORMALIZED: Removed uppercase from exam titles and card titles.
+ * @fileOverview Institutional Exam Hub v45.1.
+ * UPDATED: Simplified terminology for study material and tests.
  */
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
@@ -81,10 +81,10 @@ export default function ExamHubPage() {
     try {
       if (isPinned) {
         await updateDoc(userRef, { pinnedExams: arrayRemove(examId), updatedAt: serverTimestamp() });
-        toast({ title: "Hub Updated", description: "Vertical removed from your personal dashboard." });
+        toast({ title: "Removed from My Exams", description: "This exam has been removed from your saved list." });
       } else {
         await updateDoc(userRef, { pinnedExams: arrayUnion(examId), updatedAt: serverTimestamp() });
-        toast({ title: "Pinned to Hub", description: "Successfully added to your dashboard." });
+        toast({ title: "Added to My Exams", description: "Successfully added to your saved exams." });
       }
     } catch (e) {
       toast({ variant: "destructive", title: "Action Failed" });
@@ -110,7 +110,7 @@ export default function ExamHubPage() {
     }
   }, [rawMocks, rawNotes, rawPyqs, examId])
 
-  if (examLoading || userLoading) return <div className="h-screen flex flex-col items-center justify-center bg-white space-y-4"><Zap className="h-8 w-8 text-primary animate-pulse" /><p className="text-[10px] font-black uppercase text-slate-300">Syncing Registry...</p></div>;
+  if (examLoading || userLoading) return <div className="h-screen flex flex-col items-center justify-center bg-white space-y-4"><Zap className="h-8 w-8 text-primary animate-pulse" /><p className="text-[10px] font-black uppercase text-slate-300">Syncing Information...</p></div>;
   if (!exam) return <div className="h-screen flex flex-col items-center justify-center text-center p-6 space-y-4"><h2 className="text-xl font-black uppercase">Not Found</h2><Button onClick={() => router.push('/exams')}>Return</Button></div>;
 
   const activeBoard = boards?.find((b: any) => b.id === exam.boardId || b.abbreviation === exam.boardId);
@@ -126,17 +126,17 @@ export default function ExamHubPage() {
                   <button onClick={() => router.back()} className="h-9 w-9 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 shrink-0 hover:bg-slate-50"><ChevronLeft className="h-4 w-4" /></button>
                   <div className="min-w-0 space-y-4">
                      <div className="flex items-center gap-3">
-                        <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase px-2 py-0.5 rounded shadow-sm">{activeBoard?.abbreviation || 'OFFICIAL'} HUB</Badge>
+                        <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase px-2 py-0.5 rounded shadow-sm">{activeBoard?.abbreviation || 'OFFICIAL'} INFORMATION</Badge>
                         <button onClick={togglePin} disabled={isPinning} className={cn("flex items-center gap-2 px-3 py-1 rounded-full border transition-all active:scale-90 shadow-sm font-black uppercase text-[8px] tracking-widest", isPinned ? "bg-primary border-primary text-white" : "bg-white border-slate-200 text-slate-400 hover:text-primary")}>
                            {isPinning ? <RefreshCw className="h-2.5 w-2.5 animate-spin" /> : isPinned ? <CheckCircle2 className="h-2.5 w-2.5" /> : <Star className="h-2.5 w-2.5" />}
-                           {isPinned ? 'FOLLOWING' : 'FOLLOW VERTICAL'}
+                           {isPinned ? 'FOLLOWING' : 'SAVE EXAM'}
                         </button>
                      </div>
                      <div className="space-y-1">
                         <h1 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">
                            {exam.name}
                         </h1>
-                        <p className="text-sm md:text-xl font-bold text-slate-400 max-w-3xl leading-snug">Prepare with official patterns and verified study nodes.</p>
+                        <p className="text-sm md:text-xl font-bold text-slate-400 max-w-3xl leading-snug">Prepare with official patterns and verified study materials.</p>
                      </div>
                   </div>
                </div>
@@ -148,10 +148,10 @@ export default function ExamHubPage() {
          <Tabs defaultValue="FULL" className="space-y-8 md:space-y-10">
             <div className="bg-white border border-slate-100 rounded-2xl p-1 shadow-md overflow-x-auto no-scrollbar">
                <TabsList className="bg-transparent border-none p-0 flex h-12 w-full justify-start gap-1">
-                  <DashboardTab value="FULL" label="Full Length" icon={Zap} />
-                  <DashboardTab value="SUBJECT" label="Subject-Wise" icon={BookOpen} />
-                  <DashboardTab value="SECTIONAL" label="Sectional" icon={List} />
-                  <DashboardTab value="PYQ" label="Official PYQ" icon={Layers} />
+                  <DashboardTab value="FULL" label="Full Mock Tests" icon={Zap} />
+                  <DashboardTab value="SUBJECT" label="Subject Tests" icon={BookOpen} />
+                  <DashboardTab value="SECTIONAL" label="Sectional Tests" icon={List} />
+                  <DashboardTab value="PYQ" label="Official Papers" icon={Layers} />
                   <DashboardTab value="NOTES" label="Study Notes" icon={FileText} />
                   <DashboardTab value="SYLLABUS" label="Syllabus" icon={Info} />
                </TabsList>
@@ -209,12 +209,12 @@ function MockList({ data, results, isPassActive, loading, boards, exam }: any) {
                      <div className="flex items-center justify-center gap-2">
                         {isPremium && <Badge className="bg-amber-50 text-amber-600 border-none text-[8px] font-black px-2 py-0.5 rounded">PREMIUM</Badge>}
                         <Badge variant="outline" className="border-slate-100 text-slate-400 text-[8px] font-black px-2 py-0.5 rounded uppercase">{board?.abbreviation || 'PSSSB'}</Badge>
-                        {result && <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black px-2 py-0.5 rounded">ATTEMPTED</Badge>}
+                        {result && <Badge className="bg-emerald-50 text-emerald-600 border-none font-black px-2 py-0.5 rounded">ATTEMPTED</Badge>}
                      </div>
                   </CardHeader>
                   <CardContent className="p-0 mt-6">
                      <Button onClick={() => router.push(locked ? '/pass' : `/mocks/${mock.id}`)} className={cn("w-full h-12 rounded-xl font-black text-[10px] tracking-widest uppercase shadow-lg border-none", locked ? "bg-amber-500 hover:bg-amber-600" : "bg-[#0F172A] hover:bg-black")}>
-                        {locked ? <><Lock className="h-3.5 w-3.5 mr-2" /> Unlock Hub</> : 'Attempt Now'}
+                        {locked ? <><Lock className="h-3.5 w-3.5 mr-2" /> Unlock Test</> : 'Start Test'}
                      </Button>
                   </CardContent>
                </Card>
@@ -226,7 +226,7 @@ function MockList({ data, results, isPassActive, loading, boards, exam }: any) {
 
 function NotesList({ data, isPassActive, loading, type }: any) {
    if (loading) return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-2xl bg-white" />)}</div>;
-   if (data.length === 0) return <div className="py-24 text-center opacity-20 flex flex-col items-center gap-4"><FileText className="h-10 w-10 text-slate-300" /><p className="font-headline font-black text-lg uppercase tracking-widest">No Materials Node</p></div>;
+   if (data.length === 0) return <div className="py-24 text-center opacity-20 flex flex-col items-center gap-4"><FileText className="h-10 w-10 text-slate-300" /><p className="font-headline font-black text-lg uppercase tracking-widest">No Materials Found</p></div>;
 
    return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -240,7 +240,7 @@ function NotesList({ data, isPassActive, loading, type }: any) {
                      </div>
                      <div className="min-w-0">
                         <h3 className="text-base font-black text-[#0F172A] truncate max-w-[240px]">{item.title}</h3>
-                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">{item.category || type} Hub</p>
+                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">{item.category || type}</p>
                      </div>
                   </div>
                   <Button asChild className="h-10 px-6 bg-[#0F172A] hover:bg-black text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-md shrink-0">

@@ -13,8 +13,8 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Production Mobile Bottom Navigation v1.4
- * TYPOGRAPHY: Switched to Title Case for a cleaner mobile interface.
+ * Production Mobile Bottom Navigation v1.5.
+ * UPDATED: Simplified labels for mobile navigation.
  */
 
 export default function MobileNav() {
@@ -35,7 +35,7 @@ export default function MobileNav() {
       icon: Home,
     },
     {
-      label: "My Hub",
+      label: "My Exams",
       href: "/my-exams",
       icon: Target,
     },
@@ -45,7 +45,7 @@ export default function MobileNav() {
       icon: Zap,
     },
     {
-      label: "Stats",
+      label: "My Progress",
       href: "/dashboard",
       icon: BarChart3,
     },

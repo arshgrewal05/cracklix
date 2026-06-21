@@ -38,8 +38,8 @@ import { usePWAInstall } from "@/hooks/use-pwa-install"
 import { getAuthorityIcon } from "@/lib/exam-icons"
 
 /**
- * @fileOverview Institutional My Hub Hub v11.0.
- * UPDATED: Replaced "Nodes" with detailed counts and "Coming Soon" guards.
+ * @fileOverview Institutional My Exams Page v11.1.
+ * UPDATED: Simplified terminology for exams and followed exams.
  */
 
 export default function MyExamsPage() {
@@ -149,7 +149,7 @@ export default function MyExamsPage() {
     setUnpinningId(examId);
     try {
       await updateDoc(doc(db, "users", user.uid), { pinnedExams: arrayRemove(examId), updatedAt: serverTimestamp() });
-      toast({ title: "Hub Updated", description: "Vertical removed from your personal hub." });
+      toast({ title: "Removed", description: "Exam removed from your list." });
     } catch (e) {
       toast({ variant: "destructive", title: "Action Failed" });
     } finally { setUnpinningId(null); }
@@ -160,7 +160,7 @@ export default function MyExamsPage() {
     setSettingTargetId(examId);
     try {
       await updateDoc(doc(db, "users", user.uid), { targetExam: examName, updatedAt: serverTimestamp() });
-      toast({ title: "Target Locked", description: `Your focus is now set to ${examName}.` });
+      toast({ title: "Focus Updated", description: `Your focus is now set to ${examName}.` });
     } catch (e) {
       toast({ variant: "destructive", title: "Update Failed" });
     } finally { setSettingTargetId(null); }
@@ -168,7 +168,7 @@ export default function MyExamsPage() {
 
   const handleOpenHub = (examId: string, hasContent: boolean) => {
      if (!hasContent) {
-        toast({ title: "Coming Soon", description: "No assets yet. We're working on it!" });
+        toast({ title: "Coming Soon", description: "Study materials are being verified for this exam." });
         return;
      }
      router.push(`/exams/${examId}`);
@@ -188,8 +188,8 @@ export default function MyExamsPage() {
            <div className="lg:col-span-8 space-y-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-1">
                  <div className="space-y-2">
-                    <h1 className="text-3xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">MY <span className="text-primary">HUB</span></h1>
-                    <p className="text-sm md:text-base text-slate-600 font-medium max-w-xl">Your authoritative preparation registry.</p>
+                    <h1 className="text-3xl md:text-5xl font-headline font-black text-[#0F172A] uppercase tracking-tighter leading-none">MY <span className="text-primary">EXAMS</span></h1>
+                    <p className="text-sm md:text-base text-slate-600 font-medium max-w-xl">Manage your official preparation list.</p>
                  </div>
                  <Button asChild className="h-12 px-8 bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[10px] tracking-widest rounded-xl shadow-xl gap-3 transition-all border-none">
                     <Link href="/exams"><Plus className="h-4 w-4 text-primary" /> Add Exams</Link>
@@ -199,7 +199,7 @@ export default function MyExamsPage() {
               <section className="space-y-6">
                  <div className="flex items-center gap-2.5 px-1">
                     <ShieldCheck className="h-4 w-4 text-primary" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Active Registry</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">My Followed Exams</h3>
                  </div>
                  
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
@@ -215,7 +215,7 @@ export default function MyExamsPage() {
                           {isTarget && (
                             <div className="absolute top-4 right-4 z-20">
                               <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm px-2.5 py-0.5 font-black text-[7px] uppercase rounded-lg">
-                                TARGET
+                                FOCUS
                               </Badge>
                             </div>
                           )}
@@ -233,15 +233,15 @@ export default function MyExamsPage() {
                              <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
                                 {stats.full > 0 && <span className="text-[8px] font-bold text-slate-400 uppercase">{stats.full} Mocks</span>}
                                 {stats.subject > 0 && <span className="text-[8px] font-bold text-slate-400 uppercase">{stats.subject} Tests</span>}
-                                {stats.pyq > 0 && <span className="text-[8px] font-bold text-slate-400 uppercase">{stats.pyq} PYQs</span>}
-                                {!hasContent && <span className="text-[8px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1"><Info className="h-2 w-2" /> Adding Content</span>}
+                                {stats.pyq > 0 && <span className="text-[8px] font-bold text-slate-400 uppercase">{stats.pyq} Papers</span>}
+                                {!hasContent && <span className="text-[8px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1"><Info className="h-2 w-2" /> No Content Yet</span>}
                              </div>
                           </div>
                           <div className="space-y-4 pt-6 mt-auto">
                              <div className="grid grid-cols-2 gap-3">
                                 <Button onClick={() => handleSetTarget(exam.name, exam.id)} disabled={settingTargetId === exam.id || isTarget} variant="outline" className={cn("h-10 rounded-xl border-2 font-black uppercase text-[8px] tracking-tight gap-2", isTarget ? "bg-emerald-50 border-emerald-100 text-emerald-700" : "bg-white border-slate-100 text-[#0F172A]")}>{settingTargetId === exam.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Target className="h-3 w-3" />}{isTarget ? 'LOCKED' : 'FOCUS'}</Button>
                                 <Button onClick={() => handleOpenHub(exam.id, hasContent)} className={cn("h-10 rounded-xl font-black uppercase text-[8px] tracking-tight border-none shadow-lg text-white", hasContent ? "bg-[#0F172A] hover:bg-black" : "bg-slate-200 text-slate-400 cursor-not-allowed")}>
-                                   {hasContent ? 'OPEN HUB' : 'COMING SOON'}
+                                   {hasContent ? 'OPEN EXAM' : 'COMING SOON'}
                                 </Button>
                              </div>
                              <button onClick={() => handleUnpin(exam.id)} disabled={unpinningId === exam.id} className="w-fit mx-auto flex items-center justify-center gap-2 text-[8px] font-black text-slate-300 hover:text-rose-500 uppercase tracking-widest transition-colors active:scale-90">{unpinningId === exam.id ? <RefreshCw className="h-2.5 w-2.5 animate-spin" /> : <X className="h-2.5 w-2.5" />}REMOVE</button>
@@ -251,8 +251,8 @@ export default function MyExamsPage() {
                     }) : (
                        <Card className="col-span-full border-2 border-dashed border-slate-200 bg-white/50 py-16 rounded-[2.5rem] flex flex-col items-center justify-center text-center space-y-6">
                           <Plus className="h-8 w-8 text-slate-300" />
-                          <div className="space-y-1"><p className="text-xl font-black text-[#0F172A] uppercase">Hub Empty</p><p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Add exams to customize your dashboard.</p></div>
-                          <Button asChild className="bg-[#0F172A] hover:bg-black rounded-xl h-12 px-10 font-black uppercase text-[10px] tracking-widest border-none"><Link href="/exams">Select Exams</Link></Button>
+                          <div className="space-y-1"><p className="text-xl font-black text-[#0F172A] uppercase">List Empty</p><p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Follow an exam to customize your dashboard.</p></div>
+                          <Button asChild className="bg-[#0F172A] hover:bg-black rounded-xl h-12 px-10 font-black uppercase text-[10px] tracking-widest border-none"><Link href="/exams">Find Exams</Link></Button>
                        </Card>
                     )}
                  </div>
@@ -265,7 +265,7 @@ export default function MyExamsPage() {
                  <div className="relative z-10 space-y-6 text-left">
                     <div className="space-y-1">
                        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">ACCOUNT STATUS</p>
-                       <h3 className="text-xl md:text-2xl font-black uppercase">{passActive ? 'Elite Active' : 'Basic Tier'}</h3>
+                       <h3 className="text-xl md:text-2xl font-black uppercase">{passActive ? 'Elite Active' : 'Free Tier'}</h3>
                     </div>
                     
                     {passActive && passTimer ? (
@@ -281,13 +281,13 @@ export default function MyExamsPage() {
                           <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
                           <div className="min-w-0">
                              <p className="text-[8px] font-black text-rose-400 uppercase tracking-widest">ACCESS LIMITED</p>
-                             <p className="text-xs font-bold text-rose-200 uppercase">Upgrade for Elite Mocks</p>
+                             <p className="text-xs font-bold text-rose-200 uppercase">Unlock All Mock Tests</p>
                           </div>
                        </div>
                     )}
 
                     <Button asChild className="w-full h-14 bg-primary hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-xl shadow-3xl border-none active:scale-95 transition-all">
-                       <Link href="/pass">{passActive ? 'MANAGE PASS' : 'UPGRADE NOW'} <ChevronRight className="h-4 w-4 ml-1" /></Link>
+                       <Link href="/pass">{passActive ? 'VIEW PASS' : 'UPGRADE NOW'} <ChevronRight className="h-4 w-4 ml-1" /></Link>
                     </Button>
                  </div>
               </Card>
@@ -295,11 +295,11 @@ export default function MyExamsPage() {
               {!isInstalled && canInstall && (
                 <div className="bg-white rounded-[2rem] p-7 border border-slate-100 shadow-xl space-y-5 text-left relative overflow-hidden group">
                    <div className="space-y-1">
-                      <h4 className="text-base font-black text-[#0F172A] uppercase leading-none">Install App</h4>
-                      <p className="text-[11px] text-slate-500 font-medium">Get rapid access to mock tests.</p>
+                      <h4 className="text-base font-black text-[#0F172A] uppercase leading-none">Download App</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">Get faster access to tests.</p>
                    </div>
                    <Button onClick={installApp} className="w-full h-11 bg-slate-50 hover:bg-slate-100 text-[#0F172A] font-black uppercase text-[9px] tracking-widest rounded-xl border-none shadow-sm gap-2">
-                      <Download className="h-3.5 w-3.5" /> DOWNLOAD PWA
+                      <Download className="h-3.5 w-3.5" /> INSTALL NOW
                    </Button>
                 </div>
               )}
@@ -309,7 +309,7 @@ export default function MyExamsPage() {
         <section className="space-y-6 pt-4">
            <div className="flex items-center gap-2.5 px-1">
               <History className="h-4 w-4 text-slate-400" />
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Preparation Logs</h3>
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recent Test History</h3>
            </div>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {attemptsLoading ? Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-2xl bg-white" />) : 

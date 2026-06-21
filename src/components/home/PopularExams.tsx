@@ -21,8 +21,8 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview High-Fidelity Popular Exams v66.0.
- * NORMALIZED: Removed uppercase from board titles.
+ * @fileOverview Popular Punjab Exams v66.1.
+ * UPDATED: Simplified exam viewing language.
  */
 
 function getBoardFallbackIcon(id: string, abbrev: string) {
@@ -30,8 +30,8 @@ function getBoardFallbackIcon(id: string, abbrev: string) {
   if (key.includes('psssb')) return <Landmark className="h-full w-full text-amber-600" />;
   if (key.includes('police')) return <ShieldCheck className="h-full w-full text-blue-800" />;
   if (key.includes('ppsc')) return <Landmark className="h-full w-full text-emerald-700" />;
-  if (key.includes('teaching')) return <GraduationCap className="h-full w-full text-orange-500" />;
-  if (key.includes('pspcl') || key.includes('pstcl')) return <Zap className="h-full w-full text-blue-500" />;
+  if (key.includes('teaching') || key.includes('cadre') || key.includes('pstet')) return <GraduationCap className="h-full w-full text-orange-500" />;
+  if (key.includes('pspcl') || key.includes('pstcl') || key.includes('power')) return <Zap className="h-full w-full text-blue-500" />;
   if (key.includes('court') || key.includes('justice') || key.includes('sssc')) return <Scale className="h-full w-full text-slate-600" />;
   return <Activity className="h-full w-full text-slate-300" />;
 }
@@ -112,7 +112,7 @@ export default function PopularExams() {
 
                         <div className="mt-6 pt-4 border-t border-slate-50">
                            <span className="text-blue-600 font-black text-[11px] uppercase tracking-widest flex items-center gap-2 group-hover:translate-x-1 transition-transform">
-                              Explore Hub <ArrowRight className="h-3.5 w-3.5" />
+                              View Exam <ArrowRight className="h-3.5 w-3.5" />
                            </span>
                         </div>
                      </Card>

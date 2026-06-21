@@ -12,7 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 /**
- * @fileOverview Home Study Updates Preview v1.1 (Title Case Update).
+ * @fileOverview Home Study Updates Preview v1.2.
+ * UPDATED: Simplified study material language.
  */
 export default function CurrentAffairsPreview() {
   const db = useFirestore();
@@ -38,13 +39,13 @@ export default function CurrentAffairsPreview() {
                  <div className="h-10 w-10 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-600 shadow-sm">
                     <Newspaper className="h-5 w-5" />
                  </div>
-                 <span className="text-[10px] font-bold text-slate-500 tracking-tight">Study Center</span>
+                 <span className="text-[10px] font-bold text-slate-500 tracking-tight">Study Material</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight">Current Affairs</h2>
               <p className="text-slate-500 font-medium text-sm md:text-lg">Daily bilingual updates for all upcoming recruitments.</p>
            </div>
            <Button asChild variant="ghost" className="text-blue-600 font-bold text-sm tracking-tight gap-2">
-              <Link href="/current-affairs">Full Study Hub <ChevronRight className="h-4 w-4" /></Link>
+              <Link href="/current-affairs">View All Updates <ChevronRight className="h-4 w-4" /></Link>
            </Button>
         </div>
 
@@ -55,7 +56,7 @@ export default function CurrentAffairsPreview() {
               <Link key={item.id} href="/current-affairs">
                  <Card className="border-none shadow-xl hover:shadow-4xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col border border-slate-100 p-8">
                     <div className="flex justify-between items-start mb-6">
-                       <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-400 text-[8px] font-bold px-2">{item.type || 'Daily'} Hub</Badge>
+                       <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-400 text-[8px] font-bold px-2">{item.type || 'Daily'} Updates</Badge>
                        <span className="text-[9px] font-bold text-slate-300 tracking-tight flex items-center gap-2">
                           <Calendar className="h-3 w-3 text-blue-600" /> {item.month} {item.year}
                        </span>

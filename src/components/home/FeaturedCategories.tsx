@@ -18,8 +18,8 @@ import { collection, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview Elite Exam Categories Hub v27.0.
- * NORMALIZED: Removed uppercase from category titles and section headers.
+ * @fileOverview Elite Exam Categories Hub v27.1.
+ * UPDATED: Simplified category language.
  */
 
 const FALLBACK_ICONS: Record<string, string> = {
@@ -53,15 +53,15 @@ export default function FeaturedCategories() {
           <div className="space-y-2 max-w-3xl">
              <div className="flex items-center gap-3">
                 <Landmark className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-                <span className="text-[10px] md:text-[11px] font-bold text-slate-400 tracking-tight uppercase">Vertical Library</span>
+                <span className="text-[10px] md:text-[11px] font-bold text-slate-400 tracking-tight uppercase">Exam Categories</span>
              </div>
              <h2 className="text-[28px] sm:text-[36px] md:text-[42px] lg:text-[48px] font-black tracking-tight text-[#0F172A] leading-[1.1]">
                 Choose Your <span className="text-primary">Exam Category</span>
              </h2>
-             <p className="text-slate-600 font-medium text-sm md:text-base">Select a vertical to browse official preparation centers.</p>
+             <p className="text-slate-600 font-medium text-sm md:text-base">Select a category to start your official preparation.</p>
           </div>
           <Button asChild variant="ghost" className="text-primary font-bold text-xs tracking-tight gap-2 p-0 h-auto hover:bg-transparent">
-             <Link href="/exams">Full Category List <ArrowRight className="h-3.5 w-3.5" /></Link>
+             <Link href="/exams">All Categories <ArrowRight className="h-3.5 w-3.5" /></Link>
           </Button>
         </div>
 
@@ -120,7 +120,7 @@ export default function FeaturedCategories() {
               )
             })
           ) : (
-            <div className="col-span-full py-16 text-center opacity-20 italic text-sm">Awaiting Category Registry...</div>
+            <div className="col-span-full py-16 text-center opacity-20 italic text-sm">Awaiting Categories...</div>
           )}
         </div>
       </div>

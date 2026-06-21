@@ -34,8 +34,8 @@ import ShareButton from "@/components/navigation/ShareButton"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Dashboard v38.0.
- * NORMALIZED: Removed uppercase from student names and test titles.
+ * @fileOverview Student Progress Dashboard v38.1.
+ * UPDATED: Simplified labels for progress and saved exams.
  */
 export default function StudentDashboard() {
   const { user, profile, loading: authLoading, profileLoading } = useUser() as any;
@@ -118,7 +118,7 @@ export default function StudentDashboard() {
   if (!mounted || authLoading || (user && !profile)) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-white space-y-4">
        <Zap className="h-8 w-8 text-primary animate-pulse" />
-       <p className="text-[10px] font-black uppercase text-slate-300">Synchronizing Hub...</p>
+       <p className="text-[10px] font-black uppercase text-slate-300">Synchronizing Progress...</p>
     </div>
   );
 
@@ -182,14 +182,14 @@ export default function StudentDashboard() {
                 <CardHeader className="p-5 md:p-8 border-b border-slate-50 bg-slate-50/30">
                     <div className="space-y-0.5">
                       <h3 className="font-black text-base md:text-xl uppercase text-[#0F172A]">Recent attempts</h3>
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Performance History</p>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Test History</p>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     <div className="divide-y divide-slate-50">
                       {resultsLoading ? (
                           Array.from({ length: 3 }).map((_, i) => (
-                            <div key={i} className="p-5 md:p-8 flex gap-5 items-center"><Skeleton className="h-10 w-10 rounded-xl" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-1/3" /><Skeleton className="h-3 w-1/4" /></div></div>
+                            <div key={i} className="p-5 md:p-8 flex gap-5 items-center"><Skeleton className="h-10 w-10 rounded-xl bg-slate-50" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-1/3 bg-slate-50" /><Skeleton className="h-3 w-1/4 bg-slate-50" /></div></div>
                           ))
                       ) : stats.list.length > 0 ? (
                           stats.list.map((r: any) => (
@@ -212,7 +212,7 @@ export default function StudentDashboard() {
                             </Link>
                           ))
                       ) : (
-                          <div className="p-16 text-center opacity-30 italic text-xs md:text-sm uppercase font-black tracking-widest text-slate-400">No activity yet.</div>
+                          <div className="p-16 text-center opacity-30 italic text-xs md:text-sm uppercase font-black tracking-widest text-slate-400">No tests taken yet.</div>
                       )}
                     </div>
                 </CardContent>
@@ -223,23 +223,23 @@ export default function StudentDashboard() {
               <Card className="border-none shadow-4xl bg-gradient-to-br from-blue-600 to-primary text-white p-8 md:p-10 rounded-[1.5rem] md:rounded-[2rem] relative overflow-hidden group">
                 <div className="absolute bottom-0 right-0 p-6 opacity-10 rotate-12 group-hover:scale-110 transition-transform duration-1000"><Flame className="h-40 w-40" /></div>
                 <div className="relative z-10 space-y-4 text-left">
-                    <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] text-white/70">LEARNING STREAK</p>
+                    <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] text-white/70">STUDY STREAK</p>
                     <div className="flex items-baseline gap-3">
                       <div className="text-5xl md:text-7xl font-black leading-none">{resultsLoading ? "..." : stats.streak}</div>
                       <div className="space-y-0.5">
                           <p className="text-lg font-black uppercase">Days</p>
-                          <p className="text-[7px] font-bold uppercase text-white/60">Active Hub</p>
+                          <p className="text-[7px] font-bold uppercase text-white/60">Practice Streak</p>
                       </div>
                     </div>
                 </div>
               </Card>
 
               <div className="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-xl space-y-6">
-                 <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Personal Tools</h4>
+                 <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Quick Tools</h4>
                  <div className="grid grid-cols-1 gap-3">
-                    <QuickToolLink href="/my-exams" label="My Exams Hub" icon={Target} />
-                    <QuickToolLink href="/analytics" label="Progress Report" icon={TrendingUp} />
-                    <QuickToolLink href="/bookmarks" label="Saved MCQs" icon={Bookmark} />
+                    <QuickToolLink href="/my-exams" label="My Exams" icon={Target} />
+                    <QuickToolLink href="/analytics" label="Full Analytics" icon={TrendingUp} />
+                    <QuickToolLink href="/bookmarks" label="Saved Questions" icon={Bookmark} />
                  </div>
               </div>
           </div>
@@ -259,7 +259,7 @@ function MetricItem({ label, val, icon }: any) {
       </div>
       <div className="flex flex-col gap-0.5">
         <div className="text-lg md:text-2xl font-black text-[#0F172A] leading-none tabular-nums truncate">{val}</div>
-        <p className="text-[7px] md:text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1">{label}</p>
+        <p className="text-[7px] font-black uppercase tracking-widest text-slate-400 mt-1">{label}</p>
       </div>
     </Card>
   )
