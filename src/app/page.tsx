@@ -14,24 +14,24 @@ import GlobalSearch from "@/components/home/GlobalSearch";
 import StatsBar from "@/components/home/StatsBar";
 
 /**
- * @fileOverview Official Home Page v204.0.
- * RESTORED: Added StatsBar back to the discovery flow.
+ * @fileOverview Official Home Page v205.0.
+ * RE-ORDERED: StatsBar moved to be exactly below Hero quick actions.
  */
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white font-body pb-safe text-left">
       <Navbar />
       
-      {/* 1. Hero Section */}
+      {/* 1. Hero Section (Contains Quick Actions at bottom) */}
       <Hero />
 
-      {/* 2. Global Search Hook */}
+      {/* 2. Live Metrics Hub (Exactly below Hero Actions) */}
+      <StatsBar />
+
+      {/* 3. Global Search Hook */}
       <div className="relative z-40 py-8 md:py-12 bg-white">
         <GlobalSearch />
       </div>
-
-      {/* 3. Live Metrics Hub (Restored) */}
-      <StatsBar />
 
       {/* 4. Choose Your Exam (Primary Discovery) */}
       <FeaturedCategories />

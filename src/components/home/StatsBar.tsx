@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview High-Fidelity Live Stats Bar v4.0.
- * SCREENSHOT MATCH: Restored specific icons, light backgrounds, and uppercase sub-labels.
+ * @fileOverview High-Fidelity Live Stats Bar v4.1.
+ * REFINED: Blended background and reduced top padding to sit exactly below Hero cards.
  */
 
 const formatCompact = (num: number) => {
@@ -57,7 +57,7 @@ export default function StatsBar() {
   ], [stats]);
 
   return (
-    <section className="bg-white py-6 md:py-16 border-b border-slate-50">
+    <section className="bg-blue-50/20 pt-0 pb-6 md:py-16 border-b border-slate-50">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {items.map((item, i) => (
