@@ -34,8 +34,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Dashboard v33.2 (Hardened Types).
- * FIXED: TS18046 (icon.props) access through explicit type casting and isValidElement.
+ * @fileOverview Student Dashboard v33.3 (Hardened Types).
+ * FIXED: TS2304 (Layers import) and TS18046 (icon.props).
  */
 export default function StudentDashboard() {
   const { user, profile, loading: authLoading } = useUser();
@@ -223,7 +223,7 @@ export default function StudentDashboard() {
 
           <div className="lg:col-span-4 space-y-4 md:space-y-6">
               <Card className="border-none shadow-4xl bg-gradient-to-br from-blue-600 to-primary text-white p-6 md:p-10 rounded-2xl md:rounded-[2rem] relative overflow-hidden group">
-                <div className="absolute bottom-0 right-0 p-4 opacity-10 rotate-12 group-hover:scale-110 transition-transform duration-1000"><Flame className="h-24 w-24 md:h-32 md:w-32" /></div>
+                <div className="absolute bottom-0 right-0 p-4 opacity-10 rotate-12 group-hover:scale-110 transition-transform duration-1000"><Flame className="h-24 w-24 md:h-32 w-32" /></div>
                 <div className="relative z-10 space-y-2 md:space-y-4 text-left">
                     <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/70">STUDY STREAK</p>
                     <div className="flex items-baseline gap-2">
