@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Refined Admin Layout v8.0.
- * UPDATED: Increased Logo height for consistent premium branding.
+ * @fileOverview Refined Admin Layout v9.0.
+ * UPDATED: Increased Logo scale for maximum brand visibility in dashboard.
  */
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -52,7 +52,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const toggleSidebar = () => {
     const newState = !isSidebarOpen;
-    newState ? setIsSidebarOpen(true) : setIsSidebarOpen(false); // Direct toggle
     setIsSidebarOpen(newState);
     localStorage.setItem('admin-sidebar-state', newState ? 'expanded' : 'collapsed');
   };
@@ -99,7 +98,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Logo
               variant="light"
               className="shrink-0 -ml-2"
-              imgClassName="h-[60px] md:h-[78px]"
+              imgClassName="h-[64px] md:h-[82px]"
             />
           </div>
           
