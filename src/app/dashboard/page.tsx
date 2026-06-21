@@ -33,9 +33,9 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Dashboard v30.0 (Type Fixed).
+ * @fileOverview Student Dashboard v31.0 (Hardened).
  * FIXED: Explicit casting for React.cloneElement to prevent unknown property errors.
- * FIXED: Date narrowing to prevent build failure.
+ * FIXED: Date narrowing to prevent build failure on optional passExpiresAt.
  */
 export default function StudentDashboard() {
   const { user, profile, loading: authLoading } = useUser() as any;

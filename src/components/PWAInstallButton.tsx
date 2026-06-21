@@ -13,8 +13,9 @@ interface PWAInstallButtonProps {
 }
 
 /**
- * @fileOverview Hardened PWA Install Trigger v14.0.
+ * @fileOverview Hardened PWA Install Trigger v15.0.
  * Listens to global window.deferredPrompt and provides fallbacks for iOS.
+ * FIXED: Uses 'pwa-installable' event to force updates when prompt is captured.
  */
 export default function PWAInstallButton({ 
   className, 
@@ -44,7 +45,10 @@ export default function PWAInstallButton({
   useEffect(() => {
     setMounted(true);
 
-    const handleCheck = () => updateState();
+    const handleCheck = () => {
+       console.log('[INSTALL_BTN] Syncing installability state...');
+       updateState();
+    };
 
     window.addEventListener('pwa-installable', handleCheck);
     window.addEventListener('appinstalled', handleCheck);

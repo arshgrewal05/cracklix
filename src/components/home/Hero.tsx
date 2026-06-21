@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { AuthorityLogo } from "@/lib/exam-icons";
 
 /**
- * @fileOverview Official High-Density PWA Hero v45.0.
+ * @fileOverview Official High-Density PWA Hero v46.0.
  * UPDATED: Quick Actions converted to fully clickable high-fidelity cards with branded logos.
  */
 
@@ -137,7 +137,7 @@ function QuickActionCard({ boardId, label, href }: { boardId: string, label: str
         items-center
         gap-4 md:gap-6
         shadow-md
-        hover:shadow-2xl
+        hover:shadow-xl
         hover:-translate-y-1
         transition-all
         duration-500

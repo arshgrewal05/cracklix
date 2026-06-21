@@ -26,9 +26,9 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview High-Fidelity PWA Install Hub v6.0.
- * FIXED: Standalone detection hardening.
- * FIXED: Enabled browser prompt capture on this page.
+ * @fileOverview High-Fidelity PWA Install Hub v8.0.
+ * FIXED: Standalone detection hardening to prevent false "Already Installed" messages.
+ * FIXED: Removed automatic prompt blocking on this path.
  */
 
 type DeviceType = "android" | "ios" | "desktop" | "unknown";
@@ -49,7 +49,7 @@ export default function InstallPage() {
   const updateState = useCallback(() => {
     if (typeof window === 'undefined') return;
 
-    // Hardened standalone check to prevent browser false positives
+    // Hardened standalone check with media query stability
     const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
     setIsStandalone(isStandaloneMode);
     
@@ -98,8 +98,8 @@ export default function InstallPage() {
        });
     } else {
        toast({
-         title: "Manual Mode",
-         description: "Automated prompt blocked. See manual steps below.",
+         title: "Browser Setup",
+         description: "Please use your browser's menu (3 dots) and select 'Install App'.",
        });
     }
   };
@@ -189,11 +189,6 @@ export default function InstallPage() {
                              >
                                 <Download className="h-4 w-4 md:h-6 md:w-6" /> {isInstallable ? 'Install App' : 'Manual Setup'}
                              </Button>
-                             {!isInstallable && device !== 'desktop' && (
-                                <p className="text-[10px] font-bold text-center text-slate-500 uppercase tracking-widest">
-                                   Wait for prompt or use manual steps below
-                                </p>
-                             )}
                           </div>
                        </div>
                     )}
@@ -204,7 +199,7 @@ export default function InstallPage() {
                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 space-y-4">
                     <Card className="p-6 md:p-10 rounded-[2.5rem] bg-slate-50 border border-slate-200 space-y-6 text-left shadow-inner">
                        <h3 className="text-lg font-black uppercase text-[#0F172A] flex items-center gap-2">
-                          <Smartphone className="h-5 w-5 text-primary" /> Manual Android Steps
+                          <Smartphone className="h-5 w-5 text-primary" /> Manual Setup
                        </h3>
                        <div className="space-y-4">
                           <InstructionStep num={1} icon={<MoreVertical className="h-3.5 w-3.5" />} text="Open 3-dots menu in browser" color="text-slate-500" />

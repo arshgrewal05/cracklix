@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Hardened Institutional PWA Manager v18.0.
+ * @fileOverview Hardened Institutional PWA Manager v22.0.
  * FIXED: Removed /install exclusion to ensure prompt works on the setup page.
  * FIXED: Reliable standalone detection with hydration guard.
+ * ADDED: Dispatcher for custom 'pwa-installable' event to sync UI buttons.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -43,6 +44,7 @@ export default function PWAManager() {
       console.log('[PWA_AUDIT] beforeinstallprompt event captured');
       e.preventDefault();
       (window as any).deferredPrompt = e;
+      // Notify all PWA buttons that installation is now available
       window.dispatchEvent(new CustomEvent('pwa-installable'));
       checkStatus();
     };

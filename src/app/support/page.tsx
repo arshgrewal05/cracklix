@@ -30,8 +30,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import Link from "next/link"
 
 /**
- * @file Overview Official Institutional Support Hub v5.3.
- * FIXED: Missing Link and Loader2 imports.
+ * @fileOverview Official Institutional Support Hub v5.4.
+ * FIXED: Missing Link and Loader2 imports resolved.
  */
 
 export default function SupportPage() {
@@ -194,62 +194,6 @@ export default function SupportPage() {
            </div>
         </div>
       </main>
-
-      <Footer />
-
-      <Dialog open={isRaising} onOpenChange={setIsRaising}>
-         <DialogContent className="sm:max-w-xl rounded-[3rem] bg-white border-none shadow-5xl p-0 overflow-hidden text-left flex flex-col">
-            <div className="h-2 w-full bg-[#0F172A] shrink-0" />
-            <DialogHeader className="p-10 pb-4">
-               <DialogTitle className="text-2xl font-black font-headline uppercase flex items-center gap-4">
-                  <Plus className="h-8 w-8 text-primary" /> Raise support ticket
-               </DialogTitle>
-               <DialogDescription className="sr-only">Submit a new support request for our team to review.</DialogDescription>
-            </DialogHeader>
-            
-            <div className="px-10 pb-10 space-y-6 overflow-y-auto">
-               <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2 text-left">
-                     <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Issue category</Label>
-                     <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none">
-                        <option value="PAYMENT">Payment issue</option>
-                        <option value="PASS">Pass activation</option>
-                        <option value="MOCK_TEST">Mock test issue</option>
-                        <option value="TECHNICAL">App issues</option>
-                        <option value="ACCOUNT">Account issue</option>
-                        <option value="OTHER">Other query</option>
-                     </select>
-                  </div>
-                  <div className="space-y-2 text-left">
-                     <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Priority</Label>
-                     <select value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})} className="w-full h-12 bg-slate-50 border-none rounded-xl px-4 font-bold text-sm outline-none">
-                        <option value="LOW">Low (2-3 Days)</option>
-                        <option value="MEDIUM">Medium (24 Hours)</option>
-                        <option value="HIGH">High (4-8 Hours)</option>
-                        <option value="URGENT">Urgent (As soon as possible)</option>
-                     </select>
-                  </div>
-               </div>
-               
-               <div className="space-y-2 text-left">
-                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Subject</Label>
-                  <Input value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} className="h-12 rounded-xl font-bold" placeholder="e.g. Pass not showing active" />
-               </div>
-
-               <div className="space-y-2 text-left">
-                  <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Problem details</Label>
-                  <Textarea value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} className="min-h-[150px] rounded-2xl bg-slate-50 border-none p-5 font-medium leading-relaxed" placeholder="Describe your problem in detail..." />
-               </div>
-            </div>
-
-            <DialogFooter className="p-10 pt-4 bg-slate-50 flex gap-4">
-               <Button variant="ghost" onClick={() => setIsRaising(false)} className="rounded-xl h-14 font-black uppercase text-[10px] text-slate-400">Cancel</Button>
-               <Button onClick={handleRaiseTicket} disabled={raisingLoading} className="flex-1 bg-[#0F172A] hover:bg-black text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl gap-3">
-                  {raisingLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Send ticket
-               </Button>
-            </DialogFooter>
-         </DialogContent>
-      </Dialog>
 
       <Footer />
     </div>
