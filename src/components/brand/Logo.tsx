@@ -17,8 +17,8 @@ interface LogoProps {
 }
 
 /**
- * @fileOverview Cracklix High-Fidelity Brand Identity v65.0.
- * UPDATED: Increased base height and resolution for bolder header presence.
+ * @fileOverview Cracklix High-Fidelity Brand Identity v66.0.
+ * UPDATED: Optimized for maximum size and clarity in all headers.
  */
 export default function Logo({
   className = "",
@@ -56,7 +56,7 @@ export default function Logo({
         className={cn(
           "transition-all flex-shrink-0 w-auto object-contain",
           isIcon 
-            ? "h-12 md:h-16 scale-110" 
+            ? "h-14 md:h-20 scale-110" 
             : "h-[56px] md:h-[72px]",
           imgClassName
         )}

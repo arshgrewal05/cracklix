@@ -28,8 +28,8 @@ import ShareButton from "@/components/navigation/ShareButton";
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Mobile Sidebar v45.0 (High Density).
- * TYPOGRAPHY: Convert headings to proper Title Case.
+ * @fileOverview Mobile Sidebar v46.0 (High Density).
+ * UPDATED: Increased logo size for better mobile presence.
  */
 export default function MobileSidebar({
   onClose,
@@ -74,18 +74,18 @@ export default function MobileSidebar({
     <div className="flex h-full flex-col bg-white font-body overflow-hidden text-left">
 
       {/* HEADER: LOGO & CLOSE */}
-      <div className="h-[64px] px-3 shrink-0 bg-white border-b border-slate-50 flex items-center justify-between">
+      <div className="h-[72px] px-3 shrink-0 bg-white border-b border-slate-50 flex items-center justify-between">
          <Logo
            variant="light"
            align="left"
-           imgClassName="h-[54px]"
+           imgClassName="h-[60px]"
            onClick={onClose}
          />
          <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
       </div>
 
@@ -142,7 +142,7 @@ export default function MobileSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex h-9 items-center gap-3 rounded-lg px-4 transition-all active:scale-[0.98]",
+                    "flex h-10 items-center gap-3 rounded-lg px-4 transition-all active:scale-[0.98]",
                     isActive
                       ? "bg-blue-50 text-primary shadow-sm"
                       : "text-slate-600 hover:bg-slate-50"
@@ -150,14 +150,14 @@ export default function MobileSidebar({
                 >
                   <item.icon
                     className={cn(
-                      "h-3.5 w-3.5 shrink-0",
+                      "h-4 w-4 shrink-0",
                       isActive
                         ? "text-primary"
                         : "text-slate-400"
                     )}
                   />
 
-                  <span className="font-bold text-[12px] tracking-tight">
+                  <span className="font-bold text-[13px] tracking-tight">
                     {item.label}
                   </span>
                 </Link>

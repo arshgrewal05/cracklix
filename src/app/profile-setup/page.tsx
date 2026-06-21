@@ -16,8 +16,8 @@ import { Phone, User as UserIcon, GraduationCap, Calendar, MapPin, ChevronLeft, 
 import { Gender } from "@/types"
 
 /**
- * @file Overview Student Profile Setup v14.1 (Build Fixed).
- * FIXED: Added missing Loader2 import.
+ * @file Overview Student Profile Setup v14.2 (Production Hardened).
+ * FIXED: Added missing Loader2 icon import.
  */
 export default function ProfileSetup() {
   const router = useRouter()
@@ -102,7 +102,7 @@ export default function ProfileSetup() {
          <button onClick={() => router.back()} className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 shadow-sm active:scale-95 transition-all">
             <ChevronLeft className="h-5 w-5" />
          </button>
-         <Logo variant="light" align="center" />
+         <Logo variant="light" align="center" imgClassName="h-[52px] md:h-[68px]" />
          <div className="w-10 md:w-12" />
       </div>
 

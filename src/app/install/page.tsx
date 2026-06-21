@@ -27,8 +27,8 @@ import { cn } from "@/lib/utils";
 import PWAInstallButton from "@/components/PWAInstallButton";
 
 /**
- * @fileOverview Public PWA Install Hub v12.1 (Build Fixed).
- * FIXED: Added missing isValidElement import.
+ * @fileOverview Public PWA Install Hub v12.2 (Build Fixed).
+ * FIXED: Explicitly importing isValidElement and React.
  */
 export default function InstallPage() {
   const [device, setDevice] = useState<"android" | "ios" | "desktop" | "unknown">("desktop");

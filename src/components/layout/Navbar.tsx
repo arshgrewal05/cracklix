@@ -43,8 +43,8 @@ import PWAInstallButton from "@/components/PWAInstallButton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Standardized Navbar v57.0.
- * UPDATED: Increased Logo Size for maximum brand presence.
+ * @fileOverview Standardized Navbar v58.0.
+ * UPDATED: Optimized logo sizing for maximum brand presence.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -123,7 +123,7 @@ export default function Navbar() {
             <button
               onClick={() => setIsSidebarOpen(true)}
               aria-label="Open menu"
-              className="flex items-center justify-center w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm active:scale-95 transition-all shrink-0 hover:border-primary/30 mr-1"
+              className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm active:scale-95 transition-all shrink-0 hover:border-primary/30 mr-2"
             >
               <Menu className="w-5 h-5 md:w-6 md:h-6" />
             </button>
@@ -131,7 +131,7 @@ export default function Navbar() {
             <Logo
               variant="light"
               className="flex-shrink-0"
-              imgClassName="h-[52px] md:h-[68px]"
+              imgClassName="h-[56px] md:h-[72px]"
             />
           </div>
 
@@ -157,17 +157,17 @@ export default function Navbar() {
 
             <Link
               href="/search"
-              className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl flex items-center justify-center bg-slate-50 text-slate-600 hover:text-primary transition-all active:scale-95"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center bg-slate-50 text-slate-600 hover:text-primary transition-all active:scale-95"
             >
               <Search className="w-5 h-5" />
             </Link>
 
             {loading ? (
-              <Skeleton className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl bg-slate-100" />
+              <Skeleton className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-slate-100" />
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-9 h-9 md:h-12 rounded-lg md:rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center active:scale-95 transition-all">
+                  <button className="w-10 h-10 md:h-12 rounded-lg md:rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center active:scale-95 transition-all">
                     <StudentAvatar
                       profile={profile}
                       className="w-full h-full border-none"
