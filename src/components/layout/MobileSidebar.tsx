@@ -28,7 +28,7 @@ import ShareButton from "@/components/navigation/ShareButton";
 import { Button } from "@/components/ui/button";
 
 /**
- * @fileOverview Mobile Sidebar v47.0 (Logo Scaled).
+ * @fileOverview Mobile Sidebar v49.0 (Logo Scaled Again).
  */
 export default function MobileSidebar({
   onClose,
@@ -73,18 +73,18 @@ export default function MobileSidebar({
     <div className="flex h-full flex-col bg-white font-body overflow-hidden text-left">
 
       {/* HEADER: LOGO & CLOSE */}
-      <div className="h-[80px] px-3 shrink-0 bg-white border-b border-slate-50 flex items-center justify-between">
+      <div className="h-[100px] px-3 shrink-0 bg-white border-b border-slate-50 flex items-center justify-between">
          <Logo
            variant="light"
            align="left"
-           imgClassName="h-[68px]"
+           imgClassName="h-[88px]"
            onClick={onClose}
          />
          <button
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 active:scale-95 transition-all border border-slate-100"
           >
-            <X className="h-5 w-5" />
+            <X className="h-6 w-6" />
           </button>
       </div>
 
@@ -92,46 +92,46 @@ export default function MobileSidebar({
       <div className="flex-1 overflow-y-auto custom-scrollbar">
 
         {/* USER PROFILE CARD */}
-        <div className="px-2 py-3">
+        <div className="px-2 py-4">
           <Link
             href="/profile"
             onClick={onClose}
             className="block active:scale-[0.98] transition-all"
           >
-            <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-3 shadow-sm hover:border-primary/20 transition-all">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-50">
+            <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm hover:border-primary/20 transition-all">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50">
                 {profileLoading ? (
-                  <Skeleton className="h-full w-full rounded-lg" />
+                  <Skeleton className="h-full w-full rounded-xl" />
                 ) : (
                   <StudentAvatar
                     profile={profile}
                     className="h-full w-full border-none"
-                    iconClassName="w-5 h-5"
+                    iconClassName="w-6 h-6"
                   />
                 )}
               </div>
 
               <div className="min-w-0 flex-1">
-                <h3 className="text-xs font-black text-slate-900 tracking-tight truncate leading-none">
+                <h3 className="text-sm font-black text-slate-900 tracking-tight truncate leading-none">
                   {profile?.name || user?.displayName || "Aspirant"}
                 </h3>
-                <p className="mt-1 text-[7px] text-slate-400 font-bold tracking-widest uppercase">
+                <p className="mt-1.5 text-[8px] text-slate-400 font-bold tracking-widest uppercase">
                   Account Hub
                 </p>
               </div>
 
-              <ChevronRight className="h-3 w-3 shrink-0 text-slate-300" />
+              <ChevronRight className="h-4 w-4 shrink-0 text-slate-300" />
             </div>
           </Link>
         </div>
 
         {/* NAVIGATION LIST */}
         <div className="px-2">
-          <p className="mb-1.5 px-4 text-[9px] font-black text-slate-400 tracking-widest uppercase">
+          <p className="mb-2 px-4 text-[10px] font-black text-slate-400 tracking-widest uppercase">
             Discovery Hub
           </p>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1">
             {mainItems.map((item) => {
               const isActive = pathname === item.href;
 
@@ -141,7 +141,7 @@ export default function MobileSidebar({
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex h-10 items-center gap-3 rounded-lg px-4 transition-all active:scale-[0.98]",
+                    "flex h-12 items-center gap-4 rounded-xl px-4 transition-all active:scale-[0.98]",
                     isActive
                       ? "bg-blue-50 text-primary shadow-sm"
                       : "text-slate-600 hover:bg-slate-50"
@@ -149,14 +149,14 @@ export default function MobileSidebar({
                 >
                   <item.icon
                     className={cn(
-                      "h-4 w-4 shrink-0",
+                      "h-5 w-5 shrink-0",
                       isActive
                         ? "text-primary"
                         : "text-slate-400"
                     )}
                   />
 
-                  <span className="font-bold text-[13px] tracking-tight">
+                  <span className="font-bold text-[14px] tracking-tight">
                     {item.label}
                   </span>
                 </Link>
@@ -166,28 +166,28 @@ export default function MobileSidebar({
         </div>
 
         {/* SHARE APP PROMO */}
-        <div className="px-2 py-4">
-           <div className="bg-[#0B1528] rounded-[1.25rem] p-3 space-y-2 border border-white/5 shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-3 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Award className="h-10 w-10" /></div>
+        <div className="px-2 py-6">
+           <div className="bg-[#0B1528] rounded-[1.5rem] p-4 space-y-3 border border-white/5 shadow-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><Award className="h-12 w-12" /></div>
               <div className="relative z-10 text-left">
-                <h4 className="text-[9px] font-black text-white tracking-widest uppercase">Spread the Word</h4>
+                <h4 className="text-[10px] font-black text-white tracking-widest uppercase">Spread the Word</h4>
               </div>
               <ShareButton 
                 variant="dark" 
-                className="w-full h-9 rounded-lg bg-primary hover:bg-blue-600 text-white text-[9px] border-none shadow-lg relative z-10" 
+                className="w-full h-10 rounded-xl bg-primary hover:bg-blue-600 text-white text-[10px] border-none shadow-lg relative z-10" 
               />
            </div>
         </div>
       </div>
 
       {/* FOOTER: SIGNOUT */}
-      <div className="border-t border-slate-100 bg-white p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] shrink-0">
+      <div className="border-t border-slate-100 bg-white p-4 pb-[calc(env(safe-area-inset-bottom)+16px)] shrink-0">
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="w-full h-12 justify-start text-red-500 text-sm font-black rounded-xl hover:bg-red-50 transition-all active:scale-95"
+          className="w-full h-14 justify-start text-red-500 text-sm font-black rounded-2xl hover:bg-red-50 transition-all active:scale-95"
         >
-          <LogOut className="h-4 w-4 mr-3" />
+          <LogOut className="h-5 w-5 mr-4" />
           Sign Out
         </Button>
       </div>

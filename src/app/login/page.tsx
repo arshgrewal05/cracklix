@@ -41,7 +41,7 @@ import Link from "next/link"
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Cracklix Premium Login Hub v78.0 (Setup Blocker Removed).
+ * @fileOverview Cracklix Premium Login Hub v80.0 (Logo Scaled).
  */
 
 const formatCompact = (num: number) => {
@@ -205,9 +205,9 @@ function LoginContent() {
       <div className="hidden lg:flex flex-[1.1] bg-gradient-to-br from-[#020B2D] via-[#071B4D] to-[#0A2D7A] text-white p-12 xl:p-20 flex-col justify-start relative overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10 space-y-12 xl:space-y-16 max-w-[650px] pt-12 xl:pt-20">
+        <div className="relative z-10 space-y-12 xl:space-y-20 max-w-[650px] pt-12 xl:pt-20">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-            <Logo variant="dark" align="left" imgClassName="h-[90px] xl:h-[120px]" />
+            <Logo variant="dark" align="left" imgClassName="h-[110px] xl:h-[150px]" />
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-8">
@@ -222,7 +222,7 @@ function LoginContent() {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="grid grid-cols-2 gap-6 pt-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="grid grid-cols-2 gap-8 pt-6">
             <HeroStat icon={ClipboardList} label={`${statsLoading ? '...' : formatCompact(stats?.totalMocks)}+ Mock Tests`} />
             <HeroStat icon={Zap} label={`${statsLoading ? '...' : formatCompact(stats?.totalQuestions)}+ Questions`} />
             <HeroStat icon={Users} label={`${statsLoading ? '...' : formatCompact(stats?.totalUsers)}+ Active Aspirants`} />
@@ -234,21 +234,21 @@ function LoginContent() {
       {/* RIGHT PANEL: AUTH */}
       <div className="flex-1 flex flex-col items-center justify-start p-4 md:p-12 lg:p-20 relative bg-slate-50 lg:bg-white overflow-y-auto">
         
-        <div className="w-full flex items-center justify-between mb-6 lg:hidden">
+        <div className="w-full flex items-center justify-between mb-8 lg:hidden">
            <Link href="/" className="flex items-center gap-2 text-slate-400 font-black uppercase text-[10px] tracking-widest hover:text-primary transition-colors">
               <ChevronLeft className="h-4 w-4" /> Home
            </Link>
-           <Logo variant="light" align="center" imgClassName="h-14" />
+           <Logo variant="light" align="center" imgClassName="h-20" />
            <div className="w-10" />
         </div>
 
         <motion.div 
            initial={{ opacity: 0, scale: 0.95 }} 
            animate={{ opacity: 1, scale: 1 }} 
-           className="w-full max-w-[480px] pt-2 lg:pt-20 pb-24" 
+           className="w-full max-w-[480px] pt-4 lg:pt-20 pb-24" 
         >
-          <Card className="border-none shadow-5xl lg:shadow-none bg-white/92 backdrop-blur-[20px] rounded-[32px] p-6 md:p-12 space-y-6 md:space-y-8">
-            <div className="space-y-1.5 text-center lg:text-left">
+          <Card className="border-none shadow-5xl lg:shadow-none bg-white/92 backdrop-blur-[20px] rounded-[32px] p-6 md:p-12 space-y-6 md:space-y-10">
+            <div className="space-y-2 text-center lg:text-left">
                <h2 className="text-2xl md:text-4xl font-[900] tracking-tight text-[#0F172A] leading-none">
                  {mode === 'login' ? 'Welcome Back' : 'Create Account'}
                </h2>
@@ -257,13 +257,13 @@ function LoginContent() {
                </p>
             </div>
 
-            <form onSubmit={handleEmailAuth} className="space-y-5">
+            <form onSubmit={handleEmailAuth} className="space-y-6">
               {mode === 'register' && (
                 <div className="space-y-1.5">
                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Full Name</Label>
                   <div className="relative group">
                     <User className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-primary transition-colors" />
-                    <Input value={name} onChange={(e) => setName(e.target.value)} required className="h-12 md:h-14 rounded-xl bg-slate-50 border-none text-[#0F172A] font-bold pl-12 md:pl-14 shadow-inner" placeholder="e.g. Arsh Grewal" />
+                    <Input value={name} onChange={(e) => setName(e.target.value)} required className="h-14 md:h-16 rounded-2xl bg-slate-50 border-none text-[#0F172A] font-bold pl-12 md:pl-14 shadow-inner" placeholder="e.g. Arsh Grewal" />
                   </div>
                 </div>
               )}
@@ -272,7 +272,7 @@ function LoginContent() {
                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Email Address</Label>
                 <div className="relative group">
                   <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-primary transition-colors" />
-                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-12 md:h-14 rounded-xl bg-slate-50 border-none text-[#0F172A] font-bold pl-12 md:pl-14 shadow-inner" placeholder="name@domain.com" />
+                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-14 md:h-16 rounded-2xl bg-slate-50 border-none text-[#0F172A] font-bold pl-12 md:pl-14 shadow-inner" placeholder="name@domain.com" />
                 </div>
               </div>
 
@@ -281,7 +281,7 @@ function LoginContent() {
                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Password</Label>
                   <div className="relative group">
                     <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-primary transition-colors" />
-                    <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-12 md:h-14 rounded-xl bg-slate-50 border-none text-[#0F172A] pl-12 md:pl-14 pr-12 font-bold shadow-inner" placeholder="Secret Key" />
+                    <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-14 md:h-16 rounded-2xl bg-slate-50 border-none text-[#0F172A] pl-12 md:pl-14 pr-12 font-bold shadow-inner" placeholder="Secret Key" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">{showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}</button>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ function LoginContent() {
                     <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Confirm Password</Label>
                     <div className="relative group">
                       <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-primary transition-colors" />
-                      <Input type={showPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="h-12 md:h-14 rounded-xl bg-slate-50 border-none text-[#0F172A] pl-12 md:pl-14 shadow-inner" placeholder="Repeat Key" />
+                      <Input type={showPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="h-14 md:h-16 rounded-2xl bg-slate-50 border-none text-[#0F172A] pl-12 md:pl-14 shadow-inner" placeholder="Repeat Key" />
                     </div>
                   </div>
                 )}
@@ -307,8 +307,8 @@ function LoginContent() {
                 )}
               </div>
 
-              <div className="pt-2 flex flex-col gap-3">
-                <Button type="submit" className="w-full h-12 md:h-16 bg-blue-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-full shadow-xl border-none transition-all active:scale-[0.98]" disabled={loading}>
+              <div className="pt-2 flex flex-col gap-4">
+                <Button type="submit" className="w-full h-14 md:h-18 bg-blue-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-full shadow-xl border-none transition-all active:scale-[0.98]" disabled={loading}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (mode === 'login' ? "Continue to Hub" : "Create My Account")}
                 </Button>
                 <div className="flex items-center gap-3 py-1">
@@ -316,14 +316,14 @@ function LoginContent() {
                   <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">OR</span>
                   <div className="h-px flex-1 bg-slate-100" />
                 </div>
-                <Button variant="outline" className="w-full h-12 border-2 border-slate-100 text-[#0F172A] gap-3 rounded-full font-black text-[10px] md:text-[11px] hover:bg-slate-50 uppercase tracking-widest shadow-sm" onClick={handleGoogleSignIn} disabled={loading}>
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" className="h-4 w-4 md:h-5 md:w-5" alt="G" /> Google Login
+                <Button variant="outline" className="w-full h-14 border-2 border-slate-100 text-[#0F172A] gap-3 rounded-full font-black text-[10px] md:text-[11px] hover:bg-slate-50 uppercase tracking-widest shadow-sm" onClick={handleGoogleSignIn} disabled={loading}>
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" className="h-5 w-5" alt="G" /> Google Login
                 </Button>
               </div>
             </form>
 
-            <div className="text-center pt-5 border-t border-slate-50">
-               <p className="text-[11px] md:text-[12px] font-bold text-slate-400">
+            <div className="text-center pt-8 border-t border-slate-50">
+               <p className="text-[11px] md:text-[13px] font-bold text-slate-400">
                 {mode === 'login' ? "Don't have an account?" : "Already registered?"}
                 <button 
                   onClick={() => {
@@ -341,20 +341,20 @@ function LoginContent() {
       </div>
 
       <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
-        <DialogContent className="bg-white rounded-[2rem] max-w-[440px] p-8 md:p-10 shadow-5xl text-left border-none">
+        <DialogContent className="bg-white rounded-[2rem] max-w-[440px] p-8 md:p-12 shadow-5xl text-left border-none">
           <DialogHeader className="text-center space-y-4">
-            <div className="h-12 w-12 md:h-14 md:w-14 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary shadow-xl">{resetLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <RefreshCw className="h-6 w-6" />}</div>
+            <div className="h-14 w-14 md:h-16 md:w-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary shadow-xl">{resetLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <RefreshCw className="h-6 w-6" />}</div>
             <DialogTitle className="text-xl md:text-2xl font-[900] uppercase tracking-tight text-[#0F172A]">Recover Account</DialogTitle>
             <DialogDescription className="text-slate-400 text-[10px] md:text-sm font-bold uppercase tracking-widest text-center mt-2 leading-relaxed">Enter your email for reset link.</DialogDescription>
           </DialogHeader>
-          <div className="py-6 space-y-6">
+          <div className="py-8 space-y-6">
             <div className="space-y-1.5 text-left">
               <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Your Email</Label>
-              <Input type="email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} placeholder="aspirant@cracklix.com" className="h-14 bg-slate-50 border-none rounded-xl text-[#0F172A] text-base font-bold px-6 shadow-inner" />
+              <Input type="email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} placeholder="aspirant@cracklix.com" className="h-16 bg-slate-50 border-none rounded-2xl text-[#0F172A] text-base font-bold px-6 shadow-inner" />
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => handleResetPassword()} disabled={resetLoading} className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-full shadow-xl transition-all border-none">
+            <Button onClick={() => handleResetPassword()} disabled={resetLoading} className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-full shadow-xl transition-all border-none">
               {resetLoading ? "Processing..." : "Send Reset Link"}
             </Button>
           </DialogFooter>
@@ -366,11 +366,11 @@ function LoginContent() {
 
 function HeroStat({ icon: Icon, label }: { icon: any, label: string }) {
   return (
-    <div className="flex items-center gap-3 group">
-      <div className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-        <Icon className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+    <div className="flex items-center gap-4 group">
+      <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+        <Icon className="h-5 w-5 md:h-6 md:w-6 text-primary" />
       </div>
-      <span className="text-[10px] md:text-xs xl:text-[13px] font-bold tracking-tight text-slate-200">{label}</span>
+      <span className="text-[11px] md:text-sm xl:text-lg font-bold tracking-tight text-slate-200">{label}</span>
     </div>
   )
 }

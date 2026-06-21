@@ -43,8 +43,8 @@ import PWAInstallButton from "@/components/PWAInstallButton";
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
 /**
- * @fileOverview Standardized Navbar v61.0.
- * UPDATED: Increased logo height for maximum brand presence.
+ * @fileOverview Standardized Navbar v63.0.
+ * UPDATED: Increased logo and header heights for massive brand presence.
  */
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -105,12 +105,12 @@ export default function Navbar() {
       SUPER_ADMIN_WHITELIST.includes(user.email.toLowerCase()));
 
   if (!mounted) {
-    return <nav className="w-full border-b border-slate-100 bg-white h-[64px] md:h-[88px]" />;
+    return <nav className="w-full border-b border-slate-100 bg-white h-[80px] md:h-[112px]" />;
   }
 
   return (
     <div className="sticky top-0 z-50 w-full font-body pt-safe bg-white border-b border-slate-100">
-      <nav className="w-full h-[64px] md:h-[88px] transition-all duration-300">
+      <nav className="w-full h-[80px] md:h-[112px] transition-all duration-300">
         <div className="w-full max-w-7xl mx-auto px-3 md:px-4 h-full flex items-center justify-between gap-1 md:gap-2">
 
           <div className="flex items-center shrink-0 h-full">
@@ -125,7 +125,7 @@ export default function Navbar() {
             <Logo
               variant="light"
               className="flex-shrink-0"
-              imgClassName="h-[52px] md:h-[68px]"
+              imgClassName="h-[64px] md:h-[92px]"
             />
           </div>
 
