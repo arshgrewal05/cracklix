@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview High-Fidelity Live Stats Bar v4.1.
- * REFINED: Blended background and reduced top padding to sit exactly below Hero cards.
+ * @fileOverview High-Fidelity Single-Line Stats Bar v5.0.
+ * OPTIMIZED: Forced single horizontal line (grid-cols-4) with micro-scaling for PWA mobile.
  */
 
 const formatCompact = (num: number) => {
@@ -29,55 +29,55 @@ export default function StatsBar() {
     { 
       label: "QUESTIONS", 
       val: (formatCompact(stats?.totalQuestions) || "439") + "+", 
-      icon: <Zap className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />,
+      icon: <Zap className="h-3 w-3 md:h-6 md:w-6 text-blue-600" />,
       bgColor: "bg-blue-50/50",
       borderColor: "border-blue-100/50"
     },
     { 
-      label: "MOCK TESTS", 
+      label: "MOCKS", 
       val: (formatCompact(stats?.totalMocks) || "8") + "+", 
-      icon: <ClipboardList className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />,
+      icon: <ClipboardList className="h-3 w-3 md:h-6 md:w-6 text-purple-600" />,
       bgColor: "bg-purple-50/50",
       borderColor: "border-purple-100/50"
     },
     { 
       label: "CATEGORIES", 
       val: (formatCompact(stats?.totalCategories) || "214") + "+", 
-      icon: <ShieldCheck className="h-5 w-5 md:h-6 md:w-6 text-emerald-600" />,
+      icon: <ShieldCheck className="h-3 w-3 md:h-6 md:w-6 text-emerald-600" />,
       bgColor: "bg-emerald-50/50",
       borderColor: "border-emerald-100/50"
     },
     { 
       label: "ASPIRANTS", 
       val: (formatCompact(stats?.totalUsers) || "6") + "+", 
-      icon: <Users className="h-5 w-5 md:h-6 md:w-6 text-orange-600" />,
+      icon: <Users className="h-3 w-3 md:h-6 md:w-6 text-orange-600" />,
       bgColor: "bg-orange-50/50",
       borderColor: "border-orange-100/50"
     }
   ], [stats]);
 
   return (
-    <section className="bg-blue-50/20 pt-0 pb-6 md:py-16 border-b border-slate-50">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+    <section className="bg-white pt-0 pb-6 md:py-16">
+      <div className="container mx-auto px-2 md:px-4 max-w-7xl">
+        <div className="grid grid-cols-4 gap-1.5 md:gap-8">
           {items.map((item, i) => (
-            <Card key={i} className="border border-slate-100 shadow-sm rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 bg-white flex items-center gap-5 md:gap-8 transition-all duration-500 hover:shadow-2xl hover:translate-y-[-4px] group">
+            <Card key={i} className="border border-slate-100 shadow-sm rounded-xl md:rounded-[2.5rem] p-2 md:p-10 bg-white flex flex-col md:flex-row items-center justify-center md:justify-start gap-1.5 md:gap-8 transition-all duration-500 hover:shadow-xl group">
               <div className={cn(
-                "h-12 w-12 md:h-16 md:w-16 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110 shadow-sm",
+                "h-7 w-7 md:h-16 md:w-16 rounded-full flex items-center justify-center shrink-0 border transition-transform duration-500 group-hover:scale-110 shadow-sm",
                 item.bgColor,
                 item.borderColor
               )}>
                 {item.icon}
               </div>
-              <div className="text-left flex flex-col justify-center min-w-0">
+              <div className="text-center md:text-left flex flex-col justify-center min-w-0">
                 {loading && !stats ? (
-                  <Skeleton className="h-8 md:h-12 w-20 bg-slate-50" />
+                  <Skeleton className="h-3 md:h-12 w-10 md:w-20 bg-slate-50" />
                 ) : (
-                  <span className="text-2xl md:text-5xl font-black text-[#0F172A] tabular-nums tracking-tighter leading-none antialiased">
+                  <span className="text-[10px] md:text-4xl font-black text-[#0F172A] tabular-nums tracking-tighter leading-none antialiased">
                     {item.val}
                   </span>
                 )}
-                <span className="text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2 md:mt-3 leading-none">
+                <span className="text-[6px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest mt-0.5 md:mt-3 leading-none truncate w-full">
                   {item.label}
                 </span>
               </div>
