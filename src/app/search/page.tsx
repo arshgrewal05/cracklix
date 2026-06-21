@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect, Suspense, cloneElement, isValidElement } from "react"
@@ -13,8 +14,8 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Search Center Hub v2.6.
- * NORMALIZED: Removed uppercase from result names.
+ * @fileOverview Search Center Hub v2.7.
+ * FIXED: Resolved React UMD global type error by using direct cloneElement import.
  */
 
 export default function SearchPage() {
