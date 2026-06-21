@@ -1,32 +1,30 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { 
   DollarSign, 
-  TrendingUp, 
-  CreditCard, 
   Clock, 
   User, 
   CheckCircle2, 
   Download,
-  Filter,
   Zap,
   BarChart3,
   Search,
   Globe
 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
-import { collection, query, orderBy, where, limit } from "firebase/firestore"
+import { collection, query, where, limit } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Revenue Hub v5.1.
+ * @fileOverview Institutional Revenue Hub v6.0 (Hardened).
+ * FIXED: Removed server-side orderBy to bypass index requirement; implemented client-side sorting.
  * PWA SYNC: Removed uppercase, reduced font scales, and normalized Title Case.
  */
 
@@ -35,14 +33,24 @@ export default function AdminPayments() {
   const [searchTerm, setSearchTerm] = useState("")
   
   // REAL-TIME LEDGER LISTENERS
-  const approvedQuery = useMemo(() => (db ? query(collection(db, "payment_requests"), where("status", "==", "APPROVED"), orderBy("updatedAt", "desc"), limit(100)) : null), [db])
+  // Removed orderBy to fix index requirement error. We will sort in useMemo.
+  const approvedQuery = useMemo(() => (db ? query(collection(db, "payment_requests"), where("status", "==", "APPROVED"), limit(200)) : null), [db])
   const pendingQuery = useMemo(() => (db ? query(collection(db, "payment_requests"), where("status", "==", "PENDING")) : null), [db])
 
-  const { data: approvedPayments, loading: approvedLoading } = useCollection<any>(approvedQuery)
+  const { data: rawApproved, loading: approvedLoading } = useCollection<any>(approvedQuery)
   const { data: pendingPayments } = useCollection<any>(pendingQuery)
 
+  const approvedPayments = useMemo(() => {
+    if (!rawApproved) return []
+    // Client-side sorting to avoid Firestore Index requirement
+    return [...rawApproved].sort((a, b) => {
+      const timeA = a.updatedAt?.seconds || 0
+      const timeB = b.updatedAt?.seconds || 0
+      return timeB - timeA
+    })
+  }, [rawApproved])
+
   const filteredPayments = useMemo(() => {
-    if (!approvedPayments) return []
     return approvedPayments.filter((p: any) => 
       p.userName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
       p.transactionId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -51,9 +59,8 @@ export default function AdminPayments() {
   }, [approvedPayments, searchTerm])
 
   const stats = useMemo(() => {
-    if (!approvedPayments) return { total: 0, count: 0, pending: 0, razorpayCount: 0 }
-    const total = approvedPayments.reduce((acc: number, p: any) => acc + (p.amount || 0), 0)
-    const razorpayCount = approvedPayments.filter((p: any) => p.gateway === 'RAZORPAY').length
+    const total = approvedPayments.reduce((acc: number, p: any) => acc + (Number(p.amount) || 0), 0)
+    const razorpayCount = approvedPayments.filter((p: any) => p.gateway === 'RAZORPAY' || p.gateway === 'CASHFREE').length
     return { 
       total, 
       count: approvedPayments.length, 
@@ -70,8 +77,8 @@ export default function AdminPayments() {
               <BarChart3 className="h-4 w-4 text-emerald-500" />
               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Revenue Monitor</span>
            </div>
-          <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] tracking-tight">Revenue Hub</h1>
-          <p className="text-slate-500 text-[11px] md:text-lg font-medium">Tracking verified monetization nodes and gateway transaction cycles.</p>
+          <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] tracking-tight leading-none">Revenue Hub</h1>
+          <p className="text-slate-500 text-[11px] md:text-lg font-medium leading-tight">Tracking verified monetization nodes and gateway transaction cycles.</p>
         </div>
         <Button variant="outline" className="w-full md:w-auto h-11 md:h-14 px-8 rounded-full border-slate-200 bg-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-sm">
            <Download className="h-4 w-4" /> Export Ledger
@@ -95,12 +102,12 @@ export default function AdminPayments() {
          />
       </div>
 
-      <Card className="border-none shadow-xl rounded-2xl md:rounded-[3rem] overflow-hidden bg-white mx-1">
-        <CardHeader className="p-6 md:p-10 border-b border-slate-50 bg-slate-50/30">
-           <CardTitle className="text-lg md:text-2xl font-black text-[#0F172A]">Transaction Audit Ledger</CardTitle>
+      <Card className="border-none shadow-xl rounded-2xl md:rounded-[3rem] overflow-hidden bg-white mx-1 border border-slate-50">
+        <CardHeader className="p-5 md:p-10 border-b border-slate-50 bg-slate-50/30">
+           <CardTitle className="text-sm md:text-2xl font-black text-[#0F172A]">Transaction Audit Ledger</CardTitle>
         </CardHeader>
-        <CardContent className="p-0 text-left">
-          <Table>
+        <CardContent className="p-0 text-left overflow-x-auto">
+          <Table className="min-w-[800px]">
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-slate-50 h-14 md:h-20">
                 <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Aspirant Hub</TableHead>
@@ -125,7 +132,7 @@ export default function AdminPayments() {
                           <div className="min-w-0">
                              <p className="font-bold text-[#0F172A] text-sm md:text-lg leading-tight truncate">{p.userName || 'Aspirant'}</p>
                              <div className="flex items-center gap-2 mt-1">
-                                <Badge className="bg-slate-50 text-slate-400 border-none text-[7px] font-black uppercase px-2">{p.gateway || 'MANUAL'}</Badge>
+                                <Badge className="bg-slate-50 text-slate-400 border-none text-[7px] font-black uppercase px-2 rounded-md">{p.gateway || 'MANUAL'}</Badge>
                              </div>
                           </div>
                        </div>
@@ -138,7 +145,7 @@ export default function AdminPayments() {
                        </div>
                     </TableCell>
                     <TableCell className="text-center">
-                       <Badge className="bg-[#0F172A] text-white border-none font-black text-[8px] md:text-[9px] px-3 py-1 rounded-lg">
+                       <Badge className="bg-[#0F172A] text-white border-none font-black text-[8px] md:text-[9px] px-3 py-1 rounded-lg shadow-sm">
                           {p.planName || 'ELITE'}
                        </Badge>
                     </TableCell>
@@ -168,14 +175,14 @@ export default function AdminPayments() {
 function FinanceCard({ label, value, trend, icon, highlight }: any) {
   return (
     <Card className={cn(
-      "border-none shadow-lg bg-white p-5 md:p-8 rounded-2xl md:rounded-[2rem] relative overflow-hidden group",
+      "border-none shadow-lg bg-white p-5 md:p-8 rounded-2xl md:rounded-[2rem] relative overflow-hidden group border border-slate-50",
       highlight && "ring-2 ring-primary/10 bg-primary/5"
     )}>
        <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5 group-hover:scale-110 transition-transform">{icon}</div>
        <div className="space-y-3 md:space-y-4 relative z-10 text-left">
           <div className="flex justify-between items-center">
              <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.1em] text-slate-400">{label}</p>
-             <Badge className={cn("border-none text-[7px] font-black uppercase px-1.5 rounded", highlight ? "bg-primary text-white" : "bg-emerald-50 text-emerald-600")}>{trend}</Badge>
+             <Badge className={cn("border-none text-[7px] font-black uppercase px-1.5 rounded", highlight ? "bg-primary text-white" : "bg-emerald-50 text-emerald-600 shadow-sm")}>{trend}</Badge>
           </div>
           <p className="text-2xl md:text-4xl font-black text-[#0F172A] tabular-nums leading-none tracking-tight">{value}</p>
        </div>
