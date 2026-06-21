@@ -3,8 +3,8 @@ import { Shield, GraduationCap, Scale, Zap, Stethoscope, Landmark, BookOpen, Act
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Branding Engine v18.0 (Hierarchy Aligned).
- * RESOLVER: Maps board/category IDs to official high-fidelity local assets.
+ * @fileOverview Institutional Branding Engine v19.0.
+ * RESOLVER: Maps new canonical board/category IDs to official high-fidelity assets.
  */
 
 const CANONICAL_BOARD_LOGOS: Record<string, string> = {
