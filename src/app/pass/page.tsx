@@ -1,4 +1,3 @@
-
 "use client"
 
 import Navbar from "@/components/layout/Navbar"
@@ -17,7 +16,8 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Institutional Pass Center v16.0 (Live Countdown).
+ * @fileOverview Institutional Pass Center v17.0 (Free Pass Aware).
+ * FIXED: Removed price > 0 filter to allow ₹0 Free Passes to be visible in the registry.
  */
 
 export default function PassPage() {
@@ -145,13 +145,22 @@ export default function PassPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-           {passesLoading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[400px] w-full rounded-[32px] bg-white" />) : passes.filter(p => p.price > 0).map((plan, idx) => (
+           {passesLoading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[400px] w-full rounded-[32px] bg-white" />) : passes.map((plan, idx) => (
              <motion.div key={plan.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }}>
                 <Card className="h-full border-none shadow-3xl bg-white rounded-[3rem] overflow-hidden flex flex-col transition-all duration-500 hover:translate-y-[-8px]">
                    <CardHeader className="p-10 md:p-14 pb-6 text-center space-y-6">
                       <div className="h-16 w-16 md:h-20 md:w-20 rounded-2xl bg-slate-50 text-primary flex items-center justify-center mx-auto shadow-inner"><Gem className="h-8 w-8 md:h-10 md:w-10 fill-current" /></div>
                       <CardTitle className="font-black text-xl md:text-3xl uppercase tracking-tight text-[#0F172A]">{plan.name}</CardTitle>
-                      <div className="flex items-baseline justify-center gap-2"><span className="text-2xl font-black text-primary">₹</span><span className="text-5xl md:text-7xl font-black text-[#0F172A] tracking-tighter tabular-nums">{plan.price}</span></div>
+                      <div className="flex items-baseline justify-center gap-2">
+                        {plan.price > 0 ? (
+                           <>
+                              <span className="text-2xl font-black text-primary">₹</span>
+                              <span className="text-5xl md:text-7xl font-black text-[#0F172A] tracking-tighter tabular-nums">{plan.price}</span>
+                           </>
+                        ) : (
+                           <span className="text-5xl md:text-7xl font-black text-emerald-500 tracking-tighter uppercase">FREE</span>
+                        )}
+                      </div>
                       <p className="text-[10px] font-black uppercase text-slate-400 tracking-[2px]">VALIDITY: {plan.durationDays} DAYS</p>
                    </CardHeader>
                    <CardContent className="px-10 md:px-14 pb-10 flex-1">
@@ -163,7 +172,9 @@ export default function PassPage() {
                    </CardContent>
                    <CardFooter className="p-10 md:p-14 pt-0">
                       <Button asChild className="w-full h-16 md:h-20 rounded-2xl md:rounded-[2.5rem] bg-[#0F172A] hover:bg-black text-white font-black uppercase text-[11px] tracking-[2px] shadow-4xl transition-all active:scale-95 border-none">
-                         <Link href={`/checkout?plan=${plan.id}`}>UPGRADE NOW <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                         <Link href={`/checkout?plan=${plan.id}`}>
+                            {plan.price > 0 ? 'UPGRADE NOW' : 'ACTIVATE FREE'} <ArrowRight className="ml-2 h-4 w-4" />
+                         </Link>
                       </Button>
                    </CardFooter>
                 </Card>

@@ -1,14 +1,15 @@
 import { Firestore, doc, setDoc, serverTimestamp, collection, writeBatch } from 'firebase/firestore';
 
 /**
- * @fileOverview Institutional Punjab-Centric Seeding Node v79.0 (Logo Hardened).
+ * @fileOverview Institutional Punjab-Centric Seeding Node v80.0 (Free Pass Hardened).
+ * UPDATED: Explicitly seeded a FOUNDATIONAL FREE PASS node for trial visibility.
  */
 
 export async function seedInitialData(db: Firestore) {
   console.log('[AUDIT] Initializing Absolute Punjab Registry Sync...');
   const batch = writeBatch(db);
 
-  // 1. STRATEGIC CATEGORIES (WITH RESTORED LOGOS)
+  // 1. STRATEGIC CATEGORIES
   const categories = [
     {
       id: "punjab-govt",
@@ -56,7 +57,7 @@ export async function seedInitialData(db: Firestore) {
     batch.set(doc(db, 'categories', cat.id), { ...cat, updatedAt: serverTimestamp() }, { merge: true });
   }
 
-  // 2. BOARDS SILO (WITH OFFICIAL LOGOS)
+  // 2. BOARDS SILO
   const boards = [
     { 
       id: 'psssb', 
@@ -115,8 +116,9 @@ export async function seedInitialData(db: Firestore) {
     }, { merge: true });
   });
 
-  // 4. PASS PLANS
+  // 4. PASS PLANS (Restored Free Pass Visibility)
   const passes = [
+    { id: 'free-pass', name: 'Free Elite Trial', price: 0, durationDays: 7, features: ['Unlimited Trial Mocks', 'Bilingual Support', 'Performance Audit', 'Basic Notes'], active: true, displayOrder: 0, type: 'FREE' },
     { id: 'monthly-pass', name: 'Monthly Elite', price: 299, durationDays: 30, features: ['Unlimited Full Mocks', 'AI Logic Solutions', 'PDF Study Notes', 'Ad-Free Hub'], active: true, displayOrder: 1, type: 'PREMIUM' },
     { id: 'quarterly-pass', name: 'Quarterly Elite', price: 799, durationDays: 90, features: ['Everything in Monthly', 'PYQ Mega Archive', 'Priority Updates', 'Extended Validity'], active: true, displayOrder: 2, type: 'PREMIUM' },
     { id: 'yearly-pass', name: 'Yearly Elite', price: 1999, durationDays: 365, features: ['Maximum Savings', 'Full Year Access', 'Selection Batch Entry', 'Founder Mentorship'], active: true, displayOrder: 3, type: 'PREMIUM' }
