@@ -8,8 +8,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Institutional Core Features Hub v2.0.
- * Restored: Mock Tests, Study Material, Previous Papers, and Performance Analytics.
+ * @fileOverview Institutional Preparation Hub v3.0.
+ * UPDATED: Simplified language (Open Hub -> Open Section) and reduced heading scale.
  */
 
 const features = [
@@ -49,16 +49,16 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="bg-white py-12 md:py-24 border-t border-slate-50">
+    <section className="bg-slate-50/50 py-12 md:py-20 border-y border-slate-100">
       <div className="container mx-auto px-4 max-w-7xl text-left">
-        <div className="flex items-center justify-between mb-12 md:mb-16 px-1">
+        <div className="flex items-center justify-between mb-10 md:mb-14 px-1">
            <div className="flex items-center gap-4">
               <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-inner">
                  <Sparkles className="h-5 w-5" />
               </div>
               <div className="space-y-1">
-                 <h2 className="text-xl md:text-3xl font-headline font-black text-[#0F172A] uppercase tracking-tight">Core Features</h2>
-                 <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Institutional Preparation Nodes</p>
+                 <h2 className="text-2xl md:text-4xl font-headline font-black text-[#0F172A] uppercase tracking-tight">PREPARATION HUB</h2>
+                 <p className="text-[10px] md:text-xs font-bold text-slate-600 uppercase tracking-widest">Verified Study Resources</p>
               </div>
            </div>
         </div>
@@ -81,12 +81,12 @@ export default function Features() {
                         <h3 className="text-xl font-black uppercase text-[#0F172A] group-hover:text-primary transition-colors">
                           {feature.title}
                         </h3>
-                        <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                        <p className="text-slate-600 text-sm font-medium leading-relaxed">
                           {feature.desc}
                         </p>
                      </div>
                      <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between text-primary font-black text-[10px] uppercase tracking-widest">
-                        <span>Open Hub</span>
+                        <span>Open Section</span>
                         <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                      </div>
                   </Card>

@@ -14,8 +14,8 @@ import MeetFounder from "@/components/home/MeetFounder";
 import Footer from "@/components/layout/Footer";
 
 /**
- * @fileOverview Official Home Page v183.0.
- * RESTORED: Core Features hub (Mock Tests, Study Material, etc.) to original position.
+ * @fileOverview Official Home Page v184.0.
+ * RELOCATED: Features hub (Quick Access) moved below Latest Mocks for better discovery flow.
  */
 
 export default function HomePage() {
@@ -26,22 +26,22 @@ export default function HomePage() {
       {/* 1. Hero Section */}
       <Hero />
 
-      {/* 2. Core Features (Mock Tests, Study Material, PYQs, Analytics) */}
-      <Features />
-
-      {/* 3. Global Search */}
+      {/* 2. Global Search */}
       <div className="relative z-40 py-8 md:py-12 bg-white">
         <GlobalSearch />
       </div>
 
-      {/* 4. Exam Categories */}
+      {/* 3. Exam Categories */}
       <FeaturedCategories />
 
-      {/* 5. Popular Exams */}
+      {/* 4. Popular Exams */}
       <PopularExams />
 
-      {/* 6. Latest Mock Tests */}
+      {/* 5. Latest Mock Tests */}
       <LatestMocks />
+
+      {/* 6. Preparation Hub (Mock Tests, Study Material, PYQs, Analytics) */}
+      <Features />
 
       {/* 7. Personal Progress */}
       <ContinueLearning />
