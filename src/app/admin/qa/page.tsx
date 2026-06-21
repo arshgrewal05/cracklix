@@ -13,7 +13,8 @@ import {
   Archive,
   GitMerge,
   Activity,
-  Zap
+  Zap,
+  Loader2
 } from "lucide-react"
 import { useCollection, useFirestore } from "@/firebase"
 import { collection, doc, writeBatch, serverTimestamp, deleteDoc } from "firebase/firestore"
@@ -22,8 +23,9 @@ import { cn } from "@/lib/utils"
 import type { Question } from "@/types"
 
 /**
- * @fileOverview CBT Integrity Hub v13.0 (PWA Hardened).
- * UPDATED: Removed ALL CAPS, reduced font scales, and standardized to Blue Pill system.
+ * @fileOverview CBT Integrity Hub v14.0 (PWA Hardened).
+ * FIXED: Defined Loader2 in imports.
+ * UPDATED: Removed ALL CAPS, reduced font scales, and normalized Title Case.
  */
 
 interface QAStatCardProps {
@@ -32,6 +34,7 @@ interface QAStatCardProps {
   color: string;
   desc: string;
   icon: React.ReactNode;
+  className?: string;
 }
 
 export default function QADashboard() {
@@ -112,7 +115,7 @@ export default function QADashboard() {
         <div className="space-y-1">
            <div className="flex items-center gap-2 mb-1">
               <ShieldAlert className="h-4 w-4 text-rose-500" />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Integrity Governance Monitor</span>
+              <span className="text-[9px] font-black tracking-[0.1em] text-slate-400">Integrity Governance Monitor</span>
            </div>
           <h1 className="text-2xl md:text-5xl font-black text-[#0F172A] tracking-tight">CBT Integrity</h1>
           <p className="text-slate-500 text-[11px] md:text-lg font-medium leading-tight">Sanitize global bank overlaps and validate asset fidelity.</p>
@@ -120,7 +123,7 @@ export default function QADashboard() {
         <Button 
           onClick={handleReScan} 
           disabled={qLoading}
-          className="w-full md:w-auto h-11 md:h-14 px-8 bg-primary hover:bg-blue-700 text-white rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl border-none transition-all active:scale-95 gap-3"
+          className="w-full md:w-auto h-11 md:h-14 px-8 bg-primary hover:bg-blue-700 text-white rounded-full font-black text-[10px] tracking-widest shadow-xl border-none transition-all active:scale-95 gap-3"
         >
           {qLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Re-Scan Registry
         </Button>
@@ -140,7 +143,7 @@ export default function QADashboard() {
                   <h3 className="text-lg md:text-3xl font-black text-[#0F172A]">Duplicate Audit Stream</h3>
                </div>
                {audit.duplicates.length > 0 && (
-                  <Button onClick={handleBulkPurgeDuplicates} variant="outline" className="h-10 rounded-full border-rose-100 text-rose-600 font-black uppercase text-[9px] gap-2 px-6">
+                  <Button onClick={handleBulkPurgeDuplicates} variant="outline" className="h-10 rounded-full border-rose-100 text-rose-600 font-black text-[9px] gap-2 px-6">
                      <Trash2 className="h-3.5 w-3.5" /> Purge All
                   </Button>
                )}
@@ -150,9 +153,9 @@ export default function QADashboard() {
                <Table>
                   <TableHeader className="bg-slate-50/50">
                      <TableRow className="border-slate-50 h-14 md:h-20">
-                        <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Conflict Statements</TableHead>
-                        <TableHead className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-center text-slate-400">Confidence</TableHead>
-                        <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Audit Action</TableHead>
+                        <TableHead className="px-6 md:px-12 text-[9px] md:text-[10px] font-black tracking-widest text-slate-400">Conflict Statements</TableHead>
+                        <TableHead className="text-[9px] md:text-[10px] font-black tracking-widest text-center text-slate-400">Confidence</TableHead>
+                        <TableHead className="text-right px-6 md:px-12 text-[9px] md:text-[10px] font-black tracking-widest text-slate-400">Audit Action</TableHead>
                      </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -166,7 +169,7 @@ export default function QADashboard() {
                                  <code className="text-[8px] text-slate-300 font-mono uppercase mt-1.5 block">Node: {d.id.slice(0, 8)}...</code>
                               </TableCell>
                               <TableCell className="text-center">
-                                 <Badge className="bg-rose-50 text-rose-600 border-none px-2.5 py-0.5 text-[8px] md:text-[9px] uppercase font-black tracking-widest">
+                                 <Badge className="bg-rose-50 text-rose-600 border-none px-2.5 py-0.5 text-[8px] md:text-[9px] font-black tracking-widest">
                                     100% OVERLAP
                                  </Badge>
                               </TableCell>
@@ -187,7 +190,7 @@ export default function QADashboard() {
                            <TableCell colSpan={3} className="h-40 text-center">
                               <div className="flex flex-col items-center justify-center opacity-10 space-y-4">
                                  <Zap className="h-12 w-12 text-slate-300" />
-                                 <p className="font-black text-sm md:text-xl uppercase tracking-widest">Registry Fidelity 100%</p>
+                                 <p className="font-black text-sm md:text-xl tracking-widest">Registry Fidelity 100%</p>
                               </div>
                            </TableCell>
                         </TableRow>
@@ -201,7 +204,7 @@ export default function QADashboard() {
   )
 }
 
-function QAStatCard({ label, value, color, desc, icon, className }: any) {
+function QAStatCard({ label, value, color, desc, icon, className }: QAStatCardProps) {
    return (
       <Card className={cn("border-none shadow-lg bg-white rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 transition-all duration-500 group border border-slate-50 text-left hover:translate-y-[-4px]", className)}>
          <div className="flex items-center justify-between mb-4 md:mb-8">
@@ -210,9 +213,9 @@ function QAStatCard({ label, value, color, desc, icon, className }: any) {
             </div>
          </div>
          <div className="space-y-0.5 md:space-y-1">
-            <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p>
+            <p className="text-[8px] md:text-[10px] font-black text-slate-400 tracking-tight">{label}</p>
             <h4 className={cn("text-2xl md:text-6xl font-black tracking-tighter leading-none tabular-nums", color)}>{value}</h4>
-            <p className="text-[8px] md:text-[11px] font-bold text-slate-300 uppercase tracking-tight mt-1.5 md:mt-3">{desc}</p>
+            <p className="text-[8px] md:text-[11px] font-bold text-slate-300 tracking-tight mt-1.5 md:mt-3">{desc}</p>
          </div>
       </Card>
    )
