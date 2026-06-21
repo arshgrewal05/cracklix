@@ -18,9 +18,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official Compact Hero Hub v32.0.
- * RE-ORDERED: CTA buttons moved below quick action cards.
- * ENHANCED: Increased illustration size for mobile and desktop.
+ * @fileOverview Official High-Density PWA Hero v35.0.
+ * OPTIMIZED: Strict Title Case and mobile-first spacing.
  */
 
 export default function Hero() {
@@ -47,27 +46,27 @@ export default function Hero() {
             <motion.div 
                initial={{ opacity: 0, x: -20 }}
                animate={{ opacity: 1, x: 0 }}
-               className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-slate-100 shadow-sm group hover:border-primary/30 transition-all cursor-default"
+               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-100 shadow-sm group hover:border-primary/30 transition-all cursor-default"
             >
               <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 animate-pulse" />
-              <span className="text-[8px] md:text-[12px] font-black text-slate-700 tracking-tight">
-                ✨ Punjab's Smart Exam Platform
+              <span className="text-[10px] md:text-[12px] font-black text-slate-700 tracking-tight">
+                Punjab's Smart Exam Platform
               </span>
             </motion.div>
 
-            <div className="space-y-1.5 md:space-y-4">
+            <div className="space-y-2 md:space-y-4">
               <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.05]">
                 Crack Punjab Govt Exam <br/>
                 <span className="block text-primary">with Confidence</span>
               </h1>
 
-              <p className="text-[11px] sm:text-lg text-slate-500 max-w-lg leading-relaxed font-medium">
-                Mock Tests, PYQs, Current Affairs and Study Material in one place.
+              <p className="text-[12px] sm:text-lg text-slate-500 max-w-lg leading-relaxed font-medium">
+                Mock Tests, PYQs, and Study Material verified by official patterns.
               </p>
             </div>
           </div>
 
-          {/* 2. ILLUSTRATION - INCREASED SIZE */}
+          {/* 2. ILLUSTRATION */}
           <div className="hidden lg:flex flex-col items-center">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="relative">
               <img 
@@ -78,30 +77,30 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="lg:hidden flex justify-center mt-4">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="lg:hidden flex justify-center mt-2">
             <img 
               src="/images/hero-student.png" 
               alt="Cracklix Student" 
-              className="h-[140px] w-auto drop-shadow-xl" 
+              className="h-[120px] w-auto drop-shadow-xl" 
             />
           </motion.div>
         </div>
 
         {/* QUICK ACTIONS: 2x2 GRID FOR MOBILE */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-6 md:mt-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mt-4 md:mt-16">
           <QuickAction icon={Zap} label="Mock Tests" href="/mocks" color="bg-blue-600" />
           <QuickAction icon={BookOpen} label="Study Material" href="/notes" color="bg-indigo-600" />
           <QuickAction icon={FileText} label="PYQ Papers" href="/pyqs" color="bg-emerald-600" />
           <QuickAction icon={BarChart3} label="Current Affairs" href="/current-affairs" color="bg-orange-500" />
         </div>
 
-        {/* CTAs MOVED BELOW CARDS */}
+        {/* CTAs */}
         <div className="flex flex-row gap-2 md:gap-4 mt-6 md:mt-10 justify-center lg:justify-start">
-          <Button asChild className="flex-1 md:flex-none h-11 md:h-14 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest px-6 md:px-10">
+          <Button asChild className="flex-1 md:flex-none h-12 md:h-16 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest px-6 md:px-12 shadow-xl">
             <Link href="/mocks" className="flex items-center gap-2">Start Free Mock <ArrowRight className="h-4 w-4" /></Link>
           </Button>
-          <Button asChild variant="outline" className="flex-1 md:flex-none h-11 md:h-14 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest px-6 md:px-10">
-            <Link href="/exams">Explore Exams</Link>
+          <Button asChild variant="outline" className="flex-1 md:flex-none h-12 md:h-16 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest px-6 md:px-12 shadow-sm border-2">
+            <Link href="/exams">Explore Registry</Link>
           </Button>
         </div>
       </div>
@@ -112,8 +111,8 @@ export default function Hero() {
 function QuickAction({ icon: Icon, label, href, color }: any) {
   return (
     <Link href={href} className="block group h-full">
-      <Card className="p-3 md:p-6 rounded-xl border border-slate-100 bg-white hover:shadow-lg transition-all duration-300 h-full group flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
-        <div className={cn("h-8 w-8 md:h-12 md:w-12 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 shadow-lg text-white group-hover:scale-110 transition-transform", color)}>
+      <Card className="p-3 md:p-6 rounded-2xl border border-slate-100 bg-white hover:shadow-xl transition-all duration-300 h-full group flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
+        <div className={cn("h-8 w-8 md:h-12 md:w-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg text-white group-hover:scale-110 transition-transform", color)}>
           <Icon className="h-4 w-4 md:h-6 md:w-6" />
         </div>
         <span className="text-[10px] md:text-sm font-bold text-slate-800 leading-tight tracking-tight">{label}</span>
