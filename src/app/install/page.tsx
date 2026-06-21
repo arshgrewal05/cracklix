@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react"
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
-import { motion } from "framer-motion"
+import React, { useState, useEffect } from "react";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import { motion } from "framer-motion";
 import { 
   Smartphone, 
   Download, 
@@ -15,42 +15,22 @@ import {
   PlusSquare,
   CheckCircle2,
   MoreVertical,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import PWAInstallButton from "@/components/PWAInstallButton";
 
 /**
- * @fileOverview High-Fidelity PWA Install Hub v9.0.
- * UPDATED: Page is now PUBLICLY ACCESSIBLE to allow shared links to work without login.
+ * @fileOverview Public PWA Install Hub v10.0.
+ * ACCESSIBLE: Works without login to allow shared growth.
  */
-
-type DeviceType = "android" | "ios" | "desktop" | "unknown";
-
 export default function InstallPage() {
-  const [device, setDevice] = useState<DeviceType>("desktop");
-  const [isInstallable, setIsInstallable] = useState(false);
+  const [device, setDevice] = useState<"android" | "ios" | "desktop" | "unknown">("desktop");
   const [isStandalone, setIsStandalone] = useState(false);
   const [mounted, setMounted] = useState(false);
-  
-  const { toast } = useToast();
-  const router = useRouter();
-
-  const isIos = device === "ios";
-
-  const updateState = useCallback(() => {
-    if (typeof window === 'undefined') return;
-
-    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
-    setIsStandalone(isStandaloneMode);
-    
-    const hasPrompt = !!(window as any).deferredPrompt;
-    setIsInstallable(hasPrompt);
-  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -59,42 +39,9 @@ export default function InstallPage() {
     else if (/iphone|ipad|ipod/.test(ua)) setDevice("ios");
     else setDevice("desktop");
 
-    updateState();
-
-    const handleCheck = () => {
-      updateState();
-    };
-
-    window.addEventListener('pwa-installable', handleCheck);
-    window.addEventListener('appinstalled', handleCheck);
-    
-    return () => {
-      window.removeEventListener('pwa-installable', handleCheck);
-      window.removeEventListener('appinstalled', handleCheck);
-    };
-  }, [updateState]);
-
-  const handleInstall = async () => {
-    const prompt = (window as any).deferredPrompt;
-    if (prompt) {
-      prompt.prompt();
-      const { outcome } = await prompt.userChoice;
-      if (outcome === 'accepted') {
-        (window as any).deferredPrompt = null;
-        setIsInstallable(false);
-      }
-    } else if (isIos) {
-       toast({
-         title: "iOS Setup",
-         description: "Tap Share > Add to Home Screen to install.",
-       });
-    } else {
-       toast({
-         title: "Manual Setup",
-         description: "Please use your browser's menu and select 'Install App'.",
-       });
-    }
-  };
+    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
+    setIsStandalone(isStandaloneMode);
+  }, []);
 
   if (!mounted) return null;
 
@@ -117,7 +64,7 @@ export default function InstallPage() {
                 Cracklix <span className="text-primary">Native</span>
               </h1>
               <p className="text-[12px] md:text-2xl text-slate-500 font-medium leading-tight">
-                 Get the smartest preparation hub on your home screen.
+                 Official preparation hub for your home screen.
               </p>
            </div>
         </div>
@@ -127,26 +74,22 @@ export default function InstallPage() {
            <div className="lg:col-span-7">
               <Card className="border-none shadow-5xl rounded-3xl bg-[#0B1528] text-white overflow-hidden p-6 md:p-14 space-y-6 md:space-y-10 relative">
                  <div className="absolute top-0 right-0 p-8 opacity-5 rotate-12">
-                    {isIos ? <Apple className="h-44 w-44 md:h-64 md:w-64" /> : <Smartphone className="h-44 w-44 md:h-64 md:w-64" />}
+                    {device === "ios" ? <Apple className="h-44 w-44 md:h-64 md:w-64" /> : <Smartphone className="h-44 w-44 md:h-64 md:w-64" />}
                  </div>
                  
                  <div className="relative z-10 space-y-6 text-left">
                     <div className="flex items-center gap-2">
                        <Badge className="bg-primary text-white border-none px-3 py-1 rounded-full font-black uppercase text-[8px] md:text-[10px] tracking-widest">
-                          {device.toUpperCase()} HUB
+                          {device.toUpperCase()} NODES
                        </Badge>
-                       {isStandalone && (
-                         <Badge className="bg-emerald-500 text-white border-none px-3 py-1 rounded-full font-black uppercase text-[8px] md:text-[10px] tracking-widest">
-                            INSTALLED
-                         </Badge>
-                       )}
+                       {isStandalone && <Badge className="bg-emerald-500 text-white border-none px-3 py-1 rounded-full font-black uppercase text-[8px] md:text-[10px] tracking-widest">INSTALLED</Badge>}
                     </div>
 
                     <h2 className="text-xl md:text-5xl font-black tracking-tight">
-                       {isIos ? 'iPhone Setup' : isStandalone ? 'App Active' : 'Start Installation'}
+                       {device === "ios" ? 'iOS Hub Setup' : isStandalone ? 'App Active' : 'Start Installation'}
                     </h2>
 
-                    {isIos ? (
+                    {device === "ios" ? (
                        <div className="space-y-4">
                           <InstructionStep num={1} icon={<Share className="h-3.5 w-3.5" />} text="Tap 'Share' in Safari footer" />
                           <InstructionStep num={2} icon={<PlusSquare className="h-3.5 w-3.5" />} text="Select 'Add to Home Screen'" />
@@ -156,57 +99,52 @@ export default function InstallPage() {
                        <div className="space-y-4">
                           <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-start gap-3">
                              <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                             <p className="text-emerald-50 [11px] md:text-sm font-medium">Native mode active. Go to your home screen to launch Cracklix anytime.</p>
+                             <p className="text-emerald-50 [11px] md:text-sm font-medium">Native mode active. You are now connected to the elite prep registry.</p>
                           </div>
                           <Button asChild className="w-full h-12 bg-white text-black hover:bg-slate-100 rounded-full font-black uppercase tracking-widest text-[9px] border-none shadow-xl transition-all">
-                             <Link href="/dashboard">Enter Hub</Link>
+                             <Link href="/dashboard">Enter Dashboard</Link>
                           </Button>
                        </div>
                     ) : (
                        <div className="space-y-6 text-left">
                           <p className="text-slate-400 text-sm md:text-lg font-medium leading-relaxed">
-                             {device === "desktop" 
-                               ? 'Install the desktop app for the best mock test experience.' 
-                               : 'Faster loading and instant recruitment alerts.'}
+                             Install for low-latency mock tests and instant recruitment alerts.
                           </p>
                           <div className="space-y-3">
-                             <Button 
-                                onClick={handleInstall}
-                                className="w-full h-14 md:h-20 bg-primary hover:bg-blue-700 text-white font-black uppercase tracking-[0.2em] text-[10px] md:text-[11px] rounded-full shadow-3xl transition-all active:scale-95 border-none gap-3"
-                             >
-                                <Download className="h-4 w-4 md:h-6 md:w-6" /> {isInstallable ? 'Install App' : 'Manual Setup'}
-                             </Button>
+                             <PWAInstallButton 
+                                variant="primary"
+                                className="w-full h-14 md:h-20 text-[10px] md:text-[11px] rounded-full"
+                             />
                           </div>
                        </div>
                     )}
                  </div>
               </Card>
 
-              {(!isStandalone && !isIos) && (
-                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 space-y-4">
+              {(!isStandalone && device !== "ios") && (
+                 <div className="mt-6 space-y-4">
                     <Card className="p-6 md:p-10 rounded-[2.5rem] bg-slate-50 border border-slate-200 space-y-6 text-left shadow-inner">
                        <h3 className="text-lg font-black uppercase text-[#0F172A] flex items-center gap-2">
-                          <Smartphone className="h-5 w-5 text-primary" /> Manual Setup
+                          <Smartphone className="h-5 w-5 text-primary" /> Browser Setup
                        </h3>
                        <div className="space-y-4">
-                          <InstructionStep num={1} icon={<MoreVertical className="h-3.5 w-3.5" />} text="Open 3-dots menu in browser" color="text-slate-500" />
-                          <InstructionStep num={2} icon={<PlusSquare className="h-3.5 w-3.5" />} text="Select 'Install app' option" color="text-slate-500" />
-                          <InstructionStep num={3} icon={<CheckCircle2 className="h-3.5 w-3.5" />} text="Launch from Home Screen" color="text-slate-500" />
+                          <InstructionStep num={1} icon={<MoreVertical className="h-3.5 w-3.5" />} text="Tap browser menu (3-dots)" color="text-slate-500" />
+                          <InstructionStep num={2} icon={<PlusSquare className="h-3.5 w-3.5" />} text="Select 'Install App' or 'Add to Home'" color="text-slate-500" />
+                          <InstructionStep num={3} icon={<CheckCircle2 className="h-3.5 w-3.5" />} text="Sync and Launch" color="text-slate-500" />
                        </div>
                     </Card>
-                 </motion.div>
+                 </div>
               )}
            </div>
 
            <div className="lg:col-span-5 space-y-4 md:space-y-8 text-left">
-              <h3 className="text-[9px] font-black uppercase text-slate-400 tracking-[0.4em] ml-1">Native Hub Perks</h3>
+              <h3 className="text-[9px] font-black uppercase text-slate-400 tracking-[0.4em] ml-1">Registry Perks</h3>
               <div className="grid grid-cols-1 gap-3">
-                 <BenefitRow icon={<Smartphone />} title="Bilingual Engine" desc="Smooth PA/EN transitions." />
-                 <BenefitRow icon={<Zap />} title="Low Latency" desc="Rapid offline-first caching." />
-                 <BenefitRow icon={<ShieldCheck />} title="Verified Hub" desc="State-grade security nodes." />
+                 <BenefitRow icon={<Smartphone />} title="Native Hub" desc="Official PWA Experience." />
+                 <BenefitRow icon={<Zap />} title="Low Latency" desc="Offline cached mocks." />
+                 <BenefitRow icon={<ShieldCheck />} title="Verified" desc="Secure preparation node." />
               </div>
            </div>
-
         </div>
       </main>
       <Footer />

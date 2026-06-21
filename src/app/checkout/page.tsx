@@ -18,8 +18,8 @@ import Script from "next/script"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Testbook-Style Checkout Hub v11.0.
- * FIXED: Missing 'cn' import and hardened profile null checks.
+ * @fileOverview Testbook-Style Checkout Hub v12.0.
+ * FIXED: Missing 'cn' and 'profile' null check hardening.
  */
 
 export default function CheckoutPage() {
@@ -177,28 +177,6 @@ function CheckoutContent() {
            </Card>
         )}
 
-        {subscriptionCase === 'UPGRADE' && (
-           <Card className="mb-8 border-none bg-blue-600 text-white p-6 rounded-[1.5rem] shadow-xl flex items-center gap-6 animate-in slide-in-from-top-4">
-              <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                 <Zap className="h-6 w-6 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                 <h4 className="text-sm md:text-lg font-black uppercase tracking-tight">Instant Upgrade</h4>
-                 <p className="text-[10px] md:text-xs font-medium text-blue-50 mt-1">You are upgrading to a superior pass. The new tier will activate immediately upon verification.</p>
-              </div>
-           </Card>
-        )}
-
-        {subscriptionCase === 'LOWER' && (
-           <Card className="mb-8 border-none bg-rose-50 text-rose-600 p-6 rounded-[1.5rem] shadow-sm flex items-center gap-6 border-2 border-rose-100">
-              <AlertCircle className="h-10 w-10 shrink-0" />
-              <div className="min-w-0 flex-1">
-                 <h4 className="text-sm md:text-lg font-black uppercase tracking-tight">Purchase Blocked</h4>
-                 <p className="text-[10px] md:text-xs font-bold uppercase tracking-tight">A higher-tier pass is already active on your account.</p>
-              </div>
-           </Card>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16">
            <div className="lg:col-span-7 space-y-8">
               <Tabs defaultValue="online" className="w-full">
@@ -218,7 +196,7 @@ function CheckoutContent() {
                        <CardHeader className="p-8 md:p-10 pb-4">
                           <div className="flex items-center gap-4 mb-2">
                              <CreditCard className="h-6 w-6 text-primary" />
-                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Fast Account Activation</span>
+                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Fast Activation</span>
                           </div>
                           <CardTitle className="font-headline font-black text-xl md:text-2xl uppercase text-[#0F172A]">Payment Gateway</CardTitle>
                           <CardDescription className="text-slate-400 font-medium">Verified by Cashfree Security Node.</CardDescription>
@@ -230,9 +208,7 @@ function CheckoutContent() {
                             className="w-full h-16 md:h-20 bg-primary hover:bg-orange-600 text-white font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl shadow-3xl transition-all active:scale-95 border-none gap-4"
                           >
                              {onlineProcessing ? <Loader2 className="h-6 w-6 animate-spin" /> : <ShieldCheck className="h-6 w-6 fill-current" />}
-                             {onlineProcessing ? "INITIATING NODE..." : 
-                              subscriptionCase === 'EXTEND' ? "EXTEND MY PREPARATION" : 
-                              subscriptionCase === 'UPGRADE' ? "UPGRADE TO ELITE" : "ACTIVATE PLAN NOW"}
+                             {onlineProcessing ? "INITIATING NODE..." : "ACTIVATE PLAN NOW"}
                           </Button>
                        </CardContent>
                     </Card>
@@ -243,7 +219,7 @@ function CheckoutContent() {
                        <CardHeader className="p-8 md:p-10 bg-slate-50/50 border-b border-slate-100 text-left">
                           <div className="flex items-center gap-4 mb-2">
                              <QrCode className="h-5 w-5 text-slate-400" />
-                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Manual Ingestion Node</span>
+                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Manual Node</span>
                           </div>
                           <CardTitle className="font-headline font-black text-xl uppercase text-[#0F172A]">Direct UPI Transfer</CardTitle>
                        </CardHeader>

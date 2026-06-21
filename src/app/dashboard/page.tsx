@@ -34,8 +34,8 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Dashboard v34.0.
- * FIXED: TS2304 (Layers import) and hardened icon.props access.
+ * @fileOverview Student Dashboard v35.0.
+ * FIXED: Missing 'Layers' and 'isValidElement' hardening.
  */
 export default function StudentDashboard() {
   const { user, profile, loading: authLoading } = useUser();
@@ -124,7 +124,7 @@ export default function StudentDashboard() {
   if (!mounted || authLoading || (user && !profile)) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-white space-y-4">
        <Zap className="h-8 w-8 text-primary animate-pulse" />
-       <p className="text-[10px] font-black uppercase text-slate-300">Synchronizing Progress...</p>
+       <p className="text-[10px] font-black uppercase text-slate-300">Syncing Progress...</p>
     </div>
   );
 

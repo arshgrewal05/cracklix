@@ -7,10 +7,8 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * @fileOverview Hardened Institutional PWA Manager v23.0.
- * FIXED: Removed /install exclusion to ensure prompt works on the setup page.
- * FIXED: Reliable standalone detection with hydration guard.
- * ADDED: Dispatcher for custom 'pwa-installable' event to sync UI buttons.
+ * @fileOverview Hardened Institutional PWA Manager v25.0.
+ * FIXED: Universal capture of 'beforeinstallprompt' with global event dispatch.
  */
 export default function PWAManager() {
   const pathname = usePathname();
@@ -21,36 +19,31 @@ export default function PWAManager() {
   const checkStatus = useCallback(() => {
     if (typeof window === 'undefined') return;
     
-    // Explicit detection for standalone window vs browser session
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
     setIsInstalled(isStandalone);
 
-    // Prompt Exclusions: Active Test Session and Admin panel only.
     const isExcluded = pathname?.includes('/attempt') || pathname?.startsWith('/admin');
     const isDismissed = localStorage.getItem('cracklix_pwa_dismissed') === 'true';
     const hasPrompt = !!(window as any).deferredPrompt;
     
-    // Show prompt if: Not installed, not in excluded area, not manually dismissed, and browser event captured.
     const shouldShow = !isStandalone && !isExcluded && !isDismissed && hasPrompt;
     setShowPrompt(shouldShow);
-    
-    console.log('[PWA_AUDIT] Mode:', isStandalone ? 'Standalone' : 'Browser', '| Prompt Ready:', hasPrompt);
   }, [pathname]);
 
   useEffect(() => {
     setMounted(true);
 
     const handlePrompt = (e: any) => {
-      console.log('[PWA_AUDIT] beforeinstallprompt event captured');
+      console.log('[PWA_AUDIT] beforeinstallprompt captured');
       e.preventDefault();
       (window as any).deferredPrompt = e;
-      // Notify all PWA buttons that installation is now available
+      // Notify all install buttons to update their visibility
       window.dispatchEvent(new CustomEvent('pwa-installable'));
       checkStatus();
     };
 
     const handleAppInstalled = () => {
-      console.log('[PWA_AUDIT] App successfully integrated into device');
+      console.log('[PWA_AUDIT] App installed successfully');
       setIsInstalled(true);
       setShowPrompt(false);
       (window as any).deferredPrompt = null;
@@ -58,37 +51,30 @@ export default function PWAManager() {
 
     window.addEventListener('beforeinstallprompt', handlePrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
-    window.addEventListener('pwa-installable', checkStatus);
     
-    // Delayed initial check to allow hydration stability
     const timer = setTimeout(checkStatus, 1000);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handlePrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
-      window.removeEventListener('pwa-installable', checkStatus);
       clearTimeout(timer);
     };
   }, [checkStatus]);
 
   const handleInstallClick = async () => {
     const prompt = (window as any).deferredPrompt;
-    if (!prompt) {
-       console.warn('[PWA_AUDIT] Prompt request denied: Not yet available.');
-       return;
-    }
+    if (!prompt) return;
 
     try {
       await prompt.prompt();
       const { outcome } = await prompt.userChoice;
-      console.log('[PWA_AUDIT] User choice outcome:', outcome);
-      
+      console.log('[PWA_AUDIT] Installation outcome:', outcome);
       if (outcome === 'accepted') {
         setShowPrompt(false);
         (window as any).deferredPrompt = null;
       }
     } catch (err) {
-      console.error('[PWA_AUDIT] Installation trigger failure:', err);
+      console.error('[PWA_AUDIT] Trigger failed:', err);
     }
   };
 
@@ -111,7 +97,7 @@ export default function PWAManager() {
                    </div>
                    <div className="text-left">
                       <h4 className="text-sm font-black uppercase tracking-tight">Cracklix App</h4>
-                      <p className="text-[9px] font-black uppercase text-primary tracking-widest">Get Native Experience</p>
+                      <p className="text-[9px] font-black uppercase text-primary tracking-widest">Native Experience</p>
                    </div>
                 </div>
                 <button 
@@ -125,7 +111,7 @@ export default function PWAManager() {
                 </button>
              </div>
              <p className="text-[13px] font-bold text-slate-300 leading-snug text-left">
-               Practice faster with the official Punjab exam prep app on your home screen.
+               Install the official Punjab exam prep app on your home screen for instant alerts.
              </p>
              <Button 
                onClick={handleInstallClick}

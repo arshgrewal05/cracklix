@@ -13,9 +13,8 @@ interface PWAInstallButtonProps {
 }
 
 /**
- * @fileOverview Hardened PWA Install Trigger v15.0.
- * Listens to global window.deferredPrompt and provides fallbacks for iOS.
- * FIXED: Uses 'pwa-installable' event to force updates when prompt is captured.
+ * @fileOverview Hardened PWA Install Trigger v16.0.
+ * Works without login and handles global prompt captures.
  */
 export default function PWAInstallButton({ 
   className, 
@@ -37,7 +36,6 @@ export default function PWAInstallButton({
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(ios);
 
-    // Visible if not installed AND (deferredPrompt exists OR it is iOS)
     const hasPrompt = !!(window as any).deferredPrompt;
     setCanInstall(!isStandalone && (hasPrompt || ios));
   }, []);
@@ -46,14 +44,13 @@ export default function PWAInstallButton({
     setMounted(true);
 
     const handleCheck = () => {
-       console.log('[INSTALL_BTN] Syncing installability state...');
+       console.log('[INSTALL_BTN] PWA State Synchronized');
        updateState();
     };
 
     window.addEventListener('pwa-installable', handleCheck);
     window.addEventListener('appinstalled', handleCheck);
     
-    // Initial check
     updateState();
 
     return () => {
@@ -68,8 +65,8 @@ export default function PWAInstallButton({
     
     if (isIOS) {
        toast({
-         title: "📱 Install Instructions",
-         description: "Tap the 'Share' icon in your Safari browser and select 'Add to Home Screen'.",
+         title: "📱 iOS Installation",
+         description: "Tap 'Share' in your Safari browser and select 'Add to Home Screen'.",
        });
        return;
     }
@@ -78,15 +75,17 @@ export default function PWAInstallButton({
     if (!prompt) {
       toast({
         variant: "destructive",
-        title: "Wait",
-        description: "Installation prompt not yet available. Try reloading or using Chrome.",
+        title: "Setup Required",
+        description: "Please use the 'Install' option in your browser menu.",
       });
       return;
     }
 
     try {
+      console.log('[PWA_INSTALL] Prompting user...');
       prompt.prompt();
       const { outcome } = await prompt.userChoice;
+      console.log('[PWA_INSTALL] User Choice:', outcome);
       if (outcome === 'accepted') {
         (window as any).deferredPrompt = null;
         setCanInstall(false);
@@ -96,7 +95,7 @@ export default function PWAInstallButton({
     }
   };
 
-  if (!mounted || isInstalled || !canInstall) return null;
+  if (!mounted || isInstalled) return null;
 
   return (
     <Button
@@ -110,7 +109,7 @@ export default function PWAInstallButton({
       )}
     >
       {isIOS ? <Smartphone className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-      {showLabel && "Install App"}
+      {showLabel && (canInstall ? "Install App" : "Setup App")}
       <Sparkles className="h-3 w-3 text-primary animate-pulse" />
     </Button>
   );
