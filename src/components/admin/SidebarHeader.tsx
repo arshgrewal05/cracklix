@@ -11,8 +11,8 @@ interface SidebarHeaderProps {
 }
 
 /**
- * Cracklix Admin Sidebar Header v32.0 (High Density).
- * UPDATED: Further increased Logo scale for maximum brand visibility in admin hub.
+ * Cracklix Admin Sidebar Header v33.0 (High Density).
+ * UPDATED: Increased Logo scale for maximum brand visibility in admin hub.
  */
 export default function SidebarHeader({
   isOpen,
@@ -32,7 +32,7 @@ export default function SidebarHeader({
         align={isOpen ? "left" : "center"}
         className="transition-all duration-300"
         imgClassName={cn(
-          isOpen ? "h-[76px] md:h-[92px]" : "h-14 md:h-18"
+          isOpen ? "h-[80px] md:h-[96px]" : "h-14 md:h-18"
         )}
       />
 

@@ -19,7 +19,7 @@ import {
 } from "@/lib/constants";
 
 /**
- * @fileOverview Compact High-Density Footer v6.0 (PWA Optimized).
+ * @fileOverview Compact High-Density Footer v7.0 (Logo Increased).
  */
 
 export default function Footer() {
@@ -31,13 +31,13 @@ export default function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 items-start text-left">
 
           {/* Brand Section */}
-          <div className="col-span-2 lg:col-span-1 space-y-3">
+          <div className="col-span-2 lg:col-span-1 space-y-5">
             <Logo
               variant="dark"
               align="left"
-              imgClassName="h-[42px] md:h-[72px]"
+              imgClassName="h-[60px] md:h-[88px]"
             />
-            <p className="max-w-[280px] text-[9px] md:text-sm leading-relaxed text-slate-400">
+            <p className="max-w-[280px] text-[10px] md:text-sm leading-relaxed text-slate-400">
               Punjab's most advanced exam platform for serious aspirants.
             </p>
             <div className="flex items-center gap-3">
