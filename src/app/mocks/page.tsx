@@ -16,7 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { AuthorityLogo } from "@/lib/exam-icons"
 
 /**
- * @fileOverview High-Density Master Registry v16.0 (Hierarchy Aligned).
+ * @fileOverview High-Density Exam Hub v17.0 (Simplified Language).
+ * UPDATED: Simplified "Master Registry" to "Exam Hub".
  */
 
 const AUTHORIZED_CATEGORY_IDS = [
@@ -64,7 +65,7 @@ export default function MocksDiscoveryPage() {
                  <div className="h-7 w-7 md:h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-inner"><Landmark className="h-4 w-4 md:h-5 md:w-5" /></div>
                  <span className="text-[9px] md:text-xs font-black text-slate-400 tracking-widest uppercase">Exam Hub</span>
                </div>
-               <h1 className="text-2xl md:text-6xl font-black text-[#0F172A] leading-tight tracking-tight uppercase">Master Registry</h1>
+               <h1 className="text-2xl md:text-6xl font-black text-[#0F172A] leading-tight tracking-tight uppercase">Exam Hub</h1>
                <p className="text-slate-500 font-medium text-[11px] md:text-xl max-w-2xl leading-tight">Verified authority boards and mock tests.</p>
             </div>
           </div>

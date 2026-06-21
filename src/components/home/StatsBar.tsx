@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /**
- * @fileOverview High-Fidelity Single-Line Stats Bar v6.1.
- * ALIGNMENT: Standardized side margins to match Hero section.
+ * @fileOverview High-Fidelity Single-Line Stats Bar v6.2.
+ * UPDATED: Converted labels to Title Case and removed uppercase transformations.
  */
 
 const formatCompact = (num: number) => {
@@ -27,28 +27,28 @@ export default function StatsBar() {
 
   const items = useMemo(() => [
     { 
-      label: "QUESTIONS", 
+      label: "Questions", 
       val: (formatCompact(stats?.totalQuestions) || "439") + "+", 
       icon: <Zap className="h-3 w-3 md:h-6 md:w-6 text-blue-600" />,
       bgColor: "bg-blue-50/50",
       borderColor: "border-blue-100/50"
     },
     { 
-      label: "MOCKS", 
+      label: "Mock Tests", 
       val: (formatCompact(stats?.totalMocks) || "8") + "+", 
       icon: <ClipboardList className="h-3 w-3 md:h-6 md:w-6 text-purple-600" />,
       bgColor: "bg-purple-50/50",
       borderColor: "border-purple-100/50"
     },
     { 
-      label: "CATEGORIES", 
+      label: "Categories", 
       val: (formatCompact(stats?.totalCategories) || "214") + "+", 
       icon: <ShieldCheck className="h-3 w-3 md:h-6 md:w-6 text-emerald-600" />,
       bgColor: "bg-emerald-50/50",
       borderColor: "border-emerald-100/50"
     },
     { 
-      label: "ASPIRANTS", 
+      label: "Aspirants", 
       val: (formatCompact(stats?.totalUsers) || "6") + "+", 
       icon: <Users className="h-3 w-3 md:h-6 md:w-6 text-orange-600" />,
       bgColor: "bg-orange-50/50",
@@ -77,7 +77,7 @@ export default function StatsBar() {
                     {item.val}
                   </span>
                 )}
-                <span className="text-[6px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest mt-0.5 md:mt-3 leading-none truncate w-full">
+                <span className="text-[6px] md:text-[11px] font-bold text-slate-400 mt-0.5 md:mt-3 leading-none truncate w-full">
                   {item.label}
                 </span>
               </div>

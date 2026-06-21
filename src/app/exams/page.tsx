@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo, useEffect, useState } from "react"
@@ -7,7 +6,7 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useCollection, useFirestore, useUser } from "@/firebase"
 import { collection, query, orderBy, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "firebase/firestore"
-import { Landmark, ChevronRight, Zap, BookOpen, Search, Star, CheckCircle2, RefreshCw, Layers } from "lucide-react"
+import { Landmark, ChevronRight, Zap, BookOpen, Search, Star, CheckCircle2, RefreshCw, Layers, GraduationCap } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -19,7 +18,8 @@ import { AuthorityLogo } from "@/lib/exam-icons"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview High-Density Category Explorer v28.0 (Instant Pinning Enabled).
+ * @fileOverview High-Density Category Explorer v29.0.
+ * UPDATED: Simplified "Master Registry" to "Exam Hub" and removed uppercase.
  */
 
 const AUTHORIZED_CATEGORY_IDS = [
@@ -91,7 +91,7 @@ export default function ExamsEntryPage() {
           <div className="space-y-1 md:space-y-3">
              <div className="flex items-center gap-2">
                 <div className="h-7 w-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary shadow-inner"><Landmark className="h-4 w-4" /></div>
-                <span className="text-[9px] font-black text-slate-400 tracking-[0.2em] uppercase">Selection Hub</span>
+                <span className="text-[9px] font-black text-slate-400 tracking-widest uppercase">Selection Hub</span>
              </div>
              <h1 className="text-2xl md:text-6xl font-black text-[#0F172A] leading-tight tracking-tight uppercase">Choose Category</h1>
              <p className="text-slate-500 font-medium text-[11px] md:text-lg max-w-2xl">Find your exam or browse by recruitment category below.</p>

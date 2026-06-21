@@ -18,8 +18,8 @@ import { doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 
 /**
- * @fileOverview Official High-Density PWA Hero v36.0.
- * OPTIMIZED: Increased spacing for better visual balance.
+ * @fileOverview Official High-Density PWA Hero v37.0.
+ * UPDATED: Simplified "Explore Registry" to "Explore Exams" and removed uppercase.
  */
 
 export default function Hero() {
@@ -96,11 +96,11 @@ export default function Hero() {
 
         {/* CTAs */}
         <div className="flex flex-row gap-3 md:gap-5 mt-8 md:mt-12 justify-center lg:justify-start">
-          <Button asChild className="flex-1 md:flex-none h-14 md:h-18 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest px-6 md:px-14 shadow-xl active:scale-95 transition-all">
+          <Button asChild className="flex-1 md:flex-none h-14 md:h-18 rounded-full font-black text-xs md:text-sm tracking-widest px-6 md:px-14 shadow-xl active:scale-95 transition-all border-none">
             <Link href="/mocks" className="flex items-center gap-2">Start Free Mock <ArrowRight className="h-4 w-4" /></Link>
           </Button>
-          <Button asChild variant="outline" className="flex-1 md:flex-none h-14 md:h-18 rounded-full font-black uppercase text-[10px] md:text-xs tracking-widest px-6 md:px-14 shadow-sm border-2 active:scale-95 transition-all">
-            <Link href="/exams">Explore Registry</Link>
+          <Button asChild variant="outline" className="flex-1 md:flex-none h-14 md:h-18 rounded-full font-black text-xs md:text-sm tracking-widest px-6 md:px-14 shadow-sm border-2 active:scale-95 transition-all">
+            <Link href="/exams">Explore Exams</Link>
           </Button>
         </div>
       </div>
