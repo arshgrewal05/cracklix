@@ -26,8 +26,7 @@ import { clearAppCache } from "@/app/actions/maintenance"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Master Admin Maintenance Terminal v2.0 (PWA Optimized).
- * FIXED: Added missing Input import.
+ * @fileOverview Master Admin Maintenance Terminal v2.1 (Fixed Imports).
  */
 
 export default function MaintenancePage() {
@@ -226,7 +225,7 @@ export default function MaintenancePage() {
                </div>
                <Input 
                  value={deleteMatch} 
-                 onChange={e => setDeleteMatch(e.target.value)} 
+                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDeleteMatch(e.target.value)} 
                  className="h-12 md:h-14 rounded-xl border-slate-200 bg-slate-50 text-center font-black text-rose-600 uppercase tracking-widest" 
                  placeholder="Type here..."
                />

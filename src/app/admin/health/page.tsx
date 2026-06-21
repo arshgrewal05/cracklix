@@ -11,8 +11,8 @@ import { collection } from "firebase/firestore"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Hardened Operational Node Monitor v4.3.
- * FIXED: Added missing React import and verified cloneElement usage.
+ * @fileOverview Hardened Operational Node Monitor v4.4.
+ * FIXED: Explicitly typed cloneElement and verified React imports.
  */
 
 export default function PlatformHealth() {
@@ -84,10 +84,10 @@ export default function PlatformHealth() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8 px-1">
-         <HealthCard label="API Latency" value={`${heartbeat.latency}ms`} status="Optimal" color="text-emerald-600" icon={<Zap className="text-primary" />} />
-         <HealthCard label="Registry Density" value={questions?.length || 0} status="Verified" color="text-blue-600" icon={<Database className="text-blue-500" />} />
-         <HealthCard label="Traffic Node" status="Active" value={results?.length || 0} color="text-emerald-600" icon={<Activity className="text-emerald-500" />} />
-         <HealthCard label="Compute Load" status="Balanced" value={`${heartbeat.load}%`} color="text-emerald-600" icon={<Server className="text-rose-500" />} />
+         <HealthCard label="API Latency" value={`${heartbeat.latency}ms`} status="Optimal" color="text-emerald-600" icon={<Zap />} />
+         <HealthCard label="Registry Density" value={questions?.length || 0} status="Verified" color="text-blue-600" icon={<Database />} />
+         <HealthCard label="Traffic Node" status="Active" value={results?.length || 0} color="text-emerald-600" icon={<Activity />} />
+         <HealthCard label="Compute Load" status="Balanced" value={`${heartbeat.load}%`} color="text-emerald-600" icon={<Server />} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10 px-1">
@@ -160,7 +160,9 @@ export default function PlatformHealth() {
 function HealthCard({ label, value, status, icon, color }: any) {
    return (
       <Card className="border-none shadow-lg bg-white p-5 md:p-8 rounded-2xl md:rounded-[2rem] relative overflow-hidden group border border-slate-50">
-         <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5 group-hover:scale-110 transition-transform">{icon}</div>
+         <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5 group-hover:scale-110 transition-transform">
+            {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<any>, { className: cn("h-5 w-5 md:h-8 md:w-8", color) })}
+         </div>
          <div className="space-y-3 md:space-y-4 relative z-10 text-left">
             <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{label}</p>
             <p className="text-2xl md:text-4xl font-black text-[#0F172A] tabular-nums leading-none">{value}</p>
