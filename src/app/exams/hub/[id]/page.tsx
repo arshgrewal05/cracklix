@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 /**
- * @fileOverview Hierarchical Board Selection Hub v63.0.
- * FLOW: Board -> Exam Selection. Terminology: "Open Exam".
- * HARDENED: Zero-content cards are automatically hidden.
+ * @fileOverview Hierarchical Board Hub v65.0.
+ * FLOW: Category → Board → Exam Selection.
+ * Terminology: "Open Exam".
  */
 
 export default function HubExamsPage() {
@@ -64,8 +64,9 @@ export default function HubExamsPage() {
 
   const exams = useMemo(() => {
     if (!rawExams) return [];
-    return rawExams.filter((e: any) => (statsMap[e.id]?.total || 0) > 0);
-  }, [rawExams, statsMap]);
+    // Show all exams for a board, but maybe highlight the ones with content
+    return rawExams.sort((a: any, b: any) => (b.displayOrder || 0) - (a.displayOrder || 0));
+  }, [rawExams]);
 
   const handleTogglePin = async (e: React.MouseEvent, examId: string) => {
     e.preventDefault(); e.stopPropagation();
@@ -104,8 +105,10 @@ export default function HubExamsPage() {
                {exams.map((exam) => {
                   const s = statsMap[exam.id] || { full: 0, subject: 0, sectional: 0, pyq: 0, total: 0 };
                   const isPinned = profile?.pinnedExams?.includes(exam.id);
+                  const hasContent = s.total > 0;
+
                   return (
-                    <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-10 text-left cursor-pointer">
+                    <Card key={exam.id} onClick={() => router.push(`/exams/${exam.id}`)} className={cn("border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden h-full flex flex-col p-10 text-left cursor-pointer", !hasContent && "opacity-60 grayscale-[0.5]")}>
                        <div className="flex justify-between items-start mb-8">
                           <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
                              <GraduationCap className="h-7 w-7 text-primary" />
@@ -117,11 +120,15 @@ export default function HubExamsPage() {
                        <h3 className="text-xl md:text-2xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors mb-6">{exam.name}</h3>
                        
                        <div className="mt-auto space-y-8">
-                          <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                             {s.full > 0 && <span className="flex items-center gap-1.5"><Zap className="h-3 w-3" /> {s.full} Full Mocks</span>}
-                             {s.subject > 0 && <span className="flex items-center gap-1.5"><BookOpen className="h-3 w-3" /> {s.subject} Subject Tests</span>}
-                             {s.pyq > 0 && <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {s.pyq} PYQs</span>}
-                          </div>
+                          {hasContent ? (
+                            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                               {s.full > 0 && <span className="flex items-center gap-1.5"><Zap className="h-3 w-3" /> {s.full} Full Mocks</span>}
+                               {s.subject > 0 && <span className="flex items-center gap-1.5"><BookOpen className="h-3 w-3" /> {s.subject} Subject Tests</span>}
+                               {s.pyq > 0 && <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {s.pyq} PYQs</span>}
+                            </div>
+                          ) : (
+                            <Badge variant="outline" className="bg-slate-50 text-slate-400 border-none px-3 py-1 font-black text-[9px] uppercase">Coming Soon</Badge>
+                          )}
                           <Button className="w-full h-12 rounded-xl bg-[#0F172A] hover:bg-primary text-white font-black uppercase text-[11px] tracking-[0.2em] gap-3 shadow-md border-none transition-all active:scale-95">
                              Open Exam <ChevronRight className="h-4 w-4" />
                           </Button>
