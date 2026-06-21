@@ -25,7 +25,7 @@ import { useUser } from "@/firebase"
 import Link from "next/link"
 
 /**
- * @fileOverview High-Fidelity PWA Install Hub v1.7 (Build Fixed).
+ * @fileOverview High-Fidelity PWA Install Hub v1.8 (Syntax Fixed).
  * FIXED: Terminated all JSX return blocks correctly to resolve build failures.
  */
 
@@ -176,7 +176,7 @@ export default function InstallPage() {
                                 disabled={!isInstallable && !isIos}
                                 className="w-full h-16 md:h-20 bg-primary hover:bg-blue-700 text-white font-black uppercase tracking-[0.3em] text-[11px] rounded-2xl shadow-3xl transition-all active:scale-95 border-none gap-4"
                              >
-                                <Download className="h-6 w-6" /> {isInstallable ? 'INSTALL CRACKLIX APP' : 'BROWSER NOT READY'}
+                                <Download className="h-6 w-6" /> {isInstallable ? 'INSTALL APP NOW' : 'BROWSER NOT READY'}
                              </Button>
                              {!isInstallable && !isIos && (
                                 <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl flex items-center gap-3">
