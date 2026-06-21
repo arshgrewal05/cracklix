@@ -3,8 +3,9 @@ import { Shield, GraduationCap, Scale, Zap, Stethoscope, Landmark, BookOpen, Act
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional Branding Engine v15.0 (Single Source of Truth).
+ * @fileOverview Institutional Branding Engine v16.0 (Equalized Size).
  * RESOLVER: Maps board/category IDs to official high-fidelity local assets.
+ * OPTIMIZATION: Increased scale to 1.8 to normalize logos with large transparent padding.
  */
 
 // 1. CANONICAL BOARD REGISTRY (Single Source of Truth)
@@ -76,7 +77,7 @@ export const AuthorityLogo = ({ board, category, boardId, categoryId, className,
         <img 
           src={logoUrl} 
           alt="Official Authority Logo" 
-          className="h-full w-full object-contain animate-in fade-in duration-500 scale-[1.5]"
+          className="h-full w-full object-contain animate-in fade-in duration-500 scale-[1.8]"
           referrerPolicy="no-referrer"
           onError={(e) => {
             (e.target as any).style.display = 'none';
