@@ -13,6 +13,7 @@ interface ExamCardProps {
 /**
  * @fileOverview Refined Exam Card v4.0 (Premium Upgrade).
  * UI UPGRADE: Large board logos and dynamic resource availability chips.
+ * UI FIX: Removed uppercase from titles.
  */
 export default function ExamCard({ exam }: ExamCardProps) {
   return (
@@ -27,7 +28,7 @@ export default function ExamCard({ exam }: ExamCardProps) {
           </div>
           
           <div className="flex-1 space-y-6">
-            <h3 className="font-headline text-2xl md:text-3xl font-black text-[#0B1F3A] group-hover:text-primary transition-colors uppercase leading-tight">
+            <h3 className="font-headline text-2xl md:text-3xl font-black text-[#0B1F3A] group-hover:text-primary transition-colors leading-tight">
               {exam.name}
             </h3>
             

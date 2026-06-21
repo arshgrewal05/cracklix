@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
  * @fileOverview Institutional Category Discovery v112.0.
  * UPDATED: Real-time data aggregation for Exams, Mocks, and PYQs.
  * NO HARDCODED STATS: All numbers are derived from live database records.
+ * UI FIX: Removed uppercase from headings and titles.
  */
 
 const STRICT_WHITELIST = [
@@ -48,7 +49,7 @@ export default function FeaturedCategories() {
     <section className="py-16 bg-white border-t border-slate-50">
       <div className="container mx-auto px-4 max-w-7xl space-y-12 text-left">
         <div className="space-y-2 px-2">
-           <h2 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight uppercase">Choose Your Category</h2>
+           <h2 className="text-3xl md:text-5xl font-black text-[#0F172A] leading-tight tracking-tight">Choose Your Category</h2>
            <p className="text-slate-500 font-medium text-sm md:text-lg">Select a recruitment vertical to browse verified boards and mock tests.</p>
         </div>
 
@@ -71,17 +72,17 @@ export default function FeaturedCategories() {
             return (
               <motion.div key={cat.id} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.05 }}>
                  <Link href={`/exams/category/${cat.id}`}>
-                    <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-2xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden flex flex-col p-8 md:p-10 h-full relative">
+                    <Card className="border border-[#E5E7EB] shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2.5rem] bg-white group overflow-hidden flex flex-col p-8 md:p-10 h-full relative">
                        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-1000">
                           <AuthorityLogo category={cat} size="xl" />
                        </div>
                        
                        <div className="mb-8 flex justify-start">
-                          <AuthorityLogo category={cat} size="lg" className="bg-slate-50 rounded-2xl shadow-inner group-hover:scale-105 transition-transform" />
+                          <AuthorityLogo category={cat} size="lg" className="bg-slate-50 rounded-2xl shadow-inner group-hover:scale-105 transition-transform shadow-inner" />
                        </div>
                        
                        <div className="space-y-4 flex-1">
-                          <h3 className="text-2xl md:text-3xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight uppercase">{cat.title}</h3>
+                          <h3 className="text-2xl md:text-3xl font-black text-[#0F172A] group-hover:text-primary transition-colors leading-tight">{cat.title}</h3>
                           <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">{cat.description}</p>
                           
                           {/* REAL-TIME STATS GRID */}

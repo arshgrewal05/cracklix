@@ -32,6 +32,7 @@ import { AuthorityLogo } from "@/lib/exam-icons"
 /**
  * @fileOverview Institutional Exam Detail Hub v48.0.
  * UI FIX: Enlarged logos by removing padding and using XL sizes.
+ * UI FIX: Removed uppercase from primary titles.
  */
 
 export default function ExamHubPage() {
@@ -210,7 +211,7 @@ function NotesList({ data, isPassActive, loading, type }: any) {
                         {isLocked ? <Lock className="h-6 w-6 text-amber-500" /> : <Layers className={cn("h-6 w-6", type === 'PYQ' ? 'text-emerald-500' : 'text-blue-500')} />}
                      </div>
                      <div className="min-w-0">
-                        <h3 className="text-lg font-black text-[#0F172A] truncate max-w-[300px] uppercase leading-none">{item.title}</h3>
+                        <h3 className="text-lg font-black text-[#0F172A] truncate max-w-[300px] leading-none">{item.title}</h3>
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">{item.category || type} Node</p>
                      </div>
                   </div>

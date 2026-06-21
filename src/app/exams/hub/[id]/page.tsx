@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast"
 /**
  * @fileOverview Premium Board Hub v70.0.
  * UI UPGRADE: Large logos and dynamic resource availability chips.
+ * UI FIX: Removed uppercase from titles.
  */
 
 export default function HubExamsPage() {
@@ -116,7 +117,7 @@ export default function HubExamsPage() {
                        </div>
                        
                        <div className="space-y-4 md:space-y-6 flex-1">
-                          <h3 className="text-2xl md:text-3xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors uppercase">{exam.name}</h3>
+                          <h3 className="text-2xl md:text-3xl font-black text-[#0F172A] leading-tight group-hover:text-primary transition-colors">{exam.name}</h3>
                           
                           <div className="flex flex-wrap gap-2 md:gap-3">
                              {s.full > 0 && <AvailabilityBadge label="Full Mock Tests" emoji="📚" />}

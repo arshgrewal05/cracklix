@@ -20,6 +20,7 @@ import { AuthorityLogo } from "@/lib/exam-icons"
 /**
  * @fileOverview Dynamic Latest Mock Tests Hub v65.0 (Branding Integrated).
  * AUTO-RESOLUTION: Every exam card inherits parent board branding.
+ * UI FIX: Removed uppercase from headings and titles.
  */
 
 export default function LatestMocks() {
@@ -73,7 +74,7 @@ export default function LatestMocks() {
                         <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {mock.duration} Mins</span>
                      </div>
                      <div className="flex items-center justify-center gap-3 pt-2">
-                        {isPremium && <Badge className="bg-amber-50 text-amber-600 border-none text-[8px] font-black px-3 py-1 rounded-lg">PREMIUM</Badge>}
+                        {isPremium && <Badge className="bg-amber-50 text-amber-600 border-none text-[8px] font-black px-3 py-1 rounded-lg uppercase">PREMIUM</Badge>}
                         <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase">
                            <Users className="h-3 w-3" /> {mock.attemptsCount || 450}+ Attempts
                         </div>

@@ -14,6 +14,7 @@ import { AuthorityLogo } from "@/lib/exam-icons"
 /**
  * @fileOverview Hierarchical Category Hub v52.0.
  * UI FIX: Enlarged logos by removing padding and using XL sizes.
+ * UI FIX: Removed uppercase from titles.
  */
 
 export default function CategoryHubsPage() {

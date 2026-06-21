@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 /**
  * @fileOverview Official Live Hero Hub v19.0.
  * NORMALIZED: Stats and labels follow Title Case.
+ * UI FIX: Removed uppercase from primary headline.
  */
 
 const formatCompact = (num: number) => {

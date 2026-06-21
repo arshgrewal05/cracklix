@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 /**
  * @fileOverview Popular Punjab Exams Hub v74.0 (Premium Upgrade).
  * UI UPGRADE: Large board logos and availability markers.
+ * UI FIX: Removed uppercase from headings and titles.
  */
 
 const POPULAR_LIST = [
@@ -52,7 +53,7 @@ export default function PopularExams() {
                         </div>
                         
                         <div className="flex-1 space-y-5">
-                           <h3 className="text-xl md:text-2xl font-black text-[#04102B] leading-tight group-hover:text-primary transition-colors uppercase">
+                           <h3 className="text-xl md:text-2xl font-black text-[#04102B] leading-tight group-hover:text-primary transition-colors">
                               {p.name}
                            </h3>
                            

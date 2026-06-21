@@ -16,6 +16,7 @@ import { AuthorityLogo } from "@/lib/exam-icons"
 /**
  * @fileOverview Search Center Hub v3.0 (Branding Integrated).
  * FIXED: Replaced generic icons with AuthorityLogo resolver for exam results.
+ * UI FIX: Removed uppercase from result titles.
  */
 
 export default function SearchPage() {
