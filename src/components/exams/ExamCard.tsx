@@ -10,8 +10,7 @@ interface ExamCardProps {
 }
 
 /**
- * @fileOverview Refined Exam Card v4.9 (Build Fixed).
- * FIXED: Corrected property mapping for title/name to prevent TS errors.
+ * @fileOverview Refined Exam Card v5.0 (Type Hardened).
  */
 export default function ExamCard({ exam }: ExamCardProps) {
   const examName = exam.name || exam.title || "Official Vertical";
