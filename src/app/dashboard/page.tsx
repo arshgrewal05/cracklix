@@ -111,13 +111,13 @@ export default function StudentDashboard() {
     const avgAcc = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
     
     const totalSeconds = sorted.reduce((acc: number, r: any) => acc + (r.timeTaken || 0), 0)
-    const timeFormatted = totalSeconds >= 3600 ? `${(totalSeconds / 3600).toFixed(1)}h` : 
+    const timeFormattedValue = totalSeconds >= 3600 ? `${(totalSeconds / 3600).toFixed(1)}h` : 
                        totalSeconds >= 60 ? `${Math.floor(totalSeconds / 60)}m` : `${totalSeconds}s`;
     
     const uniqueDays = new Set(sorted.filter((r: any) => r.timestamp).map((r: any) => new Date(r.timestamp).toDateString()))
     const readiness = Math.min(100, Math.round((avgAcc * 0.7) + (Math.min(total, 30) * 1)))
 
-    return { total, avgAccuracy: avgAcc, streak: uniqueDays.size, readiness, hours: timeFormatted, list: sorted.slice(0, 8) }
+    return { total, avgAccuracy: avgAcc, streak: uniqueDays.size, readiness, hours: timeFormattedValue, list: sorted.slice(0, 8) }
   }, [rawResults])
 
   if (!mounted || authLoading || (user && !profile)) return (
@@ -144,7 +144,7 @@ export default function StudentDashboard() {
                  <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
                     <UserIcon className="h-5 w-5" />
                  </div>
-                 <p className="text-xs md:text-sm font-bold uppercase tracking-tight">Complete your profile for state merit rankings and better recommendations.</p>
+                 <p className="text-xs md:sm font-bold uppercase tracking-tight">Complete your profile for state merit rankings and better recommendations.</p>
               </div>
               <div className="flex gap-2 w-full md:w-auto">
                  <Button asChild size="sm" className="bg-white text-blue-600 hover:bg-slate-100 flex-1 md:flex-none h-9 px-6 rounded-lg text-[9px]">

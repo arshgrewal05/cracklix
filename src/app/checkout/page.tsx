@@ -127,7 +127,9 @@ function CheckoutContent() {
       
       <main className="container mx-auto px-4 md:px-6 py-8 md:py-16 max-w-6xl pb-40">
         <div className="flex items-center gap-4 mb-8">
-           <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-2xl h-12 w-12 border border-slate-200 bg-white"><ArrowLeft className="h-6 w-6" /></Button>
+           <button onClick={() => router.back()} className="h-10 w-10 md:h-12 md:w-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50 transition-colors">
+              <ArrowLeft className="h-5 w-5" />
+           </button>
            <h1 className="text-2xl md:text-4xl font-black text-[#0F172A] uppercase">Checkout</h1>
         </div>
 
@@ -135,8 +137,8 @@ function CheckoutContent() {
            <div className="lg:col-span-7 space-y-8">
               <Tabs defaultValue="online" className="w-full">
                  <TabsList className="bg-slate-100 p-1 h-14 rounded-2xl w-full mb-8 grid grid-cols-2">
-                    <TabsTrigger value="online" className="rounded-xl font-black uppercase text-[10px] h-full flex items-center gap-2">SECURE ONLINE</TabsTrigger>
-                    {planData.price > 0 && <TabsTrigger value="manual" className="rounded-xl font-black uppercase text-[10px] h-full flex items-center gap-2">MANUAL UPI</TabsTrigger>}
+                    <TabsTrigger value="online" className="rounded-xl font-black uppercase text-[10px] h-full flex items-center justify-center gap-2">SECURE ONLINE</TabsTrigger>
+                    {planData.price > 0 && <TabsTrigger value="manual" className="rounded-xl font-black uppercase text-[10px] h-full flex items-center justify-center gap-2">MANUAL UPI</TabsTrigger>}
                  </TabsList>
 
                  <TabsContent value="online">
@@ -152,7 +154,7 @@ function CheckoutContent() {
                  </TabsContent>
 
                  <TabsContent value="manual">
-                    <Card className="border-none shadow-3xl rounded-[2.5rem] bg-white p-8 md:p-10 space-y-10">
+                    <Card className="border-none shadow-5xl rounded-[2.5rem] bg-white p-8 md:p-10 space-y-10">
                        <div className="flex flex-col items-center gap-8">
                           <Image src={qrUrl} alt="QR Code for UPI Payment" width={200} height={200} className="h-44 w-44 md:h-52 md:w-52 object-contain" />
                           <div className="w-full p-4 bg-slate-900 rounded-xl flex items-center justify-between shadow-2xl">
