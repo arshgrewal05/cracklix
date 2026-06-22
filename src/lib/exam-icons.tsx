@@ -1,12 +1,10 @@
-
 import React from "react"
 import { Shield, GraduationCap, Scale, Zap, Stethoscope, Landmark, BookOpen, Activity, Cpu, Building2, Globe, Settings, FileText, FileStack } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
 /**
- * @fileOverview Institutional Branding Engine v26.0.
- * UPDATED: Integrated branded Mock Test, Study Material, and PYQ assets.
+ * @fileOverview Institutional Branding Engine v26.1 (Optimized).
  */
 
 const CANONICAL_BOARD_LOGOS: Record<string, string> = {

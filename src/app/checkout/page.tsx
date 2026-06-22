@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
@@ -19,6 +18,10 @@ import Script from "next/script"
 import { cn } from "@/lib/utils"
 import { Capacitor } from "@capacitor/core"
 import Image from "next/image"
+
+/**
+ * @fileOverview Hardened Checkout Page v2.2 (ESLint Hardened).
+ */
 
 export default function CheckoutPage() {
   return (
@@ -75,8 +78,6 @@ function CheckoutContent() {
     }
 
     try {
-      // APK COMPATIBILITY: Static exports purge /api routes.
-      // We must target the remote Vercel node when running in native mode.
       const baseUrl = Capacitor.isNativePlatform() 
         ? (process.env.NEXT_PUBLIC_SITE_URL || "https://cracklix.vercel.app") 
         : "";
@@ -156,7 +157,14 @@ function CheckoutContent() {
                  <TabsContent value="manual">
                     <Card className="border-none shadow-5xl rounded-[2.5rem] bg-white p-8 md:p-10 space-y-10">
                        <div className="flex flex-col items-center gap-8">
-                          <Image src={qrUrl} alt="QR Code for UPI Payment" width={200} height={200} className="h-44 w-44 md:h-52 md:w-52 object-contain" />
+                          <div className="relative h-44 w-44 md:h-52 md:w-52">
+                            <Image 
+                              src={qrUrl} 
+                              alt="QR Code for UPI Payment" 
+                              fill
+                              className="object-contain" 
+                            />
+                          </div>
                           <div className="w-full p-4 bg-slate-900 rounded-xl flex items-center justify-between shadow-2xl">
                              <p className="text-[13px] md:text-base font-black text-white truncate">{upiId}</p>
                              <Button size="icon" variant="ghost" onClick={() => { navigator.clipboard.writeText(upiId); toast({title:"Copied"}); }} className="text-primary hover:bg-white/5"><Copy className="h-4 w-4" /></Button>

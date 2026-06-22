@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useEffect, useState } from "react";
@@ -22,8 +21,7 @@ import { AuthorityLogo } from "@/lib/exam-icons";
 import Image from "next/image"
 
 /**
- * @fileOverview Official High-Density PWA Hero v51.0.
- * FIXED: Optimized QuickActionCard spacing to prevent text clipping on long labels.
+ * @fileOverview Official High-Density PWA Hero v51.1 (Optimized).
  */
 
 export default function Hero() {
@@ -75,7 +73,7 @@ export default function Hero() {
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="relative">
               <Image 
                 src="/images/hero-student.png" 
-                alt="Cracklix Student" 
+                alt="Cracklix Student Preparation" 
                 width={600}
                 height={600}
                 className="w-full max-w-xl drop-shadow-2xl h-auto object-contain" 
@@ -87,7 +85,7 @@ export default function Hero() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="lg:hidden flex justify-center mt-4">
             <Image 
               src="/images/hero-student.png" 
-              alt="Cracklix Student" 
+              alt="Cracklix Student Hub" 
               width={300}
               height={300}
               className="h-[140px] w-auto drop-shadow-xl" 

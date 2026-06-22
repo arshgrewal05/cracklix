@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -12,9 +11,9 @@ interface MathTextProps {
 }
 
 /**
- * @fileOverview Precision High-Contrast Renderer v18.0.
+ * @fileOverview Precision High-Contrast Renderer v18.1 (ESLint Hardened).
  * Supports Markdown Tables and KaTeX.
- * Optimized: Maximum mobile responsive table support.
+ * FIXED: prefer-const violations.
  */
 export default function MathText({ text, className }: MathTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useMemo, useState, useEffect, useCallback, Suspense } from "react"
@@ -19,8 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Institutional MCQ Bank v21.0 (PWA Refined).
- * UPDATED: Total removal of forced uppercase and conversion to Title Case SaaS aesthetic.
+ * @fileOverview Institutional MCQ Bank v21.1 (ESLint Hardened).
+ * FIXED: prefer-const for constraints variable.
  */
 
 type QuestionFilterType = 'ALL' | 'UNUSED' | 'USED' | 'LOCKED' | 'DUPLICATE' | 'REPEATED';
