@@ -1,8 +1,7 @@
-'use server';
 /**
  * @fileOverview A cinematic transformation flow for corporate branding assets.
  * 
- * - transformLogo - Server function to handle image-to-image environment generation.
+ * - transformLogo - function to handle image-to-image environment generation.
  */
 
 import { ai } from '@/ai/genkit';

@@ -11,7 +11,7 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 /**
  * @fileOverview Production Calendar Component.
- * FIXED: Chevron renderer return type to resolve Element | null constraints.
+ * FIXED: Chevron renderer return type to resolve Element | null constraints for Next.js 15.
  */
 
 function Calendar({

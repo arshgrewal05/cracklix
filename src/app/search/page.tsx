@@ -13,9 +13,8 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Production Search Hub v2.4.
- * FIXED: Explicit React import and type-safe cloneElement.
- * FIXED: Resolved 'item' reference error.
+ * @fileOverview Production Search Hub v2.7.
+ * FIXED: Resolved UMD React reference and cloneElement type safety.
  */
 
 export default function SearchPage() {

@@ -11,10 +11,11 @@ interface ExamCardProps {
 }
 
 /**
- * @fileOverview Refined Exam Card v5.0 (Type Hardened).
+ * @fileOverview Refined Exam Card v5.1.
+ * FIXED: Aligned property access with canonical Exam interface.
  */
 export default function ExamCard({ exam }: ExamCardProps) {
-  const examName = exam.name || exam.title || "Official Vertical";
+  const examName = exam.name || "Official Vertical";
   
   return (
     <Link href={`/exams/${exam.id}`}>

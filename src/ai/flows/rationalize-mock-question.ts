@@ -1,5 +1,3 @@
-
-'use server';
 /**
  * @fileOverview An AI-powered tutor that provides step-by-step explanations for mock exam questions.
  *

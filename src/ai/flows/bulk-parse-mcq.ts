@@ -1,5 +1,3 @@
-
-'use server';
 /**
  * @fileOverview Final Exam Content Formatter AI v15.0.
  * 
