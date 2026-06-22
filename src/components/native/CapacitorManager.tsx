@@ -8,7 +8,7 @@ import { Browser } from '@capacitor/browser';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
 /**
- * @fileOverview Global Native App Bridge v1.4 (Hardened).
+ * @fileOverview Global Native App Bridge v1.5 (Hardened).
  * Intercepts web behaviors to provide a high-fidelity Android experience.
  * FIXED: Wrapped native APIs in isNativePlatform guard to prevent web crashes.
  */
@@ -23,19 +23,21 @@ export default function CapacitorManager() {
     console.log('[NATIVE_BRIDGE] Initializing Android Environment');
 
     // 2. Share Bridge: Intercept navigator.share for Native Share Sheet
-    const originalShare = navigator.share;
-    navigator.share = async (data: any) => {
-      try {
-        await Share.share({
-          title: data.title || 'Cracklix',
-          text: data.text || 'Prepare for Punjab Government Exams with Cracklix.',
-          url: data.url || window.location.href,
-        });
-      } catch (err) {
-        if (originalShare) return originalShare(data);
-      }
-      return undefined;
-    };
+    if (typeof navigator !== 'undefined') {
+      const originalShare = navigator.share;
+      navigator.share = async (data: any) => {
+        try {
+          await Share.share({
+            title: data.title || 'Cracklix',
+            text: data.text || 'Prepare for Punjab Government Exams with Cracklix.',
+            url: data.url || window.location.href,
+          });
+        } catch (err) {
+          if (originalShare) return originalShare(data);
+        }
+        return undefined;
+      };
+    }
 
     // 3. Hardware Back Button Handling
     App.addListener('backButton', ({ canGoBack }) => {
@@ -66,14 +68,16 @@ export default function CapacitorManager() {
       const anchor = target.closest('a');
       
       if (anchor && anchor.href) {
-        const url = new URL(anchor.href);
-        const isExternal = url.hostname !== window.location.hostname;
-        const isPdf = anchor.href.endsWith('.pdf');
+        try {
+          const url = new URL(anchor.href);
+          const isExternal = url.hostname !== window.location.hostname;
+          const isPdf = anchor.href.endsWith('.pdf');
 
-        if (isExternal || isPdf) {
-          e.preventDefault();
-          Browser.open({ url: anchor.href });
-        }
+          if (isExternal || isPdf) {
+            e.preventDefault();
+            Browser.open({ url: anchor.href });
+          }
+        } catch (e) {}
       }
     };
 

@@ -5,7 +5,7 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useUser, useCollection, useFirestore, useAuth } from "@/firebase"
 import { collection, query, where, doc, updateDoc, serverTimestamp, deleteDoc } from "firebase/firestore"
-import { deleteUser } from "firebase/auth"
+import { deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -52,11 +52,11 @@ import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Profile Center v33.0 (Compliance Hardened).
+ * @fileOverview Student Profile Center v34.0 (Compliance Hardened).
  * FIXED: Full Account Purge (Auth + Firestore) for Play Store compliance.
  */
 export default function ProfilePage() {
-  const { user, profile, loading, profileLoading, currentDeviceId } = useUser()
+  const { user, profile, loading, profileLoading } = useUser()
   const db = useFirestore()
   const auth = useAuth()
   const router = useRouter()
@@ -74,13 +74,6 @@ export default function ProfilePage() {
     targetExam: ""
   })
   const [isSaving, setIsSaving] = useState(false)
-
-  const devicesQuery = useMemo(() => {
-    if (!db || !user) return null
-    return collection(db, "users", user.uid, "devices")
-  }, [db, user])
-
-  const { data: devices, loading: devicesLoading } = useCollection<any>(devicesQuery)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -139,18 +132,12 @@ export default function ProfilePage() {
 
   const handleUpdateProfile = async () => {
     if (!db || !user || !editForm) return
-    const mandatory = ['name', 'email', 'phone', 'dob', 'address', 'targetExam'];
-    const missing = mandatory.find(key => !editForm[key]?.trim());
-    if (missing) {
-      toast({ variant: "destructive", title: "Wait", description: `Please enter your ${missing.toUpperCase()}.` });
-      return;
-    }
     setIsSaving(true)
     try {
        const digits = editForm.phone.replace(/\D/g, '');
        const finalPhone = `+91 ${digits}`;
        await updateDoc(doc(db, "users", user.uid), { ...editForm, phone: finalPhone, updatedAt: serverTimestamp() })
-       toast({ title: "Profile Updated", description: "Your profile details have been saved." })
+       toast({ title: "Profile Updated" })
        setIsEditing(false)
     } catch (e: any) {
        toast({ variant: "destructive", title: "Error", description: e.message })
@@ -163,12 +150,8 @@ export default function ProfilePage() {
      if (deleteConfirm !== 'DELETE' || !user || !db) return;
      setIsSaving(true);
      try {
-        // 1. Purge Firestore Record
         await deleteDoc(doc(db, 'users', user.uid));
-        
-        // 2. Purge Firebase Auth Record (Mandatory for Compliance)
         await deleteUser(user);
-        
         toast({ title: "Account Purged", description: "All data nodes have been deleted." });
         router.push('/login');
      } catch (e: any) {
@@ -177,22 +160,17 @@ export default function ProfilePage() {
            toast({ 
              variant: "destructive", 
              title: "Security Barrier", 
-             description: "For your protection, please re-login and try deleting again immediately." 
+             description: "Please re-login and try again immediately." 
            });
         } else {
-           toast({ variant: "destructive", title: "Deletion Failed", description: "Could not authorize account purge." });
+           toast({ variant: "destructive", title: "Deletion Failed" });
         }
      } finally {
         setIsSaving(false);
      }
   };
 
-  if (loading) return (
-     <div className="min-h-[100dvh] bg-white flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Loading Profile...</p>
-     </div>
-  );
+  if (loading) return null;
 
   return (
     <div className="min-h-[100dvh] bg-slate-50/50 font-body pb-safe text-left">
@@ -208,7 +186,7 @@ export default function ProfilePage() {
                       <Skeleton className="h-16 w-16 md:h-44 md:w-44 rounded-2xl md:rounded-[3rem] bg-white/5" />
                     ) : (
                       <div className="relative">
-                        <StudentAvatar profile={profile} className="h-16 w-16 md:h-44 md:w-44 border-[2px] md:border-[4px] border-white/10 rounded-2xl md:rounded-[3rem] relative bg-[#0F172A]" />
+                        <StudentAvatar profile={profile} className="h-16 w-16 md:h-44 md:w-44 border-[2px] md:border-[4px] border-white/10 rounded-2xl md:rounded-[3rem] bg-[#0F172A]" />
                         <div className="absolute -bottom-1 -right-1 bg-emerald-500 h-5 w-5 md:h-12 md:w-12 rounded-lg border-[2px] md:border-[4px] border-[#0B1528] flex items-center justify-center shadow-xl">
                           <ShieldCheck className="h-3 w-3 md:h-6 md:w-6 text-white" />
                         </div>
@@ -244,8 +222,6 @@ export default function ProfilePage() {
         <div className="container mx-auto px-3 md:px-6 lg:px-12 max-w-6xl -mt-6 md:-mt-12 relative z-20">
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-12">
               <div className="lg:col-span-8 space-y-4 md:space-y-12">
-                 
-                 {/* PASS STATUS CARD */}
                  {passInfo && (
                     <Card className="border-none shadow-3xl rounded-2xl md:rounded-[2.5rem] bg-white p-5 md:p-12 overflow-hidden relative group border border-slate-100">
                        <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: passInfo.color }} />
@@ -302,13 +278,7 @@ export default function ProfilePage() {
 
                     <div className="pt-8 md:pt-12 border-t border-slate-50 space-y-4">
                        <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Persistence</p>
-                       <Button 
-                          onClick={() => setIsDeleting(true)}
-                          variant="ghost" 
-                          className="w-full h-10 text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl font-black uppercase text-[8px] tracking-widest transition-all gap-2"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" /> Delete My Account
-                       </Button>
+                       <Button onClick={() => setIsDeleting(true)} variant="ghost" className="w-full h-10 text-rose-500 hover:bg-rose-50 rounded-xl font-black uppercase text-[8px] tracking-widest transition-all gap-2"><Trash2 className="h-3.5 w-3.5" /> Delete My Account</Button>
                     </div>
                  </Card>
               </div>
@@ -365,24 +335,13 @@ export default function ProfilePage() {
                <div className="space-y-2">
                   <DialogTitle className="text-2xl font-black uppercase text-rose-600">Delete Account</DialogTitle>
                   <DialogDescription className="text-slate-500 text-sm leading-relaxed">
-                     This action is permanent and cannot be undone. All your mock attempts, results, and elite pass access will be purged. Type <strong>DELETE</strong> to authorize.
+                     This action is permanent. Type <strong>DELETE</strong> to authorize full registry purge.
                   </DialogDescription>
                </div>
-               <Input 
-                  value={deleteConfirm}
-                  onChange={(e) => setDeleteConfirm(e.target.value)}
-                  className="h-12 rounded-xl bg-slate-50 border-slate-100 text-center font-black tracking-widest text-rose-500"
-                  placeholder="---"
-               />
+               <Input value={deleteConfirm} onChange={(e) => setDeleteConfirm(e.target.value)} className="h-12 rounded-xl bg-slate-50 border-slate-100 text-center font-black tracking-widest text-rose-500" placeholder="---" />
                <div className="flex gap-4 pt-2">
                   <Button variant="ghost" onClick={() => setIsDeleting(false)} className="flex-1 rounded-xl h-12 font-black uppercase text-[9px] text-slate-400">Cancel</Button>
-                  <Button 
-                    onClick={handleDeleteAccount}
-                    disabled={deleteConfirm !== 'DELETE' || isSaving}
-                    className="flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-xl h-12 font-black uppercase text-[9px] shadow-lg border-none active:scale-95 transition-all"
-                  >
-                     Authorize Purge
-                  </Button>
+                  <Button onClick={handleDeleteAccount} disabled={deleteConfirm !== 'DELETE' || isSaving} className="flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-xl h-12 font-black uppercase text-[9px] shadow-lg border-none active:scale-95 transition-all">Authorize Purge</Button>
                </div>
             </div>
          </DialogContent>
