@@ -14,8 +14,8 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Production Search Hub v3.1.
- * FIXED: Resolved React UMD module errors and variable scope issues.
+ * @fileOverview Production Search Hub v3.2.
+ * FIXED: Explicit imports and isValidElement guard for icon cloning.
  */
 
 export default function SearchPage() {
@@ -164,11 +164,11 @@ function SearchContent() {
                     <div className="relative z-10 space-y-8">
                        <h4 className="font-black text-[10px] text-slate-400 uppercase tracking-[0.4em]">Preparation Assets</h4>
                        <div className="flex flex-wrap gap-3">
-                          <SearchBadge label="Army Hub" />
-                          <SearchBadge label="PPSC Hub" />
-                          <SearchBadge label="Clerk Series" />
-                          <SearchBadge label="Elite Pass" />
-                          <SearchBadge label="Merit List" />
+                          <SearchBadge label="Army Hub" onSelect={setQuery} />
+                          <SearchBadge label="PPSC Hub" onSelect={setQuery} />
+                          <SearchBadge label="Clerk Series" onSelect={setQuery} />
+                          <SearchBadge label="Elite Pass" onSelect={setQuery} />
+                          <SearchBadge label="Merit List" onSelect={setQuery} />
                        </div>
                     </div>
                  </Card>
@@ -218,9 +218,13 @@ function TrendingItem({ text, onSelect }: { text: string, onSelect: (v: string) 
    )
 }
 
-function SearchBadge({ label }: { label: string }) {
+function SearchBadge({ label, onSelect }: { label: string, onSelect: (v: string) => void }) {
    return (
-      <Badge variant="outline" className="rounded-xl px-4 py-2 border-slate-200 bg-slate-50/50 text-[9px] font-black uppercase tracking-widest text-slate-500 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all cursor-pointer active:scale-95 shadow-sm">
+      <Badge 
+         onClick={() => onSelect(label)}
+         variant="outline" 
+         className="rounded-xl px-4 py-2 border-slate-200 bg-slate-50/50 text-[9px] font-black uppercase tracking-widest text-slate-500 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all cursor-pointer active:scale-95 shadow-sm"
+      >
          {label}
       </Badge>
    )
