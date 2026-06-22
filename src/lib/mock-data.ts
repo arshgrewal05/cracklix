@@ -1,8 +1,7 @@
-import { Exam, MockTest, Question, CurrentAffairType, Notification } from "@/types";
+import { Exam, MockTest, Question, CurrentAffairType } from "@/types";
 
 /**
  * @fileOverview Institutional Mock Data v2.2.
- * FIXED: Aligned properties with canonical Exam and Question types.
  */
 
 export const EXAMS: Exam[] = [

@@ -31,7 +31,6 @@ import Link from "next/link"
 
 /**
  * @fileOverview Institutional Support Ticket Management Console v5.9.
- * FIXED: Restored Link and Loader2 imports.
  */
 
 export default function SupportPage() {

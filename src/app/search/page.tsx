@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils"
 
 /**
  * @fileOverview Production Search Hub v3.4.
- * FIXED: Explicit imports and isValidElement guard for icon cloning to satisfy Next.js 15 build constraints.
  */
 
 export default function SearchPage() {
