@@ -14,8 +14,8 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Production Search Hub v3.6.
- * FIXED: Explicit React imports and cloneElement hardening.
+ * @fileOverview Production Search Hub v3.7.
+ * FIXED: Resolved 'React' refers to a UMD global and cloneElement Attributes mismatch.
  */
 
 export default function SearchPage() {
