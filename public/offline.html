@@ -1,67 +1,23 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Offline | Cracklix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cracklix | Offline</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            color: #0F172A;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-            padding: 20px;
-        }
-        .icon {
-            width: 80px;
-            height: 80px;
-            background-color: #F1F5F9;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 24px;
-        }
-        h1 {
-            font-weight: 900;
-            font-size: 24px;
-            margin: 0 0 12px 0;
-            text-transform: uppercase;
-        }
-        p {
-            color: #64748B;
-            font-size: 16px;
-            margin: 0 0 32px 0;
-            max-width: 300px;
-            line-height: 1.5;
-        }
-        button {
-            background-color: #1677FF;
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 100px;
-            font-weight: 900;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(22, 119, 255, 0.2);
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #0B1528; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .container { max-width: 400px; padding: 20px; }
+        h1 { font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase; font-size: 2rem; margin-bottom: 10px; color: #1677FF; }
+        p { color: #94A3B8; font-weight: 500; }
+        .btn { display: inline-block; margin-top: 20px; background: #1677FF; color: white; padding: 12px 30px; border-radius: 12px; text-decoration: none; font-weight: 900; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <div class="icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1677FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+    <div class="container">
+        <h1>Sync Lost</h1>
+        <p>You are currently offline. Check your connectivity to continue your preparation.</p>
+        <a href="/" class="btn">Retry Node Sync</a>
     </div>
-    <h1>Offline Mode</h1>
-    <p>Please check your internet connection to sync your preparation progress.</p>
-    <button onclick="window.location.reload()">Retry Connection</button>
 </body>
 </html>

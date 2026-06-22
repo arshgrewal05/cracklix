@@ -16,11 +16,11 @@ const withPWA = require("next-pwa")({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   
-  // Enabled only for Capacitor Android builds to bundle files locally
-  output: process.env.NEXT_PUBLIC_ANDROID_APP ? 'export' : undefined,
+  // Hardened for Capacitor static export
+  output: 'export',
 
   images: {
-    unoptimized: process.env.NEXT_PUBLIC_ANDROID_APP ? true : false,
+    unoptimized: true, // Required for static export
     remotePatterns: [
       {
         protocol: "https",

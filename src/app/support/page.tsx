@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo } from "react"
@@ -108,9 +109,9 @@ export default function SupportPage() {
                  Raise tickets for institutional issues or pass activation assistance.
               </p>
            </div>
-           <Button onClick={() => setIsRaising(true)} className="h-16 px-10 bg-primary hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-3xl gap-3">
+           <button onClick={() => setIsRaising(true)} className="h-16 px-10 bg-primary hover:bg-blue-700 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-3xl flex items-center gap-3 active:scale-95 transition-all border-none">
               <Plus className="h-5 w-5" /> Raise New Ticket
-           </Button>
+           </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -122,7 +123,7 @@ export default function SupportPage() {
 
               {ticketsLoading ? (
                  <div className="space-y-4">
-                    {Array.from({ length: 3 }).map((_, i) => <Skeleton className="h-32 w-full rounded-[2rem]" />)}
+                    {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 w-full rounded-[2rem]" />)}
                  </div>
               ) : tickets && tickets.length > 0 ? (
                  <div className="space-y-4">
@@ -234,10 +235,10 @@ export default function SupportPage() {
                </div>
             </div>
             <DialogFooter className="p-6 md:p-10 pt-4 bg-slate-50 border-t border-slate-100 flex flex-row gap-4">
-               <Button variant="ghost" onClick={() => setIsRaising(false)} className="h-11 md:h-12 px-6 font-black uppercase text-[10px] text-slate-400">Discard</Button>
-               <Button onClick={handleRaiseTicket} disabled={raisingLoading} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 border-none">
+               <button onClick={() => setIsRaising(false)} className="h-11 md:h-12 px-6 font-black uppercase text-[10px] text-slate-400 bg-transparent border-none cursor-pointer">Discard</button>
+               <button onClick={handleRaiseTicket} disabled={raisingLoading} className="flex-1 bg-primary hover:bg-blue-700 text-white h-11 md:h-12 rounded-full font-black uppercase text-[10px] tracking-widest shadow-xl flex items-center justify-center gap-2 active:scale-95 border-none cursor-pointer">
                   {raisingLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Transmit Node
-               </Button>
+               </button>
             </DialogFooter>
          </DialogContent>
       </Dialog>
