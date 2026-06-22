@@ -7,8 +7,8 @@ import { Browser } from '@capacitor/browser';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
 /**
- * @fileOverview Global Native App Bridge v2.3.
- * FIXED: Async listener handles are now properly resolved before removal to prevent type errors.
+ * @fileOverview Global Native App Bridge v2.7.
+ * FIXED: Properly handled async listener removal logic.
  */
 export default function CapacitorManager() {
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function CapacitorManager() {
       return;
     }
 
-    const listeners: PluginListenerHandle[] = [];
+    const listeners: (PluginListenerHandle | null)[] = [];
 
     const setupListeners = async () => {
       // Hardware Back Button Handling
@@ -70,7 +70,7 @@ export default function CapacitorManager() {
     
     return () => {
       document.removeEventListener('click', handleLinkClick);
-      listeners.forEach(l => l.remove());
+      listeners.forEach(l => l?.remove());
     };
   }, []);
 
