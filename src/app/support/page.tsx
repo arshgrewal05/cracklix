@@ -30,7 +30,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import Link from "next/link"
 
 /**
- * @fileOverview Institutional Support Ticket Management Console v5.9.
+ * @fileOverview Institutional Support Ticket Management Console v6.0.
  */
 
 export default function SupportPage() {
