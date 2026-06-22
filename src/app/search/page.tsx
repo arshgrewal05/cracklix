@@ -206,7 +206,7 @@ function TrendingItem({ text, onSelect }: { text: string, onSelect: (v: string) 
          onClick={() => onSelect(text)}
          className="flex items-center gap-4 text-slate-400 text-sm font-bold hover:text-white cursor-pointer transition-colors group active:scale-95"
       >
-         <Sparkles className="h-4 w-4 text-primary group-hover:animate-pulse" /> 
+         <item.icon className="h-4 w-4 text-primary group-hover:animate-pulse" /> 
          <span className="uppercase tracking-tight truncate">{text}</span>
       </li>
    )

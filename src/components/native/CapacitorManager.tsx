@@ -12,12 +12,12 @@ export default function CapacitorManager() {
       return;
     }
 
-    let backListener: PluginListenerHandle | null = null;
-    let urlListener: PluginListenerHandle | null = null;
+    let backListenerHandle: PluginListenerHandle | null = null;
+    let urlListenerHandle: PluginListenerHandle | null = null;
 
     const setupListeners = async () => {
       // Hardware Back Button Handling
-      backListener = await App.addListener('backButton', ({ canGoBack }) => {
+      backListenerHandle = await App.addListener('backButton', ({ canGoBack }) => {
         if (!canGoBack) {
           App.exitApp();
         } else {
@@ -26,7 +26,7 @@ export default function CapacitorManager() {
       });
 
       // Deep Link Listener
-      urlListener = await App.addListener('appUrlOpen', (data) => {
+      urlListenerHandle = await App.addListener('appUrlOpen', (data) => {
         const slug = data.url.split('.app').pop();
         if (slug) window.location.href = slug;
       });
@@ -65,8 +65,8 @@ export default function CapacitorManager() {
     
     return () => {
       document.removeEventListener('click', handleLinkClick);
-      if (backListener) backListener.remove();
-      if (urlListener) urlListener.remove();
+      if (backListenerHandle) backListenerHandle.remove();
+      if (urlListenerHandle) urlListenerHandle.remove();
     };
   }, []);
 
