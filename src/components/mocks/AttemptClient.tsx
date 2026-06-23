@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, getDoc, updateDoc, serverTimestamp, collection, query, where, documentId, getDocs, setDoc } from "firebase/firestore";
 import { useExamStore } from "@/store/useExamStore";
@@ -26,11 +27,27 @@ import {
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
-export default function AttemptClient({ mockId }: { mockId: string }) {
+/**
+ * @fileOverview Official Mock Attempt Client Hub.
+ * FIXED: Standardized ID retrieval to prevent 404s in static builds.
+ */
+
+export default function AttemptClient({ mockId: propMockId }: { mockId?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const db = useFirestore();
   const { user, profile } = useUser();
   const { toast } = useToast();
+
+  const mockId = useMemo(() => {
+    if (propMockId) return propMockId;
+    const queryId = searchParams.get('id');
+    if (queryId) return queryId;
+    const pathSegments = pathname.split('/');
+    const lastSegment = pathSegments[pathSegments.length - 2]; // For /mocks/[id]/attempt
+    return lastSegment !== 'attempt' ? lastSegment : null;
+  }, [pathname, searchParams, propMockId]);
 
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
@@ -128,7 +145,7 @@ export default function AttemptClient({ mockId }: { mockId: string }) {
   }, [isInitializing, initError, tick]);
 
   const handleSubmitFinal = useCallback(async () => {
-    if (!db || isSubmittingFinal || !user || !mockData) return;
+    if (!db || isSubmittingFinal || !user || !mockData || !mockId) return;
     setIsSubmittingFinal(true);
     
     try {
@@ -171,7 +188,7 @@ export default function AttemptClient({ mockId }: { mockId: string }) {
       await setDoc(resultRef, resultPayload, { merge: true });
       await updateDoc(attemptRef, { status: 'COMPLETED', updatedAt: serverTimestamp() });
       
-      router.replace(`/results/${mockId}`);
+      router.replace(`/results/view?id=${mockId}`);
     } catch (e: any) {
       toast({
         variant: "destructive",
@@ -196,12 +213,12 @@ export default function AttemptClient({ mockId }: { mockId: string }) {
     </div>
   );
 
-  if (initError) return (
+  if (initError || !mockId) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-white p-10 text-center space-y-8">
        <AlertCircle className="h-16 w-16 text-rose-500" />
        <div className="space-y-2">
           <h2 className="text-2xl font-black text-[#0F172A] uppercase leading-tight">Sync Failure</h2>
-          <p className="text-slate-500 font-medium max-w-sm mx-auto">{initError}</p>
+          <p className="text-slate-500 font-medium max-w-sm mx-auto">{initError || "Mock context lost."}</p>
        </div>
        <Button onClick={() => router.replace('/dashboard')} className="h-14 px-10 bg-[#0F172A] text-white rounded-2xl font-black uppercase text-[10px]">Return to Dashboard</Button>
     </div>

@@ -1,7 +1,8 @@
+
 "use client"
 
 import React, { useMemo, useEffect, useState } from "react"
-import { useParams, useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useDoc, useFirestore, useUser } from "@/firebase"
@@ -30,14 +31,27 @@ import { cn } from "@/lib/utils"
 
 const SUPER_ADMIN_WHITELIST = ['arshdeepgrewal1122@gmail.com'];
 
+/**
+ * @fileOverview Universal Mock Overview Hub Client.
+ * FIXED: Standardized ID retrieval to handle both path segments and query parameters.
+ */
+
 export default function MockOverviewClient() {
-  const params = useParams()
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const db = useFirestore()
   const { user, profile, loading: userLoading } = useUser()
-  const mockId = params.id as string
   
+  // SUPPORT DUAL ROUTING (Path ID vs Query ID)
+  const mockId = useMemo(() => {
+    const queryId = searchParams.get('id');
+    if (queryId) return queryId;
+    const pathSegments = pathname.split('/');
+    const lastSegment = pathSegments[pathSegments.length - 1];
+    return lastSegment !== 'view' ? lastSegment : null;
+  }, [pathname, searchParams]);
+
   const { data: mock, loading: mockLoading } = useDoc<any>(useMemo(() => (db && mockId ? doc(db, "mocks", mockId) : null), [db, mockId]))
   
   const [isLocked, setIsLocked] = useState(false);
@@ -52,7 +66,7 @@ export default function MockOverviewClient() {
 
   useEffect(() => {
     async function checkAccess() {
-      if (mockLoading || !user || !mock || !db || !profile) return;
+      if (mockLoading || !user || !mock || !db || !profile || !mockId) return;
 
       const tier = (mock.accessLevel || 'FREE').toUpperCase();
       const isPremium = tier === 'PREMIUM';
@@ -82,14 +96,23 @@ export default function MockOverviewClient() {
     checkAccess();
   }, [mock, mockLoading, user, profile, db, mockId]);
 
-  if (mockLoading || userLoading || (user && !accessChecked)) return (
+  if (mockLoading || userLoading || (user && mockId && !accessChecked)) return (
     <div className="h-screen w-full flex flex-col items-center justify-center bg-white space-y-6">
        <Zap className="h-12 w-12 text-primary animate-pulse" />
        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">Synchronizing Hub...</p>
     </div>
   );
 
-  if (!user) return null;
+  if (!mockId || (!mock && !mockLoading)) return (
+    <div className="h-screen flex flex-col items-center justify-center text-center p-6 space-y-6">
+       <AlertCircle className="h-16 w-16 text-slate-200" />
+       <div className="space-y-1">
+          <h2 className="text-2xl font-black text-[#0F172A] uppercase">Registry Link Missing</h2>
+          <p className="text-slate-500 font-medium max-w-xs mx-auto">This practice series could not be verified in the current build.</p>
+       </div>
+       <Button onClick={() => router.back()} variant="outline" className="rounded-xl h-12 px-8">Return Back</Button>
+    </div>
+  );
 
   if (isLocked) return (
      <div className="min-h-screen bg-slate-50 flex flex-col font-body">
@@ -161,7 +184,7 @@ export default function MockOverviewClient() {
               </div>
               <div className="w-full md:w-auto shrink-0 pt-4">
                  <Button asChild className="w-full md:w-auto h-16 md:h-20 px-10 md:px-16 bg-[#0F172A] hover:bg-black text-white font-black uppercase tracking-[0.2em] text-[10px] md:text-[12px] rounded-2xl md:rounded-[2rem] shadow-4xl transition-all active:scale-95 border-none">
-                   <Link href={`/mocks/${mock.id}/instructions`} className="flex items-center justify-center gap-4">
+                   <Link href={`/mocks/instructions?id=${mock.id}`} className="flex items-center justify-center gap-4">
                      {activeAttempt?.status === 'IN_PROGRESS' ? <RefreshCw className="h-5 w-5" /> : <Play className="h-5 w-5 fill-current text-primary" />} 
                      {activeAttempt?.status === 'IN_PROGRESS' ? 'RESUME PREP' : 'START TEST'}
                    </Link>
@@ -207,4 +230,10 @@ function FeatureNode({ icon: Icon, title, desc }: any) {
       </div>
     </div>
   );
+}
+
+function AlertCircle(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+  )
 }

@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useMemo, useEffect, Suspense, cloneElement, isValidElement, ReactElement } from "react"
@@ -13,8 +14,8 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Global Search Hub v3.1 (Flicker Fixed).
- * FIXED: Removed UMD React reference and added explicit type casting to prevent lag.
+ * @fileOverview Global Search Hub v3.2 (Production Hardened).
+ * FIXED: Resolved 'React refers to a UMD global' by adding explicit imports and type guards.
  */
 
 export default function SearchPage() {
@@ -64,7 +65,7 @@ function SearchContent() {
     ).map((e: any) => ({ 
        title: e.name, 
        type: "Exam Center", 
-       href: `/exams/${e.id}`, 
+       href: `/exams/view?id=${e.id}`, 
        boardId: e.boardId,
        icon: <GraduationCap className="h-5 w-5" />
     }))
@@ -75,7 +76,7 @@ function SearchContent() {
     ).map((m: any) => ({ 
        title: m.title, 
        type: "Practice Test", 
-       href: `/mocks/${m.id}`, 
+       href: `/mocks/view?id=${m.id}`, 
        boardId: m.boardId,
        icon: <Zap className="h-5 w-5" />
     }))

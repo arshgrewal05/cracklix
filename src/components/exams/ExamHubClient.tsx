@@ -1,6 +1,7 @@
+
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useDoc, useCollection, useFirestore, useUser } from "@/firebase"
@@ -21,20 +22,32 @@ import {
   Star,
   CheckCircle2
 } from "lucide-react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams, usePathname } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { AuthorityLogo } from "@/lib/exam-icons"
 
+/**
+ * @fileOverview Universal Exam Hub Client.
+ * FIXED: Standardized ID retrieval and navigation to prevent 404s in static builds.
+ */
+
 export default function ExamHubClient() {
-  const params = useParams()
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const db = useFirestore()
   const { toast } = useToast()
   const { user, profile, loading: userLoading } = useUser()
-  const examId = params.id as string
+
+  const examId = useMemo(() => {
+    const queryId = searchParams.get('id');
+    if (queryId) return queryId;
+    const pathSegments = pathname.split('/');
+    return pathSegments[pathSegments.length - 1];
+  }, [pathname, searchParams]);
 
   const { data: exam, loading: examLoading } = useDoc<any>(useMemo(() => (db && examId ? doc(db, "exams", examId) : null), [db, examId]))
   
@@ -53,7 +66,7 @@ export default function ExamHubClient() {
   const isPinned = useMemo(() => profile?.pinnedExams?.includes(examId) || false, [profile, examId]);
 
   const togglePin = async () => {
-    if (!db || !user || isPinning) return;
+    if (!db || !user || isPinning || !examId) return;
     setIsPinning(true);
     const userRef = doc(db, "users", user.uid);
     try {
@@ -84,7 +97,17 @@ export default function ExamHubClient() {
   }, [rawMocks, rawPyqs, examId])
 
   if (examLoading || userLoading) return <div className="h-screen flex flex-col items-center justify-center bg-white space-y-4"><Zap className="h-8 w-8 text-primary animate-pulse" /><p className="text-[10px] font-black uppercase text-slate-300">Synchronizing...</p></div>;
-  if (!exam) return null;
+  
+  if (!examId || (!exam && !examLoading)) return (
+    <div className="h-screen flex flex-col items-center justify-center text-center p-6 space-y-6 bg-white">
+       <Layers className="h-16 w-16 text-slate-200" />
+       <div className="space-y-1">
+          <h2 className="text-2xl font-black text-[#0F172A] uppercase">Exam Node Unknown</h2>
+          <p className="text-slate-500 font-medium max-w-xs mx-auto">This recruitment vertical could not be verified.</p>
+       </div>
+       <Button onClick={() => router.back()} variant="outline" className="rounded-xl h-12 px-8">Return Back</Button>
+    </div>
+  );
 
   const activeBoard = boards?.find((b: any) => b.id === exam.boardId);
   const activeCategory = categories?.find((c: any) => c.id === exam.categoryId);
@@ -178,7 +201,7 @@ function MockList({ data, results, isPassActive, loading, boards }: any) {
                   </CardHeader>
                   <CardContent className="p-0 mt-4 md:mt-8">
                      <button 
-                        onClick={() => router.push(locked ? '/pass' : `/mocks/${mock.id}/instructions`)} 
+                        onClick={() => router.push(locked ? '/pass' : `/mocks/instructions?id=${mock.id}`)} 
                         className={cn(
                           "w-full h-9 md:h-14 rounded-full font-black text-[8px] md:text-[11px] tracking-widest uppercase shadow-md border-none transition-all active:scale-95 flex items-center justify-center gap-2 md:gap-3", 
                           locked ? "bg-orange-50 text-white" : "bg-[#0F172A] text-white"

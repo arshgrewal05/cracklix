@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -6,6 +7,11 @@ import { DayPicker } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+
+/**
+ * @fileOverview Refined Calendar Component v2.1 (Hardened).
+ * FIXED: Resolved TS return type errors for Next.js 15 build worker.
+ */
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
@@ -55,7 +61,7 @@ function Calendar({
         Chevron: ({ orientation }) => {
           if (orientation === "left") return <ChevronLeft className="h-4 w-4" />;
           if (orientation === "right") return <ChevronRight className="h-4 w-4" />;
-          return <span />;
+          return <ChevronRight className="h-4 w-4 invisible" />;
         },
       }}
       {...props}

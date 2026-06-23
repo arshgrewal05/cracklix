@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo } from "react"
@@ -18,8 +19,8 @@ import { cn } from "@/lib/utils"
 import { AuthorityLogo } from "@/lib/exam-icons"
 
 /**
- * @fileOverview High-Density Mock Grid v76.0.
- * UPDATED: Responsive logo sizing and Title Case normalization.
+ * @fileOverview High-Density Mock Grid v77.0 (Stable Path).
+ * UPDATED: Switched dynamic paths to query parameters (?id=...) to ensure 100% routing stability in static builds.
  */
 
 export default function LatestMocks() {
@@ -90,7 +91,7 @@ export default function LatestMocks() {
                        "w-full h-8 md:h-14 rounded-full font-black text-[8px] md:text-[11px] tracking-[0.2em] uppercase shadow-md border-none transition-all active:scale-95 gap-2", 
                        locked ? "bg-orange-500 hover:bg-orange-600 text-white" : "bg-[#0F172A] hover:bg-black text-white"
                      )}>
-                        <Link href={locked ? '/pass' : `/mocks/${mock.id}`}>
+                        <Link href={locked ? '/pass' : `/mocks/view?id=${mock.id}`}>
                            {locked ? <Lock className="h-2.5 w-2.5 md:h-4 md:w-4" /> : null}
                            {locked ? 'Unlock' : 'Start'}
                         </Link>
