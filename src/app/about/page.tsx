@@ -5,27 +5,16 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { motion } from "framer-motion"
 import { 
-  ShieldCheck, 
-  Target, 
-  Zap, 
+  ShieldCheck,  
   ChevronRight, 
-  Sparkles, 
-  Quote, 
-  ArrowRight,
-  BookOpen,
+  Sparkles,  
   Users,
-  Compass,
   Trophy,
-  History,
   Landmark,
-  Loader2,
   LucideIcon
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 import { useFirestore, useDoc } from "@/firebase"
 import { doc } from "firebase/firestore"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -33,6 +22,7 @@ import Image from "next/image"
 
 /**
  * @fileOverview Institutional About Center v21.1 (High Density).
+ * UPDATED: Replaced img with next/image for performance.
  */
 
 export default function AboutPage() {
@@ -46,7 +36,7 @@ export default function AboutPage() {
   const founderImg = "https://i.ibb.co/5hkxTtKS/Whats-App-Image-2026-05-28-at-10-31-36-AM.jpg";
 
   const statsRef = useMemo(() => (db ? doc(db, "settings", "stats") : null), [db]);
-  const { data: stats, loading: statsLoading } = useDoc<any>(statsRef);
+  const { data: stats } = useDoc<any>(statsRef);
 
   const liveStats = useMemo(() => {
     const totalUsers = stats?.totalUsers || 0;
@@ -118,13 +108,13 @@ export default function AboutPage() {
                     className="lg:col-span-5 relative"
                  >
                     <div className="relative aspect-[4/5] rounded-[2rem] md:rounded-[3.5rem] overflow-hidden border border-white/10 shadow-5xl group bg-[#0B1528] max-w-[280px] md:max-w-none mx-auto">
-                       <Image 
-                         src={founderImg} 
-                         fill
-                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" 
-                         alt="Arsh Grewal"
-                         priority
-                       />
+                      <Image
+                        src={founderImg}
+                        alt="Arsh Grewal"
+                        fill
+                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
+                        loading="eager"
+                      />
                        <div className="absolute inset-0 bg-gradient-to-t from-[#020817] via-transparent to-transparent opacity-80" />
                        <div className="absolute bottom-6 left-6 right-6">
                           <p className="text-lg md:text-2xl font-black uppercase tracking-tight">Arsh Grewal</p>
