@@ -34,7 +34,7 @@ import StudentAvatar from "@/components/brand/StudentAvatar"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
- * @fileOverview Student Dashboard v41.0 (Hardened Logic).
+ * @fileOverview Student Dashboard v42.0 (Hardened Logic).
  * FIXED: Study Hours logic correctly handles durations and filters out corruption.
  */
 export default function StudentDashboard() {
