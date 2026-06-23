@@ -13,7 +13,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Global Search Hub v2.0 (Type Hardened).
+ * @fileOverview Global Search Hub v2.1.
  * FIXED: Resolved TS2769 and UMD global errors by explicitly importing React 
  * and using strict type guards for cloneElement.
  */
