@@ -6,8 +6,8 @@ import { doc, updateDoc, serverTimestamp, setDoc, Firestore } from 'firebase/fir
 import { initializeFirebase } from '@/firebase/app';
 
 /**
- * @fileOverview Hardened Exam State Hub v2.1.
- * FIXED: Removed duplicate property keys for production stability.
+ * @fileOverview Hardened Exam State Hub v2.2.
+ * FIXED: Removed duplicate property keys for production stability and resolved language type conflicts.
  */
 
 interface ExamStore extends AttemptState {
@@ -54,8 +54,8 @@ export const useExamStore = create<ExamStore>((set, get) => ({
   mockId: '',
   mockTitle: '',
   userId: '',
-  language: 'ENGLISH_PUNJABI',
-  baseLanguageMode: 'ENGLISH_PUNJABI',
+  language: 'ENGLISH_PUNJABI' as LanguageDisplayMode,
+  baseLanguageMode: 'ENGLISH_PUNJABI' as LanguageDisplayMode,
   isPaused: false,
   isSubmitting: false,
   isPaletteVisible: true,

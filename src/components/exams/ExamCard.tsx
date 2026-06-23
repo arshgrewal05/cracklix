@@ -11,11 +11,11 @@ interface ExamCardProps {
 }
 
 /**
- * @fileOverview Exam Vertical Card v1.7.
+ * @fileOverview Exam Vertical Card v1.8.
  * FIXED: Resolved property access errors by correctly mapping canonical Exam interface fields.
  */
 export default function ExamCard({ exam }: ExamCardProps) {
-  const examName = exam.name || exam.title || "Official Vertical";
+  const examName = exam.name || "Official Vertical";
   
   return (
     <Link href={`/exams/${exam.id}`}>
