@@ -29,6 +29,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import Link from "next/link"
 
+/**
+ * @fileOverview Institutional Support Hub v2.1.
+ * FIXED: Missing Link and Loader2 imports causing build failures.
+ */
+
 export default function SupportPage() {
   const { user, profile } = useUser()
   const db = useFirestore()
