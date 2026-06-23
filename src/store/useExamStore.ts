@@ -6,8 +6,8 @@ import { doc, updateDoc, serverTimestamp, setDoc, Firestore } from 'firebase/fir
 import { initializeFirebase } from '@/firebase/app';
 
 /**
- * @fileOverview Hardened Exam State Hub v2.0.
- * FIXED: Removed duplicate property keys and corrected type assignments for production stability.
+ * @fileOverview Hardened Exam State Hub v2.1.
+ * FIXED: Removed duplicate property keys for production stability.
  */
 
 interface ExamStore extends AttemptState {
