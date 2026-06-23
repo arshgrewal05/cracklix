@@ -13,9 +13,9 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 /**
- * @fileOverview Global Search Hub v2.1.
+ * @fileOverview Global Search Hub v2.2.
  * FIXED: Resolved TS2769 and UMD global errors by explicitly importing React 
- * and using strict type guards for cloneElement.
+ * and using strict type guards for cloneElement to ensure a clean build.
  */
 
 export default function SearchPage() {

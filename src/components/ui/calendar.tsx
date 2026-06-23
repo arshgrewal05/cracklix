@@ -10,7 +10,7 @@ import { buttonVariants } from "@/components/ui/button"
 /**
  * @fileOverview Custom Calendar UI.
  * UPDATED: Refactored for react-day-picker v9 compatibility (Next.js 15).
- * FIXED: TypeScript return element type error for Chevron component.
+ * FIXED: TypeScript return element type error for Chevron component by returning a fallback element.
  */
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
@@ -61,7 +61,7 @@ function Calendar({
         Chevron: ({ orientation }) => {
           if (orientation === "left") return <ChevronLeft className="h-4 w-4" />;
           if (orientation === "right") return <ChevronRight className="h-4 w-4" />;
-          return <div className="h-4 w-4" />; // Fallback element instead of null to satisfy TS
+          return <div className="h-4 w-4" />; // Fallback element instead of null to satisfy TS return requirements
         },
       }}
       {...props}

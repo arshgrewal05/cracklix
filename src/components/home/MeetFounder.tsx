@@ -7,6 +7,11 @@ import { ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
+/**
+ * @fileOverview Meet Founder section.
+ * UPDATED: Replaced <img> with optimized <Image /> component.
+ */
+
 export default function MeetFounder() {
   const founderImg = "https://i.ibb.co/5hkxTtKS/Whats-App-Image-2026-05-28-at-10-31-36-AM.jpg";
 
@@ -22,6 +27,7 @@ export default function MeetFounder() {
                 alt="Arsh Grewal"
                 fill
                 className="object-cover grayscale group-hover:grayscale-0 transition-all scale-105 group-hover:scale-100 duration-1000"
+                priority
               />
             </div>
 
